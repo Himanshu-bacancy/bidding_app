@@ -11,7 +11,6 @@ class Childsubcategory extends PS_Model {
 	 */
 	function __construct() 
 	{
-		die('hiiii Himanshu how ypu doing ?');
 		parent::__construct( 'bs_childsubcategories', 'id', 'childsubcat' );
 	}
 

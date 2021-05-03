@@ -69,7 +69,7 @@
 				<?php endif; ?>
 
 					<td>
-						<a href='<?php echo $module_site_url .'/addoption/'. $sizegroup->id; ?>' title= "Size Options">
+						<a href='<?php echo 'sizegroupoption/index/'. $sizegroup->id; ?>' title= "Size Options">
 							<i style='font-size: 18px;' class='fa fa-plus'></i>
 						</a>
 					</td>

@@ -33,12 +33,10 @@ class Subcategories extends BE_Controller {
 	{
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
-
 		// get rows count
 		$this->data['rows_count'] = $this->Subcategory->count_all_by( $conds );
 		// get categories
 		$this->data['subcategories'] = $this->Subcategory->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
-
 		// load index logic
 		parent::index();
 	}

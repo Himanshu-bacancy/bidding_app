@@ -36,7 +36,6 @@ class Childsubcategories extends BE_Controller {
 		$this->data['rows_count'] = $this->Childsubcategory->count_all_by( $conds );
 		// get categories
 		$this->data['child_subcategories'] = $this->Childsubcategory->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
-		echo '<pre>'; print_r($this->data); die;
 		// load index logic
 		parent::index();
 	}
