@@ -880,15 +880,38 @@ class PS_Delete {
 	 *
 	 * @param      <type>  $id     The identifier
 	 */
-	function delete_sizegroup( $price_id )
+	function delete_sizegroup( $sizeGroup_id )
 	{		
-		if ( ! $this->CI->Sizegroups->delete( $price_id )) {
+		if ( ! $this->CI->Sizegroups->delete( $sizeGroup_id )) {
 		// if there is an error in deleting currency,
 			
 			return false;
 		}
 
+		if ( ! $this->delete_sizegroup_option_trigger( $sizeGroup_id )) {
+		// if error in deleteing sizegroup_option related data
 
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Trigger to delete sizegroup_option data when sizeGroup_id is deleted
+	 * delete sizegroup_option
+	 */
+	function delete_sizegroup_option_trigger( $sizeGroup_id )
+	{
+		//var_dump($this->CI->Sizegroup_option); exit;
+		$conds = array('sizegroup_id' => $sizeGroup_id );
+		
+		if ( ! $this->CI->Sizegroup_option->delete_by( $conds )) {
+		// if there is an error in deleting currency,
+			
+			return false;
+		}
+		
 		return true;
 	}
 

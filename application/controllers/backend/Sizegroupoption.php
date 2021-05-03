@@ -40,7 +40,7 @@ class Sizegroupoption extends BE_Controller
 		$conds['order_by_type'] = "desc";
 		//die('hello testing');
 		$conds['sizegroup_id'] = $sizegroupId;
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 		// get rows count
 		$this->data['rows_count'] = $this->Sizegroup_option->count_all_by( $conds );
 		$this->data['sizegroup_id'] = $sizegroupId;
@@ -66,7 +66,7 @@ class Sizegroupoption extends BE_Controller
 	 */
 	function search($sizegroupId = NULL)
 	{
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 		// breadcrumb urls
 		$this->data['action_title'] = get_msg('sizegroup_option_search');
 		// condition with search term
@@ -153,7 +153,7 @@ class Sizegroupoption extends BE_Controller
 		$this->db->trans_start();
 		// check access
 		$this->check_access(DEL);
-		$this->load->model('Sizegroup_option');
+		
 		// delete sizegroups and images
 		if (!$this->Sizegroup_option->delete($sizeGroupOptionId)) {
 
@@ -212,7 +212,7 @@ class Sizegroupoption extends BE_Controller
 	function is_valid_name($name, $id = 0)
 	{
 		$conds['name'] = $name;
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 		if (strtolower($this->Sizegroup_option->get_one($id)->title) == strtolower($name)) {
 			// if the name is existing name for that user id,
 			return true;
@@ -258,7 +258,7 @@ class Sizegroupoption extends BE_Controller
 
 		// prepare data
 		$sizegroupoption_data = array('status' => 1);
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 		// save data
 		if ($this->Sizegroup_option->save($sizegroupoption_data, $id)) {
 			echo 'true';
@@ -279,7 +279,7 @@ class Sizegroupoption extends BE_Controller
 
 		// prepare data
 		$sizegroupoption_data = array('status' => 0);
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 
 		// save data
 		if ($this->Sizegroup_option->save($sizegroupoption_data, $id)) {
