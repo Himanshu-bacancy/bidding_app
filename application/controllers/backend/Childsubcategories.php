@@ -2,21 +2,20 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Categories Controller
+ * Childsubcategories Controller
  */
-class Subcategories extends BE_Controller {
+class Childsubcategories extends BE_Controller {
 
 	/**
 	 * Construt required variables
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'SUBCATEGORIES' );
+		parent::__construct( MODULE_CONTROL, 'CHILDSUBCATEGORIES' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		//echo '<pre>'; print_r($conds_mod); die(' Hiii Himanshu');
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
-		
 		$logged_in_user = $this->ps_auth->get_user_info();
 
 		$user_id = $logged_in_user->user_id;
@@ -33,12 +32,11 @@ class Subcategories extends BE_Controller {
 	{
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
-
 		// get rows count
-		$this->data['rows_count'] = $this->Subcategory->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Childsubcategory->count_all_by( $conds );
 		// get categories
-		$this->data['subcategories'] = $this->Subcategory->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
-
+		$this->data['child_subcategories'] = $this->Childsubcategory->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+		echo '<pre>'; print_r($this->data); die;
 		// load index logic
 		parent::index();
 	}
@@ -57,10 +55,10 @@ class Subcategories extends BE_Controller {
 						'cat_id' => $this->searchterm_handler( $this->input->post('cat_id')) );
 		
 		// pagination
-		$this->data['rows_count'] = $this->Subcategory->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Childsubcategory->count_all_by( $conds );
 
 		// search data
-		$this->data['subcategories'] = $this->Subcategory->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['child_subcategories'] = $this->Childsubcategory->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
 
 		// load add list
 		parent::search();
@@ -103,12 +101,16 @@ class Subcategories extends BE_Controller {
 	    // Category id
 	    if ( $this->has_data( 'cat_id' )) {
 			$data['cat_id'] = $this->get_data( 'cat_id' );
-
 		}
+
+	    // SubCategory id
+	    if ( $this->has_data( 'sub_cat_id' )) {
+			$data['sub_cat_id'] = $this->get_data( 'sub_cat_id' );
+		}
+        
 		// prepare cat name
 		if ( $this->has_data( 'name' )) {
 			$data['name'] = $this->get_data( 'name' );
-
 		}
 
 		//Default Status is Publish 
@@ -128,7 +130,7 @@ class Subcategories extends BE_Controller {
 		}
 
 		// save category
-		if ( ! $this->Subcategory->save( $data, $id )) {
+		if ( ! $this->Childsubcategory->save( $data, $id )) {
 
 		// if there is an error in inserting user data,	
 
@@ -146,7 +148,7 @@ class Subcategories extends BE_Controller {
 		 */
 		
 		if ( !$id ) {
-			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'sub_category', $data['id'], "cover" )) {
+			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'child_sub_category', $data['id'], "cover" )) {
 				// if error in saving image
 
 					// commit the transaction
@@ -154,7 +156,7 @@ class Subcategories extends BE_Controller {
 					
 					return;
 				}
-			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'subcat_icon', $data['id'], "icon" )) {
+			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'child_subcat_icon', $data['id'], "icon" )) {
 				// if error in saving image
 
 					// commit the transaction
@@ -204,7 +206,7 @@ class Subcategories extends BE_Controller {
 		$enable_trigger = true; 
 		
 		// delete categories and images
-		$type = "subcategory";
+		$type = "child_subcategory";
 		//if ( !$this->ps_delete->delete_subcategory( $id, $enable_trigger )) {
 		if ( !$this->ps_delete->delete_history( $id, $type, $enable_trigger )) {
 
@@ -242,7 +244,7 @@ class Subcategories extends BE_Controller {
 		
 		$rule = 'required|callback_is_valid_name['. $id  .']';
 
-		$this->form_validation->set_rules( 'name', get_msg( 'subcat_name' ), $rule);
+		$this->form_validation->set_rules( 'name', get_msg( 'child_subcat_name' ), $rule);
 
 		if ( $this->form_validation->run() == FALSE ) {
 		// if there is an error in validating,
@@ -265,10 +267,10 @@ class Subcategories extends BE_Controller {
 	{		
 		$conds['name'] = $name;
 
-			if ( html_entity_decode(strtolower( $this->Subcategory->get_one( $id )->name )) == htmlentities(strtolower( $name ))) {
+			if ( html_entity_decode(strtolower( $this->Childsubcategory->get_one( $id )->name )) == htmlentities(strtolower( $name ))) {
 			// if the name is existing name for that user id,
 				return true;
-			} else if ( $this->Subcategory->exists( ($conds ))) {
+			} else if ( $this->Childsubcategory->exists( ($conds ))) {
 			// if the name is existed in the system,
 				$this->form_validation->set_message('is_valid_name', get_msg( 'err_dup_name' ));
 				return false;
@@ -277,24 +279,24 @@ class Subcategories extends BE_Controller {
 			return true;
 	}
 
-	/**subcategory
-	 * Check subcategory name via ajax
+	/**childsubcategory
+	 * Check child subcategory name via ajax
 	 *
-	 * @param      boolean  $subcategory_id  The subcategory identifier
+	 * @param      boolean  $child_subcategory_id  The subcategory identifier
 	 */
-	function ajx_exists( $subcategory_id = false )
+	function ajx_exists( $child_subcategory_id = false )
 	{
 		
 
 		// get subcategory name
 		$name = $_REQUEST['name'];
 
-		if ( $this->is_valid_name( $name, $subcategory_id )) {
-		// if the subcategory name is valid,
+		if ( $this->is_valid_name( $name, $child_subcategory_id )) {
+		// if the child subcategory name is valid,
 			
 			echo "true";
 		} else {
-		// if invalid subcategory name,
+		// if invalid child subcategory name,
 			
 			echo "false";
 		}
@@ -306,18 +308,18 @@ class Subcategories extends BE_Controller {
 	/**
 	 * Publish the record
 	 *
-	 * @param      integer  $subcategory_id  The subcategory identifier
+	 * @param      integer  $child_subcategory_id  The child subcategory identifier
 	 */
-	function ajx_publish( $subcategory_id = 0 )
+	function ajx_publish( $child_subcategory_id = 0 )
 	{
 		// check access
 		$this->check_access( PUBLISH );
 		
 		// prepare data
-		$subcategory_data = array( 'status'=> 1 );
+		$child_subcategory_data = array( 'status'=> 1 );
 			
 		// save data
-		if ( $this->Subcategory->save( $subcategory_data, $subcategory_id )) {
+		if ( $this->Childsubcategory->save( $child_subcategory_data, $child_subcategory_id )) {
 			echo true;
 		} else {
 			echo false;
@@ -329,16 +331,16 @@ class Subcategories extends BE_Controller {
 	 *
 	 * @param      integer  $subcategory_id  The subcategory identifier
 	 */
-	function ajx_unpublish( $subcategory_id = 0 )
+	function ajx_unpublish( $child_subcategory_id = 0 )
 	{
 		// check access
 		$this->check_access( PUBLISH );
 		
 		// prepare data
-		$subcategory_data = array( 'status'=> 0 );
+		$child_subcategory_data = array( 'status'=> 0 );
 			
 		// save data
-		if ( $this->Subcategory->save( $subcategory_data, $subcategory_id )) {
+		if ( $this->Childsubcategory->save( $child_subcategory_data, $child_subcategory_id )) {
 			echo true;
 		} else {
 			echo false;
@@ -353,10 +355,10 @@ class Subcategories extends BE_Controller {
 	{
 		
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'subcat_edit' );
+		$this->data['action_title'] = get_msg( 'child_subcat_edit' );
 
 		// load user
-		$this->data['subcategory'] = $this->Subcategory->get_one( $id );
+		$this->data['child_subcategory'] = $this->Childsubcategory->get_one( $id );
 
 		// call the parent edit logic
 		parent::edit( $id );

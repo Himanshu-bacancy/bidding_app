@@ -4,14 +4,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Model class for category table
  */
-class Subcategory extends PS_Model {
+class Childsubcategory extends PS_Model {
 
 	/**
 	 * Constructs the required data
 	 */
 	function __construct() 
 	{
-		parent::__construct( 'bs_subcategories', 'id', 'subcat' );
+		die('hiiii Himanshu how ypu doing ?');
+		parent::__construct( 'bs_childsubcategories', 'id', 'childsubcat' );
 	}
 
 	/**
@@ -32,6 +33,16 @@ class Subcategory extends PS_Model {
 			if ($conds['cat_id'] != "" || $conds['cat_id'] != 0) {
 				
 				$this->db->where( 'cat_id', $conds['cat_id'] );	
+
+			}			
+		}
+
+		// sub category id condition
+		if ( isset( $conds['sub_cat_id'] )) {
+			
+			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+				
+				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
 
 			}			
 		}

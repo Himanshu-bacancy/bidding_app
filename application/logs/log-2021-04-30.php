@@ -118,3 +118,88 @@ ERROR - 2021-04-30 10:12:54 --> Severity: Warning --> Undefined array key "lat" 
 ERROR - 2021-04-30 10:12:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
 ERROR - 2021-04-30 10:12:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
 ERROR - 2021-04-30 10:12:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-04-30 17:27:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:27:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:16 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:16 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:16 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:29:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined variable $data_str /opt/lampp/htdocs/bidding_app/application/views/backend/components/item_popular_panel.php 39
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Trying to access array offset on value of type int /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 653
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:32:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:54 --> Severity: Warning --> Undefined property: Childsubcategories::$Childsubcategory /opt/lampp/htdocs/bidding_app/application/controllers/backend/Childsubcategories.php 37
+ERROR - 2021-04-30 17:33:54 --> Severity: error --> Exception: Call to a member function count_all_by() on null /opt/lampp/htdocs/bidding_app/application/controllers/backend/Childsubcategories.php 37
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined variable $data_str /opt/lampp/htdocs/bidding_app/application/views/backend/components/item_popular_panel.php 39
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Trying to access array offset on value of type int /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 653
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:33:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined variable $data_str /opt/lampp/htdocs/bidding_app/application/views/backend/components/item_popular_panel.php 39
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Trying to access array offset on value of type int /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 653
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined variable $data_str /opt/lampp/htdocs/bidding_app/application/views/backend/components/item_popular_panel.php 39
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Trying to access array offset on value of type int /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 653
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:20 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined variable $data_str /opt/lampp/htdocs/bidding_app/application/views/backend/components/item_popular_panel.php 39
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Trying to access array offset on value of type int /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 653
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-04-30 17:43:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306

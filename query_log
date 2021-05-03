@@ -1,0 +1,11 @@
+//Create ChildSubCategory Query : 
+CREATE TABLE `bidding_app`.`bs_child_subcategories` ( `id` VARCHAR(255) NOT NULL , `cat_id` VARCHAR(255) NOT NULL , `sub_cat_id` VARCHAR(255) NOT NULL , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT NULL , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL ) ENGINE = InnoDB;
+
+//Alter child_subcategory table's id column as autoincreamented field
+ALTER TABLE `bs_child_subcategories` CHANGE `id` `id` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AUTO_INCREMENT;
+
+//Alter child_subcategory table's id column as primary key field
+ALTER TABLE `bs_child_subcategories` ADD PRIMARY KEY(`id`);
+
+//Added New Module for Sidebar Menu
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'childsubcategories', 'ChildSubCategories', 'child_subcat_module', '', '20', '1', '1')
