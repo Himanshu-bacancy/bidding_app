@@ -214,6 +214,16 @@ class Main extends BE_Controller {
 
 				// commit and success return
 				$this->db->trans_commit();
+				
+
+				// added condition for app user based on role
+				$role_id = $this->User->get_one_by( array( 'user_id' => $user_id ))->role_id;
+				if($role_id == 4)
+				{
+					$this->set_flash_msg( 'success', 'success_reset_app_user' );
+					redirect( 'success_reset_password' );	
+				}
+
 				$this->set_flash_msg( 'success', 'success_reset' );
 				redirect( 'login' );
 			}
@@ -368,4 +378,16 @@ class Main extends BE_Controller {
 
     	return true;
     }
+
+
+	/**
+	 * sucess reset the password view file for app user
+	 */
+	function success_reset_password( $code=null )
+	{	
+		// load reset form 
+		$this->load_view( 'partials/header', array( 'code' => $code )); 
+		$this->load_view( 'success_reset_password' );
+		$this->load_view( 'partials/footer' );
+	}
 }
