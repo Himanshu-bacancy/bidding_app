@@ -61,6 +61,8 @@ $route['logout'] = "main/logout";
 $route['reset_request'] = "main/reset_request";
 $route['reset_email/(.*)'] = "main/reset_email/$1";
 
+$route['success_reset_password'] = "main/success_reset_password";
+
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";
 $route['admin/(.*)'] = "backend/$1";

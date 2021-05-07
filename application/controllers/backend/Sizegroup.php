@@ -322,7 +322,7 @@ class Sizegroup extends BE_Controller {
 
 		// load user
 		$this->data['sizegroup'] = $this->Sizegroups->get_one( $groupsizeId );
-		$this->load->model('Sizegroup_option');
+		//$this->load->model('Sizegroup_option');
 		$this->data['sizegroup_option'] = $this->Sizegroup_option->get_one( $groupsizeOptionId );
 		// call the parent edit logic
 		// load header
@@ -333,4 +333,5 @@ class Sizegroup extends BE_Controller {
 		// load footer
 		$this->load_view( 'partials/footer' );
 	}
+
 }
