@@ -67,10 +67,9 @@
 					</td>
 				
 				<?php endif; ?>
-
 					<td>
 						<a href='<?php echo 'sizegroupoption/index/'. $sizegroup->id; ?>' title= "Size Options">
-							<i style='font-size: 18px;' class='fa fa-plus'></i>
+							Size Group Options
 						</a>
 					</td>
 

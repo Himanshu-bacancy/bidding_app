@@ -67,9 +67,9 @@ function runAfterJQ() {
 <?php
 	// Delete Confirm Message Modal
 	$data = array(
-		'title' => get_msg( 'delete_subcat_label' ),
-		'message' =>  get_msg( 'subcat_yes_all_message' ),
-		'no_only_btn' => get_msg( 'subcat_no_only_label' )
+		'title' => get_msg( 'delete_child_subcat_label' ),
+		'message' =>  get_msg( 'child_subcat_yes_all_message' ),
+		'no_only_btn' => get_msg( 'child_subcat_no_only_label' )
 	);
 	
 	$this->load->view( $template_path .'/components/delete_confirm_modal', $data );

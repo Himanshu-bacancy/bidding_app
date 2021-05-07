@@ -35,7 +35,7 @@
 			<tr>
 				<td><?php echo ++$count;?></td>
 				<td><?php echo $childSubCategory->name;?></td>
-				<td><?php echo $this->Subcategory->get_one( $childSubCategory->sub_cat_id )->cat_name; ?></td>
+				<td><?php echo $this->Subcategory->get_one( $childSubCategory->sub_cat_id )->name; ?></td>
 				<td><?php echo $this->Category->get_one( $childSubCategory->cat_id )->cat_name; ?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>
@@ -60,7 +60,7 @@
 					
 					<td>
 						<?php 
-						if ( $subcategory->status == 1): ?>
+						if ( $childSubCategory->status == 1): ?>
 							<button class="btn btn-sm btn-success unpublish" id='<?php echo $childSubCategory->id;?>'>
 							<?php echo get_msg('btn_yes'); ?></button>
 						<?php else:?>

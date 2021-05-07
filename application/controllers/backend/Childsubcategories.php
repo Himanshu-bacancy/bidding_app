@@ -51,6 +51,7 @@ class Childsubcategories extends BE_Controller {
 		
 		// condition with search term
 		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )),
+						'sub_cat_id' => $this->searchterm_handler( $this->input->post('sub_cat_id')),
 						'cat_id' => $this->searchterm_handler( $this->input->post('cat_id')) );
 		
 		// pagination
@@ -70,7 +71,7 @@ class Childsubcategories extends BE_Controller {
 	{
 		// breadcrumb urls
 		$this->data['action_title'] = get_msg( 'subcat_add' );
-
+		//echo '<pre>'; print_r($_POST); die(' hiiii');
 		// call the core add logic
 		parent::add();
 		
@@ -87,7 +88,6 @@ class Childsubcategories extends BE_Controller {
 	 */
 	function save( $id = false ) 
 	{
-
 		// start the transaction
 		$this->db->trans_start();
 		$logged_in_user = $this->ps_auth->get_user_info();
@@ -96,7 +96,8 @@ class Childsubcategories extends BE_Controller {
 		 * Insert Category Records 
 		 */
 		$data = array();
-
+		$associatedData = [];
+		//echo '<pre>'; print_r($this->input->post()); die;
 	    // Category id
 	    if ( $this->has_data( 'cat_id' )) {
 			$data['cat_id'] = $this->get_data( 'cat_id' );
@@ -112,6 +113,23 @@ class Childsubcategories extends BE_Controller {
 			$data['name'] = $this->get_data( 'name' );
 		}
 
+		if ( $this->has_data( 'is_color_filter' )) {
+			$data['is_color_filter'] = $this->get_data( 'is_color_filter' );
+		}
+		if ( $this->has_data( 'is_brand_filter' )) {
+			$data['is_brand_filter'] = $this->get_data( 'is_brand_filter' );
+		}
+
+		// Category id
+	    if ( $this->has_data( 'sizegroup_id' )) {
+			$sizeGroupData = $this->get_data( 'sizegroup_id' );
+			foreach($sizeGroupData as $sizeGroups){
+				$associatedData[]['sizegroup_id'] = $sizeGroups;
+			}
+			$data['is_size_filter'] = 1; 
+			//////$data['cat_id'] = 
+		}
+
 		//Default Status is Publish 
 		$data['status'] = 1;
 
@@ -125,65 +143,65 @@ class Childsubcategories extends BE_Controller {
 			//edit
 			unset($data['added_date']);
 			$data['updated_date'] = date("Y-m-d H:i:s");
-			$data['updated_user_id'] = $logged_in_user->user_id;
+			//$data['updated_user_id'] = $logged_in_user->user_id;
 		}
 
+		//echo '<pre>'; print_r($data); die;
 		// save category
 		if ( ! $this->Childsubcategory->save( $data, $id )) {
 
-		// if there is an error in inserting user data,	
-
+			//echo '<pre>'; print_r($this->db->error()); die;
+			// if there is an error in inserting user data,	
 			// rollback the transaction
 			$this->db->trans_rollback();
-
 			// set error message
 			$this->data['error'] = get_msg( 'err_model' );
-			
 			return;
+		}
+		foreach($associatedData as $key=>$associations){
+			$associatedData[$key]['child_subcategory_id'] = $data['id'];
+			$associatedData[$key]['added_date'] = date("Y-m-d H:i:s");
+		}
+		//echo '<pre>'; print_r($associatedData); die;
+		if(!empty($associatedData)){
+			$this->db->where('child_subcategory_id', $data['id']);
+        	$this->db->delete('bs_childsubcategory_sizegroups');
+			//echo '<pre>'; print_r($associatedData); die;
+			$this->db->insert_batch('bs_childsubcategory_sizegroups', $associatedData);
 		}
 
 		/** 
 		 * Upload Image Records 
 		 */
-		
+		//echo $id; die('  hello testing');
 		if ( !$id ) {
-			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'child_sub_category', $data['id'], "cover" )) {
+			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'childsubcategory_cover', $data['id'], "cover" )) {
 				// if error in saving image
-
-					// commit the transaction
-					$this->db->trans_rollback();
-					
-					return;
-				}
-			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'child_subcat_icon', $data['id'], "icon" )) {
+				// commit the transaction
+				$this->db->trans_rollback();
+				
+				return;
+			}
+			if ( ! $this->insert_images_icon_and_cover( $_FILES, 'childsubcategory_icon', $data['id'], "icon" )) {
 				// if error in saving image
-
-					// commit the transaction
-					$this->db->trans_rollback();
-					
-					return;
-				}	
+				// commit the transaction
+				$this->db->trans_rollback();
+				return;
+			}	
 		}
-		
-		
 		// commit the transaction
 		if ( ! $this->check_trans()) {
-        	
 			// set flash error message
 			$this->set_flash_msg( 'error', get_msg( 'err_model' ));
 		} else {
-
 			if ( $id ) {
 			// if user id is not false, show success_add message
-				
-				$this->set_flash_msg( 'success', get_msg( 'success_subcat_edit' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_child_subcat_edit' ));
 			} else {
 			// if user id is false, show success_edit message
-
-				$this->set_flash_msg( 'success', get_msg( 'success_subcat_add' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_child_subcat_add' ));
 			}
 		}
-
 		redirect( $this->module_site_url());
 	}
 	
@@ -227,7 +245,7 @@ class Childsubcategories extends BE_Controller {
 			$this->set_flash_msg( 'error', get_msg( 'err_model' ));	
 		} else {
         	
-			$this->set_flash_msg( 'success', get_msg( 'success_subcat_delete' ));
+			$this->set_flash_msg( 'success', get_msg( 'success_child_subcat_delete' ));
 		}
 		
 		redirect( $this->module_site_url());
@@ -312,11 +330,9 @@ class Childsubcategories extends BE_Controller {
 	function ajx_publish( $child_subcategory_id = 0 )
 	{
 		// check access
-		$this->check_access( PUBLISH );
-		
+		$this->check_access( PUBLISH );	
 		// prepare data
 		$child_subcategory_data = array( 'status'=> 1 );
-			
 		// save data
 		if ( $this->Childsubcategory->save( $child_subcategory_data, $child_subcategory_id )) {
 			echo true;
@@ -358,10 +374,20 @@ class Childsubcategories extends BE_Controller {
 
 		// load user
 		$this->data['child_subcategory'] = $this->Childsubcategory->get_one( $id );
-
+		//echo '<pre>'; print_r($this->data['child_subcategory']); die;
 		// call the parent edit logic
 		parent::edit( $id );
 		
 	}
+
+	//get all subcategories when select category
+
+	function get_all_sub_categories( $cat_id )
+    {
+    	$conds['cat_id'] = $cat_id;
+    	
+    	$sub_categories = $this->Subcategory->get_all_by($conds);
+		echo json_encode($sub_categories->result());
+    }
 
 }

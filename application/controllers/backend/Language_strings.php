@@ -170,7 +170,7 @@ class Language_strings extends BE_Controller {
 	/**
 	 * Update the existing one
 	 */
-	function edit( $id, $language_id ) {
+	function edit( $id, $language_id=Null ) {
 
 		// breadcrumb urls
 		$language_list = get_msg('list_lang_label');

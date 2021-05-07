@@ -71,5 +71,18 @@ class Childsubcategory extends PS_Model {
 		$this->db->order_by( 'added_date', 'desc' );
 
 	}
+
+
+	function getSelectedSizegroups($childSubCatId = NULL){
+		if(empty($childSubCatId)) return false;
+		$this->load->model('Childsubcategory_sizegroup');
+		$conds['child_subcategory_id'] = $childSubCatId;
+		$selectedSizeGroup = $this->Childsubcategory_sizegroup->get_all_by($conds);
+		$selectedData = [];
+		foreach($selectedSizeGroup->result() as $sizegroupIds){
+			$selectedData[] = $sizegroupIds->sizegroup_id;
+		}
+		return $selectedData;
+	}
 }
 	

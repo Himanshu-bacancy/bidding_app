@@ -9,3 +9,10 @@ ALTER TABLE `bs_child_subcategories` ADD PRIMARY KEY(`id`);
 
 //Added New Module for Sidebar Menu
 INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'childsubcategories', 'ChildSubCategories', 'child_subcat_module', '', '20', '1', '1')
+
+Alter query to add filters in ChildSubCategories
+ALTER TABLE `bs_childsubcategories` ADD `is_brand_filter` TINYINT(1) NULL AFTER `name`, ADD `is_color_filter` TINYINT(1) NULL AFTER `is_brand_filter`, ADD `is_size_filter` TINYINT(1) NULL AFTER `is_color_filter`;
+
+Created new table for child_subcategory & sizegroups association
+CREATE TABLE `bidding_app`.`bs_childsubcategory_sizegroups` ( `id` VARCHAR(255) NOT NULL , `child_subcategory_id` VARCHAR(255) NULL , `sizegroup_id` VARCHAR(255) NULL , `added_date` TIMESTAMP NULL ) ENGINE = InnoDB;
+ALTER TABLE `bs_childsubcategory_sizegroups` ADD PRIMARY KEY(`id`);

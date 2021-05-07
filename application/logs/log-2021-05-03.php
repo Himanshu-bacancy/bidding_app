@@ -378,3 +378,595 @@ ERROR - 2021-05-03 14:35:34 --> Severity: Warning --> Undefined array key "lat" 
 ERROR - 2021-05-03 14:35:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
 ERROR - 2021-05-03 14:35:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
 ERROR - 2021-05-03 14:35:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:14 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:14 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:14 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:18 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:18 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:18 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:18 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:24 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:24 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:24 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:24 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:26 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:26 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:26 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:40 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:40 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:40 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:42:40 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:13 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:27 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:27 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:27 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:27 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 14:43:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:19:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:19:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:19:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:19:22 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 15:36:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:36:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:36:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 15:36:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:00:58 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:00:58 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:00:58 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:00:59 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:01:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:01:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:01:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:01:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:08:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:23 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:08:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:23 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:08:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:08:47 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:08:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:06 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:12 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:17 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:22 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:09:28 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:35 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:39 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:39 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:14:41 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:14:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:35 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:36 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:19:39 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:19:45 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:23:57 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:48 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:49 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:24:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:25:06 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:25:29 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:26:59 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:26:59 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:26:59 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:26:59 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:00 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:02 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:04 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:05 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:06 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:06 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:06 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:27:06 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:27:14 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:28:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:28:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:28:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:28:49 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 16:28:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 16:29:09 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:05:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:05:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:05:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:41 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:41 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:41 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:07:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:14:37 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:23:57 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:12 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:12 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:12 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:25:21 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:26:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:26:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:26:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:34 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:30:48 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:43 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:33:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:34:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:34:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:34:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:34:01 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:35:14 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:35:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:35:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:35:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:35:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:15 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:15 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:15 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:15 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:47 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:37:47 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:44:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:44:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:44:38 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:44:38 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:46:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:46:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:46:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:46:32 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:49 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:49 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:50 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:51 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:52 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:53 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:54 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:55 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:47:56 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:48:03 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:49:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:49:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:49:32 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:49:32 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:52:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:23 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:23 --> Could not find the language line "f_item_cat_required"
+ERROR - 2021-05-03 17:52:45 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:45 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:45 --> Severity: Warning --> Undefined array key "lat" /opt/lampp/htdocs/bidding_app/application/core/My_Model.php 306
+ERROR - 2021-05-03 17:52:45 --> Could not find the language line "f_item_cat_required"

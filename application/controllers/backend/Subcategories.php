@@ -14,7 +14,6 @@ class Subcategories extends BE_Controller {
 		parent::__construct( MODULE_CONTROL, 'SUBCATEGORIES' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
-		//echo '<pre>'; print_r($conds_mod); die(' Hiii Himanshu');
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
 		
 		$logged_in_user = $this->ps_auth->get_user_info();
@@ -33,10 +32,12 @@ class Subcategories extends BE_Controller {
 	{
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
+
 		// get rows count
 		$this->data['rows_count'] = $this->Subcategory->count_all_by( $conds );
 		// get categories
 		$this->data['subcategories'] = $this->Subcategory->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+
 		// load index logic
 		parent::index();
 	}

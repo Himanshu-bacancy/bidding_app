@@ -1,6 +1,10 @@
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 	<?php if ( $this->config->item( 'client_side_validation' ) == true ): ?>
 
+	jQuery(document).ready(function(){
+		$('#multiselect').select2();
+	});
 	function jqvalidate() {
 
 		$('#subcategory-form').validate({
@@ -59,10 +63,26 @@
 			var id = $(this).attr('id');
 
 			// do action
-			var action = '<?php echo $module_site_url .'/delete_cover_photo/'; ?>' + id + '/<?php echo @$subcategory->id; ?>';
+			var action = '<?php echo $module_site_url .'/delete_cover_photo/'; ?>' + id + '/<?php echo @$child_subcategory->id; ?>';
 			console.log( action );
 			$('.btn-delete-image').attr('href', action);
 			
+		});
+
+		jQuery('#cat_id').on('change', function() {
+
+			var catId = $(this).val();
+			$.ajax({
+				url: '<?php echo $module_site_url . '/get_all_sub_categories/';?>' + catId,
+				method: 'GET',
+				dataType: 'JSON',
+				success:function(data){
+					jQuery('#sub_cat_id').html("");
+					jQuery.each(data, function(i, obj){
+						jQuery('#sub_cat_id').append('<option value="'+ obj.id +'">' + obj.name + '</option>');
+					});
+				}
+			});
 		});
 
 </script>
@@ -71,8 +91,8 @@
 	// replace cover photo modal
 	$data = array(
 		'title' => get_msg('upload_photo'),
-		'img_type' => 'sub_category',
-		'img_parent_id' => @$subcategory->id
+		'img_type' => 'childsubcategory_cover',
+		'img_parent_id' => @$child_subcategory->id
 	);
 
 	$this->load->view( $template_path .'/components/photo_upload_modal', $data );
@@ -82,8 +102,8 @@
 	// replace icon icon modal
 	$data = array(
 		'title' => get_msg('upload_icon'),
-		'img_type' => 'subcat_icon',
-		'img_parent_id' => @$subcategory->id
+		'img_type' => 'childsubcategory_icon',
+		'img_parent_id' => @$child_subcategory->id
 	);
 		$this->load->view( $template_path .'/components/icon_upload_modal', $data );
 		// delete icon photo modal

@@ -381,6 +381,20 @@ class PS_Delete {
 				$this->CI->Delete_history->save($data_delete);
 			}
 
+		} if( $type_name == "child_subcategory") {
+
+			if ( ! $this->CI->Childsubcategory->delete( $type_id )) {
+			// if there is an error in deleting product,
+				
+				return false;
+			} else {
+				//product is successfully deleted so need to save in log table
+				// $data_delete['type_id']   = $type_id;
+				// $data_delete['type_name'] = $type_name;
+
+				// $this->CI->Delete_history->save($data_delete);
+			}
+
 		} else if ( $type_name == "category" ) {
 
 			if ( ! $this->CI->Category->delete( $type_id )) {
@@ -421,6 +435,21 @@ class PS_Delete {
 			$conds = array( 'img_type' => 'subcategory', 'img_parent_id' => $type_id );
 			if ( $this->CI->delete_images_by( $conds )) {
 			$conds = array( 'img_type' => 'subcategory-icon', 'img_parent_id' => $type_id );
+			// if error in deleting image,
+				if ( !$this->CI->delete_images_by( $conds )) {
+				
+				// if error in deleting image, 
+
+					return false;
+				
+				} 
+			}
+		
+		} if($type_name == "child_subcategory") {
+		
+			$conds = array( 'img_type' => 'child_subcategory', 'img_parent_id' => $type_id );
+			if ( $this->CI->delete_images_by( $conds )) {
+			$conds = array( 'img_type' => 'child_subcategory-icon', 'img_parent_id' => $type_id );
 			// if error in deleting image,
 				if ( !$this->CI->delete_images_by( $conds )) {
 				
