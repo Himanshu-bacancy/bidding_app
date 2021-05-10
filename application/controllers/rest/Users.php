@@ -1643,6 +1643,289 @@ class Users extends API_Controller
 	        array(
 	        	'field' => 'phone_id',
 	        	'rules' => 'required'
+			),
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+			),
+        );
+
+		// exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        //Need to check phone_id is aleady exist or not?
+        if ( !$this->User->exists( 
+					//new
+					array('phone_id' => $this->post( 'phone_id' ))
+				)
+			) {
+        	//$rules = array(array('field' => 'user_name','rules' => 'required'));
+
+	        $added_date = date("Y-m-d H:i:s");
+
+			$user_data = array(
+				//"user_id"  => $this->post('user_id'),
+	        	//"user_name" 	=> $this->post('user_name'), 
+	        	"user_phone"    => $this->post('user_phone'), 
+	        	"phone_id" 	   => $this->post('phone_id'),
+	        	"device_token" => $this->post('device_token'),
+	        	"role_id" => 4,
+	        	"phone_verify" => 1,
+	        	"status" => 1,
+	        	"added_date" =>  $added_date,
+	        	"added_date_timestamp" => strtotime($added_date)
+        	);
+
+			$user_id = $this->post('user_id');
+        	$conds_phone['user_phone'] = $user_data['user_phone'];
+			$conds_phone['user_id'] = $user_data['user_id'];
+			$user_infos = $this->User->get_one_user_phone($conds_phone)->result();
+			$user_id_db = $user_infos[0]->user_id;
+
+
+			//if ( $user_id_db != "" && $user_id_db == $user_id) {
+			if ( !empty($user_infos)) {
+				//user phone alerady exist
+
+				//for user name and user email
+				$user_name = $user_infos[0]->user_name;
+				$user_phone = $this->post('user_phone');
+
+				/*if ($user_name == "" && $user_phone == "") {
+					$user_data = array(
+					"user_name" => $user_infos[0]->user_name,
+					"user_phone" => $user_infos[0]->user_phone,	
+					"device_token"  => $user_data['device_token'],
+					"phone_id" 	=> $user_data['phone_id'],
+					"phone_verify" => $user_data['phone_verify'],
+					"role_id" => $user_data['role_id'],
+					"status" 	=> $user_data['status']
+					);
+				} else if ($user_name == "") {
+					$user_data = array(
+					"user_name" => $user_infos[0]->user_name,
+					"user_phone"    => $user_phone,
+					"device_token"  => $user_data['device_token'],
+					"phone_id" 	=> $user_data['phone_id'],
+					"phone_verify" => $user_data['phone_verify'],
+					"role_id" => $user_data['role_id'],
+					"status" 	=> $user_data['status']
+					);
+				} else if ($user_phone == "") {
+					$user_data = array(
+					"user_name"    => $user_name,
+					"user_phone" => $user_infos[0]->user_phone,
+					"device_token"  => $user_data['device_token'], 
+					"phone_id" 	=> $user_data['phone_id'],
+					"phone_verify" => $user_data['phone_verify'],
+					"role_id" => $user_data['role_id'],
+					"status" 	=> $user_data['status']
+					);
+				} else{*/
+					$user_data = array(
+					//"user_name"    => $user_name,
+					"user_phone"    => $user_phone,
+					"device_token"  => $user_data['device_token'],
+					"phone_id" 	=> $user_data['phone_id'],
+					"phone_verify" => $user_data['phone_verify'],
+					"role_id" => $user_data['role_id'],
+					"status" 	=> $user_data['status']
+					);
+				//}
+				$this->User->save($user_data,$user_id);
+				$noti_token = array("device_token" => $this->post( 'device_token' ));
+
+				$noti_count = $this->Noti->count_all_by($noti_token);
+
+				if ($noti_count == 1) {
+					if ( $this->Noti->exists( $noti_token )) {
+						$noti_id = $this->Noti->get_one_by($noti_token);
+						$push_noti_token_id = $noti_id->push_noti_token_id;
+						$noti_data = array(
+
+							"user_id" => $user_id
+							
+						);
+						$this->Noti->save( $noti_data, $push_noti_token_id );
+					} else {
+						$noti_data = array(
+
+							"user_id" => $user_id,
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+						$this->Noti->save( $noti_data, $push_noti_token_id );
+					}
+				}else{
+					$this->Noti->delete_by($noti_token);
+						$noti_data = array(
+
+							"user_id" => $user_id,
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+						$this->Noti->save( $noti_data, $push_noti_token_id );
+
+				}
+				
+			} else {
+				
+				//user phone no not exist
+				if ( !$this->User->save($user_data, $user_id)) {
+        		$this->error_response( get_msg( 'err_user_phone_verification' ));
+        		}
+				
+		        $noti_token = array(
+    				"device_token" => $this->post( 'device_token' )
+    			);
+
+		        $noti_count = $this->Noti->count_all_by($noti_token);
+				
+				if ($noti_count == 1) {
+					if ( $this->Noti->exists( $noti_token )) {
+	        			$noti_id = $this->Noti->get_one_by($noti_token);
+	        			$push_noti_token_id = $noti_id->push_noti_token_id;
+	        			$noti_data = array(
+
+							"user_id" => $user_data['user_id']
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+			        } else {
+			            $noti_data = array(
+
+							"user_id" => $user_data['user_id'],
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+			        }
+				}else{
+					$this->Noti->delete_by($noti_token);
+						$noti_data = array(
+
+							"user_id" => $user_data['user_id'],
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+
+				} 
+
+				//var_dump($user_data['user_id']);
+        		//$this->custom_response($this->User->get_one($user_data['user_id']));
+				$this->success_response( get_msg( 'success_user_mobile_verify' ));
+
+			}
+
+        	//$this->custom_response($this->User->get_one($user_infos[0]->user_id));
+			$this->success_response( get_msg( 'success_user_mobile_verify' ));
+
+        } else {
+        	//update
+        	//User already exist in DB
+			$user_data = array(
+				//"user_name"    	=> $this->post('user_name'), 
+				"user_phone"    => $this->post('user_phone'),
+				"device_token" => $this->post('device_token')
+			);
+
+			//for user name and user email
+			$user_name = $this->post('user_name');
+			$user_phone = $this->post('user_phone');
+
+			/*if ($user_name == "" && $user_phone == "") {
+				$user_data = array(
+				'device_token'  => $this->post('device_token'), 
+				);
+			}else if ($user_name == "") {
+				$user_data = array(
+				'user_phone'    => $user_data['user_phone'],
+				'device_token'  => $user_data['device_token'], 
+				);
+			}else if ($user_phone == "") {
+				$user_data = array(
+				'user_name'    => $user_data['user_name'],
+				'device_token'  => $user_data['device_token'], 
+				);
+			}else{*/
+				$user_data = array(
+				//'user_name'    => $user_data['user_name'],
+				'user_phone'    => $user_data['user_phone'],
+				'device_token'  => $user_data['device_token'], 
+				);
+			//}
+
+			$conds['phone_id'] = $this->post( 'phone_id' );
+			$user_datas = $this->User->get_one_by($conds);
+			//$user_id = $user_datas->user_id;
+			$user_id = $this->post('user_id');
+
+			if ( $user_datas->is_banned == 1 ) {
+
+				$this->error_response( get_msg( 'err_user_banned' ));
+				
+			} else {
+				if ( !$this->User->save($user_data,$user_id)) {
+	        		$this->error_response( get_msg( 'err_user_register' ));
+	        	}
+
+	        	$noti_token = array(
+    				"device_token" => $this->post( 'device_token' )
+    			);
+
+	        	$noti_count = $this->Noti->count_all_by($noti_token);
+
+				if ($noti_count == 1) {
+					if ( $this->Noti->exists( $noti_token )) {
+	        			$noti_id = $this->Noti->get_one_by($noti_token);
+	        			$push_noti_token_id = $noti_id->push_noti_token_id;
+	        			$noti_data = array(
+
+							"user_id" => $user_id
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+			        } else {
+			            $noti_data = array(
+
+							"user_id" => $user_id,
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+			        }
+				}else{
+					$this->Noti->delete_by($noti_token);
+						$noti_data = array(
+
+							"user_id" => $user_id,
+							"device_token" => $this->post( 'device_token' )
+							
+						);
+			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+
+				} 
+
+			}
+
+        	//$this->custom_response($this->User->get_one($user_datas->user_id));
+			$this->success_response( get_msg( 'success_user_mobile_verify' ));
+
+        }
+
+	}
+
+
+	/**
+	 * Users Registration with Phone
+	*/
+	/*function old_phone_register_post()
+	{
+		$rules = array(
+	        array(
+	        	'field' => 'phone_id',
+	        	'rules' => 'required'
 	        )
         );
 
@@ -1769,7 +2052,6 @@ class Users extends API_Controller
         		$this->error_response( get_msg( 'err_user_register' ));
         		}
 				
-
 		        $noti_token = array(
     				"device_token" => $this->post( 'device_token' )
     			);
@@ -1905,7 +2187,7 @@ class Users extends API_Controller
 
         }
 
-	}
+	}*/
 
 	/**
 	 * Users Registration with Apple
