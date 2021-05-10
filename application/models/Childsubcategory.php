@@ -21,6 +21,7 @@ class Childsubcategory extends PS_Model {
 	 */
 	function custom_conds( $conds = array())
 	{
+		//echo '<pre>'; print_r($conds); die;
 		// default where clause
 		if ( !isset( $conds['no_publish_filter'] )) {
 			$this->db->where( 'status', 1 );
@@ -37,14 +38,14 @@ class Childsubcategory extends PS_Model {
 		}
 
 		// sub category id condition
-		if ( isset( $conds['sub_cat_id'] )) {
+		// if ( isset( $conds['sub_cat_id'] )) {
 			
-			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+		// 	if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
 				
-				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
+		// 		$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
 
-			}			
-		}
+		// 	}			
+		// }
 
 		// sub category id condition
 		if ( isset( $conds['id'] )) {

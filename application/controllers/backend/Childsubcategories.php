@@ -47,11 +47,10 @@ class Childsubcategories extends BE_Controller {
 	{
 
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'subcat_search' );
+		$this->data['action_title'] = get_msg( 'child_subcat_search' );
 		
 		// condition with search term
 		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )),
-						'sub_cat_id' => $this->searchterm_handler( $this->input->post('sub_cat_id')),
 						'cat_id' => $this->searchterm_handler( $this->input->post('cat_id')) );
 		
 		// pagination

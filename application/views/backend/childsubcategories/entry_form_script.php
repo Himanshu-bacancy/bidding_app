@@ -20,9 +20,9 @@
 			},
 			messages:{
 				name:{
-					blankCheck : "<?php echo get_msg( 'err_subcat_name' ) ;?>",
-					minlength: "<?php echo get_msg( 'err_subcat_len' ) ;?>",
-					remote: "<?php echo get_msg( 'err_subcat_exist' ) ;?>."
+					blankCheck : "<?php echo get_msg( 'err_child_subcat_name' ) ;?>",
+					minlength: "<?php echo get_msg( 'err_child_subcat_len' ) ;?>",
+					remote: "<?php echo get_msg( 'err_child_subcat_exist' ) ;?>."
 				},
 				cat_id:{
 			       indexCheck: "<?php echo $this->lang->line('f_item_cat_required'); ?>"
