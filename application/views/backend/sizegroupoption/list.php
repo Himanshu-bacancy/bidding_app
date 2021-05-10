@@ -53,7 +53,7 @@
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 			
 					<td>
-						<a href='<?php echo '../../sizegroup/addoption/'. $sizegroupId.'/'.$options['id']; ?>'>
+						<a href='<?php echo $module_site_url.'../../sizegroup/addoption/'. $sizegroupId.'/'.$options['id']; ?>'>
 							<i style='font-size: 18px;' class='fa fa-pencil-square-o'></i>
 						</a>
 					</td>
