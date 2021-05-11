@@ -30,3 +30,11 @@ ALTER TABLE `bs_color` ADD PRIMARY KEY(`id`);
 
 // Add auto increment primary key in childsubcategory_sizegroup
 ALTER TABLE `bs_childsubcategory_sizegroups` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+
+
+// Add modules for sidebar
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'brand', 'Brands', 'brand_module', '', '23', '1', '1')
+
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'sizegroup', 'Sizegroup', 'sizegroup_module', '', '24', '1', '1')
+
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'deliverymethod', 'Deliverymethod', 'deliverymethod_module', '', '25', '1', '1')
