@@ -27,3 +27,6 @@ CREATE TABLE `bidding_app`.`bs_color` ( `id` VARCHAR(255) NOT NULL , `name` VARC
 
 //Alter color table's id column as primary key field
 ALTER TABLE `bs_color` ADD PRIMARY KEY(`id`);
+
+// Add auto increment primary key in childsubcategory_sizegroup
+ALTER TABLE `bs_childsubcategory_sizegroups` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;

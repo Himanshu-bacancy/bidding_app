@@ -39,6 +39,7 @@
 								</a>
 							</label>
 							<div class="input-group my-colorpicker2">
+								<div class="input-group-addon"><i></i></div>
 								<?php echo form_input(array(
 									'name' => 'code',
 									'value' => set_value( 'code', show_data( @$col->code ), false ),
@@ -46,7 +47,7 @@
 									'placeholder' => "",
 									'id' => 'code'
 								)); ?>
-								 <div class="input-group-addon"><i></i></div>
+								 
 							</div>
                   		</div>
                   	</div>

@@ -26,5 +26,14 @@
  "success_sizegroupoption_delete":	"Size Group Option has been successfully deleted",
  "delete_child_subcat_label":"Delete Child Sub Category?",
  "err_user_phone_verification":"Can not verify mobile phone number, please try again",
- "success_user_mobile_verify":	"User mobile verified successfully"
+ "success_user_mobile_verify":	"User mobile verified successfully",
+ "color_name": "Color Name",
+ "color_add": "Add Color",
+ "color_info": "Color Information",
+ "err_color_name" : "Please provide color name",
+ "success_color_add" : "Color has been successfully added",
+ "success_color_edit" : "Color has been successfully updated",
+ "success_color_delete" : "Color has been successfully deleted",
+ "Select_SizeGroup" : "Select Sizegroup",
+ "err_color_code" : "Please provide color code"
 }

@@ -12,7 +12,7 @@
 				name:{
 					blankCheck : "",
 					minlength: 3,
-					remote: "<?php echo $module_site_url .'/ajx_exists/'.@$subcategory->id; ?>"
+					remote: "<?php echo $module_site_url .'/ajx_exists/'.@$child_subcategory->id; ?>"
 				},
 				cat_id: {
 		       		indexCheck : ""
