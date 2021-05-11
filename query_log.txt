@@ -20,7 +20,7 @@ ALTER TABLE `bs_childsubcategory_sizegroups` ADD PRIMARY KEY(`id`);
 
 // 10-05-2021
 //Added New Module for Sidebar Menu
-INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'color', 'Colors', 'colors', '', '21', '1', '1')
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'colors', 'Colors', 'colors', '', '21', '1', '1')
 
 // Create color table
 CREATE TABLE `bidding_app`.`bs_color` ( `id` VARCHAR(255) NOT NULL , `name` VARCHAR(255) NOT NULL , `code` VARCHAR(255) NOT NULL , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL ) ENGINE = InnoDB;

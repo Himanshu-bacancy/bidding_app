@@ -116,8 +116,11 @@
         });
         jQuery('.submit_form').on('click', function(){
             var isValid = true;
-            var i=0;
-            jQuery("#sizeGroupOptions tr").each(function () {
+            
+            jQuery("#sizeGroupOptions tr").each(function () {    
+                var str = $(this).attr('id');
+                var i = str.replace("row_", "");
+                
                 if (jQuery('#optionname_'+i).val() == "") {
                     isValid = false;
                     jQuery('#optionname_'+i).addClass('error-border');

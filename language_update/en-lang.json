@@ -35,5 +35,8 @@
  "success_color_edit" : "Color has been successfully updated",
  "success_color_delete" : "Color has been successfully deleted",
  "Select_SizeGroup" : "Select Sizegroup",
- "err_color_code" : "Please provide color code"
+ "err_color_code" : "Please provide color code",
+ "err_sizegroup_name" : "Please provide size group name",
+ "err_sizegroup_len" : "The length of Size Group Name must be greater than 3",
+ "err_sizegroup_exist" : "Size Group Name is already existed in the system",
 }
