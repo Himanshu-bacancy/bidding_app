@@ -26,5 +26,9 @@
  "success_sizegroupoption_delete":	"Size Group Option has been successfully deleted",
  "delete_child_subcat_label":"Delete Child Sub Category?",
  "err_user_phone_verification":"Can not verify mobile phone number, please try again",
- "success_user_mobile_verify":	"User mobile verified successfully"
+ "success_user_mobile_verify":	"User mobile verified successfully",
+
+ "err_sizegroup_name" : "Please provide size group name",
+ "err_sizegroup_len" : "The length of Size Group Name must be greater than 3",
+ "err_sizegroup_exist" : "Size Group Name is already existed in the system",
 }
