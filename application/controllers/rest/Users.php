@@ -84,6 +84,9 @@ class Users extends API_Controller
         if ( !$this->is_valid( $rules )) exit;
         $email_verified_enable = $this->Backend_config->get_one('be1')->email_verification_enabled;
 
+		// default set all user need to verify
+		$email_verified_enable = 1 ;
+
         $code = generate_random_string(5);
         $added_date =  date("Y-m-d H:i:s");
 
@@ -653,7 +656,6 @@ class Users extends API_Controller
 			fclose($fp);
 
 			////
-
 			$user_data = array(
 	        	"user_name" 	=> $this->post('user_name'), 
 	        	'user_email'    => $this->post('user_email'), 
