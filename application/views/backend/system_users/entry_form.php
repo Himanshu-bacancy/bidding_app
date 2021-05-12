@@ -16,7 +16,7 @@
 		<div class="row">
 			<div class="col-6">
 					<div class="form-group">
-						<label><?php echo get_msg('user_name')?></label>
+						<label><span style="font-size: 17px; color: red;">*</span> <?php echo get_msg('user_name')?></label>
 
 						<?php echo form_input(array(
 							'name' => 'user_name',
@@ -29,7 +29,7 @@
 					</div>
 					
 					<div class="form-group">
-						<label><?php echo get_msg('user_email')?></label>
+						<label><span style="font-size: 17px; color: red;">*</span> <?php echo get_msg('user_email')?></label>
 
 						<?php echo form_input(array(
 							'name' => 'user_email',
@@ -44,7 +44,7 @@
 					<?php if ( @$user->user_is_sys_admin == false ): ?>
 
 					<div class="form-group">
-						<label><?php echo get_msg('user_password')?></label>
+						<label><span style="font-size: 17px; color: red;">*</span> <?php echo get_msg('user_password')?></label>
 
 						<?php echo form_input(array(
 							'type' => 'password',
@@ -57,7 +57,7 @@
 					</div>
 								
 					<div class="form-group">
-						<label><?php echo get_msg('conf_password')?></label>
+						<label><span style="font-size: 17px; color: red;">*</span> <?php echo get_msg('conf_password')?></label>
 						
 						<?php echo form_input(array(
 							'type' => 'password',

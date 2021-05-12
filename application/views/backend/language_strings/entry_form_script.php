@@ -20,13 +20,19 @@
 		                } 
 
 		            }
-				}
+				},
+				value:{
+					required: true
+				},
 			},
 			messages:{
 				key:{
 					blankCheck : "<?php echo get_msg( 'err_lang_str_name' ) ;?>",
 					minlength: "<?php echo get_msg( 'err_lang_str_len' ) ;?>",
 					remote: "<?php echo get_msg( 'err_lang_str_exist' ) ;?>."
+				},
+				value:{
+					required: "<?php echo get_msg( 'err_lang_str_value' ) ;?>"
 				}
 			}
 		});

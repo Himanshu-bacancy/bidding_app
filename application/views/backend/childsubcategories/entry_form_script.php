@@ -16,7 +16,16 @@
 				},
 				cat_id: {
 		       		indexCheck : ""
-		      	}
+		      	},
+				sub_cat_id: {
+		       		indexCheck : ""
+		      	},
+				cover:{
+					required: true
+				},
+				icon:{
+					required: true
+				}
 			},
 			messages:{
 				name:{
@@ -25,8 +34,17 @@
 					remote: "<?php echo get_msg( 'err_child_subcat_exist' ) ;?>."
 				},
 				cat_id:{
-			       indexCheck: "<?php echo $this->lang->line('f_item_cat_required'); ?>"
-			    }
+			       indexCheck: "<?php echo get_msg( 'err_cat_select' ) ;?>"
+			    },
+				sub_cat_id:{
+			       indexCheck: "<?php echo get_msg( 'err_subcat_select' ) ;?>"
+			    },
+				cover:{
+					required: "<?php echo get_msg( 'err_upload_photo' ) ;?>"
+				},
+				icon:{
+					required: "<?php echo get_msg( 'err_upload_icon' ) ;?>"
+				}
 			}
 		});
 		
