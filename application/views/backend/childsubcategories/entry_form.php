@@ -70,7 +70,7 @@
 									<?php echo get_msg('subcat_img')?> 
 								</label>
 								<br/>
-								<input class="btn btn-sm" type="file" name="cover" id="cover">
+								<input class="btn btn-sm w-100" type="file" name="cover" id="cover">
 							</div>
 							<?php else: ?>
 								<label> <span style="font-size: 17px; color: red;">*</span>
@@ -112,7 +112,7 @@
 										<?php echo get_msg('subcat_icon')?> 
 									</label>
 									<br/>
-									<input class="btn btn-sm" type="file" name="icon" id="icon">
+									<input class="btn btn-sm w-100" type="file" name="icon" id="icon">
 								</div>
 							<?php else: ?>
 								<label> <span style="font-size: 17px; color: red;">*</span>
