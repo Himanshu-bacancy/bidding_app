@@ -38,3 +38,14 @@ INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_l
 INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'sizegroup', 'Sizegroup', 'sizegroup_module', '', '24', '1', '1')
 
 INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'deliverymethod', 'Deliverymethod', 'deliverymethod_module', '', '25', '1', '1')
+
+// Added on 13-05-2021
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'blockuserreason', 'Block User Reasons', 'blockuserreasons', '', '26', '1', '1')
+
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'reportitemreason', 'Report Item Reasons', 'reportitemreasons', '', '27', '1', '1')
+
+//Create Block User Reasons Query : 
+CREATE TABLE `bidding_app`.`bs_blockuserreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+//Create Report Item Reasons Query : 
+CREATE TABLE `bidding_app`.`bs_reportitemreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;

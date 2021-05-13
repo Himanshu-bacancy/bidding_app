@@ -887,6 +887,41 @@ class PS_Delete {
 		return true;
 	}
 
+
+	/**
+	 * Delete the Blockuserreason record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_blockuserreason( $price_id )
+	{		
+		if ( ! $this->CI->Blockuserreasons->delete( $price_id )) {
+		// if there is an error in deleting currency,
+			
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
+	 * Delete the Reportitemreason record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_reportitemreason( $price_id )
+	{		
+		if ( ! $this->CI->Reportitemreasons->delete( $price_id )) {
+		// if there is an error in deleting currency,
+			
+			return false;
+		}
+
+
+		return true;
+	}
+
 	/**
 	 * Delete the deliverymethod record
 	 *
