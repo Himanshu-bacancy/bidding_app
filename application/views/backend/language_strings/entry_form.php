@@ -26,6 +26,7 @@
 
 	            		<div class="form-group">
 	                   		<label>
+							    <span style="font-size: 17px; color: red;">*</span>
 								<?php echo get_msg('lang_string_key')?>
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('lang_string_key')?>">
 									<span class='glyphicon glyphicon-info-sign menu-icon'>
@@ -55,6 +56,7 @@
 	              		</div>
 	              		<div class="form-group">
 	                   		<label>
+							    <span style="font-size: 17px; color: red;">*</span>
 								<?php echo get_msg('lang_string_value')?>
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('lang_string_value')?>">
 									<span class='glyphicon glyphicon-info-sign menu-icon'>

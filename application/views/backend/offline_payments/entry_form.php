@@ -75,7 +75,7 @@
 
             <br/>
 
-            <input class="btn btn-sm" type="file" name="icon" id="icon">
+            <input class="btn btn-sm w-100" type="file" name="icon" id="icon">
           </div>
 
        <?php else: ?>

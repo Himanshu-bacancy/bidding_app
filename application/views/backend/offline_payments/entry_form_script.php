@@ -13,6 +13,10 @@
 				
 				icon:{
 					required: true
+				},
+				description:
+				{
+					required: true
 				}
 			},
 			messages:{
@@ -23,7 +27,10 @@
 				},
 				
 				icon:{
-					required: "Please File Upload Icon."
+					required: "<?php echo get_msg( 'err_upload_icon' ) ;?>"
+				},
+				description:{
+					required: "<?php echo get_msg( 'err_offline_desc' ) ;?>"
 				}
 			}
 		});

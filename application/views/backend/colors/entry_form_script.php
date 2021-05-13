@@ -10,6 +10,9 @@
 					blankCheck : "",
 					minlength: 3,
 					remote: "<?php echo $module_site_url .'/ajx_exists/'.@$col->id; ?>"
+				},
+				code:{
+					required: true
 				}
 			},
 			messages:{
@@ -17,6 +20,9 @@
 					blankCheck : "<?php echo get_msg( 'err_color_name' ) ;?>",
 					minlength: "<?php echo get_msg( 'err_color_len' ) ;?>",
 					remote: "<?php echo get_msg( 'err_color_exist' ) ;?>."
+				},
+				code:{
+					required: "<?php echo get_msg( 'err_color_code' ) ;?>."
 				}
 			}
 		});

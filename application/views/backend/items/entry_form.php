@@ -304,7 +304,7 @@
 
                 <br/>
 
-                <input class="btn btn-sm" type="file" name="images1">
+                <input class="btn btn-sm w-100" type="file" name="images1">
               </div>
 
               <?php else: ?>

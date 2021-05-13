@@ -11,7 +11,7 @@
 					minlength: 3,
 					remote: "<?php echo $module_site_url .'/ajx_exists/'.@$category->cat_id; ?>"
 				},
-				images1:{
+				cover:{
 					required: true
 				},
 				icon:{
@@ -24,11 +24,11 @@
 					minlength: "<?php echo get_msg( 'err_cat_len' ) ;?>",
 					remote: "<?php echo get_msg( 'err_cat_exist' ) ;?>."
 				},
-				images1:{
-					required: "Please File Upload Photo."
+				cover:{
+					required: "<?php echo get_msg( 'err_upload_photo' ) ;?>"
 				},
 				icon:{
-					required: "Please File Upload Icon."
+					required: "<?php echo get_msg( 'err_upload_icon' ) ;?>"
 				}
 			}
 		});

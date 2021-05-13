@@ -59,6 +59,7 @@
 	        			<div class="clearfix">&nbsp;</div>
 
 	        			<div class="form-group">
+							<span style="font-size: 17px; color: red;">*</span>
 			              <label><?php echo get_msg('itm_lat_label') ?>
 			                <a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('city_lat_label')?>">
 			                  <span class='glyphicon glyphicon-info-sign menu-icon'>
@@ -80,6 +81,7 @@
 			            </div>
 
 			            <div class="form-group">
+							<span style="font-size: 17px; color: red;">*</span>
 			              <label><?php echo get_msg('itm_lng_label') ?>
 			                <a href="#" class="tooltip-ps" data-toggle="tooltip" 
 			                  title="<?php echo get_msg('city_lng_tooltips')?>">

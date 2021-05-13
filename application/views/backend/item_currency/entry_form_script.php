@@ -10,6 +10,9 @@
 					blankCheck : "",
 					minlength: 3,
 					remote: "<?php echo $module_site_url .'/ajx_exists/'.@$currency->id; ?>"
+				},
+				currency_symbol:{
+					required: true
 				}
 			},
 			messages:{
@@ -17,7 +20,10 @@
 					blankCheck : "<?php echo get_msg( 'err_currency_name' ) ;?>",
 					minlength: "<?php echo get_msg( 'err_currency_len' ) ;?>",
 					remote: "<?php echo get_msg( 'err_currency_exist' ) ;?>."
-				}
+				},
+				currency_symbol:{
+					required: "<?php echo get_msg( 'err_currency_symbol' ) ;?>"
+				},
 			}
 		});
 		// custom validation

@@ -34,6 +34,7 @@
 						<br>
 						
 						<label>
+							<span style="font-size: 17px; color: red;">*</span> 
 							<?php echo get_msg('noti_message_label') ?> 
 							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('noti_message_tooltips')?>">
 								<span class='glyphicon glyphicon-info-sign menu-icon'>

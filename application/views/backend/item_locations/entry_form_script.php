@@ -16,7 +16,10 @@
 			    },
 			    lng:{
 			     blankCheck : ""
-			    }
+			    },
+				ordering:{
+					required: true
+				}
 			},
 			messages:{
 				name:{
@@ -29,7 +32,10 @@
 			    },
 			    lng:{
 			     blankCheck : "<?php echo get_msg( 'err_lng' ) ;?>"
-			    }
+			    },
+				ordering:{
+					required: "<?php echo get_msg( 'err_ordering' ) ;?>"
+				},
 			}
 		});
 		// custom validation

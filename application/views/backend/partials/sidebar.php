@@ -134,33 +134,7 @@
               <?php endif; ?>
             <?php endforeach; ?>
           <?php endif; ?>
-              <li class="nav-item">
-                <a href="<?php echo site_url($be_url) ?>/sizegroup" class="nav-link <?php echo $active_state; ?>">
-                  <i class="fa fa-caret-right"></i>
-                  <p>
-                    Size Groups
-                      
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo site_url($be_url) ?>/deliverymethod" class="nav-link <?php echo $active_state; ?>">
-                  <i class="fa fa-caret-right"></i>
-                  <p>
-                   Delivery Methods
-                      
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?php echo site_url($be_url) ?>/brand" class="nav-link <?php echo $active_state; ?>">
-                  <i class="fa fa-caret-right"></i>
-                  <p>
-                    Brands
-                      
-                  </p>
-                </a>
-              </li>
+              
             </ul>
           </li>
         <?php endforeach; ?>

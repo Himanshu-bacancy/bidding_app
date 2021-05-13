@@ -4,21 +4,21 @@
 	function jqvalidate() {
 	
 		$('#gcm-form').validate({
-			// rules:{
-			// 	message:{
-			// 		blankCheck : "",
-			// 		minlength: 3,
-			// 		remote: "<?php echo $module_site_url .'/ajx_exists/'.@$noti->id; ?>"
+			rules:{
+				message:{
+					blankCheck : "",
+					minlength: 3,
+					//remote: "<?php echo $module_site_url .'/ajx_exists/'.@$noti->id; ?>"
 					
-			// 	}
-			// },
-			// messages:{
-			// 	message:{
-			// 		blankCheck : "<?php echo get_msg( 'err_noti_name' ) ;?>",
-			// 		minlength: "<?php echo get_msg( 'err_noti_len' ) ;?>",
-			// 		remote: "<?php echo get_msg( 'err_noti_exist' ) ;?>."
-			// 	}
-			// }
+				}
+			},
+			messages:{
+				message:{
+					blankCheck : "<?php echo get_msg( 'err_noti_name' ) ;?>",
+					minlength: "<?php echo get_msg( 'err_noti_len' ) ;?>",
+					//remote: "<?php echo get_msg( 'err_noti_exist' ) ;?>."
+				}
+			}
 		});
 
 	

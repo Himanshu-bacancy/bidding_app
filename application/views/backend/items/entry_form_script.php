@@ -25,7 +25,10 @@
 			     	blankCheck : "",
 			     	indexCheck : "",
 			     	validChecklng : ""
-			    }
+			    },
+				images1:{
+					required: true
+				}
 			},
 			messages:{
 				title:{
@@ -34,10 +37,10 @@
 					remote: "<?php echo get_msg( 'err_item_exist' ) ;?>."
 				},
 				cat_id:{
-			       indexCheck: "<?php echo $this->lang->line('f_item_cat_required'); ?>"
+			       indexCheck: "<?php echo get_msg( 'err_cat_select' ) ;?>"
 			    },
 			    sub_cat_id:{
-			       indexCheck: "<?php echo $this->lang->line('f_item_subcat_required'); ?>"
+			       indexCheck: "<?php echo get_msg( 'err_subcat_select' ) ;?>"
 			    },
 				lat:{
 			     	blankCheck : "<?php echo get_msg( 'err_lat' ) ;?>",
@@ -48,7 +51,10 @@
 			     	blankCheck : "<?php echo get_msg( 'err_lng' ) ;?>",
 			     	indexCheck : "<?php echo get_msg( 'err_lat_lng' ) ;?>",
 			     	validChecklng : "<?php echo get_msg( 'lng_invlaid' ) ;?>"
-			    }
+			    },
+				images1:{
+					required: "<?php echo get_msg( 'err_upload_photo' ) ;?>"
+				},
 			},
 
 			submitHandler: function(form) {
