@@ -159,14 +159,13 @@ class Childsubcategories extends BE_Controller {
 			return;
 		}
 		foreach($associatedData as $key=>$associations){
-			$associatedData[$key]['child_subcategory_id'] = ($id=='')?$data['id']:$id;
+			$associatedData[$key]['child_subcategory_id'] = $data['id'];
 			$associatedData[$key]['added_date'] = date("Y-m-d H:i:s");
 		}
 		//echo '<pre>'; print_r($associatedData); die;
-		$this->db->where('child_subcategory_id', ($id=='')?$data['id']:$id);
-        $this->db->delete('bs_childsubcategory_sizegroups');
 		if(!empty($associatedData)){
-			
+			$this->db->where('child_subcategory_id', $data['id']);
+        	$this->db->delete('bs_childsubcategory_sizegroups');
 			//echo '<pre>'; print_r($associatedData); die;
 			$this->db->insert_batch('bs_childsubcategory_sizegroups', $associatedData);
 		}
