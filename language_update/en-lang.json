@@ -104,5 +104,5 @@
  "err_reportitemreason_len": "The length of Report Item Reason must be greater than 4",
  "err_reportitemreason_exist": "Report Item Reason is already existed in the system",
  "btn_add_reportitemreason" : "Add Report Item Reason",
- "blockuser_reason_info" : "Report Item Reason Information"
+ "blockuser_reason_info" : "Block User Reason Information"
 }
