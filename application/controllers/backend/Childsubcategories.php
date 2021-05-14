@@ -45,13 +45,14 @@ class Childsubcategories extends BE_Controller {
 	 */
 	function search() 
 	{
-
 		// breadcrumb urls
 		$this->data['action_title'] = get_msg( 'child_subcat_search' );
 		
 		// condition with search term
-		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )),
-						'cat_id' => $this->searchterm_handler( $this->input->post('cat_id')) );
+		$conds = array( 
+			'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )),
+			'cat_id' => $this->searchterm_handler( $this->input->post('cat_id')) 
+		);
 		
 		// pagination
 		$this->data['rows_count'] = $this->Childsubcategory->count_all_by( $conds );
@@ -158,14 +159,13 @@ class Childsubcategories extends BE_Controller {
 			return;
 		}
 		foreach($associatedData as $key=>$associations){
-			$associatedData[$key]['child_subcategory_id'] = ($id=='')?$data['id']:$id;
+			$associatedData[$key]['child_subcategory_id'] = $data['id'];
 			$associatedData[$key]['added_date'] = date("Y-m-d H:i:s");
 		}
 		//echo '<pre>'; print_r($associatedData); die;
-		$this->db->where('child_subcategory_id', ($id=='')?$data['id']:$id);
-        $this->db->delete('bs_childsubcategory_sizegroups');
 		if(!empty($associatedData)){
-			
+			$this->db->where('child_subcategory_id', $data['id']);
+        	$this->db->delete('bs_childsubcategory_sizegroups');
 			//echo '<pre>'; print_r($associatedData); die;
 			$this->db->insert_batch('bs_childsubcategory_sizegroups', $associatedData);
 		}
