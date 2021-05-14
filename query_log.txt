@@ -49,3 +49,14 @@ CREATE TABLE `bidding_app`.`bs_blockuserreasons` ( `id` INT(11) NOT NULL AUTO_IN
 
 //Create Report Item Reasons Query : 
 CREATE TABLE `bidding_app`.`bs_reportitemreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 14-05-2021
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'returnreason', 'Return Reasons', 'returnreasons', '', '28', '1', '1')
+
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'promotingitemplan', 'Promoting Item Plans', 'promotingitemplans', '', '29', '1', '1')
+
+//Create Return Reasons Query : 
+CREATE TABLE `bidding_app`.`bs_returnreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+//Create Promoting Item Plans Query : 
+CREATE TABLE `bidding_app`.`bs_promotingitemplans` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `code` VARCHAR(255) NOT NULL , `price` VARCHAR(255) NOT NULL , `days` INT(11) NOT NULL DEFAULT '0' , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;

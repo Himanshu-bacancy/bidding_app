@@ -922,6 +922,39 @@ class PS_Delete {
 		return true;
 	}
 
+
+	/**
+	 * Delete the Returnreason record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_returnreason( $price_id )
+	{		
+		if ( ! $this->CI->Returnreasons->delete( $price_id )) {
+			
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
+	 * Delete the Promotingitemplan record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_promotingitemplan( $price_id )
+	{		
+		if ( ! $this->CI->Promotingitemplans->delete( $price_id )) {
+			
+			return false;
+		}
+
+
+		return true;
+	}
+
 	/**
 	 * Delete the deliverymethod record
 	 *
