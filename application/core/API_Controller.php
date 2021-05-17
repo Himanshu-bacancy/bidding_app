@@ -489,7 +489,7 @@ class API_Controller extends REST_Controller
 		if ( $offset ) {
 			unset( $conds['offset']);
 		}
-		
+
 
 		if ( count( $conds ) == 0 ) {
 		// if 'id' is not existed, get all	
@@ -524,71 +524,7 @@ class API_Controller extends REST_Controller
 
 				$data = $this->model->get_all_by( $conds )->result();
 			}
-			if(isset($conds['sub_color']))
-			{
-				foreach($data as $childkey => $colordata)
-				{
-					if($colordata->is_color_filter =='1')
-					{
-						$condscstm = array();
-						$condscstm['no_publish_filter'] = 1;
-	
-						$colorarray = $this->Color->get_all_by( $condscstm);
-						
-						$data[$childkey]->colors = $colorarray->result();
-					}
-				}
-			}
-			
 
-			if(isset($conds['sub_brand']))
-			{
-				foreach($data as $childkey => $branddata)
-				{
-					if($branddata->is_brand_filter =='1')
-					{
-						$condscstm = array();
-						$condscstm['no_publish_filter'] = 1;
-	
-						$brandarray = $this->Brands->get_all_by( $condscstm);
-						
-						$data[$childkey]->brands = $brandarray->result();
-					}
-				}
-			}
-
-			if(isset($conds['sub_brand']))
-			{
-				foreach($data as $childkey => $sizedata)
-				{
-					if($sizedata->is_size_filter =='1')
-					{
-						$sizegroups = $this->Sizegroups->get_all();
-						$selectedSizeGroups = $this->Childsubcategory->getSelectedSizegroups($sizedata->id);
-						$options=array();
-						
-						foreach($selectedSizeGroups as $sizekey => $sgroups) {
-							$sizearray = $this->Sizegroups->get_one($sgroups);
-							
-							
-							$sizearr = json_decode(json_encode($sizearray), true);
-
-							if(count($sizearray)>0)
-							{
-								
-								$condscstm = array();
-								$condscstm['no_publish_filter'] = 1;
-								$condscstm['sizegroup_id'] = $sizearr['id'];
-								$sizearr['options']=$this->Sizegroup_option->get_all_by( $condscstm)->result();
-								
-							}
-							$selectedSizeGroups[$sizekey]=$sizearr;
-						}
-						$data[$childkey]->sizes =$selectedSizeGroups ;
-					}
-				}
-			}
-			
 			$this->custom_response( $data , $offset );
 		}
 	}
