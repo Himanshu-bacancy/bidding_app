@@ -13,10 +13,12 @@
 				},
 				code:{
 					required: true,
-					remote: "<?php echo $module_site_url .'/ajxcode_exists/'.@$promotingitemplan->id; ?>"
+					remote: "<?php echo $module_site_url .'/ajxcode_exists/'.@$promotingitemplan->id; ?>",
+					digits: true
 				},
 				price:{
-					required: true
+					required: true,
+					number : true
 				},
 				days:{
 					required: true
@@ -30,10 +32,12 @@
 				},
 				code:{
 					required: "<?php echo get_msg( 'err_plan_code' ) ;?>",
-					remote: "<?php echo get_msg( 'err_plancode_exist' ) ;?>."
+					remote: "<?php echo get_msg( 'err_plancode_exist' ) ;?>.",
+					digits: "<?php echo get_msg( 'err_digits' ) ;?>"
 				},
 				price:{
-					required: "<?php echo get_msg( 'err_plan_price' ) ;?>"
+					required: "<?php echo get_msg( 'err_plan_price' ) ;?>",
+					number : "<?php echo get_msg( 'err_numbers' ) ;?>"
 				},
 				days:{
 					required: "<?php echo get_msg( 'err_plan_days' ) ;?>"
