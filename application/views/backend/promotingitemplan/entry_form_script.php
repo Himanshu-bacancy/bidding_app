@@ -13,8 +13,7 @@
 				},
 				code:{
 					required: true,
-					remote: "<?php echo $module_site_url .'/ajxcode_exists/'.@$promotingitemplan->id; ?>",
-					digits: true
+					remote: "<?php echo $module_site_url .'/ajxcode_exists/'.@$promotingitemplan->id; ?>"
 				},
 				price:{
 					required: true,
@@ -32,8 +31,7 @@
 				},
 				code:{
 					required: "<?php echo get_msg( 'err_plan_code' ) ;?>",
-					remote: "<?php echo get_msg( 'err_plancode_exist' ) ;?>.",
-					digits: "<?php echo get_msg( 'err_digits' ) ;?>"
+					remote: "<?php echo get_msg( 'err_plancode_exist' ) ;?>."
 				},
 				price:{
 					required: "<?php echo get_msg( 'err_plan_price' ) ;?>",
