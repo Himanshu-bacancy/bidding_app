@@ -956,6 +956,24 @@ class PS_Delete {
 	}
 
 	/**
+	 * Delete the Address record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_address( $address_id )
+	{		
+		echo $address_id;
+		die;
+		if ( ! $this->CI->Addresses->delete( $address_id )) {
+			
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
 	 * Delete the deliverymethod record
 	 *
 	 * @param      <type>  $id     The identifier
