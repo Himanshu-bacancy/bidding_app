@@ -183,7 +183,7 @@ class Users extends API_Controller
 	        	} else {
 
 		        	if ( !send_user_register_email( $user_data['user_id'], $subject )) {
-
+						
 						$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 					
 					} 
