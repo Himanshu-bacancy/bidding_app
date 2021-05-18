@@ -722,6 +722,20 @@ class PS_Adapter {
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'sub_category' );
 	}
 
+	/**
+	 * Customize request childsubcategory object
+	 *
+	 * @param      <type>  $obj    The object
+	 */
+	function convert_childsubcategory( &$obj )
+	{
+		// set default photo
+		$obj->default_photo = $this->get_default_photo( $obj->id, 'childsubcategory_cover' );
+
+		//set default icon
+		$obj->default_icon = $this->get_default_photo( $obj->id, 'childsubcategory_icon' );
+	}
+
 	/*
 	 * Customize feed object
 	 *

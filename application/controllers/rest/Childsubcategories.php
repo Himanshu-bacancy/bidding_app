@@ -50,16 +50,21 @@ class Childsubcategories extends API_Controller
 		parent::convert_object( $obj );
 
 		// convert customize item object
-		$this->ps_adapter->convert_subcategory( $obj );
+		$this->ps_adapter->convert_childsubcategory( $obj );
 	}
 
-	function getdata_get()
+	/**
+	 * Fetch Child Subcategory
+	 * 1) fetch child subcategory data
+	 * 2) Fetch all filters with details
+	 * @param      <type>   $cat_id  The  category id
+	 * @param      <type>   $sub_cat_id  The  sub category id
+	 *  @param      <type>   $id  The  child sub category id (optional)
+	 */
+	function getdata_post()
 	{
-		// add flag for default query
-		$this->is_get = true;
-
-		// get id
-		$id = $this->get( 'id' );
+		// if id is passed in post param
+		$id = $this->post( 'id' );
 
 		if ( $id ) {
 			
@@ -140,105 +145,124 @@ class Childsubcategories extends API_Controller
 		}
 		
 
-		if ( count( $conds ) == 0 ) {
-		// if 'id' is not existed, get all	
+		// if ( count( $conds ) == 0 ) {
+		// // if 'id' is not existed, get all	
 		
-			if ( !empty( $limit ) && !empty( $offset )) {
-			// if limit & offset is not empty
+		// 	if ( !empty( $limit ) && !empty( $offset )) {
+		// 	// if limit & offset is not empty
 				
-				$data = $this->model->get_all( $limit, $offset )->result();
-			} else if ( !empty( $limit )) {
-			// if limit is not empty
+		// 		$data = $this->model->get_all( $limit, $offset )->result();
+		// 	} else if ( !empty( $limit )) {
+		// 	// if limit is not empty
 				
-				$data = $this->model->get_all( $limit )->result();
-			} else {
-			// if both are empty
+		// 		$data = $this->model->get_all( $limit )->result();
+		// 	} else {
+		// 	// if both are empty
 
-				$data = $this->model->get_all()->result();
-			}
+		// 		$data = $this->model->get_all()->result();
+		// 	}
 
-			$this->custom_response( $data , $offset );
-		} else {
+		// 	$this->custom_response( $data , $offset );
+		// } 
+		else {
 
-			if ( !empty( $limit ) && !empty( $offset )) {
-			// if limit & offset is not empty
+			// validation rules for user register
+			$rules = array(
+				array(
+					'field' => 'cat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'sub_cat_id',
+					'rules' => 'required'
+				),
+				
+			);
 
-				$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
-			} else if ( !empty( $limit )) {
-			// if limit is not empty
+			// exit if there is an error in validation,
+			if ( !$this->is_valid( $rules )) exit;
 
-				$data = $this->model->get_all_by( $conds, $limit )->result();
-			} else {
-			// if both are empty
+			// Fetch childsubcategory with cat is and sub cat id
 
-				$data = $this->model->get_all_by( $conds )->result();
-			}
-			if(isset($conds['sub_color']))
+			if($this->post( 'cat_id' ) && $this->post( 'sub_cat_id' ))
 			{
-				foreach($data as $childkey => $colordata)
-				{
-					if($colordata->is_color_filter =='1')
-					{
-						$condscstm = array();
-						$condscstm['no_publish_filter'] = 1;
-	
-						$colorarray = $this->Color->get_all_by( $condscstm);
-						
-						$data[$childkey]->colors = $colorarray->result();
+				$conds['cat_id'] =  $this->post( 'cat_id' );
+				$conds['sub_cat_id'] = $this->post( 'sub_cat_id' );
+				
+				if ( !empty( $limit ) && !empty( $offset )) {
+					// if limit & offset is not empty
+		
+						$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
+					} else if ( !empty( $limit )) {
+					// if limit is not empty
+		
+						$data = $this->model->get_all_by( $conds, $limit )->result();
+					} else {
+					// if both are empty
+					
+						$data = $this->model->get_all_by( $conds )->result();
 					}
-				}
-			}
-			
-
-			if(isset($conds['sub_brand']))
-			{
-				foreach($data as $childkey => $branddata)
-				{
-					if($branddata->is_brand_filter =='1')
+					
+					foreach($data as $childkey => $colordata)
 					{
-						$condscstm = array();
-						$condscstm['no_publish_filter'] = 1;
-	
-						$brandarray = $this->Brands->get_all_by( $condscstm);
-						
-						$data[$childkey]->brands = $brandarray->result();
-					}
-				}
-			}
-
-			if(isset($conds['sub_brand']))
-			{
-				foreach($data as $childkey => $sizedata)
-				{
-					if($sizedata->is_size_filter =='1')
-					{
-						$sizegroups = $this->Sizegroups->get_all();
-						$selectedSizeGroups = $this->Childsubcategory->getSelectedSizegroups($sizedata->id);
-						$options=array();
-						
-						foreach($selectedSizeGroups as $sizekey => $sgroups) {
-							$sizearray = $this->Sizegroups->get_one($sgroups);
+						if($colordata->is_color_filter =='1')
+						{
+							$condscstm = array();
+							$condscstm['no_publish_filter'] = 1;
+		
+							$colorarray = $this->Color->get_all_by( $condscstm);
 							
-							
-							$sizearr = json_decode(json_encode($sizearray), true);
-
-							if(count($sizearray)>0)
-							{
-								
-								$condscstm = array();
-								$condscstm['no_publish_filter'] = 1;
-								$condscstm['sizegroup_id'] = $sizearr['id'];
-								$sizearr['options']=$this->Sizegroup_option->get_all_by( $condscstm)->result();
-								
-							}
-							$selectedSizeGroups[$sizekey]=$sizearr;
+							$data[$childkey]->colors = $colorarray->result();
 						}
-						$data[$childkey]->sizes =$selectedSizeGroups ;
 					}
-				}
+					
+					
+		
+					foreach($data as $childkey => $branddata)
+					{
+						if($branddata->is_brand_filter =='1')
+						{
+							$condscstm = array();
+							$condscstm['no_publish_filter'] = 1;
+		
+							$brandarray = $this->Brands->get_all_by( $condscstm);
+							
+							$data[$childkey]->brands = $brandarray->result();
+						}
+					}
+					
+		
+					foreach($data as $childkey => $sizedata)
+					{
+						if($sizedata->is_size_filter =='1')
+						{
+							$sizegroups = $this->Sizegroups->get_all();
+							$selectedSizeGroups = $this->Childsubcategory->getSelectedSizegroups($sizedata->id);
+							$options=array();
+							
+							foreach($selectedSizeGroups as $sizekey => $sgroups) {
+								$sizearray = $this->Sizegroups->get_one($sgroups);
+								
+								
+								$sizearr = json_decode(json_encode($sizearray), true);
+	
+								if(count($sizearray)>0)
+								{
+									
+									$condscstm = array();
+									$condscstm['no_publish_filter'] = 1;
+									$condscstm['sizegroup_id'] = $sizearr['id'];
+									$sizearr['options']=$this->Sizegroup_option->get_all_by( $condscstm)->result();
+									
+								}
+								$selectedSizeGroups[$sizekey]=$sizearr;
+							}
+							$data[$childkey]->sizes =$selectedSizeGroups ;
+						}
+					}
+					
+					$this->custom_response( $data , $offset );
 			}
-			
-			$this->custom_response( $data , $offset );
 		}
 	}
 

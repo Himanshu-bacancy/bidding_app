@@ -37,15 +37,15 @@ class Childsubcategory extends PS_Model {
 			}			
 		}
 
-		// sub category id condition
-		// if ( isset( $conds['sub_cat_id'] )) {
+		//sub category id condition
+		if ( isset( $conds['sub_cat_id'] )) {
 			
-		// 	if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
 				
-		// 		$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
+				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
 
-		// 	}			
-		// }
+			}			
+		}
 
 		// sub category id condition
 		if ( isset( $conds['id'] )) {
