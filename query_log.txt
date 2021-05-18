@@ -60,3 +60,13 @@ CREATE TABLE `bidding_app`.`bs_returnreasons` ( `id` INT(11) NOT NULL AUTO_INCRE
 
 //Create Promoting Item Plans Query : 
 CREATE TABLE `bidding_app`.`bs_promotingitemplans` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `code` VARCHAR(255) NOT NULL , `price` VARCHAR(255) NOT NULL , `days` INT(11) NOT NULL DEFAULT '0' , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 18-5-2021
+
+UPDATE `bs_items_types` SET `name` = 'Request All I Want' WHERE `bs_items_types`.`id` = '1';
+UPDATE `bs_items_types` SET `name` = 'Selling All I Want' WHERE `bs_items_types`.`id` = '2';
+UPDATE `bs_items_types` SET `name` = 'Selling / Exchange All I Want' WHERE `bs_items_types`.`id` = '3';
+
+UPDATE `bs_deliverymethod` SET `name` = 'Pick - Up Only ' WHERE `bs_deliverymethod`.`id` = 1;
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery Only' WHERE `bs_deliverymethod`.`id` = '2';
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery + Pick Up' WHERE `bs_deliverymethod`.`id` = 3;
