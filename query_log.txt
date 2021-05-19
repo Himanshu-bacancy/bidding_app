@@ -65,3 +65,12 @@ CREATE TABLE `bidding_app`.`bs_promotingitemplans` ( `id` INT(11) NOT NULL AUTO_
 
 // Create Address table
 CREATE TABLE `bidding_app`.`bs_addresses` ( `id` VARCHAR(255) NOT NULL , `address1` VARCHAR(255) NOT NULL , `address2` VARCHAR(255) DEFAULT NULL , `zipcode` VARCHAR(255) NOT NULL , `state` VARCHAR(255) NOT NULL , `city` VARCHAR(255) NOT NULL , `latitude` VARCHAR(255) NOT NULL , `longitude` VARCHAR(255) NOT NULL , `is_home_address` TINYINT(1) NULL DEFAULT '0' , `is_default_address` TINYINT(1) NULL DEFAULT '0' ,`status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+// Added on 18-5-2021
+
+UPDATE `bs_items_types` SET `name` = 'Request All I Want' WHERE `bs_items_types`.`id` = '1';
+UPDATE `bs_items_types` SET `name` = 'Selling All I Want' WHERE `bs_items_types`.`id` = '2';
+UPDATE `bs_items_types` SET `name` = 'Selling / Exchange All I Want' WHERE `bs_items_types`.`id` = '3';
+
+UPDATE `bs_deliverymethod` SET `name` = 'Pick - Up Only ' WHERE `bs_deliverymethod`.`id` = 1;
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery Only' WHERE `bs_deliverymethod`.`id` = '2';
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery + Pick Up' WHERE `bs_deliverymethod`.`id` = 3;
