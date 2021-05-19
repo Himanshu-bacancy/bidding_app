@@ -38,7 +38,18 @@
 								<?php
 									$options=array();
 									$options[0]=get_msg('Prd_search_subcat');
-									$sub_categories = $this->Subcategory->get_all();
+									
+									if($child_subcategory->id)
+									{
+										$condscat['cat_id'] = $child_subcategory->cat_id;
+										$sub_categories = $this->Subcategory->get_all_by($condscat);
+									}
+									else
+									{
+										$sub_categories = $this->Subcategory->get_all();
+									}
+									
+									
 										foreach($sub_categories->result() as $subcat) {
 											$options[$subcat->id]=$subcat->name;
 									}
