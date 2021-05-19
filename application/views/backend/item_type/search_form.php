@@ -35,11 +35,11 @@
 
 	</div>	
 
-	<div class='col-3'>
+	<!-- <div class='col-3'>
 		<a href='<?php echo $module_site_url .'/add';?>' class='btn btn-sm btn-primary pull-right'>
 			<span class='fa fa-plus'></span> 
 			<?php echo get_msg( 'type_add' )?>
 		</a>
-	</div>
+	</div> -->
 
 </div>

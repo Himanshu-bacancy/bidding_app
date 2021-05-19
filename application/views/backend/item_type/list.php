@@ -10,11 +10,11 @@
 			
 			<?php endif; ?>
 			
-			<?php if ( $this->ps_auth->has_access( DEL )): ?>
+			<!-- <?php if ( $this->ps_auth->has_access( DEL )): ?>
 				
 				<th><span class="th-title"><?php echo get_msg('btn_delete')?></span></th>
 			
-			<?php endif; ?>
+			<?php endif; ?> -->
 			
 			<?php if ( $this->ps_auth->has_access( PUBLISH )): ?>
 				
@@ -45,7 +45,7 @@
 				
 				<?php endif; ?>
 				
-				<?php if ( $this->ps_auth->has_access( DEL )): ?>
+				<!-- <?php if ( $this->ps_auth->has_access( DEL )): ?>
 					
 					<td>
 						<a herf='#' class='btn-delete' data-toggle="modal" data-target="#myModal" id="<?php echo $type->id;?>">
@@ -53,7 +53,7 @@
 						</a>
 					</td>
 				
-				<?php endif; ?>
+				<?php endif; ?> -->
 				
 				<?php if ( $this->ps_auth->has_access( PUBLISH )): ?>
 					

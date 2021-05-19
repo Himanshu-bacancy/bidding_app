@@ -223,8 +223,8 @@ class Address extends API_Controller
 
         } else {
 			
-			$this->ps_delete->delete_address($this->post('address_id'));
-        	
+			$this->Addresses->delete( $this->post('address_id') );
+			
 			$this->success_response( get_msg( 'success_delete' ));
 
         }
