@@ -63,9 +63,19 @@ CREATE TABLE `bidding_app`.`bs_promotingitemplans` ( `id` INT(11) NOT NULL AUTO_
 
 // Added on 18-5-2021
 
+INSERT INTO `bs_items_types` (`id`, `name`, `status`, `added_date`) VALUES
+('1', 'Request All I Want', 1, '2021-05-18 09:58:54'),
+('2', 'Selling All I Want', 1, '2021-05-18 10:11:37'),
+('3', 'Selling / Exchange All I Want', 1, '2021-05-18 10:15:00');
+
 UPDATE `bs_items_types` SET `name` = 'Request All I Want' WHERE `bs_items_types`.`id` = '1';
 UPDATE `bs_items_types` SET `name` = 'Selling All I Want' WHERE `bs_items_types`.`id` = '2';
 UPDATE `bs_items_types` SET `name` = 'Selling / Exchange All I Want' WHERE `bs_items_types`.`id` = '3';
+
+INSERT INTO `bs_deliverymethod` (`id`, `name`, `status`, `added_date`) VALUES
+(1, 'Pick - Up Only', 1, '2021-04-13 06:57:51'),
+(2, 'Delivery Only', 1, '2021-05-18 10:57:42'),
+(3, 'Delivery + Pick Up', 1, '2021-05-18 10:59:00');
 
 UPDATE `bs_deliverymethod` SET `name` = 'Pick - Up Only ' WHERE `bs_deliverymethod`.`id` = 1;
 UPDATE `bs_deliverymethod` SET `name` = 'Delivery Only' WHERE `bs_deliverymethod`.`id` = '2';
