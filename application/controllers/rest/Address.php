@@ -152,6 +152,7 @@ class Address extends API_Controller
 				else
 				{
 					// Edit address
+					$address_data['updated_date'] =  date("Y-m-d H:i:s");
 					$this->Addresses->save($address_data,$id);
 				}
 
@@ -166,7 +167,7 @@ class Address extends API_Controller
 			 
 			$obj = $this->Addresses->get_one( $id );
 			
-			$this->ps_adapter->convert_item( $obj );
+			//$this->ps_adapter->convert_item( $obj );
 			$this->custom_response( $obj );
 		}
 		
