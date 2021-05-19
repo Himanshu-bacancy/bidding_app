@@ -56,6 +56,22 @@ class Address extends API_Controller
 		return $conds;
 	}
 
+	/**
+	 * Add / Update Address of login users
+	 * 1) Add address
+	 * 2) Edit address if id already there
+	 * @param      <type>   $address1  The  address1
+	 * @param      <type>   $address2  The  address2 (optional)
+	 *  @param      <type>   $zipcode  The  zipcode
+	 * @param      <type>   $state  The  state
+	 * @param      <type>   $city  The  city
+	 * @param      <type>   $latitude  The  latitude
+	 * @param      <type>   $longitude  The  longitude
+	 * @param      <type>   $user_id  The  User id
+	 * @param      <type>   $is_home_address  if its home address (optional)
+	 * @param      <type>   $is_default_address  Make default address (optional)
+	 */
+
 	function add_post() {
 		
 		// validation rules for add address
@@ -156,6 +172,12 @@ class Address extends API_Controller
 		
 	}
 
+	/**
+	 * Fetch Address of login users
+	 * 1) Address list
+	 * @param      <type>   $user_id  The User id
+	 */
+
 	function fetch_address_post( ) {
 
 		$rules = array(
@@ -194,8 +216,9 @@ class Address extends API_Controller
 
 
 	/**
-	* delete Address data
-	*/
+	 * delete Address data
+	 * @param      <type>   $address_id  The Address id
+	 */
 
 	function address_delete_post( ) {
 
