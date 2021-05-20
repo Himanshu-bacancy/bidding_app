@@ -49,3 +49,42 @@ CREATE TABLE `bidding_app`.`bs_blockuserreasons` ( `id` INT(11) NOT NULL AUTO_IN
 
 //Create Report Item Reasons Query : 
 CREATE TABLE `bidding_app`.`bs_reportitemreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 14-05-2021
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'returnreason', 'Return Reasons', 'returnreasons', '', '28', '1', '1')
+
+INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_lang_key`, `module_icon`, `ordering`, `is_show_on_menu`, `group_id`) VALUES (NULL, 'promotingitemplan', 'Promoting Item Plans', 'promotingitemplans', '', '29', '1', '1')
+
+//Create Return Reasons Query : 
+CREATE TABLE `bidding_app`.`bs_returnreasons` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+//Create Promoting Item Plans Query : 
+CREATE TABLE `bidding_app`.`bs_promotingitemplans` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `code` VARCHAR(255) NOT NULL , `price` VARCHAR(255) NOT NULL , `days` INT(11) NOT NULL DEFAULT '0' , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , `updated_flag` INT(11) NULL DEFAULT NULL, PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 18-05-2021
+
+// Create Address table
+CREATE TABLE `bidding_app`.`bs_addresses` ( `id` VARCHAR(255) NOT NULL , `address1` VARCHAR(255) NOT NULL , `address2` VARCHAR(255) DEFAULT NULL , `zipcode` VARCHAR(255) NOT NULL , `state` VARCHAR(255) NOT NULL , `city` VARCHAR(255) NOT NULL , `country` VARCHAR(255) NOT NULL , `latitude` VARCHAR(255) NOT NULL , `longitude` VARCHAR(255) NOT NULL , `is_home_address` TINYINT(1) NULL DEFAULT '0' , `is_default_address` TINYINT(1) NULL DEFAULT '0' ,`status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , PRIMARY KEY (id) ) ENGINE = InnoDB;
+// Added on 18-5-2021
+
+INSERT INTO `bs_items_types` (`id`, `name`, `status`, `added_date`) VALUES
+('1', 'Request All I Want', 1, '2021-05-18 09:58:54'),
+('2', 'Selling All I Want', 1, '2021-05-18 10:11:37'),
+('3', 'Selling / Exchange All I Want', 1, '2021-05-18 10:15:00');
+
+UPDATE `bs_items_types` SET `name` = 'Request All I Want' WHERE `bs_items_types`.`id` = '1';
+UPDATE `bs_items_types` SET `name` = 'Selling All I Want' WHERE `bs_items_types`.`id` = '2';
+UPDATE `bs_items_types` SET `name` = 'Selling / Exchange All I Want' WHERE `bs_items_types`.`id` = '3';
+
+INSERT INTO `bs_deliverymethod` (`id`, `name`, `status`, `added_date`) VALUES
+(1, 'Pick - Up Only', 1, '2021-04-13 06:57:51'),
+(2, 'Delivery Only', 1, '2021-05-18 10:57:42'),
+(3, 'Delivery + Pick Up', 1, '2021-05-18 10:59:00');
+
+UPDATE `bs_deliverymethod` SET `name` = 'Pick - Up Only ' WHERE `bs_deliverymethod`.`id` = 1;
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery Only' WHERE `bs_deliverymethod`.`id` = '2';
+UPDATE `bs_deliverymethod` SET `name` = 'Delivery + Pick Up' WHERE `bs_deliverymethod`.`id` = 3;
+
+
+// Added on 20-05-2021
+ALTER TABLE core_users ADD accept_delivery_id int(11);

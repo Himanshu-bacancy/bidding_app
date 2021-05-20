@@ -25,4 +25,12 @@ class Appinfo extends API_Controller
 
 	}
 
+	function similar_item_criteria_get()
+	{
+		$rows = '[{"id":1,"title":"Brand"},{"id":2,"title":"Size"},{"id":3,"title":"Condition"},{"id":4,"title":"Color"}]';
+
+		$objArray = json_decode($rows);
+
+		$this->custom_response( $objArray );		
+	}
 }

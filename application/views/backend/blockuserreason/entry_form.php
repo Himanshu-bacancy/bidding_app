@@ -17,7 +17,7 @@
 	            		<div class="form-group">
 	                   		<label>
 	                   			<span style="font-size: 17px; color: red;">*</span>
-								Reason
+								<?php echo get_msg('reason_name')?>
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('cat_name_tooltips')?>">
 									<span class='glyphicon glyphicon-info-sign menu-icon'>
 								</a>

@@ -176,7 +176,8 @@ class User extends PS_Model {
 		if ( isset( $conds['status'] )) {
 			$this->db->where( 'status', $conds['status'] );
 		} else {
-			$this->db->where( 'status', 1 );
+			$this->db->where_in( 'status', [1,2]);
+			//$this->db->where( 'status', 1 );
 		}
 
 		// user added_date_timestamp condition

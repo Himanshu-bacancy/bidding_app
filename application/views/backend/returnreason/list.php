@@ -2,7 +2,7 @@
 	<table class="table m-0 table-striped">
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
-			<th><?php echo get_msg('deliverymethod_name'); ?></th>
+			<th><?php echo get_msg('reason_name'); ?></th>
 			
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 				
@@ -10,15 +10,15 @@
 			
 			<?php endif; ?>
 			
-			<!-- <?php if ( $this->ps_auth->has_access( DEL )): ?>
+			<?php if ( $this->ps_auth->has_access( DEL )): ?>
 				
 				<th><span class="th-title"><?php echo get_msg('btn_delete')?></span></th>
 			
-			<?php endif; ?> -->
+			<?php endif; ?>
 			
 			<?php if ( $this->ps_auth->has_access( PUBLISH )): ?>
 				
-				<th><span class="th-title"><?php echo get_msg('btn_publish')?></span></th>
+				<th><span class="th-title"><?php echo get_msg('btn_status')?></span></th>
 			
 			<?php endif; ?>
 
@@ -27,43 +27,43 @@
 	
 	<?php $count = $this->uri->segment(4) or $count = 0; ?>
 
-	<?php if ( !empty( $deliverymethods ) && count( $deliverymethods->result()) > 0 ): ?>
+	<?php if ( !empty( $returnreasons ) && count( $returnreasons->result()) > 0 ): ?>
 
-		<?php foreach($deliverymethods->result() as $deliverymethod): ?>
+		<?php foreach($returnreasons->result() as $returnreason): ?>
 			
 			<tr>
 				<td><?php echo ++$count;?></td>
-				<td ><?php echo $deliverymethod->name;?></td>
+				<td ><?php echo $returnreason->name;?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 			
 					<td>
-						<a href='<?php echo $module_site_url .'/edit/'. $deliverymethod->id; ?>'>
+						<a href='<?php echo $module_site_url .'/edit/'. $returnreason->id; ?>'>
 							<i style='font-size: 18px;' class='fa fa-pencil-square-o'></i>
 						</a>
 					</td>
 				
 				<?php endif; ?>
 				
-				<!-- <?php if ( $this->ps_auth->has_access( DEL )): ?>
+				<?php if ( $this->ps_auth->has_access( DEL )): ?>
 					
 					<td>
-						<a herf='#' class='btn-delete' data-toggle="modal" data-target="#myModal" id="<?php echo $deliverymethod->id;?>">
+						<a herf='#' class='btn-delete' data-toggle="modal" data-target="#myModal" id="<?php echo $returnreason->id;?>">
 							<i style='font-size: 18px;' class='fa fa-trash-o'></i>
 						</a>
 					</td>
 				
-				<?php endif; ?> -->
+				<?php endif; ?>
 				
 				<?php if ( $this->ps_auth->has_access( PUBLISH )): ?>
 					
 					<td>
-						<?php if ( @$deliverymethod->status == 1): ?>
-							<button class="btn btn-sm btn-success unpublish" id='<?php echo $deliverymethod->id;?>'>
-							<?php echo get_msg( 'btn_yes' ); ?></button>
+						<?php if ( @$returnreason->status == 1): ?>
+							<button class="btn btn-sm btn-success unpublish" id='<?php echo $returnreason->id;?>'>
+							<?php echo get_msg( 'btn_active' ); ?></button>
 						<?php else:?>
-							<button class="btn btn-sm btn-danger publish" id='<?php echo $deliverymethod->id;?>'>
-							<?php echo get_msg( 'btn_no' ); ?></button><?php endif;?>
+							<button class="btn btn-sm btn-danger publish" id='<?php echo $returnreason->id;?>'>
+							<?php echo get_msg( 'btn_inactive' ); ?></button><?php endif;?>
 					</td>
 				
 				<?php endif; ?>
