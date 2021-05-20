@@ -131,15 +131,19 @@ class Address extends API_Controller
         	"latitude" => $this->post('latitude'), 
         	"longitude" => $this->post('longitude'),
         	"user_id" => $this->post('user_id'),
-			"is_home_address" => (!empty($this->post('is_home_address')))?$this->post('is_home_address'):'0', 
-			"is_default_address" => (!empty($this->post('is_default_address')))?$this->post('is_default_address'):'0', 
-        	"id" => $this->post('id'),
-        	"added_date" =>  date("Y-m-d H:i:s")
-        	
+			"is_home_address" => (($this->post('is_home_address')=='1'))?'1':'0', 
+			"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
+        	"id" => $this->post('id')
         );
 
 		$id = $address_data['id'];
 
+		// Validation for only one home address and default address 
+
+		$homedata = $this->db->get_where('bs_addresses', array('is_home_address' => 1 ,'user_id' => $this->post('user_id')));
+
+		$defaultdata = $this->db->get_where('bs_addresses', array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
+		
 		$usercheck  = $this->User->get_one($this->post('user_id'));
 		
 		if(isset($usercheck->is_empty_object))
@@ -157,18 +161,55 @@ class Address extends API_Controller
 				}
 				else
 				{
-					// Edit address
-					$address_data['updated_date'] =  date("Y-m-d H:i:s");
-					$this->Addresses->save($address_data,$id);
+					// Validation for only one home address and default address 
+					$this->db->select('*');
+					$this->db->from('bs_addresses');
+					$this->db->where(array('is_home_address' => 1 ,'user_id' => $this->post('user_id')));
+					$this->db->where_not_in('id',$id);
+					$homedataedit = $this->db->get();
+					
+					$this->db->select('*');
+					$this->db->from('bs_addresses');
+					$this->db->where(array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
+					$this->db->where_not_in('id',$id);
+					$defaultdataedit = $this->db->get();
+					
+					if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+					{
+						$this->error_response( get_msg( 'home_address_exist' ));
+					}
+					else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+					{
+						$this->error_response( get_msg( 'default_address_exist' ));
+					}
+					else
+					{
+						
+						// Edit address
+						$address_data['updated_date'] =  date("Y-m-d H:i:s");
+						$this->Addresses->save($address_data,$id);
+					}
+					
 				}
 
 				
 			} else{
 	
-				 $this->Addresses->save($address_data);
+				if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+				{
+					$this->error_response( get_msg( 'home_address_exist' ));
+				}
+				else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+				{
+					$this->error_response( get_msg( 'default_address_exist' ));
+				}
+				else
+				{
+					$address_data['added_date'] =  date("Y-m-d H:i:s");
+					$this->Addresses->save($address_data);
 	
-				 $id = $address_data['id'];
-				 
+					$id = $address_data['id'];
+				}
 			}
 			 
 			$obj = $this->Addresses->get_one( $id );

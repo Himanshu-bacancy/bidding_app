@@ -42,6 +42,11 @@ class Deliverymethod extends API_Controller
 
 	}
 
+	/**
+	 * Save and update delivery method id in Users table
+	 * @param      <type>   $delivery_method_id  The  Delivery method id
+	 * @param      <type>   $user_id  The  User id
+	 */
 	function user_accept_delivery_post()
 	{
 		// validation rules

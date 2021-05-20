@@ -141,5 +141,7 @@
  "success_delete" : "Record deleted successfully",
  "invalid_address_id" : "Invalid Address id",
  "invalid_user_id":"Invalid User id",
- "address_not_found" : "Address not found"
+ "address_not_found" : "Address not found",
+ "home_address_exist" : "Home address already exists",
+ "default_address_exist" : "Default address already exists"
 } 
