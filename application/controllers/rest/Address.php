@@ -62,9 +62,10 @@ class Address extends API_Controller
 	 * 2) Edit address if id already there
 	 * @param      <type>   $address1  The  address1
 	 * @param      <type>   $address2  The  address2 (optional)
-	 *  @param      <type>   $zipcode  The  zipcode
+	 * @param      <type>   $zipcode  The  zipcode
 	 * @param      <type>   $state  The  state
 	 * @param      <type>   $city  The  city
+	 * @param      <type>   $country  The  country
 	 * @param      <type>   $latitude  The  latitude
 	 * @param      <type>   $longitude  The  longitude
 	 * @param      <type>   $user_id  The  User id
@@ -91,6 +92,10 @@ class Address extends API_Controller
 	       
 	        array(
 	        	'field' => 'city',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'country',
 	        	'rules' => 'required'
 	        ),
 	        array(
@@ -122,6 +127,7 @@ class Address extends API_Controller
         	"zipcode" => $this->post('zipcode'),
         	"state" => $this->post('state'),
         	"city" => $this->post('city'),
+			"country" => $this->post('country'),
         	"latitude" => $this->post('latitude'), 
         	"longitude" => $this->post('longitude'),
         	"user_id" => $this->post('user_id'),
