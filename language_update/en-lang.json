@@ -134,5 +134,12 @@
  "promotingitemplan_delete_confirm_message": "Do you want to delete this promoting item plan?",
  "btn_add_promotingitemplan" : "Add Promoting item plan",
  "err_digits" : "Please provide digits only",
- "err_numbers" : "Please provide numbers only"
-}
+ "err_numbers" : "Please provide numbers only",
+ "delivery_method_not_found" :"Delivery method not found",
+ "user_not_found" : "User not found",
+ "accept_delivery_updated" : "User's delivery method updated successfully",
+ "success_delete" : "Record deleted successfully",
+ "invalid_address_id" : "Invalid Address id",
+ "invalid_user_id":"Invalid User id",
+ "address_not_found" : "Address not found"
+} 

@@ -84,3 +84,7 @@ INSERT INTO `bs_deliverymethod` (`id`, `name`, `status`, `added_date`) VALUES
 UPDATE `bs_deliverymethod` SET `name` = 'Pick - Up Only ' WHERE `bs_deliverymethod`.`id` = 1;
 UPDATE `bs_deliverymethod` SET `name` = 'Delivery Only' WHERE `bs_deliverymethod`.`id` = '2';
 UPDATE `bs_deliverymethod` SET `name` = 'Delivery + Pick Up' WHERE `bs_deliverymethod`.`id` = 3;
+
+
+// Added on 20-05-2021
+ALTER TABLE core_users ADD accept_delivery_id int(11);

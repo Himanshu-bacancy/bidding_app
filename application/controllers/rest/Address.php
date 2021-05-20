@@ -144,7 +144,7 @@ class Address extends API_Controller
 		
 		if(isset($usercheck->is_empty_object))
 		{
-			$this->error_response( get_msg( 'User not found' ));
+			$this->error_response( get_msg( 'user_not_found' ));
 		}
 		else
 		{
@@ -153,7 +153,7 @@ class Address extends API_Controller
 				$addresscheck  = $this->Addresses->get_one($id);
 				if(isset($addresscheck->is_empty_object))
 				{
-					$this->error_response( get_msg( 'Address not found' ));
+					$this->error_response( get_msg( 'address_not_found' ));
 				}
 				else
 				{
@@ -207,7 +207,7 @@ class Address extends API_Controller
         
         if(isset($usercheck->is_empty_object))
 		{
-        	$this->error_response( get_msg( 'Invalid User id' ));
+        	$this->error_response( get_msg( 'invalid_user_id' ));
 
         } else {
 
@@ -249,7 +249,7 @@ class Address extends API_Controller
         
         if ( $address_data->id == "") {
 
-        	$this->error_response( get_msg( 'Invalid Address id' ));
+        	$this->error_response( get_msg( 'invalid_address_id' ));
 
         } else {
 			
