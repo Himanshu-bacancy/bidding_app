@@ -13,6 +13,7 @@ class Users extends API_Controller
 	function __construct()
 	{
 		parent::__construct( 'User' );
+		$this->CI->load->library('Authorization_Token');
 	}	
 
 	/**
@@ -235,6 +236,7 @@ class Users extends API_Controller
 	 */
 	function login_post()
 	{
+		//echo '<pre>'; print_r($this->post()); die(' data received');
 		// validation rules for user register
 		$rules = array(
 			
@@ -251,7 +253,7 @@ class Users extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
-        if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ), 'user_password' => $this->post( 'user_password' ), 'device_token' => $this->post( 'device_token' )))) {
+        if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ), 'device_token' => $this->post( 'device_token' )))) {
 
         //if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ), 'user_password' => $this->post( 'user_password' )))) {
 
@@ -299,13 +301,22 @@ class Users extends API_Controller
 						);
 			        	$this->Noti->save( $noti_data, $push_noti_token_id );
 				}
-		        $this->custom_response($user);
+				// you user authentication code will go here, you can compare the user with the database or whatever
+				//echo '<pre>'; print_r($user); die;
+				$payload = [
+					'user_id' => $user->user_id ? $user->user_id : 0,
+					'user_email' => $user->user_email ? $user->user_email : '',
+					'user_phone' => $user->user_phone ? $user->user_phone : '',
+					'device_token' => $user->device_token ? $user->device_token : '',
+				];
+				//echo '<pre>'; print_r($payload); die;
+				$token = $this->authorization_token->generateToken($payload);
+				$user->token = $token;
+				//$data = ['data'=>$user, 'token'=>$token];
+				$this->custom_response($user);
 	        }
-        
-            
         } else {
-
-        	$this->error_response( get_msg( 'err_user_not_exist' ));
+			$this->error_response( get_msg( 'err_user_not_exist' ));
 
         }
 
@@ -2478,6 +2489,7 @@ class Users extends API_Controller
 	 */
 	function get_blocked_user_by_loginuser_get()
 	{
+
 		// add flag for default query
 		$this->is_get = true;
 
@@ -2493,7 +2505,11 @@ class Users extends API_Controller
 
 		$blocked_datas = $this->Block->get_all_by($conds_block)->result();
 		//print_r(count( $blocked_datas ));die;
-
+		$user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+		echo '<pre>'; print_R($user_data); die('  himanshu sharma');
 		if ( count( $blocked_datas ) > 0 ) {
 			foreach ($blocked_datas as $blocked_data) {
 		  	$result .= "'" .$blocked_data->to_block_user_id ."',";
