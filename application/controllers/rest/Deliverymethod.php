@@ -64,6 +64,18 @@ class Deliverymethod extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
 
+		if($this->post('delivery_method_id')=='1' || $this->post('delivery_method_id')=='3')
+		{
+			$rulesdis = array(
+				array(
+					'field' => 'pickup_search_distance',
+					'rules' => 'numeric|required'
+				),
+			);
+
+			if ( !$this->is_valid( $rulesdis )) exit;
+		}
+
 		$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
 		$usercheck  = $this->User->get_one($this->post('user_id'));
 
@@ -80,6 +92,7 @@ class Deliverymethod extends API_Controller
 		else
 		{
 			$delivery_data['accept_delivery_id'] = $this->post('delivery_method_id');
+			$delivery_data['pickup_search_distance'] = ($this->post('delivery_method_id')=='1' || $this->post('delivery_method_id')=='3')?$this->post('pickup_search_distance'):'';
 			$this->User->save($delivery_data,$this->post('user_id'));
 
 			$this->success_response( get_msg( 'accept_delivery_updated' ));

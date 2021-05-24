@@ -2509,7 +2509,7 @@ class Users extends API_Controller
             'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
-		echo '<pre>'; print_R($user_data); die('  himanshu sharma');
+		//echo '<pre>'; print_R($user_data); die('  himanshu sharma');
 		if ( count( $blocked_datas ) > 0 ) {
 			foreach ($blocked_datas as $blocked_data) {
 		  	$result .= "'" .$blocked_data->to_block_user_id ."',";

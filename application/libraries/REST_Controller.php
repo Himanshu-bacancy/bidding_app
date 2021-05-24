@@ -471,7 +471,7 @@ abstract class REST_Controller extends CI_Controller
     public function _allow_methods(array $methods)
     {
         $REQUEST_METHOD = $this->CI->input->server('REQUEST_METHOD', TRUE);
-        echo'<pre>'; print_r($REQUEST_METHOD); die;
+        //echo'<pre>'; print_r($REQUEST_METHOD); die;
         // check request method in `$allowed_http_methods` array()
         if (in_array(strtolower($REQUEST_METHOD), $this->allowed_http_methods))
         {

@@ -88,3 +88,6 @@ UPDATE `bs_deliverymethod` SET `name` = 'Delivery + Pick Up' WHERE `bs_deliverym
 
 // Added on 20-05-2021
 ALTER TABLE core_users ADD accept_delivery_id int(11);
+
+// Added on 24-05-2021
+ALTER TABLE core_users ADD pickup_search_distance DOUBLE NULL;
