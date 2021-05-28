@@ -991,6 +991,21 @@ class PS_Delete {
 	}
 
 	/**
+	 * Delete the deliverymethod record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_packagesize( $package_id )
+	{		
+		if ( ! $this->CI->Packagesizes->delete( $package_id )) {
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
 	 * Delete the sizegroup record
 	 *
 	 * @param      <type>  $id     The identifier
