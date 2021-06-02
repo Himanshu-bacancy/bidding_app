@@ -174,42 +174,84 @@ class Address extends API_Controller
 					$this->db->where_not_in('id',$id);
 					$defaultdataedit = $this->db->get();
 					
-					if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
-					{
-						$this->error_response( get_msg( 'home_address_exist' ));
-					}
-					else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
-					{
-						$this->error_response( get_msg( 'default_address_exist' ));
-					}
-					else
-					{
+					// if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+					// {
+					// 	$this->error_response( get_msg( 'home_address_exist' ));
+					// }
+					// else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+					// {
+					// 	$this->error_response( get_msg( 'default_address_exist' ));
+					// }
+					// else
+					// {
 						
-						// Edit address
-						$address_data['updated_date'] =  date("Y-m-d H:i:s");
-						$this->Addresses->save($address_data,$id);
+					// 	// Edit address
+					// 	$address_data['updated_date'] =  date("Y-m-d H:i:s");
+					// 	$this->Addresses->save($address_data,$id);
+					// }
+
+					if($this->post('is_home_address')=='1')
+					{
+						$this->db->set('is_home_address', '0');
+						$this->db->where('is_home_address', '1');
+						$this->db->where('user_id', $this->post('user_id'));
+						$this->db->where('id !=', $id);
+						$this->db->update('bs_addresses'); 
 					}
+
+					if($this->post('is_default_address')=='1')
+					{
+						$this->db->set('is_default_address', '0');
+						$this->db->where('is_default_address', '1');
+						$this->db->where('user_id', $this->post('user_id'));
+						$this->db->where('id !=', $id);
+						$this->db->update('bs_addresses'); 
+					}
+
+					$address_data['updated_date'] =  date("Y-m-d H:i:s");
+					$this->Addresses->save($address_data,$id);
 					
 				}
 
 				
 			} else{
 	
-				if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
-				{
-					$this->error_response( get_msg( 'home_address_exist' ));
-				}
-				else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
-				{
-					$this->error_response( get_msg( 'default_address_exist' ));
-				}
-				else
-				{
-					$address_data['added_date'] =  date("Y-m-d H:i:s");
-					$this->Addresses->save($address_data);
+				// if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+				// {
+				// 	$this->error_response( get_msg( 'home_address_exist' ));
+				// }
+				// else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+				// {
+				// 	$this->error_response( get_msg( 'default_address_exist' ));
+				// }
+				// else
+				// {
+				// 	$address_data['added_date'] =  date("Y-m-d H:i:s");
+				// 	$this->Addresses->save($address_data);
 	
-					$id = $address_data['id'];
+				// 	$id = $address_data['id'];
+				// }
+
+				if($this->post('is_home_address')=='1')
+				{
+					$this->db->set('is_home_address', '0');
+					$this->db->where('is_home_address', '1');
+					$this->db->where('user_id', $this->post('user_id'));
+					$this->db->update('bs_addresses'); 
 				}
+
+				if($this->post('is_default_address')=='1')
+				{
+					$this->db->set('is_default_address', '0');
+					$this->db->where('is_default_address', '1');
+					$this->db->where('user_id', $this->post('user_id'));
+					$this->db->update('bs_addresses'); 
+				}
+
+				$address_data['added_date'] =  date("Y-m-d H:i:s");
+				$this->Addresses->save($address_data);
+
+				$id = $address_data['id'];
 			}
 			 
 			$obj = $this->Addresses->get_one( $id );
@@ -261,6 +303,98 @@ class Address extends API_Controller
 
 
 	}
+
+	/**
+	 * set default address
+	 * @param      <type>   $address_id  The Address id
+	 */
+
+	 function set_default_address_post()
+	 {
+		$rules = array(
+			array(
+	        	'field' => 'address_id',
+	        	'rules' => 'required'
+	        )
+	    );   
+	    
+	    // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        $id = $this->post('address_id');
+
+        $conds['id'] = $id;
+
+        // check address id
+		$address_data = $this->Addresses->get_one_by($conds);
+
+        
+        if ( $address_data->id == "") {
+
+        	$this->error_response( get_msg( 'invalid_address_id' ));
+
+        } else {
+
+			$this->db->set('is_default_address', '0');
+			$this->db->where('is_default_address', '1');
+			$this->db->where('user_id', $address_data->user_id);
+			$this->db->update('bs_addresses'); 
+
+			
+			$address_data1['is_default_address'] =  '1';
+			$address_data1['updated_date'] =  date("Y-m-d H:i:s");
+			$this->Addresses->save($address_data1,$id);
+
+        	$this->success_response( get_msg( 'success_default_address' ));
+
+        }
+	 }
+
+	 /**
+	 * set home address
+	 * @param      <type>   $address_id  The Address id
+	 */
+
+	 function set_home_address_post()
+	 {
+		$rules = array(
+			array(
+	        	'field' => 'address_id',
+	        	'rules' => 'required'
+	        )
+	    );   
+	    
+	    // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        $id = $this->post('address_id');
+
+        $conds['id'] = $id;
+
+        // check address id
+		$address_data = $this->Addresses->get_one_by($conds);
+
+        
+        if ( $address_data->id == "") {
+
+        	$this->error_response( get_msg( 'invalid_address_id' ));
+
+        } else {
+
+			$this->db->set('is_home_address', '0');
+			$this->db->where('is_home_address', '1');
+			$this->db->where('user_id', $address_data->user_id);
+			$this->db->update('bs_addresses'); 
+
+			
+			$address_data1['is_home_address'] =  '1';
+			$address_data1['updated_date'] =  date("Y-m-d H:i:s");
+			$this->Addresses->save($address_data1,$id);
+
+        	$this->success_response( get_msg( 'success_home_address' ));
+
+        }
+	 }
 
 
 	/**

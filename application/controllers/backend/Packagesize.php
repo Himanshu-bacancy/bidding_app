@@ -195,6 +195,23 @@ class Packagesize extends BE_Controller {
 		// start the transaction
 		$this->db->trans_start();
 
+		$carrierdata = $this->db->get_where('bs_shippingcarriers', array('packagesize_id' => $id));
+
+		if($carrierdata->num_rows() >= 1)
+		{
+			$this->db->trans_rollback();
+
+			// set error message
+			$this->data['error'] = get_msg( 'carrier_delete_alert' );
+
+			$this->set_flash_msg( 'error', get_msg( 'carrier_delete_alert' ));	
+			
+			// redirect to list view
+			redirect( $this->module_site_url());
+		}
+
+		
+
 		// check access
 		$this->check_access( DEL );
 		

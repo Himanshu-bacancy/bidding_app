@@ -193,5 +193,8 @@
  "success_shippingcarrier_edit": "Shipping carrier has been successfully updated",
  "success_upload" : "Successfully uploaded",
  "shippingcarrier_edit" : "Edit shipping carrier",
- "packagesize_edit" : "Edit package size"
+ "packagesize_edit" : "Edit package size",
+ "success_default_address" : "Default address has been set successfully",
+ "success_home_address" : "Home address has been set successfully",
+ "carrier_delete_alert" : "This package size contains shipping carries in it. Please delete them first"
 } 
