@@ -196,5 +196,6 @@
  "packagesize_edit" : "Edit package size",
  "success_default_address" : "Default address has been set successfully",
  "success_home_address" : "Home address has been set successfully",
- "carrier_delete_alert" : "This package size contains shipping carries in it. Please delete them first"
+ "carrier_delete_alert" : "This package size contains shipping carries in it. Please delete them first",
+ "invalid_packagesize_id" : "Invalid Package size id"
 } 

@@ -123,23 +123,23 @@ class Packagesize extends API_Controller
 				$data = $this->model->get_all_by( $conds )->result();
 			}
 
-			foreach($data as $childkey => $sizedata)
-			{
-				$condscstm = array();
-				$this->ps_adapter->convert_shippingcarrier( $sizedata );
-				$condscstm['packagesize_id'] = $sizedata->id;
+			// foreach($data as $childkey => $sizedata)
+			// {
+			// 	$condscstm = array();
+			// 	$this->ps_adapter->convert_shippingcarrier( $sizedata );
+			// 	$condscstm['packagesize_id'] = $sizedata->id;
 
-				$carrierarray = $this->Shippingcarriers->get_all_by( $condscstm);
+			// 	$carrierarray = $this->Shippingcarriers->get_all_by( $condscstm);
 
-				$carrierdata = $carrierarray->result();
+			// 	$carrierdata = $carrierarray->result();
 
-				foreach($carrierdata as $carrierkey => $carrier)
-				{
-					$carrierdata[$carrierkey]->default_icon = $this->get_default_photo( $carrier->id, 'shippingcarrier_icon' );
-				}
+			// 	foreach($carrierdata as $carrierkey => $carrier)
+			// 	{
+			// 		$carrierdata[$carrierkey]->default_icon = $this->get_default_photo( $carrier->id, 'shippingcarrier_icon' );
+			// 	}
 				
-				$data[$childkey]->shippingcarriers = $carrierdata;
-			}
+			// 	$data[$childkey]->shippingcarriers = $carrierdata;
+			// }
 
 			$this->custom_response( $data , $offset );
 		}
