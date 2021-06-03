@@ -107,7 +107,6 @@ class Authorization_Token
                 catch(Exception $e) {
                     return ['status' => FALSE, 'message' => $e->getMessage()];
                 }
-
                 if(!empty($token_decode) AND is_object($token_decode))
                 {
                     // Check Token API Time [API_TIME]
@@ -123,10 +122,15 @@ class Authorization_Token
                         $time_difference = strtotime('now') - $token_decode->API_TIME;
                         if( $time_difference >= $this->token_expire_time )
                         {
-                            return ['status' => FALSE, 'message' => 'Token Time Expire.'];
+                            $newTokenData = [
+                                'user_id'=>$token_decode->user_id,
+                                'user_email'=>$token_decode->user_email,
+                                'user_phone'=>$token_decode->user_phone,
+                                'device_token'=>$token_decode->device_token,
+                            ];
+                            return ['status' => FALSE, 'message' => 'Token Time Expire.', 'new_token' => $this->generateToken($newTokenData)];
 
-                        }else
-                        {
+                        } else {
                             /**
                              * All Validation False Return Data
                              */

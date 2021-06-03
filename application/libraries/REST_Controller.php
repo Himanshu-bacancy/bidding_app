@@ -817,13 +817,10 @@ abstract class REST_Controller extends CI_Controller
         // check token is valid
         $result = $this->authorization_token->validateToken();
 
-        if (isset($result['status']) AND $result['status'] === true)
-        {
+        if (isset($result['status']) AND $result['status'] === true) {
             return $result['data'];
-
         } else {
-
-            $this->_response(['status' => FALSE, 'error' => $result['message']], self::HTTP_UNAUTHORIZED);
+            $this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
         }
     }
 
