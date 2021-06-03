@@ -75,7 +75,6 @@ class Address extends API_Controller
 
 	function add_post() {
 		
-<<<<<<< HEAD
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
@@ -91,6 +90,7 @@ class Address extends API_Controller
 			//         ],
 			//     ],
 			// 200);
+
 			// validation rules for add address
 			$rules = array(
 				array(
@@ -153,22 +153,30 @@ class Address extends API_Controller
 			);
 
 			$id = $address_data['id'];
+
 			// Validation for only one home address and default address 
 
 			$homedata = $this->db->get_where('bs_addresses', array('is_home_address' => 1 ,'user_id' => $this->post('user_id')));
+
 			$defaultdata = $this->db->get_where('bs_addresses', array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
+			
 			$usercheck  = $this->User->get_one($this->post('user_id'));
 			
 			if(isset($usercheck->is_empty_object))
 			{
 				$this->error_response( get_msg( 'user_not_found' ));
-			} else {
+			}
+			else
+			{
 				if($id != ""){
+
 					$addresscheck  = $this->Addresses->get_one($id);
 					if(isset($addresscheck->is_empty_object))
 					{
 						$this->error_response( get_msg( 'address_not_found' ));
-					} else {
+					}
+					else
+					{
 						// Validation for only one home address and default address 
 						$this->db->select('*');
 						$this->db->from('bs_addresses');
@@ -182,130 +190,62 @@ class Address extends API_Controller
 						$this->db->where_not_in('id',$id);
 						$defaultdataedit = $this->db->get();
 						
-						if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1')) {
-							$this->error_response( get_msg( 'home_address_exist' ));
-						} else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1')) {
-							$this->error_response( get_msg( 'default_address_exist' ));
-						} else {
+						// if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+						// {
+						// 	$this->error_response( get_msg( 'home_address_exist' ));
+						// }
+						// else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+						// {
+						// 	$this->error_response( get_msg( 'default_address_exist' ));
+						// }
+						// else
+						// {
 							
-							// Edit address
-							$address_data['updated_date'] =  date("Y-m-d H:i:s");
-							$this->Addresses->save($address_data,$id);
+						// 	// Edit address
+						// 	$address_data['updated_date'] =  date("Y-m-d H:i:s");
+						// 	$this->Addresses->save($address_data,$id);
+						// }
+
+						if($this->post('is_home_address')=='1')
+						{
+							$this->db->set('is_home_address', '0');
+							$this->db->where('is_home_address', '1');
+							$this->db->where('user_id', $this->post('user_id'));
+							$this->db->where('id !=', $id);
+							$this->db->update('bs_addresses'); 
 						}
-=======
-		// validation rules for add address
-		$rules = array(
-			array(
-	        	'field' => 'address1',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'zipcode',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'state',
-	        	'rules' => 'required'
-	        ),
-	       
-	        array(
-	        	'field' => 'city',
-	        	'rules' => 'required'
-	        ),
-			array(
-	        	'field' => 'country',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'latitude',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'longitude',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'user_id',
-	        	'rules' => 'required'
-	        )
 
-        );
+						if($this->post('is_default_address')=='1')
+						{
+							$this->db->set('is_default_address', '0');
+							$this->db->where('is_default_address', '1');
+							$this->db->where('user_id', $this->post('user_id'));
+							$this->db->where('id !=', $id);
+							$this->db->update('bs_addresses'); 
+						}
 
-        $lat = $this->post('latitude');
-		$lng = $this->post('longitude');
-        $location = location_check($lat,$lng);
+						$address_data['updated_date'] =  date("Y-m-d H:i:s");
+						$this->Addresses->save($address_data,$id);
+						
+					}
 
-        // exit if there is an error in validation,
-        if ( !$this->is_valid( $rules )) exit;
-        
-	  	$address_data = array(
-
-        	"address1" => $this->post('address1'),
-			"address2" => (!empty($this->post('address2')))?$this->post('address2'):'', 
-        	"zipcode" => $this->post('zipcode'),
-        	"state" => $this->post('state'),
-        	"city" => $this->post('city'),
-			"country" => $this->post('country'),
-        	"latitude" => $this->post('latitude'), 
-        	"longitude" => $this->post('longitude'),
-        	"user_id" => $this->post('user_id'),
-			"is_home_address" => (($this->post('is_home_address')=='1'))?'1':'0', 
-			"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
-        	"id" => $this->post('id')
-        );
-
-		$id = $address_data['id'];
-
-		// Validation for only one home address and default address 
-
-		$homedata = $this->db->get_where('bs_addresses', array('is_home_address' => 1 ,'user_id' => $this->post('user_id')));
-
-		$defaultdata = $this->db->get_where('bs_addresses', array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
-		
-		$usercheck  = $this->User->get_one($this->post('user_id'));
-		
-		if(isset($usercheck->is_empty_object))
-		{
-			$this->error_response( get_msg( 'user_not_found' ));
-		}
-		else
-		{
-			if($id != ""){
-
-				$addresscheck  = $this->Addresses->get_one($id);
-				if(isset($addresscheck->is_empty_object))
-				{
-					$this->error_response( get_msg( 'address_not_found' ));
-				}
-				else
-				{
-					// Validation for only one home address and default address 
-					$this->db->select('*');
-					$this->db->from('bs_addresses');
-					$this->db->where(array('is_home_address' => 1 ,'user_id' => $this->post('user_id')));
-					$this->db->where_not_in('id',$id);
-					$homedataedit = $this->db->get();
 					
-					$this->db->select('*');
-					$this->db->from('bs_addresses');
-					$this->db->where(array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
-					$this->db->where_not_in('id',$id);
-					$defaultdataedit = $this->db->get();
-					
-					// if(($homedataedit->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
+				} else{
+		
+					// if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
 					// {
 					// 	$this->error_response( get_msg( 'home_address_exist' ));
 					// }
-					// else if(($defaultdataedit->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
+					// else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
 					// {
 					// 	$this->error_response( get_msg( 'default_address_exist' ));
 					// }
 					// else
 					// {
-						
-					// 	// Edit address
-					// 	$address_data['updated_date'] =  date("Y-m-d H:i:s");
-					// 	$this->Addresses->save($address_data,$id);
+					// 	$address_data['added_date'] =  date("Y-m-d H:i:s");
+					// 	$this->Addresses->save($address_data);
+		
+					// 	$id = $address_data['id'];
 					// }
 
 					if($this->post('is_home_address')=='1')
@@ -313,7 +253,6 @@ class Address extends API_Controller
 						$this->db->set('is_home_address', '0');
 						$this->db->where('is_home_address', '1');
 						$this->db->where('user_id', $this->post('user_id'));
-						$this->db->where('id !=', $id);
 						$this->db->update('bs_addresses'); 
 					}
 
@@ -322,75 +261,21 @@ class Address extends API_Controller
 						$this->db->set('is_default_address', '0');
 						$this->db->where('is_default_address', '1');
 						$this->db->where('user_id', $this->post('user_id'));
-						$this->db->where('id !=', $id);
 						$this->db->update('bs_addresses'); 
->>>>>>> d4d7def1b93424389ddbcd24182a42a11b30cf2d
 					}
 
-					$address_data['updated_date'] =  date("Y-m-d H:i:s");
-					$this->Addresses->save($address_data,$id);
-					
-				} else {
-		
-					if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1')) {
-						$this->error_response( get_msg( 'home_address_exist' ));
-					} else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1')) {
-						$this->error_response( get_msg( 'default_address_exist' ));
-					} else {
-						$address_data['added_date'] =  date("Y-m-d H:i:s");
-						$this->Addresses->save($address_data);
-		
-						$id = $address_data['id'];
-					}
+					$address_data['added_date'] =  date("Y-m-d H:i:s");
+					$this->Addresses->save($address_data);
+
+					$id = $address_data['id'];
 				}
 				
-<<<<<<< HEAD
 				$obj = $this->Addresses->get_one( $id );
-				//echo '<pre>'; print_r($obj); die('   hiiii himanshu sharma ');
+				
 				//$this->ps_adapter->convert_item( $obj );
 				$this->custom_response( $obj );
-=======
-			} else{
-	
-				// if(($homedata->num_rows() >= 1) && ($this->post('is_home_address') =='1'))
-				// {
-				// 	$this->error_response( get_msg( 'home_address_exist' ));
-				// }
-				// else if(($defaultdata->num_rows() >= 1) && ($this->post('is_default_address') =='1'))
-				// {
-				// 	$this->error_response( get_msg( 'default_address_exist' ));
-				// }
-				// else
-				// {
-				// 	$address_data['added_date'] =  date("Y-m-d H:i:s");
-				// 	$this->Addresses->save($address_data);
-	
-				// 	$id = $address_data['id'];
-				// }
-
-				if($this->post('is_home_address')=='1')
-				{
-					$this->db->set('is_home_address', '0');
-					$this->db->where('is_home_address', '1');
-					$this->db->where('user_id', $this->post('user_id'));
-					$this->db->update('bs_addresses'); 
-				}
-
-				if($this->post('is_default_address')=='1')
-				{
-					$this->db->set('is_default_address', '0');
-					$this->db->where('is_default_address', '1');
-					$this->db->where('user_id', $this->post('user_id'));
-					$this->db->update('bs_addresses'); 
-				}
-
-				$address_data['added_date'] =  date("Y-m-d H:i:s");
-				$this->Addresses->save($address_data);
-
-				$id = $address_data['id'];
->>>>>>> d4d7def1b93424389ddbcd24182a42a11b30cf2d
 			}
-		}
+		} 
 		// } else {
 		// 	//echo $user_data->error; die;
 		// 	$obj = [
