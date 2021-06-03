@@ -28,6 +28,9 @@ class Deliverymethod extends API_Controller
 
 		}
 
+		$conds['order_by'] = 1;
+		$conds['order_by_field'] = 'id';
+		$conds['order_by_type'] = 'asc';
 		return $conds;
 	}
 

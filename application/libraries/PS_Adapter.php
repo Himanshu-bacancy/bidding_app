@@ -736,6 +736,18 @@ class PS_Adapter {
 		$obj->default_icon = $this->get_default_photo( $obj->id, 'childsubcategory_icon' );
 	}
 
+	function convert_packagesize( &$obj )
+	{
+		//set default icon
+		$obj->default_icon = $this->get_default_photo( $obj->id, 'packagesize_icon' );
+	}
+
+	function convert_shippingcarrier( &$obj )
+	{
+		//set default icon
+		$obj->default_icon = $this->get_default_photo( $obj->id, 'shippingcarrier_icon' );
+	}
+
 	/*
 	 * Customize feed object
 	 *

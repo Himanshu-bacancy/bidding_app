@@ -991,6 +991,36 @@ class PS_Delete {
 	}
 
 	/**
+	 * Delete the packagesize record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_packagesize( $package_id )
+	{		
+		if ( ! $this->CI->Packagesizes->delete( $package_id )) {
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
+	 * Delete the shipping carrier record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_shippingcarrier( $carrier_id )
+	{		
+		if ( ! $this->CI->Shippingcarriers->delete( $carrier_id )) {
+			return false;
+		}
+
+
+		return true;
+	}
+
+	/**
 	 * Delete the sizegroup record
 	 *
 	 * @param      <type>  $id     The identifier
