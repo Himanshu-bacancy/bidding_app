@@ -105,3 +105,7 @@ INSERT INTO `core_modules` (`module_id`, `module_name`, `module_desc`, `module_l
 
 //Create Shipping carrier Table Query : 
 CREATE TABLE `bidding_app`.`bs_shippingcarriers` ( `id` VARCHAR(255) NOT NULL , `name` VARCHAR(255) NOT NULL , `packagesize_id` VARCHAR(255) NOT NULL ,`price` VARCHAR(255) NOT NULL , `min_days` int(11) NOT NULL , `max_days` int(11) NOT NULL , `status` TINYINT(1) NULL DEFAULT '1' , `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `added_user_id` VARCHAR(255) NULL DEFAULT NULL , `updated_date` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' , PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 04-06-2021
+// Create Blacklist table Query :
+CREATE TABLE `bidding_app`.`bs_blacklist` ( `id` VARCHAR(255) NOT NULL , `token` TEXT NOT NULL , `user_id` VARCHAR(255) NOT NULL ,`added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (id) ) ENGINE = InnoDB;

@@ -311,6 +311,28 @@ class Users extends API_Controller
 				];
 				//echo '<pre>'; print_r($payload); die;
 				$token = $this->authorization_token->generateToken($payload);
+
+				$check_data = array(
+
+					"user_id" => $user->user_id
+				);
+
+				
+				$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+				if(!empty($blacklist_data->result()))
+				{
+					foreach($blacklist_data->result() as $blacklist)
+					{
+						$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+						if( $time_difference >= $this->config->item('token_expire_time'))
+                        {
+							$this->Blacklists->delete( $blacklist->id);
+						}
+					}
+				}
+
 				$user->token = $token;
 				//$data = ['data'=>$user, 'token'=>$token];
 				$this->custom_response($user);
@@ -2559,22 +2581,43 @@ class Users extends API_Controller
 	 */
 	function logout_post()
 	{
-		// validation rules for user register
-		$rules = array(
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		if(!empty($user_data) && $user_data['token_data'])
+		{
+			// validation rules for user register
+			$rules = array(
+				
+				array(
+					'field' => 'user_id',
+					'rules' => 'required|callback_id_check[User]'
+				)
+			);
+
+			// exit if there is an error in validation,
+			if ( !$this->is_valid( $rules )) exit;
 			
-	        array(
-	        	'field' => 'user_id',
-	        	'rules' => 'required|callback_id_check[User]'
-	        )
-        );
+			$conds['user_id'] = $this->post('user_id');
+			$this->Noti->delete_by($conds);
 
-		// exit if there is an error in validation,
-        if ( !$this->is_valid( $rules )) exit;
-       
-       $conds['user_id'] = $this->post('user_id');
-       $this->Noti->delete_by($conds);
+			$headers = $this->input->request_headers();
+			$token_data = array(
 
-       $this->success_response( get_msg( 'success_logout' ));
+				"token" => $headers['Authorization'],
+				"user_id" => $user_data['token_data']['user_id'], 
+				"added_date" => date("Y-m-d H:i:s")
+			);
+
+			$this->Blacklists->save($token_data);
+
+			$this->success_response( get_msg( 'success_logout' ));
+		}
+		
 
 	}
 	

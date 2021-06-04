@@ -117,6 +117,21 @@ class Authorization_Token
                     else
                     {
                         /**
+                         * Check Token Active or not
+                         */
+                        $check_data = array(
+
+                            "token" => $token_data['token'], 
+                            "user_id" => $token_decode->user_id
+                        );
+                
+                        $blacklist_data = $this->CI->Blacklists->count_all_by($check_data);
+                        if($blacklist_data=='1')
+                        {
+                            return ['status' => FALSE, 'message' => 'Token is not valid'];
+                        }
+
+                        /**
                          * Check Token Time Valid 
                          */
                         $time_difference = strtotime('now') - $token_decode->API_TIME;
