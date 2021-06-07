@@ -112,7 +112,7 @@ class Authorization_Token
                     // Check Token API Time [API_TIME]
                     if (empty($token_decode->API_TIME OR !is_numeric($token_decode->API_TIME))) {
                         
-                        return ['status' => FALSE, 'message' => 'Token Time Not Define!'];
+                        return ['status' => FALSE, 'message' => get_msg( 'token_time_not_define' )];
                     }
                     else
                     {
@@ -128,7 +128,7 @@ class Authorization_Token
                         $blacklist_data = $this->CI->Blacklists->count_all_by($check_data);
                         if($blacklist_data=='1')
                         {
-                            return ['status' => FALSE, 'message' => 'Token is not valid'];
+                            return ['status' => FALSE, 'message' => get_msg( 'token_not_valid' )];
                         }
 
                         /**
@@ -143,7 +143,7 @@ class Authorization_Token
                                 'user_phone'=>$token_decode->user_phone,
                                 'device_token'=>$token_decode->device_token,
                             ];
-                            return ['status' => FALSE, 'message' => 'Token Time Expire.', 'new_token' => $this->generateToken($newTokenData)];
+                            return ['status' => FALSE, 'message' => get_msg( 'token_time_expire' ), 'new_token' => $this->generateToken($newTokenData)];
 
                         } else {
                             /**
@@ -179,6 +179,6 @@ class Authorization_Token
                     return ['status' => TRUE, 'token' => $header_value];
             }
         }
-        return ['status' => FALSE, 'message' => 'Token is not defined.'];
+        return ['status' => FALSE, 'message' => get_msg( 'token_not_define' )];
     }
 }

@@ -52,6 +52,12 @@ class Deliverymethod extends API_Controller
 	 */
 	function user_accept_delivery_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// validation rules
 		$rules = array(
 			array(

@@ -56,6 +56,12 @@ class Shippingcarrier extends API_Controller
 
 	function getdata_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		$rules = array(
 			array(
 	        	'field' => 'packagesize_id',

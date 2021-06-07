@@ -63,6 +63,11 @@ class Childsubcategories extends API_Controller
 	 */
 	function getdata_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		// if id is passed in post param
 		$id = $this->post( 'id' );
 
