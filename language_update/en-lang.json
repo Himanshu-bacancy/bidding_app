@@ -197,5 +197,9 @@
  "success_default_address" : "Default address has been set successfully",
  "success_home_address" : "Home address has been set successfully",
  "carrier_delete_alert" : "This package size contains shipping carries in it. Please delete them first",
- "invalid_packagesize_id" : "Invalid Package size id"
+ "invalid_packagesize_id" : "Invalid Package size id",
+ "token_time_not_define" : "Token Time Not Define!",
+ "token_time_expire" : "Token Time Expire",
+ "token_not_valid" : "Token is not valid",
+ "token_not_define" : "Token is not defined"
 } 

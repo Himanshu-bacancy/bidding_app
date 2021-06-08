@@ -452,6 +452,13 @@ class API_Controller extends REST_Controller
 	 */
 	function get_get()
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// add flag for default query
 		$this->is_get = true;
 

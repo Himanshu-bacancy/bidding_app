@@ -28,6 +28,12 @@ class Appinfo extends API_Controller
 	// To fetch similar items while adding product
 	function similar_item_criteria_get()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		$rows = '[{"id":1,"title":"Brand"},{"id":2,"title":"Size"},{"id":3,"title":"Condition"},{"id":4,"title":"Color"}]';
 
 		$objArray = json_decode($rows);

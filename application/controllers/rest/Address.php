@@ -295,6 +295,12 @@ class Address extends API_Controller
 
 	function fetch_address_post( ) {
 
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		$rules = array(
 			array(
 	        	'field' => 'user_id',
@@ -336,6 +342,11 @@ class Address extends API_Controller
 
 	 function set_default_address_post()
 	 {
+		 // API Configuration [Return Array: User Token Data]
+		 $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		$rules = array(
 			array(
 	        	'field' => 'address_id',
@@ -382,6 +393,12 @@ class Address extends API_Controller
 
 	 function set_home_address_post()
 	 {
+		 // API Configuration [Return Array: User Token Data]
+		 $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		$rules = array(
 			array(
 	        	'field' => 'address_id',
@@ -429,6 +446,12 @@ class Address extends API_Controller
 
 	function address_delete_post( ) {
 
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		$rules = array(
 			array(
 	        	'field' => 'address_id',
