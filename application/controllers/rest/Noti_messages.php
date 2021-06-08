@@ -18,6 +18,12 @@ class Noti_messages extends API_Controller
 
 	function all_notis_post() 
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		
 		$limit = $this->get( 'limit' );
    		$offset = $this->get( 'offset' );

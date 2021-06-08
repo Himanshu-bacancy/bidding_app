@@ -18,7 +18,12 @@ class Images extends API_Controller
 
 	function upload_post()
 	{
-		
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		$platform_name = $this->post('platform_name');
 		if ( !$platform_name ) {
 			$this->custom_response( get_msg('required_platform') ) ;
@@ -98,6 +103,11 @@ class Images extends API_Controller
 
 	function upload_item_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 
 		$item_id = $this->post('item_id');
 		$files = $this->post('file');

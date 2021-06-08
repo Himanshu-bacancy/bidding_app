@@ -541,6 +541,11 @@ class API_Controller extends REST_Controller
 	 */
 	function get_favourite_get()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
 		
 		// add flag for default query
 		$this->is_get = true;
@@ -760,6 +765,11 @@ class API_Controller extends REST_Controller
 
 	function get_token_get()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
 
 		$payment_info = $this->Paid_config->get_one('pconfig1');
 
@@ -797,7 +807,12 @@ class API_Controller extends REST_Controller
 	 * Search API
 	 */
 	function search_post()
-	{	
+	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);	
 
 		// add flag for default query
 		$this->is_search = true;
@@ -1025,7 +1040,12 @@ class API_Controller extends REST_Controller
 	 */
 	function add_follow_post() 
 	{
-		
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		// validation rules for create
 		
 		$rules = array(
@@ -1262,6 +1282,11 @@ class API_Controller extends REST_Controller
 	*/
 	function touch_item_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 
 		$user_id = $this->post('user_id');
 		$item_id = $this->post('item_id');
@@ -1494,6 +1519,12 @@ class API_Controller extends REST_Controller
 	 */
 	function get_item_by_followuser_get()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+
 		// add flag for default query
 		$this->is_get = true;
 
@@ -1684,6 +1715,12 @@ class API_Controller extends REST_Controller
 	 */
 	function add_rating_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		// set the add flag for custom response
 		$this->is_add = true;
 
@@ -1766,6 +1803,12 @@ class API_Controller extends REST_Controller
 
 	function rating_user_post()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		$this->is_add = true;
 
 		if ( !$this->is_valid( $this->create_validation_rules )) {
@@ -1877,6 +1920,12 @@ class API_Controller extends REST_Controller
 	function get_offline_payment_get()
 	{
 		
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+
 		// add flag for default query
 		$this->is_get = true;
 
@@ -1930,6 +1979,12 @@ class API_Controller extends REST_Controller
 	 */
 	function get_reported_item_by_loginuser_get()
 	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+
 		// add flag for default query
 		$this->is_get = true;
 

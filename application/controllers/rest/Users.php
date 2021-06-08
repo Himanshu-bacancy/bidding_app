@@ -407,6 +407,13 @@ class Users extends API_Controller
 
 	function profile_update_post()
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// validation rules for user register
 		$rules = array(
 			array(
@@ -853,12 +860,85 @@ class Users extends API_Controller
 
 				} 
 
+				// JWT token generation
 
-        		$this->custom_response($this->User->get_one($user_data['user_id']));
+				$userdatacs = $this->User->get_one($user_data['user_id']);
+
+				$payload = [
+					'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+					'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+					'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+					'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+				];
+				
+				$token = $this->authorization_token->generateToken($payload);
+
+				$check_data = array(
+
+					"user_id" => $user_data['user_id']
+				);
+
+				
+				$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+				if(!empty($blacklist_data->result()))
+				{
+					foreach($blacklist_data->result() as $blacklist)
+					{
+						$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+						if( $time_difference >= $this->config->item('token_expire_time'))
+                        {
+							$this->Blacklists->delete( $blacklist->id);
+						}
+					}
+				}
+
+				$userdatacs->token = $token;
+
+        		$this->custom_response($userdatacs);
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_infos[0]->user_id));
+			// JWT token generation
+
+			$userdatacs = $this->User->get_one($user_infos[0]->user_id);
+
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_infos[0]->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs);
+
+        	//$this->custom_response($this->User->get_one($user_infos[0]->user_id));
 
         } else {
 
@@ -992,7 +1072,48 @@ class Users extends API_Controller
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_datas->user_id));
+			// JWT token generation
+
+			$userdatacs = $this->User->get_one($user_datas->user_id);
+
+			
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_datas->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+			
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs);
+
+        	//$this->custom_response($this->User->get_one($user_datas->user_id));
 
         }
 
@@ -1038,6 +1159,12 @@ class Users extends API_Controller
 
 	function user_delete_post( ) {
 
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// validation rules for user register
 		$rules = array(
 			array(
@@ -1518,11 +1645,91 @@ class Users extends API_Controller
 
 				}
 
-        		$this->custom_response($this->User->get_one($user_data['user_id']));
+				// JWT token generation
+				$userdatacs = $this->User->get_one($user_data['user_id']);
+
+			
+				$payload = [
+					'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+					'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+					'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+					'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+				];
+
+				
+				
+				$token = $this->authorization_token->generateToken($payload);
+
+				$check_data = array(
+
+					"user_id" => $user_data['user_id']
+				);
+
+				
+				$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+				if(!empty($blacklist_data->result()))
+				{
+					foreach($blacklist_data->result() as $blacklist)
+					{
+						$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+						if( $time_difference >= $this->config->item('token_expire_time'))
+                        {
+							$this->Blacklists->delete( $blacklist->id);
+						}
+					}
+				}
+				
+				$userdatacs->token = $token;
+
+				$this->custom_response($userdatacs); 	
+
+        		//$this->custom_response($this->User->get_one($user_data['user_id']));
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_infos[0]->user_id));
+			// JWT token generation
+			$userdatacs = $this->User->get_one($user_infos[0]->user_id);
+
+			
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_infos[0]->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+			
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs); 	
+
+        	//$this->custom_response($this->User->get_one($user_infos[0]->user_id));
 
         } else {
 
@@ -1662,7 +1869,47 @@ class Users extends API_Controller
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_datas->user_id));
+			// JWT token generation
+			$userdatacs = $this->User->get_one($user_datas->user_id);
+
+			
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_datas->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+			
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs); 	
+
+        	//$this->custom_response($this->User->get_one($user_datas->user_id));
 
         }
 
@@ -2406,11 +2653,91 @@ class Users extends API_Controller
 
 				} 
 
-        		$this->custom_response($this->User->get_one($user_data['user_id']));
+				// JWT token generation
+				$userdatacs = $this->User->get_one($user_data['user_id']);
+
+			
+				$payload = [
+					'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+					'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+					'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+					'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+				];
+
+				
+				
+				$token = $this->authorization_token->generateToken($payload);
+
+				$check_data = array(
+
+					"user_id" => $user_data['user_id']
+				);
+
+				
+				$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+				if(!empty($blacklist_data->result()))
+				{
+					foreach($blacklist_data->result() as $blacklist)
+					{
+						$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+						if( $time_difference >= $this->config->item('token_expire_time'))
+                        {
+							$this->Blacklists->delete( $blacklist->id);
+						}
+					}
+				}
+				
+				$userdatacs->token = $token;
+
+				$this->custom_response($userdatacs); 	
+
+        		//$this->custom_response($this->User->get_one($user_data['user_id']));
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_infos[0]->user_id));
+			// JWT token generation
+			$userdatacs = $this->User->get_one($user_infos[0]->user_id);
+
+			
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_infos[0]->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+			
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs); 	
+
+        	//$this->custom_response($this->User->get_one($user_infos[0]->user_id));
 
         } else {
 
@@ -2499,7 +2826,47 @@ class Users extends API_Controller
 
 			}
 
-        	$this->custom_response($this->User->get_one($user_datas->user_id));
+			// JWT token generation
+			$userdatacs = $this->User->get_one($user_datas->user_id);
+
+			
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			
+			
+			$token = $this->authorization_token->generateToken($payload);
+
+			$check_data = array(
+
+				"user_id" => $user_datas->user_id
+			);
+
+			
+			$blacklist_data = $this->Blacklists->get_all_by($check_data);
+
+			if(!empty($blacklist_data->result()))
+			{
+				foreach($blacklist_data->result() as $blacklist)
+				{
+					$time_difference = strtotime('now') - strtotime($blacklist->added_date);
+
+					if( $time_difference >= $this->config->item('token_expire_time'))
+					{
+						$this->Blacklists->delete( $blacklist->id);
+					}
+				}
+			}
+			
+			$userdatacs->token = $token;
+
+			$this->custom_response($userdatacs); 
+
+        	//$this->custom_response($this->User->get_one($user_datas->user_id));
 
         }
 
@@ -2511,6 +2878,12 @@ class Users extends API_Controller
 	 */
 	function get_blocked_user_by_loginuser_get()
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
 
 		// add flag for default query
 		$this->is_get = true;
