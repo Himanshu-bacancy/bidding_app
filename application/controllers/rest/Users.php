@@ -253,7 +253,7 @@ class Users extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
-        if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ), 'device_token' => $this->post( 'device_token' )))) {
+        if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ),'user_password' => $this->post( 'user_password' ), 'device_token' => $this->post( 'device_token' )))) {
 
         //if ( $this->User->exists( array( 'user_email' => $this->post( 'user_email' ), 'user_password' => $this->post( 'user_password' )))) {
 
