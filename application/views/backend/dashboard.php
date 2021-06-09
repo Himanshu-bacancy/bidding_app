@@ -86,7 +86,7 @@
                 'panel_title' => get_msg('popular_item'),
                 'module_name' => 'popularitems' ,
                 'total_count' => $this->Touch->count_all(),
-                'data' => $this->Touch->get_item_count(5)->result()
+                'data' => $this->Touch->get_item_count(5)
               );
 
               $this->load->view( $template_path .'/components/item_popular_panel', $data ); 
