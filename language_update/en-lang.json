@@ -203,5 +203,6 @@
  "token_not_valid" : "Token is not valid",
  "token_not_define" : "Token is not defined",
  "selling_fees_label" : "Selling Fees",
- "in_percentage" : "in percentage"
+ "in_percentage" : "in percentage",
+ "service_fees_label" : "Service Fees"
 } 
