@@ -54,9 +54,15 @@ abstract class REST_Controller extends CI_Controller
     const HTTP_OK = 200;
 
     /**
+     * Token expired
+     */
+    const TOKEN_EXPIRED = 410;
+
+    /**
      * HTTP status codes and their respective description
      */
     const HEADER_STATUS_STRINGS = [
+        '410' => 'TOKEN_EXPIRED',
         '405' => 'HTTP/1.1 405 Method Not Allowed',
         '400' => 'BAD REQUEST',
         '408' => 'Request Timeout',
@@ -821,7 +827,12 @@ abstract class REST_Controller extends CI_Controller
         if (isset($result['status']) AND $result['status'] === true) {
             return $result['data'];
         } else {
-            $this->response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
+            if(isset($result['new_token']) && !empty($result['new_token'])){
+                $this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::TOKEN_EXPIRED);
+            }else{
+                $this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
+            }
+            //$this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
         }
     }
 
