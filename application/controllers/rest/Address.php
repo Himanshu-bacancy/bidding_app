@@ -335,6 +335,59 @@ class Address extends API_Controller
 
 	}
 
+
+	/**
+	 * Fetch default Address of login users
+	 * 1) Default Address 
+	 * @param      <type>   $user_id  The User id
+	 */
+
+	function fetch_defaultaddress_post( ) {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		$rules = array(
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        )
+	    );   
+	    
+	    // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        $id = $this->post('user_id');
+
+        $condscstm['user_id'] = $this->post('user_id');
+		$condscstm['is_default_address'] = '1';
+
+        // check user id
+		$usercheck  = $this->User->get_one($this->post('user_id'));
+
+        
+        if(isset($usercheck->is_empty_object))
+		{
+        	$this->error_response( get_msg( 'invalid_user_id' ));
+
+        } else {
+
+			$this->db->select('*');
+			$this->db->from('bs_addresses');
+			$this->db->where(array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
+			$defaultdata = $this->db->get();
+			//$data = $this->Addresses->get_all_by( $condscstm )->result();
+
+        	$this->custom_response( $defaultdata->result() );
+
+        }
+
+
+	}
+
 	/**
 	 * set default address
 	 * @param      <type>   $address_id  The Address id

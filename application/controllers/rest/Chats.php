@@ -1066,6 +1066,13 @@ class Chats extends API_Controller
 
 	function offer_list_post()
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// validation rules for chat history
 		// $rules = array(
 	 //        array(
