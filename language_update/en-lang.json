@@ -201,5 +201,7 @@
  "token_time_not_define" : "Token Time Not Define!",
  "token_time_expire" : "Token Time Expire",
  "token_not_valid" : "Token is not valid",
- "token_not_define" : "Token is not defined"
+ "token_not_define" : "Token is not defined",
+ "selling_fees_label" : "Selling Fees",
+ "in_percentage" : "in percentage"
 } 

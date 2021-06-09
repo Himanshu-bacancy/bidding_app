@@ -104,6 +104,24 @@ echo form_open( '', $attributes);
 							));
 						?>
 					</div>
+
+					<div class="form-group">
+						<label><?php echo get_msg('selling_fees_label')?>  (<?php echo get_msg('in_percentage')?>)
+							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('selling_fees_label')?>">
+								<span class='glyphicon glyphicon-info-sign menu-icon'>
+							</a>
+						</label>
+						<?php 
+							echo form_input( array(
+								'type' => 'text',
+								'name' => 'selling_fees',
+								'id' => 'selling_fees',
+								'class' => 'form-control',
+								'placeholder' => get_msg('selling_fees_label'),
+								'value' => set_value( 'selling_fees', show_data( @$backend->selling_fees ), false )
+							));
+						?>
+					</div>
 	          	</div>
 
 

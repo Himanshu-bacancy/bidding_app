@@ -215,6 +215,11 @@ class Backend_configs extends BE_Controller {
 			$data['ios_appstore_id'] = $this->get_data( 'ios_appstore_id' );
 		}
 
+		// selling_fees
+		if ( $this->has_data( 'selling_fees' )) {
+			$data['selling_fees'] = $this->get_data( 'selling_fees' );
+		}
+
         // print_r($data);die;
 
 		// save backend config

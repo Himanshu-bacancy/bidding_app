@@ -109,3 +109,6 @@ CREATE TABLE `bidding_app`.`bs_shippingcarriers` ( `id` VARCHAR(255) NOT NULL , 
 // Added on 04-06-2021
 // Create Blacklist table Query :
 CREATE TABLE `bidding_app`.`bs_blacklist` ( `id` VARCHAR(255) NOT NULL , `token` TEXT NOT NULL , `user_id` VARCHAR(255) NOT NULL ,`added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 09-06-2021
+ALTER TABLE core_backend_config ADD selling_fees DOUBLE NOT NULL DEFAULT '10';
