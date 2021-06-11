@@ -33,6 +33,12 @@ class Itemreports extends API_Controller
 
 	function add_post() {
 
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		$item_id = $this->post('item_id');
 		$added_user_id = $this->Item->get_one($item_id)->added_user_id;
 		$reported_user_id = $this->post('reported_user_id');

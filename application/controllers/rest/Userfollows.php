@@ -75,6 +75,12 @@ class Userfollows extends API_Controller
 	 */
 	function search_post()
 	{	
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
 		// add flag for default query
 		$this->is_search = true;
 

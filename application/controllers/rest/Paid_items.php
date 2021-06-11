@@ -120,6 +120,12 @@ class Paid_items extends API_Controller
 	}
 
 	function add_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		// print_r($this->post( 'payment_method' ));die;
 		if($this->post( 'payment_method' ) == "paypal") {
 

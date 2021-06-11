@@ -204,5 +204,7 @@
  "token_not_define" : "Token is not defined",
  "selling_fees_label" : "Selling Fees",
  "in_percentage" : "in percentage",
- "service_fees_label" : "Service Fees"
+ "service_fees_label" : "Service Fees",
+ "select_similar_items" : "Please select similar items",
+ "select_exchange_category" : "Please select exchange category"
 } 

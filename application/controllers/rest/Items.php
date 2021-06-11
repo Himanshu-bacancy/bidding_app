@@ -131,6 +131,13 @@ class Items extends API_Controller
 	}
 
 	function add_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
 		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
 		if ($approval_enable == 1) {
 			$status = 0;
@@ -253,6 +260,293 @@ class Items extends API_Controller
 
 		}
 		 
+		$obj = $this->Item->get_one( $id );
+		
+		$this->ps_adapter->convert_item( $obj );
+		$this->custom_response( $obj );
+
+	}
+
+	/**
+	 * Add / Update item of login users
+	 * 1) Add / Edit item
+	 * 2) Add item colors (optional)
+	 * 3) Add item exchange category (optional)
+	 * 4) Add item similar creteria (optional)
+	 * 5) Add item sizegroup otions (optional)
+	 * @param      <type>   $cat_id  The  cat_id
+	 * @param      <type>   $sub_cat_id  The  sub_cat_id
+	 * @param      <type>   $childsubcat_id  The  childsubcat_id
+	 * @param      <type>   $item_type_id  The  item_type_id
+	 * @param      <type>   $condition_of_item_id  The  condition_of_item_id
+	 * @param      <type>   $title  The  title
+	 * @param      <type>   $delivery_method_id  The  delivery_method_id
+	 * @param      <type>   $address_id  The  address_id
+	 * @param      <type>   $description  The  description
+	 * @param      <type>   $price  (optional)
+	 * @param      <type>   $brand  THe brand id (optional)
+	 * @param      <type>   $id  (optional)
+	 * @param      <type>   $sizegroup_id  (optional)
+	 * @param      <type>   $is_all_colors (optional) 0/1
+	 * @param      <type>   $pieces  (optional)
+	 * @param      <type>   $is_negotiable  (optional) 0/1
+	 * @param      <type>   $negotiable_percentage  (optional)
+	 * @param      <type>   $expiration_date_days  (optional)
+	 * @param      <type>   $expiration_date  (optional)
+	 * @param      <type>   $observation  (optional)
+	 * @param      <type>   $is_draft  (optional) 0/1
+	 * @param      <type>   $pay_shipping_by  (optional) '1 for buyer, 2 for seller'
+	 * @param      <type>   $shipping_type  (optional) '1 for prepaid-label, 2 for manual-delivery
+	 * @param      <type>   $packagesize_id  (optional)
+	 * @param      <type>   $shippingcarrier_id  (optional)
+	 * @param      <type>   $shipping_cost_by_seller  (optional)
+	 * @param      <type>   $is_confirm_with_seller  (optional) 0/1
+	 * @param      <type>   $is_exchange (optional) 0/1
+	 * @param      <type>   $is_accept_similar  (optional) 0/1
+	 * @param      <type>   $similar_items  (optional) array
+	 * @param      <type>   $exchange_category  (optional) array
+	 * @param      <type>   $color_ids  (optional) array
+	 * @param      <type>   $sizegroupoption_ids  (optional) array
+	 */
+
+	function additem_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		
+		
+		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
+		if ($approval_enable == 1) {
+			$status = 0;
+		} else {
+			$status = 1;
+		}
+		// validation rules for user register
+		$rules = array(
+			array(
+	        	'field' => 'cat_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'sub_cat_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'childsubcat_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'item_type_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'condition_of_item_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'title',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'delivery_method_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'address_id',
+	        	'rules' => 'required'
+	        )
+
+        );
+
+        // $lat = $this->post('lat');
+		// $lng = $this->post('lng');
+        // $location = location_check($lat,$lng);
+
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        
+	  	$item_data = array(
+
+        	"cat_id" => $this->post('cat_id'), 
+        	"sub_cat_id" => $this->post('sub_cat_id'),
+        	"item_type_id" => $this->post('item_type_id'),
+        	"condition_of_item_id" => $this->post('condition_of_item_id'),
+        	"description" => $this->post('description'),
+        	"price" => $this->post('price'),
+        	"brand" => $this->post('brand'),
+        	"title" => $this->post('title'),
+        	"status" => $status,
+        	"id" => $this->post('id'),
+			"delivery_method_id" => $this->post('delivery_method_id'),
+			"address_id" => $this->post('address_id'),
+			"childsubcat_id" => $this->post('childsubcat_id'),
+			"sizegroup_id" => $this->post('sizegroup_id'),
+			"childsubcat_id" => $this->post('childsubcat_id'),
+			"is_all_colors" => $this->post('is_all_colors'),
+			"pieces" => $this->post('pieces'),
+			"is_negotiable" => $this->post('is_negotiable'),
+			"negotiable_percentage" => $this->post('negotiable_percentage'),
+			"expiration_date_days" => $this->post('expiration_date_days'),
+			"expiration_date" => $this->post('expiration_date'),
+			"observation" => $this->post('observation'),
+			"is_draft" => $this->post('is_draft'),
+			"pay_shipping_by" => $this->post('pay_shipping_by'),
+			"shipping_type" => $this->post('shipping_type'),
+			"packagesize_id" => $this->post('packagesize_id'),
+			"shippingcarrier_id" => $this->post('shippingcarrier_id'),
+			"shipping_cost_by_seller" => $this->post('shipping_cost_by_seller'),
+			"is_confirm_with_seller" => $this->post('is_confirm_with_seller'),
+			"is_exchange" => $this->post('is_exchange'),
+			"is_accept_similar" => $this->post('is_accept_similar'),
+
+        	"added_user_id" => $this->post('added_user_id'),
+        	"added_date" =>  date("Y-m-d H:i:s")
+        	
+        );
+
+		// check if similar items are selected
+
+		if($this->post('is_accept_similar')=='1' && count($this->post('similar_items')<=0))
+		{
+			$this->error_response( get_msg( 'select_similar_items' ));
+		}
+
+		// check if exchange categories are selected
+
+		if($this->post('is_exchange')=='1' && count($this->post('exchange_category')<=0))
+		{
+			$this->error_response( get_msg( 'select_exchange_category' ));
+		}
+
+		// check address id
+
+		$address_id = $this->post('address_id');
+		$conds['id'] = $address_id;
+		$address_data = $this->Addresses->get_one_by($conds);
+		if ( $address_data->id == "") {
+			$this->error_response( get_msg( 'invalid_address_id' ));
+		}
+
+		// check delivery method id
+		$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
+		if(isset($deliverycheck->is_empty_object))
+		{
+			$this->error_response( get_msg( 'delivery_method_not_found' ));
+		}
+
+
+		$id = $item_data['id'];
+		
+		if($id != ""){
+			$status = $this->Item->get_one($id)->status;
+			$item_data['status'] = $status;
+		 	$this->Item->save($item_data,$id);
+		 	///start deep link update item tb by MN
+			$description = $item_data['description'];
+			$title = $item_data['title'];
+			$conds_img = array( 'img_type' => 'item', 'img_parent_id' => $id );
+	        $images = $this->Image->get_all_by( $conds_img )->result();
+			$img = $this->ps_image->upload_url . $images[0]->img_path;
+			$deep_link = deep_linking_shorten_url($description,$title,$img,$id);
+			$itm_data = array(
+				'dynamic_link' => $deep_link
+			);
+			$this->Item->save($itm_data,$id);
+			///End
+
+		} else{
+
+		 	$this->Item->save($item_data);
+
+		 	$id = $item_data['id'];
+		 	///start deep link update item tb by MN
+			$description = $item_data['description'];
+			$title = $item_data['title'];
+			$conds_img = array( 'img_type' => 'item', 'img_parent_id' => $id );
+	        $images = $this->Image->get_all_by( $conds_img )->result();
+			$img = $this->ps_image->upload_url . $images[0]->img_path;
+			$deep_link = deep_linking_shorten_url($description,$title,$img,$id);
+			$itm_data = array(
+				'dynamic_link' => $deep_link
+			);
+			$this->Item->save($itm_data,$id);
+			///End
+
+		}
+		 
+		//$itemcheckdata = array( 'item_id' => $id );
+
+		
+		if(count($this->post('similar_items'))>0)
+		{
+			
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_similarcreteria');
+			
+			foreach($this->post('similar_items') as $similaritemcreteria)
+			{
+				$similar_data = array(
+					"similarcreteria_id" => $similaritemcreteria, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemsimilarcreteria->save($similar_data);
+			}
+		}
+
+		if(count($this->post('exchange_category'))>0)
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_exchange');
+
+			foreach($this->post('exchange_category') as $catid)
+			{
+				$exchange_data = array(
+					"cat_id" => $catid, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemexchangecategory->save($exchange_data);
+			}
+		}
+
+		if(count($this->post('color_ids'))>0)
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_colors');
+
+			foreach($this->post('color_ids') as $colorid)
+			{
+				$color_data = array(
+					"color_id" => $colorid, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemcolors->save($color_data);
+			}
+		}
+
+		if(count($this->post('sizegroupoption_ids'))>0)
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_sizegroupoptions');
+
+			foreach($this->post('sizegroupoption_ids') as $optionid)
+			{
+				$option_data = array(
+					"sizegroup_option_id" => $optionid, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemsizegroupoptions->save($option_data);
+			}
+		}
+
+
 		$obj = $this->Item->get_one( $id );
 		
 		$this->ps_adapter->convert_item( $obj );

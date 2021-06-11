@@ -21,6 +21,12 @@ class Blockusers extends API_Controller
 	 */
 	function add_post() 
 	{
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		
 		// validation rules for create
 		

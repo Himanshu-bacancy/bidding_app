@@ -1013,6 +1013,12 @@ class API_Controller extends REST_Controller
 	function add_post()
 	{
 	
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 		// set the add flag for custom response
 		$this->is_add = true;
 
