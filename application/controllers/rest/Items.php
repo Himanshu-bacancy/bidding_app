@@ -292,7 +292,7 @@ class Items extends API_Controller
 	 * @param      <type>   $is_negotiable  (optional) 0/1
 	 * @param      <type>   $negotiable_percentage  (optional)
 	 * @param      <type>   $expiration_date_days  (optional)
-	 * @param      <type>   $expiration_date  (optional)
+	 
 	 * @param      <type>   $observation  (optional)
 	 * @param      <type>   $is_draft  (optional) 0/1
 	 * @param      <type>   $pay_shipping_by  (optional) '1 for buyer, 2 for seller'
@@ -391,7 +391,7 @@ class Items extends API_Controller
 			"is_negotiable" => $this->post('is_negotiable'),
 			"negotiable_percentage" => $this->post('negotiable_percentage'),
 			"expiration_date_days" => $this->post('expiration_date_days'),
-			"expiration_date" => $this->post('expiration_date'),
+			//"expiration_date" => $this->post('expiration_date'),
 			"observation" => $this->post('observation'),
 			"is_draft" => $this->post('is_draft'),
 			"pay_shipping_by" => $this->post('pay_shipping_by'),
