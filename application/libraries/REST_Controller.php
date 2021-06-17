@@ -828,9 +828,10 @@ abstract class REST_Controller extends CI_Controller
             return $result['data'];
         } else {
             if(isset($result['new_token']) && !empty($result['new_token'])){
-                $this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::TOKEN_EXPIRED);
+                //changed function from _response to response
+                $this->response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::TOKEN_EXPIRED);
             }else{
-                $this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
+                $this->response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
             }
             //$this->_response(['status' => FALSE, 'error' => $result['message'], 'new_token' => $result['new_token']], self::HTTP_UNAUTHORIZED);
         }

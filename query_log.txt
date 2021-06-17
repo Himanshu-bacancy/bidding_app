@@ -129,3 +129,6 @@ CREATE TABLE `bidding_app`.`bs_item_similarcreteria` ( `id` VARCHAR(255) NOT NUL
 
 // Create Item sizegroup options table Query :
 CREATE TABLE `bidding_app`.`bs_item_sizegroupoptions` ( `id` VARCHAR(255) NOT NULL , `sizegroup_option_id` int(11) NOT NULL , `item_id` VARCHAR(255) NOT NULL ,`added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (id) ) ENGINE = InnoDB;
+
+// Added on 17-06-2021
+ALTER TABLE bs_items ADD pickup_distance DOUBLE NULL;

@@ -303,6 +303,7 @@ class Items extends API_Controller
 	 * @param      <type>   $is_confirm_with_seller  (optional) 0/1
 	 * @param      <type>   $is_exchange (optional) 0/1
 	 * @param      <type>   $is_accept_similar  (optional) 0/1
+	 * @param     <type>    $pickup_distance  (optional)
 	 * @param      <type>   $similar_items  (optional) array
 	 * @param      <type>   $exchange_category  (optional) array
 	 * @param      <type>   $color_ids  (optional) array
@@ -391,7 +392,7 @@ class Items extends API_Controller
 			"is_negotiable" => $this->post('is_negotiable'),
 			"negotiable_percentage" => $this->post('negotiable_percentage'),
 			"expiration_date_days" => $this->post('expiration_date_days'),
-			//"expiration_date" => $this->post('expiration_date'),
+			"pickup_distance" => $this->post('pickup_distance'),
 			"observation" => $this->post('observation'),
 			"is_draft" => $this->post('is_draft'),
 			"pay_shipping_by" => $this->post('pay_shipping_by'),
@@ -410,14 +411,13 @@ class Items extends API_Controller
 
 		// check if similar items are selected
 
-		if($this->post('is_accept_similar')=='1' && count($this->post('similar_items')<=0))
+		if($this->post('is_accept_similar')=='1' && (count($this->post('similar_items'))<=0 || empty($this->post('similar_items'))))
 		{
 			$this->error_response( get_msg( 'select_similar_items' ));
 		}
 
 		// check if exchange categories are selected
-
-		if($this->post('is_exchange')=='1' && count($this->post('exchange_category')<=0))
+		if($this->post('is_exchange')=='1' && (count($this->post('exchange_category'))<=0 || empty($this->post('exchange_category'))))
 		{
 			$this->error_response( get_msg( 'select_exchange_category' ));
 		}
