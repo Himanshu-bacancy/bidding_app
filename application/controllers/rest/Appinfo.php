@@ -30,7 +30,7 @@ class Appinfo extends API_Controller
 	{
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
+            'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
 		
