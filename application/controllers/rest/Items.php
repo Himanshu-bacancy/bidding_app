@@ -392,7 +392,7 @@ class Items extends API_Controller
 			"is_negotiable" => $this->post('is_negotiable'),
 			"negotiable_percentage" => $this->post('negotiable_percentage'),
 			"expiration_date_days" => $this->post('expiration_date_days'),
-			"expiration_date" => ($this->post('expiration_date_days'))?date('Y-m-d', strtotime($todate. ' + '.$this->post('expiration_date_days').' days')):'',
+			"expiration_date" => !empty($this->post('expiration_date_days')) ? date('Y-m-d', strtotime($todate. ' + '.$this->post('expiration_date_days').' days')) : '',
 			"pickup_distance" => $this->post('pickup_distance'),
 			"observation" => $this->post('observation'),
 			"is_draft" => $this->post('is_draft'),
