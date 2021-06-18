@@ -359,6 +359,10 @@ class Items extends API_Controller
 	        array(
 	        	'field' => 'address_id',
 	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'price',
+	        	'rules' => 'required'
 	        )
 
         );

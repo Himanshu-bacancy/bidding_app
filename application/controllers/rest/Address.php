@@ -343,7 +343,7 @@ class Address extends API_Controller
 	 */
 
 	function fetch_defaultaddress_post( ) {
-
+		
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
@@ -380,8 +380,9 @@ class Address extends API_Controller
 			$this->db->where(array('is_default_address' => 1 ,'user_id' => $this->post('user_id')));
 			$defaultdata = $this->db->get();
 			//$data = $this->Addresses->get_all_by( $condscstm )->result();
-
-        	$this->custom_response( $defaultdata->result() );
+			$resultData = $defaultdata->result();
+			$data = count( $resultData) == 1 ? $resultData[0] : $resultData;
+        	$this->custom_response($data);
 
         }
 
