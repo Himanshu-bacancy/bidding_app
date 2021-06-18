@@ -396,13 +396,13 @@ class Items extends API_Controller
 			"pickup_distance" => $this->post('pickup_distance'),
 			"observation" => $this->post('observation'),
 			"is_draft" => $this->post('is_draft'),
-			"pay_shipping_by" => $this->post('pay_shipping_by'),
-			"shipping_type" => $this->post('shipping_type'),
-			"packagesize_id" => $this->post('packagesize_id'),
-			"shippingcarrier_id" => $this->post('shippingcarrier_id'),
-			"shipping_cost_by_seller" => $this->post('shipping_cost_by_seller'),
-			"is_confirm_with_seller" => $this->post('is_confirm_with_seller'),
-			"is_exchange" => $this->post('is_exchange'),
+			"pay_shipping_by" => ($this->post('item_type_id')=='1')?'':$this->post('pay_shipping_by'),
+			"shipping_type" => ($this->post('item_type_id')=='1')?'':$this->post('shipping_type'),
+			"packagesize_id" => ($this->post('item_type_id')=='1')?'':$this->post('packagesize_id'),
+			"shippingcarrier_id" => ($this->post('item_type_id')=='1')?'':$this->post('shippingcarrier_id'),
+			"shipping_cost_by_seller" => ($this->post('item_type_id')=='1')?'':$this->post('shipping_cost_by_seller'),
+			"is_confirm_with_seller" => ($this->post('item_type_id')=='1')?'':$this->post('is_confirm_with_seller'),
+			"is_exchange" => ($this->post('item_type_id')=='1')?'':$this->post('is_exchange'),
 			"is_accept_similar" => $this->post('is_accept_similar'),
 
         	"added_user_id" => $this->post('added_user_id'),
@@ -481,8 +481,13 @@ class Items extends API_Controller
 		 
 		//$itemcheckdata = array( 'item_id' => $id );
 
+		if($this->post('item_type_id')!='1')
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_similarcreteria');
+		}
 		
-		if(count($this->post('similar_items'))>0)
+		if(count($this->post('similar_items'))>0 && $this->post('item_type_id')=='1')
 		{
 			
 			$this->db->where('item_id', $id);
@@ -499,7 +504,13 @@ class Items extends API_Controller
 			}
 		}
 
-		if(count($this->post('exchange_category'))>0)
+		if($this->post('item_type_id')=='1')
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_exchange');
+		}
+
+		if(count($this->post('exchange_category'))>0 && ($this->post('item_type_id')=='2' || $this->post('item_type_id')=='3'))
 		{
 			$this->db->where('item_id', $id);
     		$this->db->delete('bs_item_exchange');
@@ -549,7 +560,25 @@ class Items extends API_Controller
 
 
 		$obj = $this->Item->get_one( $id );
+
+		$this->db->where('item_id', $id);
+    	$colordata = $this->db->get('bs_item_colors');
+
+		$this->db->where('item_id', $id);
+    	$sizegroupoptiondata = $this->db->get('bs_item_sizegroupoptions');
+
+		$this->db->where('item_id', $id);
+    	$exchangecatdata = $this->db->get('bs_item_exchange');
+
+		$this->db->where('item_id', $id);
+    	$similaritemdata = $this->db->get('bs_item_similarcreteria');
+
 		
+		$obj->item_colors = $colordata->result();
+		$obj->sizegroup_options = $sizegroupoptiondata->result();
+		$obj->exchange_category = $exchangecatdata->result();
+		$obj->similar_item = $similaritemdata->result();
+
 		$this->ps_adapter->convert_item( $obj );
 		$this->custom_response( $obj );
 
