@@ -169,6 +169,28 @@
 							<br>
 					</div>
 
+					<div class="col-md-6">
+	            		<div class="form-group">
+	                   		<label>
+	                   			<span style="font-size: 17px; color: red;">*</span>
+								<?php echo get_msg('shippo_object_id')?>
+								<a href="#" class="tooltip-ps" data-toggle="tooltip" >
+									<span class='glyphicon glyphicon-info-sign menu-icon'>
+								</a>
+							</label>
+
+							<?php echo form_input( array(
+								'name' => 'shippo_object_id',
+								'value' => set_value( 'shippo_object_id', show_data( @$shippingcarrier->shippo_object_id ), false ),
+								'class' => 'form-control form-control-sm',
+								'placeholder' => get_msg( 'shippo_object_id' ),
+								'id' => 'shippo_object_id'
+							)); ?>
+	              		</div>
+
+	              		
+	            	</div>
+
 					
 	            <!-- /.row -->
 	        	</div>

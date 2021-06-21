@@ -132,3 +132,6 @@ CREATE TABLE `bidding_app`.`bs_item_sizegroupoptions` ( `id` VARCHAR(255) NOT NU
 
 // Added on 17-06-2021
 ALTER TABLE bs_items ADD pickup_distance DOUBLE NULL;
+
+// Added on 21-06-2021
+ALTER TABLE bs_shippingcarriers ADD shippo_object_id VARCHAR(255) NULL;

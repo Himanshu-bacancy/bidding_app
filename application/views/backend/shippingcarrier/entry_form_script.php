@@ -28,6 +28,9 @@
 				packagesize_id: {
 		       		indexCheck : ""
 		      	},
+				shippo_object_id:{
+					required: true
+				}
 			},
 			messages:{
 				name:{
@@ -52,6 +55,9 @@
 				packagesize_id: {
 					indexCheck: "<?php echo get_msg( 'err_packagesize_select' ) ;?>"
 		      	},
+				shippo_object_id:{
+					required: "<?php echo get_msg( 'err_shippo_object_id' ) ;?>"
+				},
 			}
 		});
 		// custom validation

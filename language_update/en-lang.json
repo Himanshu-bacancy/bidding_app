@@ -206,5 +206,7 @@
  "in_percentage" : "in percentage",
  "service_fees_label" : "Service Fees",
  "select_similar_items" : "Please select similar items",
- "select_exchange_category" : "Please select exchange category"
+ "select_exchange_category" : "Please select exchange category",
+ "shippo_object_id" : "Shippo object id",
+ "err_shippo_object_id" : "Please provide shippo object id"
 } 

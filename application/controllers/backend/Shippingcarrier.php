@@ -133,6 +133,9 @@ class Shippingcarrier extends BE_Controller {
 		if ( $this->has_data( 'packagesize_id' )) {
 			$data['packagesize_id'] = $this->get_data( 'packagesize_id' );
 		}
+		if ( $this->has_data( 'shippo_object_id' )) {
+			$data['shippo_object_id'] = $this->get_data( 'shippo_object_id' );
+		}
 
 
 		// save Shippingcarriers

@@ -189,6 +189,16 @@ class PS_Adapter {
 			$obj->sub_category = $tmp_sub_category;
 		}
 
+		// Sub Category Object
+		if ( isset( $obj->childsubcat_id )) {
+
+			$tmp_childsub_category = $this->CI->Childsubcategory->get_one( $obj->childsubcat_id );
+
+			$this->convert_childsubcategory( $tmp_childsub_category );
+
+			$obj->childsub_category = $tmp_childsub_category;
+		}
+
 		// Itemtype Object
 		if ( isset( $obj->item_type_id )) {
 
@@ -229,6 +239,61 @@ class PS_Adapter {
 
 			$tmp_deal_option = $this->CI->Option->get_one( $obj->deal_option_id );
 			$obj->deal_option = $tmp_deal_option ;
+		}
+
+		// fetch exchange category
+		if (  $obj->is_exchange =='1') {
+
+			$this->CI->db->where('item_id', $obj->id);
+    		$exchange_category = $this->CI->db->get('bs_item_exchange')->result();
+			//$exchange_category = $this->CI->Itemexchangecategory->get_all_by( $itemconds )->result();
+			$obj->exchange_category = $exchange_category ;
+		}
+
+		// fetch similar item creteria
+		if (  $obj->is_accept_similar =='1') {
+
+			$this->CI->db->where('item_id', $obj->id);
+    		$similar_items = $this->CI->db->get('bs_item_similarcreteria')->result();
+			$obj->similar_items = $similar_items ;
+		}
+
+		// fetch colors
+		$this->CI->db->where('item_id', $obj->id);
+    	$item_colors = $this->CI->db->get('bs_item_colors')->result();
+		$obj->item_colors = $item_colors ;
+
+		// fetch sizegroup options
+		$this->CI->db->where('item_id', $obj->id);
+    	$sizegroup_options = $this->CI->db->get('bs_item_sizegroupoptions')->result();
+		$obj->sizegroup_options = $sizegroup_options ;
+
+		// Address object
+		if ( isset( $obj->Address_id )) {
+
+			$tmp_address = $this->CI->Addresses->get_one( $obj->Address_id );
+			$obj->item_address = $tmp_address;
+		}
+
+		// Delivery method object
+		if ( isset( $obj->delivery_method_id )) {
+
+			$tmp_deliverymethod = $this->CI->Deliverymethods->get_one( $obj->delivery_method_id );
+			$obj->item_deliverymethod = $tmp_deliverymethod;
+		}
+
+		// Packagesize object
+		if ( isset( $obj->packagesize_id ) && $obj->packagesize_id !='') {
+
+			$tmp_packagesize = $this->CI->Packagesizes->get_one( $obj->packagesize_id );
+			$obj->item_packagesize = $tmp_packagesize;
+		}
+
+		// Shippingcarrier object
+		if ( isset( $obj->shippingcarrier_id ) && $obj->shippingcarrier_id !='') {
+
+			$tmp_shippingcarrier = $this->CI->Shippingcarriers->get_one( $obj->shippingcarrier_id );
+			$obj->item_shippingcarrier = $tmp_shippingcarrier;
 		}
 
 		//print_r($obj->added_user_id . "$$");die;
