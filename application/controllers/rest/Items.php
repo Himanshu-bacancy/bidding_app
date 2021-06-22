@@ -589,6 +589,21 @@ class Items extends API_Controller
 
 	}
 
+	/**
+	 * Search item with filters
+	 * @param      <type>   $cat_id  The  cat_id
+	 * @param      <type>   $sub_cat_id  The  sub_cat_id
+	 * @param      <type>   $childsubcat_id  The  childsubcat_id
+	 * @param      <type>   $item_type_id  The  item_type_id
+	 * @param      <type>   $condition_of_item_id  The  condition_of_item_id
+	 * @param      <type>   $title  The  title
+	 * @param      <type>   $delivery_method_id  The  delivery_method_id
+	 * @param      <type>   $brand  THe brand id
+	 * @param      <type>   $sizegroup_id 
+	 * @param      <type>   $color_id array
+	 * @param      <type>   $sizegroupoption_id  array
+	 */
+
 	function searchitem_post()
 	{
 		// API Configuration [Return Array: User Token Data]
