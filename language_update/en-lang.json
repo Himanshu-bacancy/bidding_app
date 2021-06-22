@@ -208,5 +208,6 @@
  "select_similar_items" : "Please select similar items",
  "select_exchange_category" : "Please select exchange category",
  "shippo_object_id" : "Shippo object id",
- "err_shippo_object_id" : "Please provide shippo object id"
+ "err_shippo_object_id" : "Please provide shippo object id",
+ "invalid_image_id" : "Invalid image id"
 } 

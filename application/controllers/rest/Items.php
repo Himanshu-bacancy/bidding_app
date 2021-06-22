@@ -872,6 +872,55 @@ class Items extends API_Controller
 		$this->custom_response( $data );
 	}
 
+	/**
+	 * Delete image from database and folder
+	 * @param      <type>   $image_id  The  image_id
+	 
+	 */
+	function deleteimage_post()
+	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for image delete
+		$rules = array(
+			array(
+	        	'field' => 'image_id',
+	        	'rules' => 'required'
+	        )
+	    );   
+	    
+	    // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        $id = $this->post('image_id');
+
+        $conds['img_id'] = $id;
+
+        // check image id
+
+        $image_data = $this->Image->get_one_by($conds);
+
+        
+		if ( $image_data->img_id == "") {
+
+        	$this->error_response( get_msg( 'invalid_image_id' ));
+
+        } else {
+			//@unlink('./uploads/'.$image_data->img_path);
+			$img_path = './uploads/'.$image_data->img_path;
+			unlink( $img_path );
+			$this->db->where('img_id', $id);
+        	$this->db->delete('core_images');
+
+			$this->success_response( get_msg( 'success_delete' ));
+		}
+
+	}
+
 
 	/**
 	* Trigger to delete item related data when item is deleted

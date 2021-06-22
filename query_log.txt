@@ -138,3 +138,5 @@ ALTER TABLE bs_shippingcarriers ADD shippo_object_id VARCHAR(255) NULL;
 
 // Added on 22-06-2021
 ALTER TABLE bs_items ADD is_confirm TINYINT(1) NULL DEFAULT '0';
+
+ALTER TABLE core_images ADD PRIMARY KEY (img_id)
