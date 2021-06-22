@@ -135,3 +135,6 @@ ALTER TABLE bs_items ADD pickup_distance DOUBLE NULL;
 
 // Added on 21-06-2021
 ALTER TABLE bs_shippingcarriers ADD shippo_object_id VARCHAR(255) NULL;
+
+// Added on 22-06-2021
+ALTER TABLE bs_items ADD is_confirm TINYINT(1) NULL DEFAULT '0';

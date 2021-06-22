@@ -38,6 +38,8 @@ class Item extends PS_Model {
 		}
 
 		// order by
+		// post parameter "order_by" : "fieldname"
+		// post parameter "order_type" : "asc/desc"
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
@@ -84,6 +86,59 @@ class Item extends PS_Model {
 
 			}			
 		}
+
+		//  delivery method id condition 
+		if ( isset( $conds['delivery_method_id'] )) {
+			
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
+				
+					$this->db->where( 'delivery_method_id', $conds['delivery_method_id'] );	
+				}
+
+			}			
+		}
+
+		//  child sub category id condition 
+		if ( isset( $conds['childsubcat_id'] )) {
+			
+			if ($conds['childsubcat_id'] != "") {
+				if($conds['childsubcat_id'] != '0'){
+				
+					$this->db->where( 'childsubcat_id', $conds['childsubcat_id'] );	
+				}
+
+			}			
+		}
+
+		//  sizegroup id condition 
+		if ( isset( $conds['sizegroup_id'] )) {
+			
+			if ($conds['sizegroup_id'] != "") {
+				if($conds['sizegroup_id'] != '0'){
+				
+					$this->db->where( 'sizegroup_id', $conds['sizegroup_id'] );	
+				}
+
+			}			
+		}
+
+		// //  sizegroupoption id condition 
+		// if ( isset( $conds['sizegroupoption_id'] )) {
+			
+		// 	if ($conds['sizegroupoption_id'] != "") {
+		// 		if($conds['sizegroupoption_id'] != '0'){
+				
+		// 			$this->db->select('*');
+		// 			$this->db->from('bs_item_sizegroupoptions');
+		// 			$this->db->where( 'sizegroup_option_id', $conds['sizegroupoption_id'] );
+
+		// 		}
+
+		// 	}			
+		// }
+
+		
 
 		// Type id
 		if ( isset( $conds['item_type_id'] )) {
@@ -165,7 +220,7 @@ class Item extends PS_Model {
 
 		// title condition
 		if ( isset( $conds['title'] )) {
-			$this->db->like( 'title', $conds['title'] );
+			$this->db->where( 'title', $conds['title'] );
 		}
 
 		// payment_type condition

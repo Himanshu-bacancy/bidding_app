@@ -469,6 +469,104 @@ class PS_Model extends CI_Model {
 	
 	}
 
+	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
+		//print_r($conds);die;
+
+		if($conds['lat'] != "" && $conds['lng'] != "") {
+			$this->db->select('*,( 3959
+		      * acos( cos( radians('. $conds['lat'] .') )
+		              * cos(  radians( lat )   )
+		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		            + sin( radians('. $conds['lat'] .') )
+		              * sin( radians( lat ) )
+		            )
+		    ) as distance');
+
+		    if ($conds['miles'] == "") {
+		    	$conds['miles'] = 0;
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+		    } else {
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+
+		    }
+
+		   
+		}
+
+		// item id (id) check for user block condition
+		if ( isset( $conds['item_id'] )) {
+			
+			if ($conds['item_id'] != "") {
+				if($conds['item_id'] != '0'){
+				
+					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
+				}
+
+			}			
+		}
+
+		// item id (id) check for item reported condition
+		if ( isset( $conds['reported_item_id'] )) {
+			
+			if ($conds['reported_item_id'] != "") {
+				if($conds['reported_item_id'] != '0'){
+				
+					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item id (id) check for item color condition
+		if ( isset( $conds['coloritem_id'] )) {
+			
+			if ($conds['coloritem_id'] != "") {
+				if($conds['coloritem_id'] != '0'){
+					
+					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item id (id) check for sizegroupoption condition
+		if ( isset( $conds['sizeoption_item_id'] )) {
+			
+			if ($conds['sizeoption_item_id'] != "") {
+				if($conds['sizeoption_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+
+		// where clause
+		$this->custom_conds( $conds );
+		
+		
+		// from table
+		$this->db->from( $this->table_name );
+
+		if ( $limit ) {
+		// if there is limit, set the limit
+			
+			$this->db->limit($limit);
+		}
+		
+		if ( $offset ) {
+		// if there is offset, set the offset,
+			
+			$this->db->offset($offset);
+		}
+		
+	 	return $this->db->get();
+		// print_r($this->db->last_query());die;
+	
+	}
+
 
 	/**
 	 * Counts the number of all by the conditions

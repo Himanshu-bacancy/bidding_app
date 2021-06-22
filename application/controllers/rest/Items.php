@@ -303,6 +303,7 @@ class Items extends API_Controller
 	 * @param      <type>   $is_confirm_with_seller  (optional) 0/1
 	 * @param      <type>   $is_exchange (optional) 0/1
 	 * @param      <type>   $is_accept_similar  (optional) 0/1
+	 * @param      <type>   $is_confirm (optional) 0/1
 	 * @param     <type>    $pickup_distance  (optional)
 	 * @param      <type>   $similar_items  (optional) array
 	 * @param      <type>   $exchange_category  (optional) array
@@ -408,7 +409,7 @@ class Items extends API_Controller
 			"is_confirm_with_seller" => ($this->post('item_type_id')=='1')?'':$this->post('is_confirm_with_seller'),
 			"is_exchange" => ($this->post('item_type_id')=='1')?'':$this->post('is_exchange'),
 			"is_accept_similar" => $this->post('is_accept_similar'),
-
+			"is_confirm" => $this->post('is_confirm'),
         	"added_user_id" => $this->post('added_user_id'),
         	"added_date" =>  date("Y-m-d H:i:s")
         	
@@ -586,6 +587,274 @@ class Items extends API_Controller
 		$this->ps_adapter->convert_item( $obj );
 		$this->custom_response( $obj );
 
+	}
+
+	function searchitem_post()
+	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);	
+
+		// add flag for default query
+		$this->is_search = true;
+
+		// add default conds
+		$default_conds = $this->default_conds();
+		$user_conds = $this->get();
+
+		$post_conds = $this->post();
+
+		$conds = array_merge( $default_conds, $user_conds );
+
+		$conds = array_merge( $post_conds, $conds );
+
+		
+
+		// check empty condition
+		$final_conds = array();
+		foreach( $conds as $key => $value ) {
+    
+		    if($key != "status") {
+			    if ( !empty( $value )) {
+			     $final_conds[$key] = $value;
+			    }
+		    }
+
+		    if($key == "status") {
+		    	$final_conds[$key] = $value;
+		    }
+
+
+		}
+
+		
+		$conds = $final_conds;
+		$limit = $this->get( 'limit' );
+		$offset = $this->get( 'offset' );
+		
+		if ($conds['item_search']==1) {
+
+			/* For User Block */
+
+			//user block check with login_user_id
+			$conds_login_block['from_block_user_id'] = $this->get_login_user_id();
+			$login_block_count = $this->Block->count_all_by($conds_login_block);
+			//print_r($login_block_count);die;
+
+			// user blocked existed by login user
+			if ($login_block_count > 0) {
+				// get the blocked user by login user
+				$to_block_user_datas = $this->Block->get_all_by($conds_login_block)->result();
+
+				foreach ( $to_block_user_datas as $to_block_user_data ) {
+
+					$to_block_user_id .= "'" .$to_block_user_data->to_block_user_id . "',";
+			
+				}
+
+				// get block user's item
+
+				$result_users = rtrim($to_block_user_id,',');
+				$conds_user['added_user_id'] = $result_users;
+
+				$item_users = $this->Item->get_all_in_item( $conds_user )->result();
+
+				foreach ( $item_users as $item_user ) {
+
+					$id .= $item_user->id .",";
+				
+				}
+
+				// get all item without block user's item
+
+				$result_items = rtrim($id,',');
+				$item_id = explode(",", $result_items);
+				//print_r($item_id);die;
+				//$conds['id'] = $result_items;
+
+			}	
+
+			/* For Item Report */
+
+			//item report check with login_user_id
+			$conds_report['reported_user_id'] = $this->get_login_user_id();
+			$reported_data_count = $this->Itemreport->count_all_by($conds_report);
+
+			// item reported existed by login user
+			if ($reported_data_count > 0) {
+				// get the reported item data
+				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
+
+				foreach ( $item_reported_datas as $item_reported_data ) {
+
+					$item_ids .= "'" .$item_reported_data->item_id . "',";
+			
+				}
+
+				// get block user's item
+
+				$result_reports = rtrim($item_ids,',');
+				$conds_item['id'] = $result_reports;
+
+				$item_reports = $this->Item->get_all_in_report( $conds_item )->result();
+
+				foreach ( $item_reports as $item_report ) {
+
+					$ids .= $item_report->id .",";
+				
+				}
+
+				// get all item without block user's item
+
+				$result_items = rtrim($ids,',');
+				$reported_item_id = explode(",", $result_items);
+				//$conds['id'] = $result_items;
+			}
+
+			//  color id condition 
+			if ( isset( $conds['color_id'] ) && !empty( $conds['color_id'] )) {
+
+				foreach($conds['color_id'] as $colorid)
+				{
+					if ( $colorid != "") {
+						if( $colorid != '0'){
+						
+							$this->db->select('*');
+							$this->db->from('bs_item_colors');
+							$this->db->where( 'color_id', $colorid );
+							$colorfilter = $this->db->get();
+							foreach($colorfilter->result() as $coloritem)
+							{
+								$colorids .= $coloritem->item_id .",";
+							}
+						}
+					}	
+				}
+				
+						
+			}
+
+			if(isset($colorids) && $colorids !='')
+			{
+				$color_items = rtrim($colorids,',');
+				$colored_item_id = explode(",", $color_items);	
+			}
+			
+			//  sizegroupoption id condition 
+
+			if ( isset( $conds['sizegroupoption_id'] ) && !empty( $conds['sizegroupoption_id'] )) {
+
+				foreach($conds['sizegroupoption_id'] as $optionid)
+				{
+					if ( $optionid != "") {
+						if( $optionid != '0'){
+						
+							$this->db->select('*');
+							$this->db->from('bs_item_sizegroupoptions');
+							$this->db->where( 'sizegroup_option_id', $optionid );
+							$sizeoptionfilter = $this->db->get();
+							foreach($sizeoptionfilter->result() as $sizeoptionitem)
+							{
+								$sizeoptionids .= $sizeoptionitem->item_id .",";
+							}
+						}
+					}	
+				}
+			}
+
+			if(isset($sizeoptionids) && $sizeoptionids !='')
+			{
+				$sizeoption_items = rtrim($sizeoptionids,',');
+				$sizeoption_item_id = explode(",", $sizeoption_items);	
+			}
+			
+			if ($conds['is_paid'] == "only_paid_item") {
+
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
+				$conds['is_paid'] = 1 ;
+				
+				if ( !empty( $limit ) && !empty( $offset )) {
+				// if limit & offset is not empty
+				$data = $this->model->get_all_item_by_paid( $conds, $limit, $offset )->result();
+
+
+				} else if ( !empty( $limit )) {
+					// if limit is not empty
+					$data = $this->model->get_all_item_by_paid( $conds, $limit )->result();
+
+				} else {
+					// if both are empty
+					$data = $this->model->get_all_item_by_paid( $conds )->result();
+
+				}
+			} elseif ($conds['is_paid'] == "paid_item_first") {
+				$result = "";
+
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
+				$conds['is_paid'] = 1;
+				
+				if ( !empty( $limit ) && !empty( $offset )) {
+					// if limit & offset is not empty
+					$data = $this->model->get_all_item_by_paid_date( $conds, $limit, $offset )->result();
+
+
+				} else if ( !empty( $limit )) {
+					// if limit is not empty
+					$data = $this->model->get_all_item_by_paid_date( $conds, $limit )->result();
+
+				} else {
+					// if both are empty
+					$data_paid = $this->model->get_all_item_by_paid_date( $conds )->result();
+
+				}
+			} else {
+
+				//$conds['item_id'] = $item_id;
+				//$conds['reported_item_id'] = $reported_item_id;
+
+				$conds['coloritem_id'] = $colored_item_id;
+				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				
+
+				if ( !empty( $limit ) && !empty( $offset )) {
+					// if limit & offset is not empty
+					$data = $this->model->get_all_by_itemnew( $conds, $limit, $offset )->result();
+
+
+					} else if ( !empty( $limit )) {
+						// if limit is not empty
+						$data = $this->model->get_all_by_itemnew( $conds, $limit )->result();
+
+					} else {
+						// if both are empty
+						$data = $this->model->get_all_by_itemnew( $conds )->result();
+
+					}
+				
+				}	
+			
+		} else {
+			if ( !empty( $limit ) && !empty( $offset )) {
+			// if limit & offset is not empty
+			$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
+
+
+			} else if ( !empty( $limit )) {
+				// if limit is not empty
+				$data = $this->model->get_all_by( $conds, $limit )->result();
+
+			} else {
+				// if both are empty
+				$data = $this->model->get_all_by( $conds )->result();
+
+			}
+		}
+
+		$this->custom_response( $data );
 	}
 
 
