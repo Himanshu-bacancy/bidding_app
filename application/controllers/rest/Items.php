@@ -921,6 +921,63 @@ class Items extends API_Controller
 
 	}
 
+	/**
+	 * auto suggestion item with category
+	 * @param      <type>   $text  The  to search the item
+	 
+	 */
+	function autosearch_post()
+	{
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for image delete
+		$rules = array(
+			array(
+	        	'field' => 'text',
+	        	'rules' => 'required'
+	        )
+	    );   
+	    
+	    // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+        $title = $this->post('text');
+
+        $requesttype = $this->db->select('name,id')->from('bs_items_types')->where('id', 1)->where('status', 1)->get()->row();
+		$sellingtype = $this->db->select('name,id')->from('bs_items_types')->where('id', 2)->where('status', 1)->get()->row();
+		$sellingexchangetype = $this->db->select('name,id')->from('bs_items_types')->where('id', 3)->where('status', 1)->get()->row();
+
+		$typeArr = array($requesttype,$sellingtype,$sellingexchangetype);
+
+		foreach($typeArr as $typekey => $type)
+		{
+			$this->db->select('bs_items.id,bs_items.title, bs_categories.cat_name as catname'); 
+			$this->db->from('bs_categories');
+			$this->db->join('bs_items', 'bs_categories.cat_id = bs_items.cat_id');
+			$this->db->where("title LIKE '%$title%'");
+			$this->db->where('item_type_id', $type->id);
+			$this->db->where('bs_items.status', 1);
+			$searchresult = $this->db->get()->result();
+			//echo count($searchresult);
+			if(count($searchresult)<='0')
+			{
+				unset($typeArr[$typekey]);
+			}
+			else
+			{
+				$typeArr[$typekey]->searchresult = $searchresult;
+			}
+			
+		}
+
+		$this->response($typeArr);
+
+	}
+
 
 	/**
 	* Trigger to delete item related data when item is deleted
