@@ -955,7 +955,7 @@ class Items extends API_Controller
 
 		foreach($typeArr as $typekey => $type)
 		{
-			$this->db->select('bs_items.id,bs_items.title, bs_categories.cat_name as catname'); 
+			$this->db->select('bs_items.id,bs_items.title, bs_categories.cat_name as catname, CONCAT(bs_items.title, " in ", bs_categories.cat_name) AS display_text'); 
 			$this->db->from('bs_categories');
 			$this->db->join('bs_items', 'bs_categories.cat_id = bs_items.cat_id');
 			$this->db->where("title LIKE '%$title%'");
