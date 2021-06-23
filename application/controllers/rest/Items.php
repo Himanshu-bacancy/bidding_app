@@ -974,7 +974,16 @@ class Items extends API_Controller
 			
 		}
 
-		$this->response($typeArr);
+		if(count($typeArr)>0)
+		{
+			$this->response($typeArr);
+		}
+		else
+		{
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}
+
+		
 
 	}
 
