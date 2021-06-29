@@ -602,6 +602,8 @@ class Items extends API_Controller
 	 * @param      <type>   $sizegroup_id 
 	 * @param      <type>   $color_id array
 	 * @param      <type>   $sizegroupoption_id  array
+	 * @param      <type>   $order_by  THe order by field name
+	 * @param      <type>   $order_type asc/desc 
 	 */
 
 	function searchitem_post()
@@ -612,6 +614,9 @@ class Items extends API_Controller
             'requireAuthorization' => true,
         ]);	
 
+		
+		//echo $user_data['token_data']['user_id'];
+		
 		// add flag for default query
 		$this->is_search = true;
 
@@ -784,6 +789,61 @@ class Items extends API_Controller
 				$sizeoption_items = rtrim($sizeoptionids,',');
 				$sizeoption_item_id = explode(",", $sizeoption_items);	
 			}
+
+			//  lat long condition 
+			if ( isset( $conds['miles'] ) && $conds['miles'] != '' ) {
+
+				$this->db->select('*');
+				$this->db->from('bs_addresses');
+				$this->db->where( 'user_id', $user_data['token_data']['user_id'] );
+				$this->db->where( 'is_default_address', '1');
+				$addrfilter = $this->db->get();
+
+				
+				if(count($addrfilter->row())>0)
+				{
+					$this->db->select('*,( 3959
+					* acos( cos( radians('. $addrfilter->row()->latitude .') )
+							* cos(  radians( latitude )   )
+							* cos(  radians( longitude ) - radians('. $addrfilter->row()->longitude .') )
+							+ sin( radians('. $addrfilter->row()->latitude .') )
+							* sin( radians( latitude ) )
+							)
+					) as distance');
+
+					$this->db->from('bs_addresses');
+
+					if ($conds['miles'] == "") {
+						$conds['miles'] = 0;
+						$this->db->having('distance < ' .  $conds['miles'] );
+					} else {
+						$this->db->having('distance < ' .  $conds['miles'] );
+
+					}
+					$addressdatas = $this->db->get();
+					if(count($addressdatas->result())>0) 
+					{
+						foreach($addressdatas->result() as $address)
+						{
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'Address_id', $address->id );
+							$addressfilter = $this->db->get();
+							
+							foreach($addressfilter->result() as $addressitem)
+							{
+								$addressitemids .= $addressitem->id .",";
+							}
+						}
+					}
+				}
+			}
+
+			if(isset($addressitemids) && $addressitemids !='')
+			{
+				$address_items = rtrim($addressitemids,',');
+				$address_item_id = explode(",", $address_items);	
+			}
 			
 			if ($conds['is_paid'] == "only_paid_item") {
 
@@ -833,8 +893,8 @@ class Items extends API_Controller
 
 				$conds['coloritem_id'] = $colored_item_id;
 				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
 				
-
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_by_itemnew( $conds, $limit, $offset )->result();

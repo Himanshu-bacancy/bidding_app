@@ -472,26 +472,26 @@ class PS_Model extends CI_Model {
 	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
 		//print_r($conds);die;
 
-		if($conds['lat'] != "" && $conds['lng'] != "") {
-			$this->db->select('*,( 3959
-		      * acos( cos( radians('. $conds['lat'] .') )
-		              * cos(  radians( lat )   )
-		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
-		            + sin( radians('. $conds['lat'] .') )
-		              * sin( radians( lat ) )
-		            )
-		    ) as distance');
+		// if($conds['lat'] != "" && $conds['lng'] != "") {
+		// 	$this->db->select('*,( 3959
+		//       * acos( cos( radians('. $conds['lat'] .') )
+		//               * cos(  radians( lat )   )
+		//               * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		//             + sin( radians('. $conds['lat'] .') )
+		//               * sin( radians( lat ) )
+		//             )
+		//     ) as distance');
 
-		    if ($conds['miles'] == "") {
-		    	$conds['miles'] = 0;
-		    	$this->db->having('distance < ' .  $conds['miles'] );
-		    } else {
-		    	$this->db->having('distance < ' .  $conds['miles'] );
+		//     if ($conds['miles'] == "") {
+		//     	$conds['miles'] = 0;
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
+		//     } else {
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
 
-		    }
+		//     }
 
 		   
-		}
+		// }
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
@@ -538,6 +538,18 @@ class PS_Model extends CI_Model {
 				if($conds['sizeoption_item_id'] != '0'){
 				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+
+		// address id (id) check for lat long 
+		if ( isset( $conds['address_item_id'] )) {
+			
+			if ($conds['address_item_id'] != "") {
+				if($conds['address_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
 
 			}			
