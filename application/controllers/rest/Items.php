@@ -1129,4 +1129,26 @@ class Items extends API_Controller
 		$this->ps_adapter->convert_item( $obj );
 	}
 
+	/**
+	* Get drafted items from item database table
+	*/
+	function get_drafted_item_get(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+		$userId = $this->get('user_id');
+
+		$this->db->where('added_user_id', $userId);
+		$this->db->where('is_draft', 1);
+    	$itemData = $this->db->get('bs_items');
+
+        $items = $itemData->result();
+		$this->ps_adapter->convert_item( $items );
+		$result['data'] = $items; 
+        $result['item_count'] = count($items); 
+        $this->custom_response($result);
+	}
+
 }
