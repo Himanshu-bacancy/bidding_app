@@ -563,7 +563,6 @@ class Items extends API_Controller
 			}
 		}
 
-
 		$obj = $this->Item->get_one( $id );
 
 		$this->db->where('item_id', $id);
