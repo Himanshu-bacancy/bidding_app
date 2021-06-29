@@ -1140,6 +1140,7 @@ class Items extends API_Controller
         ]);
 		$userId = $this->get('user_id');
 
+		$this->db->select("id");
 		$this->db->where('added_user_id', $userId);
 		$this->db->where('is_draft', 1);
     	$itemData = $this->db->get('bs_items');
