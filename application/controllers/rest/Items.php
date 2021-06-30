@@ -603,7 +603,8 @@ class Items extends API_Controller
 	 * @param      <type>   $color_id array
 	 * @param      <type>   $sizegroupoption_id  array
 	 * @param      <type>   $order_by  THe order by field name
-	 * @param      <type>   $order_type asc/desc 
+	 * @param      <type>   $order_type asc/desc
+	 * @param      <type>   $miles  
 	 */
 
 	function searchitem_post()
