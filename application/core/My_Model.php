@@ -542,7 +542,70 @@ class PS_Model extends CI_Model {
 
 			}			
 		}
+		
 
+		// item check for brand condition
+		if ( isset( $conds['brand_items_id'] )) {
+			
+			
+			if ($conds['brand_items_id'] != "") {
+				if($conds['brand_items_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for itemtype condition
+		if ( isset( $conds['itemtype_item_id'] )) {
+			
+			
+			if ($conds['itemtype_item_id'] != "") {
+				if($conds['itemtype_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for child subcat condition
+		if ( isset( $conds['childsubcat_item_id'] )) {
+			
+			
+			if ($conds['childsubcat_item_id'] != "") {
+				if($conds['childsubcat_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for delivery method condition
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			
+			
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+				}
+
+			}			
+		}
+
+		
+		// item check for item condition
+		if ( isset( $conds['itemcondition_item_id'] )) {
+			
+			
+			if ($conds['itemcondition_item_id'] != "") {
+				if($conds['itemcondition_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
+				}
+
+			}			
+		}
+		
+		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
 			

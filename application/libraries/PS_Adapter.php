@@ -189,7 +189,7 @@ class PS_Adapter {
 			$obj->sub_category = $tmp_sub_category;
 		}
 
-		// Sub Category Object
+		// Child Sub Category Object
 		if ( isset( $obj->childsubcat_id )) {
 
 			$tmp_childsub_category = $this->CI->Childsubcategory->get_one( $obj->childsubcat_id );
@@ -241,6 +241,13 @@ class PS_Adapter {
 			$obj->deal_option = $tmp_deal_option ;
 		}
 
+		// sizegroup Object
+		if ( isset( $obj->sizegroup_id )) {
+
+			$tmp_sizegroup = $this->CI->Sizegroups->get_one( $obj->sizegroup_id );
+			$obj->sizegroup = $tmp_sizegroup;
+		}
+
 		// fetch exchange category
 		if (  $obj->is_exchange =='1') {
 
@@ -259,13 +266,20 @@ class PS_Adapter {
 		}
 
 		// fetch colors
-		$this->CI->db->where('item_id', $obj->id);
-    	$item_colors = $this->CI->db->get('bs_item_colors')->result();
+		$this->CI->db->select('bs_item_colors.*,bs_color.name, bs_color.code'); 
+		$this->CI->db->from('bs_item_colors');
+		$this->CI->db->join('bs_color', 'bs_item_colors.color_id = bs_color.id');
+		$this->CI->db->where('bs_item_colors.item_id', $obj->id);
+		
+		$item_colors = $this->CI->db->get()->result();
 		$obj->item_colors = $item_colors ;
 
 		// fetch sizegroup options
-		$this->CI->db->where('item_id', $obj->id);
-    	$sizegroup_options = $this->CI->db->get('bs_item_sizegroupoptions')->result();
+		$this->CI->db->select('bs_item_sizegroupoptions.*,bs_sizegroup_option.title, bs_sizegroup_option.description'); 
+		$this->CI->db->from('bs_item_sizegroupoptions');
+		$this->CI->db->join('bs_sizegroup_option', 'bs_item_sizegroupoptions.sizegroup_option_id = bs_sizegroup_option.id');
+		$this->CI->db->where('bs_item_sizegroupoptions.item_id', $obj->id);
+    	$sizegroup_options = $this->CI->db->get()->result();
 		$obj->sizegroup_options = $sizegroup_options ;
 
 		// Address object
@@ -280,6 +294,13 @@ class PS_Adapter {
 
 			$tmp_deliverymethod = $this->CI->Deliverymethods->get_one( $obj->delivery_method_id );
 			$obj->item_deliverymethod = $tmp_deliverymethod;
+		}
+
+		// Brand object
+		if ( isset( $obj->brand )) {
+
+			$tmp_brand = $this->CI->Brands->get_one( $obj->brand );
+			$obj->item_brand = $tmp_brand;
 		}
 
 		// Packagesize object
@@ -796,6 +817,52 @@ class PS_Adapter {
 	{
 		// set default photo
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'childsubcategory_cover' );
+
+		if($obj->is_color_filter =='1')
+			{
+				$condscstm = array();
+				$condscstm['no_publish_filter'] = 1;
+
+				$colorarray = $this->CI->Color->get_all_by( $condscstm);
+				
+				$obj->colors = $colorarray->result();
+			}
+
+			if($obj->is_brand_filter =='1')
+			{
+				$condscstm = array();
+				$condscstm['no_publish_filter'] = 1;
+
+				$brandarray = $this->CI->Brands->get_all_by( $condscstm);
+				
+				$obj->brands = $brandarray->result();
+			}
+
+			if($obj->is_size_filter =='1')
+			{
+				$sizegroups = $this->CI->Sizegroups->get_all();
+				$selectedSizeGroups = $this->CI->Childsubcategory->getSelectedSizegroups($obj->id);
+				$options=array();
+				
+				foreach($selectedSizeGroups as $sizekey => $sgroups) {
+					$sizearray = $this->CI->Sizegroups->get_one($sgroups);
+					
+					
+					$sizearr = json_decode(json_encode($sizearray), true);
+
+					if(count($sizearray)>0)
+					{
+						
+						$condscstm = array();
+						$condscstm['no_publish_filter'] = 1;
+						$condscstm['sizegroup_id'] = $sizearr['id'];
+						$sizearr['options']=$this->CI->Sizegroup_option->get_all_by( $condscstm)->result();
+						
+					}
+					$selectedSizeGroups[$sizekey]=$sizearr;
+				}
+				$obj->sizes =$selectedSizeGroups ;
+			}
 
 		//set default icon
 		$obj->default_icon = $this->get_default_photo( $obj->id, 'childsubcategory_icon' );
