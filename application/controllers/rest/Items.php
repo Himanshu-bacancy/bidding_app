@@ -1192,10 +1192,11 @@ class Items extends API_Controller
 			}
 			
 		}
-
-		if(count($typeArr)>0)
+		$arr2 = array_values($typeArr);
+		
+		if(count($arr2)>0)
 		{
-			$this->response($typeArr);
+			$this->response($arr2);
 		}
 		else
 		{
@@ -1370,6 +1371,58 @@ class Items extends API_Controller
 		$result['data'] = $items; 
         $result['item_count'] = count($items); 
         $this->custom_response($result);
+	}
+
+	/**
+	* Get items with different item types
+	* @param      <type>   $user_id  The userid
+	* @param      <type>   $itemtype_id  The itemtype id
+	*/
+	function fetch_itemtype_items_post(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		
+		$rules = array(
+			array(
+				'field' => 'user_id',
+				'rules' => 'required'
+			),
+			array(
+				'field' => 'itemtype_id',
+				'rules' => 'required'
+			),
+		);
+
+		if ( !$this->is_valid( $rules )) exit;
+
+		$userId = $this->post('user_id');
+		$itemtypeId = $this->post('itemtype_id');
+
+		$itemtypecheck  = $this->Itemtype->get_one($this->post('itemtype_id'));
+
+        
+        if(isset($itemtypecheck->is_empty_object))
+		{
+        	$this->error_response( get_msg( 'invalid_itemtype_id' ));
+
+        }
+		else
+		{
+			$this->db->select("*");
+			$this->db->where('added_user_id', $userId);
+			$this->db->where('item_type_id', $itemtypeId);
+			$itemData = $this->db->get('bs_items');
+
+			$items = $itemData->result();
+			$this->ps_adapter->convert_item( $items );
+			
+			$this->custom_response($items);
+		}
+
+		
 	}
 
 }
