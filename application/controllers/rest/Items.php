@@ -547,6 +547,26 @@ class Items extends API_Controller
 			}
 		}
 
+		if($this->post('is_all_colors')=='1' && (!empty($this->post('is_all_colors'))))
+		{
+			$condscstm = array();
+			$condscstm['no_publish_filter'] = 1;
+
+			$colorarray = $this->Color->get_all_by( $condscstm);
+			
+			$colorsdata = $colorarray->result();
+
+			foreach($colorsdata as $color)
+			{
+				$colors_data = array(
+					"color_id" => $color->id, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemcolors->save($colors_data);
+			}
+		}
+
 		if(count($this->post('sizegroupoption_ids'))>0)
 		{
 			$this->db->where('item_id', $id);
