@@ -1429,6 +1429,14 @@ class Items extends API_Controller
         	$this->error_response( get_msg( 'invalid_itemtype_id' ));
 
         }
+		else if($this->post('is_draft')=='1' && (!empty($this->post('is_draft'))))
+		{
+			$this->db->select("*");
+			$this->db->where('added_user_id', $userId);
+			$this->db->where('is_draft', 1);
+			$this->db->where('item_type_id', $itemtypeId);
+			$itemData = $this->db->get('bs_items');
+		}
 		else
 		{
 			$this->db->select("*");
@@ -1436,11 +1444,13 @@ class Items extends API_Controller
 			$this->db->where('item_type_id', $itemtypeId);
 			$itemData = $this->db->get('bs_items');
 
-			$items = $itemData->result();
-			$this->ps_adapter->convert_item( $items );
 			
-			$this->custom_response($items);
 		}
+
+		$items = $itemData->result();
+		$this->ps_adapter->convert_item( $items );
+		
+		$this->custom_response($items);
 
 		
 	}
