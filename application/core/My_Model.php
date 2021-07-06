@@ -864,7 +864,7 @@ class PS_Model extends CI_Model {
 
 	 
  	/**
-	Returns Item list by followuser
+	* Returns Item list by followuser
 	*/
 	function get_all_item_by_followuser( $conds = array() , $limit = false, $offset = false)
 	{
@@ -1977,16 +1977,16 @@ class PS_Model extends CI_Model {
 		}
 
 		// Type id
-		if ( isset( $conds['item_type_id'] )) {
+		// if ( isset( $conds['item_type_id'] )) {
 			
-			if ($conds['item_type_id'] != "") {
-				if($conds['item_type_id'] != '0'){
+		// 	if ($conds['item_type_id'] != "") {
+		// 		if($conds['item_type_id'] != '0'){
 				
-					$this->db->where( 'item_type_id', $conds['item_type_id'] );	
-				}
+		// 			$this->db->where( 'item_type_id', $conds['item_type_id'] );	
+		// 		}
 
-			}			
-		}
+		// 	}			
+		// }
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -2025,9 +2025,9 @@ class PS_Model extends CI_Model {
 		}
 
 		// condition_of_item id condition
-		if ( isset( $conds['condition_of_item_id'] )) {
-			$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
-		}
+		// if ( isset( $conds['condition_of_item_id'] )) {
+		// 	$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
+		// }
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
