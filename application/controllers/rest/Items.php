@@ -1021,9 +1021,18 @@ class Items extends API_Controller
 			
 			if ($conds['is_paid'] == "only_paid_item") {
 
-				$conds['item_id'] = $item_id;
-				$conds['reported_item_id'] = $reported_item_id;
+				//$conds['item_id'] = $item_id;
+				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
+
+				$conds['coloritem_id'] = $colored_item_id;
+				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
+				$conds['itemtype_item_id'] = $itemtype_item_id;
+				$conds['childsubcat_item_id'] = $childsubcat_item_id;
+				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+				$conds['itemcondition_item_id'] = $itemcondition_item_id;
+				$conds['brand_items_id'] = $brand_items_id;
 				
 				if ( !empty( $limit ) && !empty( $offset )) {
 				// if limit & offset is not empty
@@ -1042,9 +1051,18 @@ class Items extends API_Controller
 			} elseif ($conds['is_paid'] == "paid_item_first") {
 				$result = "";
 
-				$conds['item_id'] = $item_id;
-				$conds['reported_item_id'] = $reported_item_id;
+				//$conds['item_id'] = $item_id;
+				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1;
+
+				$conds['coloritem_id'] = $colored_item_id;
+				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
+				$conds['itemtype_item_id'] = $itemtype_item_id;
+				$conds['childsubcat_item_id'] = $childsubcat_item_id;
+				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+				$conds['itemcondition_item_id'] = $itemcondition_item_id;
+				$conds['brand_items_id'] = $brand_items_id;
 				
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty

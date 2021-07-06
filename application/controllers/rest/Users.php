@@ -66,10 +66,10 @@ class Users extends API_Controller
 	{
 
 		// API Configuration [Return Array: User Token Data]
-        $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
-            'requireAuthorization' => true,
-        ]);
+        // $user_data = $this->_apiConfig([
+        //     'methods' => ['POST'],
+        //     'requireAuthorization' => true,
+        // ]);
 		// validation rules for user register
 		$rules = array(
 			array(
@@ -92,7 +92,7 @@ class Users extends API_Controller
         $email_verified_enable = $this->Backend_config->get_one('be1')->email_verification_enabled;
 
 		// default set all user need to verify
-		$email_verified_enable = 1 ;
+		//$email_verified_enable = 1 ;
 
         $code = generate_random_string(5);
         $added_date =  date("Y-m-d H:i:s");
@@ -182,14 +182,15 @@ class Users extends API_Controller
 	        	$subject = get_msg('user_acc_reg_label');
 				
 	        	if($email_verified_enable != 1) {
+					
 	        		if ( !send_user_register_email_without_verify( $user_data['user_id'], $subject )) {
 
-					$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
+					//$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 				
 					} 
 	        	} else {
-
-		        	if ( !send_user_register_email( $user_data['user_id'], $subject )) {
+					
+					if ( !send_user_register_email( $user_data['user_id'], $subject )) {
 						
 						$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 					
@@ -204,17 +205,41 @@ class Users extends API_Controller
        		$subject = get_msg('user_acc_reg_label');
 
        		if($email_verified_enable != 1) {
-	        	if ( !send_user_register_email_without_verify( $user_id, $subject )) {
-					$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
+				if ( !send_user_register_email_without_verify( $user_id, $subject )) {
+					//$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 				} 
 	        } else {
-       			if ( !send_user_register_email( $user_id, $subject )) {
+				if ( !send_user_register_email( $user_id, $subject )) {
 					$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 				} 
 			}
-       		$this->custom_response($this->User->get_one($user_id));
+
+			$userdatacs = $this->User->get_one($user_id);
+
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+			
+			$token = $this->authorization_token->generateToken($payload);
+			$userdatacs->token = $token;
+       		$this->custom_response($userdatacs);
        	}
-        $this->custom_response($this->User->get_one($user_data["user_id"]));
+
+		$userdatac = $this->User->get_one($user_data["user_id"]);
+
+		$payload = [
+			'user_id' => $userdatac->user_id ? $userdatac->user_id : 0,
+			'user_email' => $userdatac->user_email ? $userdatac->user_email : '',
+			'user_phone' => $userdatac->user_phone ? $userdatac->user_phone : '',
+			'device_token' => $userdatac->device_token ? $userdatac->device_token : '',
+		];
+		
+		$token = $this->authorization_token->generateToken($payload);
+		$userdatac->token = $token;
+        $this->custom_response($userdatac);
 
 	}
 
