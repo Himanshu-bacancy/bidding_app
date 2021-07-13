@@ -164,7 +164,11 @@ class Chats extends API_Controller
 		// validation rules for chat history
 		$rules = array(
 			array(
-	        	'field' => 'item_id',
+	        	'field' => 'requested_item_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'offered_item_id',
 	        	'rules' => 'required'
 	        ),
 	        array(
@@ -198,6 +202,18 @@ class Chats extends API_Controller
 		$requestedItemId = $this->post('requested_item_id');
 		$offeredItemId = $this->post('offered_item_id');
 
+		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
+		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
+		
+		if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+		if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
         $type = $this->post('type');
 		$chat_data = array(
         	"item_id" => $this->post('item_id'), 
