@@ -472,26 +472,26 @@ class PS_Model extends CI_Model {
 	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
 		//print_r($conds);die;
 
-		if($conds['lat'] != "" && $conds['lng'] != "") {
-			$this->db->select('*,( 3959
-		      * acos( cos( radians('. $conds['lat'] .') )
-		              * cos(  radians( lat )   )
-		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
-		            + sin( radians('. $conds['lat'] .') )
-		              * sin( radians( lat ) )
-		            )
-		    ) as distance');
+		// if($conds['lat'] != "" && $conds['lng'] != "") {
+		// 	$this->db->select('*,( 3959
+		//       * acos( cos( radians('. $conds['lat'] .') )
+		//               * cos(  radians( lat )   )
+		//               * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		//             + sin( radians('. $conds['lat'] .') )
+		//               * sin( radians( lat ) )
+		//             )
+		//     ) as distance');
 
-		    if ($conds['miles'] == "") {
-		    	$conds['miles'] = 0;
-		    	$this->db->having('distance < ' .  $conds['miles'] );
-		    } else {
-		    	$this->db->having('distance < ' .  $conds['miles'] );
+		//     if ($conds['miles'] == "") {
+		//     	$conds['miles'] = 0;
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
+		//     } else {
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
 
-		    }
+		//     }
 
 		   
-		}
+		// }
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
@@ -538,6 +538,81 @@ class PS_Model extends CI_Model {
 				if($conds['sizeoption_item_id'] != '0'){
 				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item check for brand condition
+		if ( isset( $conds['brand_items_id'] )) {
+			
+			
+			if ($conds['brand_items_id'] != "") {
+				if($conds['brand_items_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for itemtype condition
+		if ( isset( $conds['itemtype_item_id'] )) {
+			
+			
+			if ($conds['itemtype_item_id'] != "") {
+				if($conds['itemtype_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for child subcat condition
+		if ( isset( $conds['childsubcat_item_id'] )) {
+			
+			
+			if ($conds['childsubcat_item_id'] != "") {
+				if($conds['childsubcat_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for delivery method condition
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			
+			
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+				}
+
+			}			
+		}
+
+		
+		// item check for item condition
+		if ( isset( $conds['itemcondition_item_id'] )) {
+			
+			
+			if ($conds['itemcondition_item_id'] != "") {
+				if($conds['itemcondition_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
+				}
+
+			}			
+		}
+		
+		
+		// address id (id) check for lat long 
+		if ( isset( $conds['address_item_id'] )) {
+			
+			if ($conds['address_item_id'] != "") {
+				if($conds['address_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
 
 			}			
@@ -789,7 +864,7 @@ class PS_Model extends CI_Model {
 
 	 
  	/**
-	Returns Item list by followuser
+	* Returns Item list by followuser
 	*/
 	function get_all_item_by_followuser( $conds = array() , $limit = false, $offset = false)
 	{
@@ -1445,6 +1520,106 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+		// item id (id) check for item color condition
+		if ( isset( $conds['coloritem_id'] )) {
+			
+			if ($conds['coloritem_id'] != "") {
+				if($conds['coloritem_id'] != '0'){
+					
+					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item id (id) check for sizegroupoption condition
+		if ( isset( $conds['sizeoption_item_id'] )) {
+			
+			if ($conds['sizeoption_item_id'] != "") {
+				if($conds['sizeoption_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item check for brand condition
+		if ( isset( $conds['brand_items_id'] )) {
+			
+			
+			if ($conds['brand_items_id'] != "") {
+				if($conds['brand_items_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for itemtype condition
+		if ( isset( $conds['itemtype_item_id'] )) {
+			
+			
+			if ($conds['itemtype_item_id'] != "") {
+				if($conds['itemtype_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for child subcat condition
+		if ( isset( $conds['childsubcat_item_id'] )) {
+			
+			
+			if ($conds['childsubcat_item_id'] != "") {
+				if($conds['childsubcat_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for delivery method condition
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			
+			
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+				}
+
+			}			
+		}
+
+		
+		// item check for item condition
+		if ( isset( $conds['itemcondition_item_id'] )) {
+			
+			
+			if ($conds['itemcondition_item_id'] != "") {
+				if($conds['itemcondition_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
+				}
+
+			}			
+		}
+		
+		
+		// address id (id) check for lat long 
+		if ( isset( $conds['address_item_id'] )) {
+			
+			if ($conds['address_item_id'] != "") {
+				if($conds['address_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
+				}
+
+			}			
+		}
+
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {
 			$this->db->group_start();
@@ -1579,6 +1754,106 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+		// item id (id) check for item color condition
+		if ( isset( $conds['coloritem_id'] )) {
+			
+			if ($conds['coloritem_id'] != "") {
+				if($conds['coloritem_id'] != '0'){
+					
+					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item id (id) check for sizegroupoption condition
+		if ( isset( $conds['sizeoption_item_id'] )) {
+			
+			if ($conds['sizeoption_item_id'] != "") {
+				if($conds['sizeoption_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item check for brand condition
+		if ( isset( $conds['brand_items_id'] )) {
+			
+			
+			if ($conds['brand_items_id'] != "") {
+				if($conds['brand_items_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for itemtype condition
+		if ( isset( $conds['itemtype_item_id'] )) {
+			
+			
+			if ($conds['itemtype_item_id'] != "") {
+				if($conds['itemtype_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for child subcat condition
+		if ( isset( $conds['childsubcat_item_id'] )) {
+			
+			
+			if ($conds['childsubcat_item_id'] != "") {
+				if($conds['childsubcat_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for delivery method condition
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			
+			
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+				}
+
+			}			
+		}
+
+		
+		// item check for item condition
+		if ( isset( $conds['itemcondition_item_id'] )) {
+			
+			
+			if ($conds['itemcondition_item_id'] != "") {
+				if($conds['itemcondition_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
+				}
+
+			}			
+		}
+		
+		
+		// address id (id) check for lat long 
+		if ( isset( $conds['address_item_id'] )) {
+			
+			if ($conds['address_item_id'] != "") {
+				if($conds['address_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
+				}
+
+			}			
+		}
+
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {
 			$this->db->group_start();
@@ -1702,16 +1977,16 @@ class PS_Model extends CI_Model {
 		}
 
 		// Type id
-		if ( isset( $conds['item_type_id'] )) {
+		// if ( isset( $conds['item_type_id'] )) {
 			
-			if ($conds['item_type_id'] != "") {
-				if($conds['item_type_id'] != '0'){
+		// 	if ($conds['item_type_id'] != "") {
+		// 		if($conds['item_type_id'] != '0'){
 				
-					$this->db->where( 'item_type_id', $conds['item_type_id'] );	
-				}
+		// 			$this->db->where( 'item_type_id', $conds['item_type_id'] );	
+		// 		}
 
-			}			
-		}
+		// 	}			
+		// }
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -1750,9 +2025,9 @@ class PS_Model extends CI_Model {
 		}
 
 		// condition_of_item id condition
-		if ( isset( $conds['condition_of_item_id'] )) {
-			$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
-		}
+		// if ( isset( $conds['condition_of_item_id'] )) {
+		// 	$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
+		// }
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
@@ -1789,6 +2064,107 @@ class PS_Model extends CI_Model {
 
 			}			
 		}
+
+		// item id (id) check for item color condition
+		if ( isset( $conds['coloritem_id'] )) {
+			
+			if ($conds['coloritem_id'] != "") {
+				if($conds['coloritem_id'] != '0'){
+					
+					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item id (id) check for sizegroupoption condition
+		if ( isset( $conds['sizeoption_item_id'] )) {
+			
+			if ($conds['sizeoption_item_id'] != "") {
+				if($conds['sizeoption_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
+				}
+
+			}			
+		}
+		
+
+		// item check for brand condition
+		if ( isset( $conds['brand_items_id'] )) {
+			
+			
+			if ($conds['brand_items_id'] != "") {
+				if($conds['brand_items_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for itemtype condition
+		if ( isset( $conds['itemtype_item_id'] )) {
+			
+			
+			if ($conds['itemtype_item_id'] != "") {
+				if($conds['itemtype_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for child subcat condition
+		if ( isset( $conds['childsubcat_item_id'] )) {
+			
+			
+			if ($conds['childsubcat_item_id'] != "") {
+				if($conds['childsubcat_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
+				}
+
+			}			
+		}
+
+		// item check for delivery method condition
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			
+			
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+				}
+
+			}			
+		}
+
+		
+		// item check for item condition
+		if ( isset( $conds['itemcondition_item_id'] )) {
+			
+			
+			if ($conds['itemcondition_item_id'] != "") {
+				if($conds['itemcondition_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
+				}
+
+			}			
+		}
+		
+		
+		// address id (id) check for lat long 
+		if ( isset( $conds['address_item_id'] )) {
+			
+			if ($conds['address_item_id'] != "") {
+				if($conds['address_item_id'] != '0'){
+				
+					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
+				}
+
+			}			
+		}
+
 
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {

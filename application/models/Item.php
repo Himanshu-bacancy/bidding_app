@@ -40,6 +40,10 @@ class Item extends PS_Model {
 		// order by
 		// post parameter "order_by" : "fieldname"
 		// post parameter "order_type" : "asc/desc"
+		// -- For Low to high : "order_by" : "price" & "order_type" : "asc"
+		// -- For High to low : "order_by" : "price" & "order_type" : "desc"
+		// -- For Latest : "order_by" : "added_date" & "order_type" : "desc"
+		// -- For Popular : "order_by" : "touch_count" & "order_type" : "desc"
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
@@ -88,28 +92,28 @@ class Item extends PS_Model {
 		}
 
 		//  delivery method id condition 
-		if ( isset( $conds['delivery_method_id'] )) {
+		// if ( isset( $conds['delivery_method_id'] )) {
 			
-			if ($conds['delivery_method_id'] != "") {
-				if($conds['delivery_method_id'] != '0'){
+		// 	if ($conds['delivery_method_id'] != "") {
+		// 		if($conds['delivery_method_id'] != '0'){
 				
-					$this->db->where( 'delivery_method_id', $conds['delivery_method_id'] );	
-				}
+		// 			$this->db->where( 'delivery_method_id', $conds['delivery_method_id'] );	
+		// 		}
 
-			}			
-		}
+		// 	}			
+		// }
 
 		//  child sub category id condition 
-		if ( isset( $conds['childsubcat_id'] )) {
+		// if ( isset( $conds['childsubcat_id'] )) {
 			
-			if ($conds['childsubcat_id'] != "") {
-				if($conds['childsubcat_id'] != '0'){
+		// 	if ($conds['childsubcat_id'] != "") {
+		// 		if($conds['childsubcat_id'] != '0'){
 				
-					$this->db->where( 'childsubcat_id', $conds['childsubcat_id'] );	
-				}
+		// 			$this->db->where( 'childsubcat_id', $conds['childsubcat_id'] );	
+		// 		}
 
-			}			
-		}
+		// 	}			
+		// }
 
 		//  sizegroup id condition 
 		if ( isset( $conds['sizegroup_id'] )) {
@@ -141,16 +145,16 @@ class Item extends PS_Model {
 		
 
 		// Type id
-		if ( isset( $conds['item_type_id'] )) {
+		// if ( isset( $conds['item_type_id'] )) {
 			
-			if ($conds['item_type_id'] != "") {
-				if($conds['item_type_id'] != '0'){
+		// 	if ($conds['item_type_id'] != "") {
+		// 		if($conds['item_type_id'] != '0'){
 				
-					$this->db->where( 'item_type_id', $conds['item_type_id'] );	
-				}
+		// 			$this->db->where( 'item_type_id', $conds['item_type_id'] );	
+		// 		}
 
-			}			
-		}
+		// 	}			
+		// }
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -189,9 +193,9 @@ class Item extends PS_Model {
 		}
 
 		// condition_of_item id condition
-		if ( isset( $conds['condition_of_item_id'] )) {
-			$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
-		}
+		// if ( isset( $conds['condition_of_item_id'] )) {
+		// 	$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
+		// }
 
 		// description condition
 		if ( isset( $conds['description'] )) {
@@ -209,9 +213,9 @@ class Item extends PS_Model {
 		}
 
 		// brand condition
-		if ( isset( $conds['brand'] )) {
-			$this->db->where( 'brand', $conds['brand'] );
-		}
+		// if ( isset( $conds['brand'] )) {
+		// 	$this->db->where( 'brand', $conds['brand'] );
+		// }
 
 		// business_mode condition
 		if ( isset( $conds['business_mode'] )) {
