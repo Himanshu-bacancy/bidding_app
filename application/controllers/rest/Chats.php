@@ -160,8 +160,7 @@ class Chats extends API_Controller
 	/**
 	 * Update Price 
 	 */
-	function update_price_post()
-	{
+	function update_price_post(){
 		// validation rules for chat history
 		$rules = array(
 			array(
@@ -179,35 +178,43 @@ class Chats extends API_Controller
 	        array(
 	        	'field' => 'nego_price',
 	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'color_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'size_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'nego_price',
+	        	'rules' => 'required'
 	        )
         );
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
+		$requestedItemId = $this->post('requested_item_id');
+		$offeredItemId = $this->post('offered_item_id');
 
         $type = $this->post('type');
-
-        $chat_data = array(
-
+		$chat_data = array(
         	"item_id" => $this->post('item_id'), 
         	"buyer_user_id" => $this->post('buyer_user_id'), 
         	"seller_user_id" => $this->post('seller_user_id')
-
         );
 
         $chat_history_data = $this->Chat->get_one_by($chat_data);
-
-
         if($chat_history_data->id == "") {
 
         	if ( $type == "to_buyer" ) {
 
         		//prepare data for noti
 		    	$user_ids[] = $this->post('buyer_user_id');
-
-
+				
 	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        	//print_r($devices);die;	
+	        	//echo '<pre>'; print_r($devices); die;	
 
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
@@ -215,11 +222,10 @@ class Chats extends API_Controller
 						$device_ids[] = $device->device_token;
 					}
 				}
-
-
+	        	
 				$user_id = $this->post('buyer_user_id');
 	       		$user_name = $this->User->get_one($user_id)->user_name;
-
+				
 		    	$price = $this->post('nego_price');
 	       		if ( $price == 0) {
 		    		$data['message'] = "Offer Rejected!";
@@ -231,7 +237,6 @@ class Chats extends API_Controller
 		    	$data['sender_name'] = $user_name;
 		    	$data['item_id'] = $this->post('item_id');
 
-        		
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
 		    	
 		    	$chat_data = array(
@@ -241,18 +246,16 @@ class Chats extends API_Controller
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
 		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price')
+		        	"nego_price" => $this->post('nego_price'),
+                    "size_id" => $this->post('size_id'),
+                    "color_id" => $this->post('color_id'),
+                    "quantity" => $this->post('quantity')
 
 		        );
-
-
-		       
-
 	    	} elseif ( $type == "to_seller" ) {
 
 	    		//prepare data for noti
 		    	$user_ids[] = $this->post('seller_user_id');
-
 
 	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
 	        	//print_r($devices);die;	
@@ -263,7 +266,6 @@ class Chats extends API_Controller
 						$device_ids[] = $device->device_token;
 					}
 				}
-
 
 				$user_id = $this->post('seller_user_id');
 	       		$user_name = $this->User->get_one($user_id)->user_name;
@@ -282,18 +284,17 @@ class Chats extends API_Controller
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
 		    	$chat_data = array(
-
 		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,
 		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price')
-
+		        	"nego_price" => $this->post('nego_price'),
+                    "size_id" => $this->post('size_id'),
+                    "color_id" => $this->post('color_id'),
+                    "quantity" => $this->post('quantity')
 		        );
-
 	    	}
-
 	       	//sending noti
 	    	$status = send_android_fcm_chat( $device_ids, $data );
 
@@ -301,28 +302,18 @@ class Chats extends API_Controller
 	        $obj = $this->Chat->get_one_by($chat_data);
 			$this->ps_adapter->convert_chathistory( $obj );
 			$this->custom_response( $obj );
-
-
 	    } else {
-
-		    	if ( $type == "to_buyer" ) {
-
-
+			if ( $type == "to_buyer" ) {
 		    	//prepare data for noti
 		    	$user_ids[] = $this->post('buyer_user_id');
-
-
 	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
 	        	//print_r($devices);die;	
-
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
 					foreach ( $devices as $device ) {
 						$device_ids[] = $device->device_token;
 					}
 				}
-
-
 				$user_id = $this->post('buyer_user_id');
 	       		$user_name = $this->User->get_one($user_id)->user_name;
 
@@ -339,35 +330,26 @@ class Chats extends API_Controller
 
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
-		    	
 		    	$chat_data = array(
-
 		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
 		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price')
-
+		        	"nego_price" => $this->post('nego_price'),
+                    "size_id" => $this->post('size_id'),
+                    "color_id" => $this->post('color_id'),
+                    "quantity" => $this->post('quantity')
 		        );
-
-		    	} elseif ( $type == "to_seller" ) {
-
-
+			} elseif ( $type == "to_seller" ) {
 		    	$user_ids[] = $this->post('seller_user_id');
-
 	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        
-
-
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
 					foreach ( $devices as $device ) {
 						$device_ids[] = $device->device_token;
 					}
 				}
-
-
 				$user_id = $this->post('seller_user_id');
 	       		$user_name = $this->User->get_one($user_id)->user_name;
 
@@ -391,29 +373,21 @@ class Chats extends API_Controller
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,
 		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price')
-
+		        	"nego_price" => $this->post('nego_price'),
+                    "size_id" => $this->post('size_id'),
+                    "color_id" => $this->post('color_id'),
+                    "quantity" => $this->post('quantity')
 		        );
-
-		    	}
-
-	    	
-
-	    	if( !$this->Chat->Save( $chat_data,$chat_history_data->id )) {
-
-	    		$this->error_response( get_msg( 'err_price_update' ));
-
-	    	
-	    	} else {
-
-	    		//sending noti
-	    		$status = send_android_fcm_chat( $device_ids, $data );
-
-	    		$obj = $this->Chat->get_one_by($chat_data);
+			}
+			if( !$this->Chat->Save( $chat_data,$chat_history_data->id )) {
+				$this->error_response( get_msg( 'err_price_update' ));
+			} else {
+				//sending noti
+				$status = send_android_fcm_chat( $device_ids, $data );
+				$obj = $this->Chat->get_one_by($chat_data);
 				$this->ps_adapter->convert_chathistory( $obj );
 				$this->custom_response( $obj );
-	    	}
-
+			}
 	    }
 	}
 
