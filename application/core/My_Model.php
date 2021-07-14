@@ -567,6 +567,18 @@ class PS_Model extends CI_Model {
 
 			}			
 		}
+		
+		// SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
+				}
+
+			}			
+		}
 
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
@@ -636,10 +648,10 @@ class PS_Model extends CI_Model {
 			
 			$this->db->offset($offset);
 		}
-		
+
 	 	return $this->db->get();
 		// print_r($this->db->last_query());die;
-	
+
 	}
 
 
@@ -1570,6 +1582,18 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['item_type_id'] );	
+				}
+
+			}			
+		}
+
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
 			
@@ -1804,6 +1828,19 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
+				}
+
+			}			
+		}
+
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
 			
@@ -1987,6 +2024,18 @@ class PS_Model extends CI_Model {
 
 		// 	}			
 		// }
+
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+				
+					$this->db->where_in( 'item_type_id', $conds['item_type_id'] );	
+				}
+
+			}			
+		}
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -2210,7 +2259,7 @@ class PS_Model extends CI_Model {
 	    $query = $this->db->query('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');
 	    // print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
 	   
-	 	
+
 	  	return $query;
 	  	//print_r($this->db->last_query());die;
 	}
