@@ -253,6 +253,10 @@ class PS_Adapter {
 
 			$this->CI->db->where('item_id', $obj->id);
     		$exchange_category = $this->CI->db->get('bs_item_exchange')->result();
+			//echo '<pre>'; print_r($exchange_category); die;
+			foreach($exchange_category as $key=>$categoryData){
+				$this->convert_category($categoryData);
+			}
 			//$exchange_category = $this->CI->Itemexchangecategory->get_all_by( $itemconds )->result();
 			$obj->exchange_category = $exchange_category ;
 		}

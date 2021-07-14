@@ -21,7 +21,6 @@ class Chat extends PS_Model {
 	 */
 	function custom_conds( $conds = array())
 	{
-		
 		// id condition
 		if ( isset( $conds['id'] )) {
 			$this->db->where( 'id', $conds['id'] );
@@ -57,6 +56,20 @@ class Chat extends PS_Model {
 			$this->db->where( 'nego_price', $conds['nego_price'] );
 		}
 
+		// size_id condition
+		if ( isset( $conds['size_id'] )) {
+			$this->db->where( 'size_id', $conds['size_id'] );
+		}
+
+		// color_id condition
+		if ( isset( $conds['color_id'] )) {
+			$this->db->where( 'color_id', $conds['color_id'] );
+		}
+
+		// quantity condition
+		if ( isset( $conds['quantity'] )) {
+			$this->db->where( 'quantity', $conds['quantity'] );
+		}
 		
 	}
 }

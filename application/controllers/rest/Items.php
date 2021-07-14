@@ -547,26 +547,6 @@ class Items extends API_Controller
 			}
 		}
 
-		if($this->post('is_all_colors')=='1' && (!empty($this->post('is_all_colors'))))
-		{
-			$condscstm = array();
-			$condscstm['no_publish_filter'] = 1;
-
-			$colorarray = $this->Color->get_all_by( $condscstm);
-			
-			$colorsdata = $colorarray->result();
-
-			foreach($colorsdata as $color)
-			{
-				$colors_data = array(
-					"color_id" => $color->id, 
-					"item_id" => $id,
-					"added_date" =>  date("Y-m-d H:i:s")
-				);
-				$this->Itemcolors->save($colors_data);
-			}
-		}
-
 		if(count($this->post('sizegroupoption_ids'))>0)
 		{
 			$this->db->where('item_id', $id);
@@ -582,6 +562,7 @@ class Items extends API_Controller
 				$this->Itemsizegroupoptions->save($option_data);
 			}
 		}
+
 
 		$obj = $this->Item->get_one( $id );
 
@@ -612,19 +593,15 @@ class Items extends API_Controller
 	 * Search item with filters
 	 * @param      <type>   $cat_id  The  cat_id
 	 * @param      <type>   $sub_cat_id  The  sub_cat_id
-	 * @param      <type>   $childsubcat_id  The  childsubcat ids in array
-	 * @param      <type>   $item_type_id  The  item_type ids in array
-	 * @param      <type>   $condition_of_item_id  The  condition_of_item ids in array
-	 * @param      <type>   $delivery_method_id  The  delivery_method ids in array
-	 * @param      <type>   $brand_search  THe brand ids in array
+	 * @param      <type>   $childsubcat_id  The  childsubcat_id
+	 * @param      <type>   $item_type_id  The  item_type_id
+	 * @param      <type>   $condition_of_item_id  The  condition_of_item_id
+	 * @param      <type>   $title  The  title
+	 * @param      <type>   $delivery_method_id  The  delivery_method_id
+	 * @param      <type>   $brand  THe brand id
 	 * @param      <type>   $sizegroup_id 
 	 * @param      <type>   $color_id array
 	 * @param      <type>   $sizegroupoption_id  array
-	 * @param      <type>   $order_by  THe order by field name
-	 * @param      <type>   $order_type asc/desc
-	 * @param      <type>   $min_price  
-	 * @param      <type>   $max_price 
-	 * @param      <type>   $miles  
 	 */
 
 	function searchitem_post()
@@ -635,9 +612,6 @@ class Items extends API_Controller
             'requireAuthorization' => true,
         ]);	
 
-		
-		//echo $user_data['token_data']['user_id'];
-		
 		// add flag for default query
 		$this->is_search = true;
 
@@ -809,230 +783,13 @@ class Items extends API_Controller
 			{
 				$sizeoption_items = rtrim($sizeoptionids,',');
 				$sizeoption_item_id = explode(",", $sizeoption_items);	
-			
-			}
-			
-			
-			//  item type id condition 
-			if ( isset( $conds['item_type_id'] ) && !empty( $conds['item_type_id'] )) {
-
-				foreach($conds['item_type_id'] as $itemtypeid)
-				{
-					if ( $itemtypeid != "") {
-						if( $itemtypeid != '0'){
-						
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'item_type_id', $itemtypeid );
-							$itemtypefilter = $this->db->get();
-							foreach($itemtypefilter->result() as $itemtypeitem)
-							{
-								$itemtype_itemids .= $itemtypeitem->id .",";
-							}
-						}
-					}	
-				}
-				
-						
-			}
-
-			
-			if(isset($itemtype_itemids) && $itemtype_itemids !='')
-			{
-				$itemtype_items = rtrim($itemtype_itemids,',');
-				$itemtype_item_id = explode(",", $itemtype_items);	
-			}
-
-			//  childsubcat id condition 
-			if ( isset( $conds['childsubcat_id'] ) && !empty( $conds['childsubcat_id'] )) {
-
-				foreach($conds['childsubcat_id'] as $childsubcatid)
-				{
-					if ( $childsubcatid != "") {
-						if( $childsubcatid != '0'){
-						
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'childsubcat_id', $childsubcatid );
-							$childsubcatfilter = $this->db->get();
-							foreach($childsubcatfilter->result() as $childsubcat_item)
-							{
-								$childsubcat_itemids .= $childsubcat_item->id .",";
-							}
-						}
-					}	
-				}
-				
-						
-			}
-
-			
-			if(isset($childsubcat_itemids) && $childsubcat_itemids !='')
-			{
-				$childsubcat_items = rtrim($childsubcat_itemids,',');
-				$childsubcat_item_id = explode(",", $childsubcat_items);	
-			}
-
-			//  delivery method id condition 
-			if ( isset( $conds['delivery_method_id'] ) && !empty( $conds['delivery_method_id'] )) {
-
-				foreach($conds['delivery_method_id'] as $deliverymethodid)
-				{
-					if ( $deliverymethodid != "") {
-						if( $deliverymethodid != '0'){
-						
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'delivery_method_id', $deliverymethodid );
-							$deliverymethodfilter = $this->db->get();
-							foreach($deliverymethodfilter->result() as $deliverymethod_item)
-							{
-								$deliverymethod_itemids .= $deliverymethod_item->id .",";
-							}
-						}
-					}	
-				}
-				
-						
-			}
-
-			
-			if(isset($deliverymethod_itemids) && $deliverymethod_itemids !='')
-			{
-				$deliverymethod_items = rtrim($deliverymethod_itemids,',');
-				$deliverymethod_item_id = explode(",", $deliverymethod_items);	
-			}
-
-			//  item condition id condition 
-			if ( isset( $conds['condition_of_item_id'] ) && !empty( $conds['condition_of_item_id'] )) {
-
-				foreach($conds['condition_of_item_id'] as $itemconditionid)
-				{
-					if ( $itemconditionid != "") {
-						if( $itemconditionid != '0'){
-						
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'condition_of_item_id', $itemconditionid );
-							$itemconditionfilter = $this->db->get();
-							foreach($itemconditionfilter->result() as $itemcondition_item)
-							{
-								$itemcondition_itemids .= $itemcondition_item->id .",";
-							}
-						}
-					}	
-				}
-				
-						
-			}
-
-			
-			if(isset($itemcondition_itemids) && $itemcondition_itemids !='')
-			{
-				$itemcondition_items = rtrim($itemcondition_itemids,',');
-				$itemcondition_item_id = explode(",", $itemcondition_items);	
-			}
-
-			//  Brand id condition 
-			if ( isset( $conds['brand_search'] ) && !empty( $conds['brand_search'] )) {
-
-				foreach($conds['brand_search'] as $brand_id)
-				{
-					if ( $brand_id != "") {
-						if( $brand_id != '0'){
-						
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'brand', $brand_id );
-							$brandfilter = $this->db->get();
-							foreach($brandfilter->result() as $brand_item)
-							{
-								$brand_itemids .= $brand_item->id .",";
-							}
-						}
-					}	
-				}
-				
-						
-			}
-
-			
-			if(isset($brand_itemids) && $brand_itemids !='')
-			{
-				$brand_item = rtrim($brand_itemids,',');
-				$brand_items_id = explode(",", $brand_item);	
-			}
-			
-
-			//  lat long condition 
-			if ( isset( $conds['miles'] ) && $conds['miles'] != '' ) {
-
-				$this->db->select('*');
-				$this->db->from('bs_addresses');
-				$this->db->where( 'user_id', $user_data['token_data']['user_id'] );
-				$this->db->where( 'is_default_address', '1');
-				$addrfilter = $this->db->get();
-
-				
-				if(count($addrfilter->row())>0)
-				{
-					$this->db->select('*,( 3959
-					* acos( cos( radians('. $addrfilter->row()->latitude .') )
-							* cos(  radians( latitude )   )
-							* cos(  radians( longitude ) - radians('. $addrfilter->row()->longitude .') )
-							+ sin( radians('. $addrfilter->row()->latitude .') )
-							* sin( radians( latitude ) )
-							)
-					) as distance');
-
-					$this->db->from('bs_addresses');
-
-					if ($conds['miles'] == "") {
-						$conds['miles'] = 0;
-						$this->db->having('distance < ' .  $conds['miles'] );
-					} else {
-						$this->db->having('distance < ' .  $conds['miles'] );
-
-					}
-					$addressdatas = $this->db->get();
-					if(count($addressdatas->result())>0) 
-					{
-						foreach($addressdatas->result() as $address)
-						{
-							$this->db->select('*');
-							$this->db->from('bs_items');
-							$this->db->where( 'Address_id', $address->id );
-							$addressfilter = $this->db->get();
-							
-							foreach($addressfilter->result() as $addressitem)
-							{
-								$addressitemids .= $addressitem->id .",";
-							}
-						}
-					}
-				}
-			}
-
-			if(isset($addressitemids) && $addressitemids !='')
-			{
-				$address_items = rtrim($addressitemids,',');
-				$address_item_id = explode(",", $address_items);	
 			}
 			
 			if ($conds['is_paid'] == "only_paid_item") {
 
-				//$conds['item_id'] = $item_id;
-				//$conds['reported_item_id'] = $reported_item_id;
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
-
-				$conds['coloritem_id'] = $colored_item_id;
-				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
 				
 				if ( !empty( $limit ) && !empty( $offset )) {
 				// if limit & offset is not empty
@@ -1051,18 +808,9 @@ class Items extends API_Controller
 			} elseif ($conds['is_paid'] == "paid_item_first") {
 				$result = "";
 
-				//$conds['item_id'] = $item_id;
-				//$conds['reported_item_id'] = $reported_item_id;
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1;
-
-				$conds['coloritem_id'] = $colored_item_id;
-				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
 				
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
@@ -1085,12 +833,7 @@ class Items extends API_Controller
 
 				$conds['coloritem_id'] = $colored_item_id;
 				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
+				
 
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
@@ -1230,11 +973,10 @@ class Items extends API_Controller
 			}
 			
 		}
-		$arr2 = array_values($typeArr);
-		
-		if(count($arr2)>0)
+
+		if(count($typeArr)>0)
 		{
-			$this->response($arr2);
+			$this->response($typeArr);
 		}
 		else
 		{
@@ -1399,7 +1141,6 @@ class Items extends API_Controller
         ]);
 		$userId = $this->get('user_id');
 
-		$this->db->select("id");
 		$this->db->where('added_user_id', $userId);
 		$this->db->where('is_draft', 1);
     	$itemData = $this->db->get('bs_items');
@@ -1409,68 +1150,6 @@ class Items extends API_Controller
 		$result['data'] = $items; 
         $result['item_count'] = count($items); 
         $this->custom_response($result);
-	}
-
-	/**
-	* Get items with different item types
-	* @param      <type>   $user_id  The userid
-	* @param      <type>   $itemtype_id  The itemtype id
-	*/
-	function fetch_itemtype_items_post(){
-		// API Configuration [Return Array: User Token Data]
-        $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
-            'requireAuthorization' => true,
-        ]);
-		
-		$rules = array(
-			array(
-				'field' => 'user_id',
-				'rules' => 'required'
-			),
-			array(
-				'field' => 'itemtype_id',
-				'rules' => 'required'
-			),
-		);
-
-		if ( !$this->is_valid( $rules )) exit;
-
-		$userId = $this->post('user_id');
-		$itemtypeId = $this->post('itemtype_id');
-
-		$itemtypecheck  = $this->Itemtype->get_one($this->post('itemtype_id'));
-
-        
-        if(isset($itemtypecheck->is_empty_object))
-		{
-        	$this->error_response( get_msg( 'invalid_itemtype_id' ));
-
-        }
-		else if($this->post('is_draft')=='1' && (!empty($this->post('is_draft'))))
-		{
-			$this->db->select("*");
-			$this->db->where('added_user_id', $userId);
-			$this->db->where('is_draft', 1);
-			$this->db->where('item_type_id', $itemtypeId);
-			$itemData = $this->db->get('bs_items');
-		}
-		else
-		{
-			$this->db->select("*");
-			$this->db->where('added_user_id', $userId);
-			$this->db->where('item_type_id', $itemtypeId);
-			$itemData = $this->db->get('bs_items');
-
-			
-		}
-
-		$items = $itemData->result();
-		$this->ps_adapter->convert_item( $items );
-		
-		$this->custom_response($items);
-
-		
 	}
 
 }

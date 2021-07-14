@@ -140,3 +140,6 @@ ALTER TABLE bs_shippingcarriers ADD shippo_object_id VARCHAR(255) NULL;
 ALTER TABLE bs_items ADD is_confirm TINYINT(1) NULL DEFAULT '0';
 
 ALTER TABLE core_images ADD PRIMARY KEY (img_id)
+
+// Added on 09-07-2021
+ALTER TABLE `bs_chat_history` ADD `size_id` VARCHAR(255) NULL AFTER `nego_price`, ADD `color_id` VARCHAR(255) NULL AFTER `size_id`, ADD `quantity` INT(11) NULL AFTER `color_id`;
