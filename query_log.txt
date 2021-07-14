@@ -143,3 +143,6 @@ ALTER TABLE core_images ADD PRIMARY KEY (img_id)
 
 // Added on 09-07-2021
 ALTER TABLE `bs_chat_history` ADD `size_id` VARCHAR(255) NULL AFTER `nego_price`, ADD `color_id` VARCHAR(255) NULL AFTER `size_id`, ADD `quantity` INT(11) NULL AFTER `color_id`;
+
+ALTER TABLE `bs_chat_history` CHANGE `item_id` `requested_item_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `bs_chat_history` CHANGE `requested_item_id` `requested_item_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `buyer_user_id` `buyer_user_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `seller_user_id` `seller_user_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `nego_price` `nego_price` DOUBLE NULL, CHANGE `buyer_unread_count` `buyer_unread_count` INT(11) NULL, CHANGE `seller_unread_count` `seller_unread_count` INT(11) NULL, CHANGE `added_date` `added_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;

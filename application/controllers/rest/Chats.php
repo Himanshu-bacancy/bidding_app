@@ -184,7 +184,7 @@ class Chats extends API_Controller
 	        	'rules' => 'required'
 			),
 	        array(
-	        	'field' => 'nego_price',
+	        	'field' => 'type',
 	        	'rules' => 'required'
 	        )
         );
