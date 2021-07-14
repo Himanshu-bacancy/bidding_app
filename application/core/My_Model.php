@@ -545,7 +545,7 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
@@ -553,6 +553,15 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
 
+			}			
+		}*/
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
+				}
 			}			
 		}
 
@@ -1559,7 +1568,7 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
@@ -1567,6 +1576,15 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
 
+			}			
+		} */
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {		
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
+				}
 			}			
 		}
 
@@ -1811,6 +1829,18 @@ class PS_Model extends CI_Model {
 			if ($conds['brand_items_id'] != "") {
 				if($conds['brand_items_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			
+			
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
 				}
 
 			}			
@@ -2141,12 +2171,24 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
 				if($conds['brand_items_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}*/
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			
+			
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
 				}
 
 			}			
