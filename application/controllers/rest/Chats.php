@@ -182,15 +182,7 @@ class Chats extends API_Controller
 	        array(
 	        	'field' => 'nego_price',
 	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'color_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'size_id',
-	        	'rules' => 'required'
-	        ),
+			),
 	        array(
 	        	'field' => 'nego_price',
 	        	'rules' => 'required'
