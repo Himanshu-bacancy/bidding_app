@@ -383,7 +383,6 @@ class Chats extends API_Controller
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
 		    	$chat_data = array(
-
 		        	"requested_item_id" => $this->post('requested_item_id'),
 					"offered_item_id" => $this->post('offered_item_id'),
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
@@ -1073,29 +1072,29 @@ class Chats extends API_Controller
 		
 		// validation rules for chat history
 		// $rules = array(
-	 //        array(
-	 //        	'field' => 'seller_user_id',
-	 //        	'rules' => 'required'
-	 //        )
-  //       );
+	    //     array(
+	    //     	'field' => 'seller_user_id',
+	    //     	'rules' => 'required'
+	    //     )
+        // );
 
 
 		// // exit if there is an error in validation,
-  //       if ( !$this->is_valid( $rules )) exit;
-  //       $chat_data = array(
+        // if ( !$this->is_valid( $rules )) exit;
+        // $chat_data = array(
 
-  //       	"seller_user_id" => $this->post('seller_user_id')
+        	// "seller_user_id" => $this->post('seller_user_id')
 
-  //       );
-  //       $chats = $this->Chat->get_all_by($chat_data);
-  //       foreach ($chats->result() as $ch) {
-  //       	$nego_price = $ch->nego_price;
-  //       	$is_accept = $ch->is_accept;
-  //       	if ($nego_price != 0 && $is_accept != 0) {
-  //       		$result .= $ch->id .",";
-	 //        }
-  //       }
-  //       $id_from_his = rtrim($result,",");
+        // );
+        // $chats = $this->Chat->get_all_by($chat_data);
+        // foreach ($chats->result() as $ch) {
+        // 	$nego_price = $ch->nego_price;
+        // 	$is_accept = $ch->is_accept;
+        // 	if ($nego_price != 0 && $is_accept != 0) {
+        // 		$result .= $ch->id .",";
+	    //     }
+        // }
+        // $id_from_his = rtrim($result,",");
 		// $result_id = explode(",", $id_from_his);
 		// $obj = $this->Chat->get_multi_info($result_id)->result();
 
@@ -1329,7 +1328,50 @@ class Chats extends API_Controller
 
 		}
 
-
     }
-    
+
+	// COUNTER API
+	function make_offer_counter_post(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for chat history
+		$rules = array(
+			array(
+	        	'field' => 'id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'price',
+	        	'rules' => 'required'
+	        ),
+        );
+		if ( !$this->is_valid( $rules )) exit;
+
+		$chat_history_id = $this->post('id');
+		$chat_history_data = $this->Chat->get_one_by(array('id' => $chat_history_id));
+
+		if($chat_history_data->id == ""){
+			$this->error_response(get_msg('err_chat_history_not_available'));
+		}else{
+			$chat_data_update = array(
+				"item_id" => $chat_history_data->item_id,
+				"buyer_user_id" => $chat_history_data->buyer_user_id, 
+				"seller_user_id" => $chat_history_data->seller_user_id, 
+				"nego_price" => $this->post('price'), 
+				"parent_id" => $chat_history_id, 
+				"is_accept" => 0,
+			);
+
+			if(!$this->Chat->Save( $chat_data_update)) {
+				$this->error_response(get_msg( 'err_count_update'));
+			}else{
+				$this->success_response(get_msg('offer_change_success'));
+			}
+		}
+	}
+
 }
