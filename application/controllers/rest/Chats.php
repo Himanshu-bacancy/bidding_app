@@ -164,7 +164,11 @@ class Chats extends API_Controller
 		// validation rules for chat history
 		$rules = array(
 			array(
-	        	'field' => 'item_id',
+	        	'field' => 'requested_item_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'offered_item_id',
 	        	'rules' => 'required'
 	        ),
 	        array(
@@ -178,17 +182,9 @@ class Chats extends API_Controller
 	        array(
 	        	'field' => 'nego_price',
 	        	'rules' => 'required'
-	        ),
+			),
 	        array(
-	        	'field' => 'color_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'size_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'nego_price',
+	        	'field' => 'type',
 	        	'rules' => 'required'
 	        )
         );
@@ -198,9 +194,22 @@ class Chats extends API_Controller
 		$requestedItemId = $this->post('requested_item_id');
 		$offeredItemId = $this->post('offered_item_id');
 
+		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
+		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
+		
+		if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+		if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
         $type = $this->post('type');
 		$chat_data = array(
-        	"item_id" => $this->post('item_id'), 
+        	"requested_item_id" => $this->post('requested_item_id'),
+			"offered_item_id" => $this->post('offered_item_id'), 
         	"buyer_user_id" => $this->post('buyer_user_id'), 
         	"seller_user_id" => $this->post('seller_user_id')
         );
@@ -235,13 +244,15 @@ class Chats extends API_Controller
 		    	$data['buyer_user_id'] = $this->post('buyer_user_id');
 		    	$data['seller_user_id'] = $this->post('seller_user_id');
 		    	$data['sender_name'] = $user_name;
-		    	$data['item_id'] = $this->post('item_id');
+		    	$data['requested_item_id'] = $this->post('requested_item_id');
+				$data['offered_item_id'] = $this->post('offered_item_id');
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
 		    	
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+		        	"requested_item_id" => $this->post('requested_item_id'),
+					"offered_item_id" => $this->post('offered_item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
@@ -279,12 +290,14 @@ class Chats extends API_Controller
 		    	$data['buyer_user_id'] = $this->post('buyer_user_id');
 		    	$data['seller_user_id'] = $this->post('seller_user_id');
 		    	$data['sender_name'] = $user_name;
-		    	$data['item_id'] = $this->post('item_id');
+		    	$data['requested_item_id'] = $this->post('requested_item_id');
+				$data['offered_item_id'] = $this->post('offered_item_id');
 
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
 		    	$chat_data = array(
-		        	"item_id" => $this->post('item_id'), 
+		        	"requested_item_id" => $this->post('requested_item_id'),
+					"offered_item_id" => $this->post('offered_item_id'),
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,
@@ -326,12 +339,14 @@ class Chats extends API_Controller
 		    	$data['buyer_user_id'] = $this->post('buyer_user_id');
 		    	$data['seller_user_id'] = $this->post('seller_user_id');
 		    	$data['sender_name'] = $user_name;
-		    	$data['item_id'] = $this->post('item_id');
+		    	$data['requested_item_id'] = $this->post('requested_item_id');
+				$data['offered_item_id'] = $this->post('offered_item_id');
 
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
 		    	$chat_data = array(
-		        	"item_id" => $this->post('item_id'), 
+		        	"requested_item_id" => $this->post('requested_item_id'),
+					"offered_item_id" => $this->post('offered_item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
@@ -362,13 +377,15 @@ class Chats extends API_Controller
 		    	$data['buyer_user_id'] = $this->post('buyer_user_id');
 		    	$data['seller_user_id'] = $this->post('seller_user_id');
 		    	$data['sender_name'] = $user_name;
-		    	$data['item_id'] = $this->post('item_id');
+		    	$data['requested_item_id'] = $this->post('requested_item_id');
+				$data['offered_item_id'] = $this->post('offered_item_id');
 
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+		        	"requested_item_id" => $this->post('requested_item_id'),
+					"offered_item_id" => $this->post('offered_item_id'),
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,

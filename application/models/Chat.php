@@ -26,9 +26,14 @@ class Chat extends PS_Model {
 			$this->db->where( 'id', $conds['id'] );
 		}
 
-		// item_id condition
-		if ( isset( $conds['item_id'] )) {
-			$this->db->where( 'item_id', $conds['item_id'] );
+		// requested_item_id condition
+		if ( isset( $conds['requested_item_id'] )) {
+			$this->db->where( 'requested_item_id', $conds['requested_item_id'] );
+		}
+
+		// offered_item_id condition
+		if ( isset( $conds['offered_item_id'] )) {
+			$this->db->where( 'offered_item_id', $conds['offered_item_id'] );
 		}
 
 		// buyer_user_id condition

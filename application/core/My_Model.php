@@ -545,7 +545,7 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
@@ -553,6 +553,15 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
 
+			}			
+		}*/
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
+				}
 			}			
 		}
 
@@ -563,6 +572,18 @@ class PS_Model extends CI_Model {
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+		
+		// SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
 
 			}			
@@ -636,10 +657,10 @@ class PS_Model extends CI_Model {
 			
 			$this->db->offset($offset);
 		}
-		
+
 	 	return $this->db->get();
 		// print_r($this->db->last_query());die;
-	
+
 	}
 
 
@@ -1547,7 +1568,7 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
@@ -1555,6 +1576,15 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
 
+			}			
+		} */
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {		
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
+				}
 			}			
 		}
 
@@ -1565,6 +1595,18 @@ class PS_Model extends CI_Model {
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['item_type_id'] );	
 				}
 
 			}			
@@ -1792,6 +1834,18 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			
+			
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
+				}
+
+			}			
+		}
+
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
 			
@@ -1799,6 +1853,19 @@ class PS_Model extends CI_Model {
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
+				}
+
+			}			
+		}
+
+
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
 
 			}			
@@ -1987,6 +2054,18 @@ class PS_Model extends CI_Model {
 
 		// 	}			
 		// }
+
+        // SKV: CHECK CONDITION FOR ITEM TYPE
+		if ( isset( $conds['item_type_id'] )) {
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+				
+					$this->db->where_in( 'item_type_id', $conds['item_type_id'] );	
+				}
+
+			}			
+		}
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -2092,12 +2171,24 @@ class PS_Model extends CI_Model {
 		
 
 		// item check for brand condition
-		if ( isset( $conds['brand_items_id'] )) {
+		/*if ( isset( $conds['brand_items_id'] )) {
 			
 			
 			if ($conds['brand_items_id'] != "") {
 				if($conds['brand_items_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
+				}
+
+			}			
+		}*/
+
+		// SKV: CHECK CONDITION FOR BRAND
+		if ( isset( $conds['brand_search'] )) {
+			
+			
+			if ($conds['brand_search'] != "") {
+				if($conds['brand_search'] != '0'){
+					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
 				}
 
 			}			
@@ -2210,7 +2301,7 @@ class PS_Model extends CI_Model {
 	    $query = $this->db->query('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');
 	    // print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
 	   
-	 	
+
 	  	return $query;
 	  	//print_r($this->db->last_query());die;
 	}
