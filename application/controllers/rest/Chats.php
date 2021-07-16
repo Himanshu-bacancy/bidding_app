@@ -1113,9 +1113,20 @@ class Chats extends API_Controller
 
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
-
-		
-
+                //start new code
+		$type 	 = $this->post('type');
+                $condition = "type = '".$type."'";
+                if($type == 'direct_buy' || $type == 'request_item') {
+                    $condition .= " AND buyer_user_id = '".$user_id."'";
+                } else if($type == 'selling ') {
+                    $condition .= " AND seller_user_id = '".$user_id."'";
+                } else if($type == 'exchange ') {
+                    $condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
+                }
+                $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
+		$this->ps_adapter->convert_chathistory( $obj );
+                $this->custom_response( $obj );
+                // end of code
 			// get limit & offset
 
 			if ( $return_type == "buyer") {
