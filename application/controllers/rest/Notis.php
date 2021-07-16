@@ -173,10 +173,10 @@ class Notis extends API_Controller
 		
 		// validation rules for user register
 		$rules = array(
-			array(
-	        	'field' => 'item_id',
-	        	'rules' => 'required'
-	        ),
+			// array(
+	        // 	'field' => 'item_id',
+	        // 	'rules' => 'required'
+	        // ),
 
 			array(
 	        	'field' => 'buyer_user_id',
@@ -196,6 +196,18 @@ class Notis extends API_Controller
 	        )
 
         );
+
+		if($this->post('type') == 'to_seller'){
+			array_push($rules, array(
+					'field' => 'requested_item_id',
+					'rules' => 'required'
+				));
+		}else{
+			array_push($rules, array(
+				'field' => 'offered_item_id',
+				'rules' => 'required'
+			));
+		}
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
@@ -219,8 +231,6 @@ class Notis extends API_Controller
 			$user_ids[] = $this->post('seller_user_id');
 
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        
-
 
 			$device_ids = array();
 			if ( count( $devices ) > 0 ) {
@@ -231,15 +241,15 @@ class Notis extends API_Controller
 
 	        $chat_old_count = $this->Chat->get_one_by($chat_data)->seller_unread_count;
 
-	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
+ 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
 	        $user_id = $this->post('buyer_user_id');
 	        $user_name = $this->User->get_one($user_id)->user_name;
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 
 	        $update_chat_data = array(
-
-	        	"item_id" => $this->post('item_id'), 
+				"requested_item_id" => $this->post('item_id'), 
+	        	// "item_id" => $this->post('item_id'), 
 	        	"buyer_user_id" => $this->post('buyer_user_id'), 
 	        	"seller_user_id" => $this->post('seller_user_id'),
 	        	"seller_unread_count" => $chat_old_count
@@ -261,7 +271,7 @@ class Notis extends API_Controller
 				}
 			}
 
-	    	$chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
+			$chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
 
 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
@@ -270,8 +280,8 @@ class Notis extends API_Controller
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 	        
 	        $update_chat_data = array(
-
-	        	"item_id" => $this->post('item_id'), 
+				"offered_item_id" => $this->post('item_id'), 
+	        	// "item_id" => $this->post('item_id'), 
 	        	"buyer_user_id" => $this->post('buyer_user_id'), 
 	        	"seller_user_id" => $this->post('seller_user_id'),
 	        	"buyer_unread_count" => $chat_old_count
@@ -281,25 +291,18 @@ class Notis extends API_Controller
 	    }
 
 		if( !$this->Chat->Save( $update_chat_data,$chat_id )) {
-
-    		$this->error_response( get_msg( 'err_count_update' ));
-
-    	
+    		$this->error_response( get_msg( 'err_count_update' ));    	
     	} else {
 
     		//$this->success_response( get_msg( 'count_update_success' ));
-
     		$data['message'] = $this->post('message');
 	    	$data['buyer_user_id'] = $this->post('buyer_user_id');
 	    	$data['seller_user_id'] = $this->post('seller_user_id');
 	    	$data['sender_name'] = $user_name;
 	    	$data['item_id'] = $this->post('item_id');
 	    	$data['sender_profle_photo'] = $user_profile_photo;
-
 			$status = send_android_fcm_chat( $device_ids, $data );
-
-			if($status) {
-
+			if($status) {				
 				$this->success_response( get_msg( 'success_noti_send'));
 
 			} else {
@@ -307,10 +310,7 @@ class Notis extends API_Controller
 				$this->error_response( get_msg( 'error_noti_send' ));
 
 			}
-
     	}
-    	
-
 	}
 
 
