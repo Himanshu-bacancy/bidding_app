@@ -260,12 +260,19 @@ class PS_Adapter {
 			//$exchange_category = $this->CI->Itemexchangecategory->get_all_by( $itemconds )->result();
 			$obj->exchange_category = $exchange_category ;
 		}
-
 		// fetch similar item creteria
 		if (  $obj->is_accept_similar =='1') {
-
 			$this->CI->db->where('item_id', $obj->id);
-    		$similar_items = $this->CI->db->get('bs_item_similarcreteria')->result();
+			$similar_items = $this->CI->db->get('bs_item_similarcreteria')->result();
+			$newArray = [];
+			$i = 0;
+			foreach($similar_items as $key=>$items){
+				$this->CI->db->from('bs_similar_criterias');
+				$this->CI->db->where('bs_similar_criterias.id', $items->similarcreteria_id);
+				$variableChe = $this->CI->db->get()->row();
+				$similar_items[$key]->similarcriteria_title = $variableChe->title;
+				$similar_items[$key]->similarcriteria_icon = $variableChe->icon;
+			}
 			$obj->similar_items = $similar_items ;
 		}
 

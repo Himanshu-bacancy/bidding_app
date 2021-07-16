@@ -246,6 +246,7 @@ class Chats extends API_Controller
 		    	$data['sender_name'] = $user_name;
 		    	$data['requested_item_id'] = $this->post('requested_item_id');
 				$data['offered_item_id'] = $this->post('offered_item_id');
+				$data["type"] = $type;
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
 		    	
@@ -260,7 +261,8 @@ class Chats extends API_Controller
 		        	"nego_price" => $this->post('nego_price'),
                     "size_id" => $this->post('size_id'),
                     "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity')
+                    "quantity" => $this->post('quantity'),
+					"type" => $type
 
 		        );
 	    	} elseif ( $type == "to_seller" ) {
@@ -292,6 +294,7 @@ class Chats extends API_Controller
 		    	$data['sender_name'] = $user_name;
 		    	$data['requested_item_id'] = $this->post('requested_item_id');
 				$data['offered_item_id'] = $this->post('offered_item_id');
+				$data['type'] = $type;
 
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
@@ -305,7 +308,8 @@ class Chats extends API_Controller
 		        	"nego_price" => $this->post('nego_price'),
                     "size_id" => $this->post('size_id'),
                     "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity')
+                    "quantity" => $this->post('quantity'),
+					"type" => $type
 		        );
 	    	}
 	       	//sending noti
@@ -341,6 +345,7 @@ class Chats extends API_Controller
 		    	$data['sender_name'] = $user_name;
 		    	$data['requested_item_id'] = $this->post('requested_item_id');
 				$data['offered_item_id'] = $this->post('offered_item_id');
+				$data['type'] = $type;
 
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
@@ -354,7 +359,8 @@ class Chats extends API_Controller
 		        	"nego_price" => $this->post('nego_price'),
                     "size_id" => $this->post('size_id'),
                     "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity')
+                    "quantity" => $this->post('quantity'),
+					"type" => $type
 		        );
 			} elseif ( $type == "to_seller" ) {
 		    	$user_ids[] = $this->post('seller_user_id');
@@ -379,6 +385,7 @@ class Chats extends API_Controller
 		    	$data['sender_name'] = $user_name;
 		    	$data['requested_item_id'] = $this->post('requested_item_id');
 				$data['offered_item_id'] = $this->post('offered_item_id');
+				$data['type'] = $type;
 
 		    	$seller_unread_count = $chat_history_data->seller_unread_count;
 		    	
@@ -392,7 +399,8 @@ class Chats extends API_Controller
 		        	"nego_price" => $this->post('nego_price'),
                     "size_id" => $this->post('size_id'),
                     "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity')
+                    "quantity" => $this->post('quantity'),
+					"type" => $type
 		        );
 			}
 			if( !$this->Chat->Save( $chat_data,$chat_history_data->id )) {

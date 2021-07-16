@@ -33,11 +33,11 @@ class Appinfo extends API_Controller
             'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
-		
-		$rows = '[{"id":1,"title":"Brand"},{"id":2,"title":"Size"},{"id":3,"title":"Condition"},{"id":4,"title":"Color"}]';
+		$data = $this->db->get('bs_similar_criterias')->result();
+		//$rows = '[{"id":1,"title":"Brand"},{"id":2,"title":"Size"},{"id":3,"title":"Condition"},{"id":4,"title":"Color"}]';
 
-		$objArray = json_decode($rows);
+		//$objArray = json_decode($data);
 
-		$this->custom_response( $objArray );		
+		$this->custom_response( $data );		
 	}
 }

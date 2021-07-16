@@ -338,20 +338,18 @@ class API_Controller extends REST_Controller
 
 			if ( is_array( $data )) {
 			// if the data is array
-
 				foreach ( $data as $obj ) {
 
 					// convert object for each obj
 					$this->convert_object( $obj );
 				}
 			} else {
-
 				$this->convert_object( $data );
 			}
 		}
 
 		$data = $this->ps_security->clean_output( $data );
-
+		echo '<pre>'; print_r($data); die;
 		$this->response( $data );
 	}
 
@@ -469,13 +467,11 @@ class API_Controller extends REST_Controller
 			
 			// if 'id' is existed, get one record only
 			$data = $this->model->get_one( $id );
-
 			if ( isset( $data->is_empty_object )) {
 			// if the id is not existed in the return object, the object is empty
 				
 				$data = array();
 			}
-
 			$this->custom_response( $data );
 		}
 
