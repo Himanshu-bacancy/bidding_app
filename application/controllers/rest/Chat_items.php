@@ -1,7 +1,7 @@
 <?php
 require_once( APPPATH .'libraries/REST_Controller.php' );
-
-/**
+  
+/**   
  * REST API for News
  */
 class Chat_items extends API_Controller
