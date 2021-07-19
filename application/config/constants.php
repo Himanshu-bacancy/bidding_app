@@ -104,3 +104,8 @@ define( 'BAN', 'ban' );
 define( 'GET_ALL_CATEGORIES', 'GET_ALL_CATEGORIES' );
 define( 'GET_ALL_WALLPAPERS', 'GET_ALL_WALLPAPERS' );
 define( 'SEARCH_WALLPAPERS', 'SEARCH_WALLPAPERS' );
+
+define('request_item', 1);
+define('selling', 2);
+define('exchange', 3);
+define('direct_buy ', 4);
