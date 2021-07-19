@@ -270,7 +270,7 @@ class PS_Adapter {
 				$this->CI->db->from('bs_similar_criterias');
 				$this->CI->db->where('bs_similar_criterias.id', $items->similarcreteria_id);
 				$variableChe = $this->CI->db->get()->row();
-				$similar_items[$key]->similarcriteria_title = $variableChe->title;
+				$similar_items[$key]->title = $variableChe->title;
 				$similar_items[$key]->similarcriteria_icon = $variableChe->icon;
 			}
 			$obj->similar_items = $similar_items ;
