@@ -216,15 +216,20 @@ class Notis extends API_Controller
 
         
 
-
-		$chat_data = array(
-
-        	"item_id" => $this->post('item_id'), 
-        	"buyer_user_id" => $this->post('buyer_user_id'), 
-        	"seller_user_id" => $this->post('seller_user_id')
-        	
-
-        );
+		if($this->post('type') == "to_seller"){
+			$chat_data = array(
+				"requested_item_id" => $this->post('requested_item_id'), 
+				"buyer_user_id" => $this->post('buyer_user_id'), 
+				"seller_user_id" => $this->post('seller_user_id')
+			);
+		}else{
+			$chat_data = array(
+				"offered_item_id" => $this->post('offered_item_id'), 
+				"buyer_user_id" => $this->post('buyer_user_id'), 
+				"seller_user_id" => $this->post('seller_user_id')	
+			);
+		}
+		
 
 		if($this->post('type') == "to_seller") {
 
