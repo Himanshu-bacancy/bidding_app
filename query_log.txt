@@ -149,3 +149,7 @@ ALTER TABLE `bs_chat_history` CHANGE `requested_item_id` `requested_item_id` VAR
 
 // Added on 15-07-2021
 ALTER TABLE `bs_chat_history` ADD `parent_id` VARCHAR(255) NULL AFTER `seller_unread_count`;
+
+// Added 19-07-2021
+ALTER TABLE `bs_chat_history` ADD `exchange_id` VARCHAR(255) NULL AFTER `id`;
+ALTER TABLE `bs_chat_history` ADD `operation_type` VARCHAR(255) NULL AFTER `type`;
