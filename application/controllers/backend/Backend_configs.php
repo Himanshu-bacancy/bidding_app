@@ -220,6 +220,12 @@ class Backend_configs extends BE_Controller {
 			$data['selling_fees'] = $this->get_data( 'selling_fees' );
 		}
 
+
+		// processing_fees
+		if ( $this->has_data( 'processing_fees' )) {
+			$data['processing_fees'] = $this->get_data( 'processing_fees' );
+		}
+
         // print_r($data);die;
 
 		// save backend config

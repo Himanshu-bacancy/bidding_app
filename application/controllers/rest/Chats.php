@@ -167,10 +167,6 @@ class Chats extends API_Controller
 	        	'field' => 'requested_item_id',
 	        	'rules' => 'required'
 	        ),
-			array(
-	        	'field' => 'offered_item_id[]',
-	        	'rules' => 'required'
-	        ),
 	        array(
 	        	'field' => 'buyer_user_id',
 	        	'rules' => 'required'
@@ -192,6 +188,18 @@ class Chats extends API_Controller
 	        	'rules' => 'required'
 	        )
         );
+
+		if($this->post('operation_type') == 1){
+			array_push($rules, array(
+	        	'field' => 'offered_item_id',
+	        	'rules' => 'required'
+	        ));
+		}elseif($this->post('operation_type') == 3){
+			array_push($rules, array(
+	        	'field' => 'offered_item_id[]',
+	        	'rules' => 'required'
+	        ));
+		}
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
@@ -428,9 +436,24 @@ class Chats extends API_Controller
 			$requestedItemDetails = $this->Item->get_one( $requestedItemId );
 			
 			if(is_array($this->post('offered_item_id'))){	
+				$requestedItemDetails = $this->Item->get_one( $requestedItemId );
 				foreach($this->post('offered_item_id') as $offeredItemId){
-					$obj[] = $this->save_chat($offeredItemId, $next_exchange_id);
+					$offeredItemDetails = $this->Item->get_one( $offeredItemId );
+					if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+					}
+					if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+					}
+					if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+					}
 				}
+				$offeredItemId = implode(",", $this->post('offered_item_id'));
+				$obj = $this->save_chat($offeredItemId, $next_exchange_id);
+				// foreach($this->post('offered_item_id') as $offeredItemId){
+				// 	$obj[] = $this->save_chat($offeredItemId, $next_exchange_id);
+				// }
 			}else{
 				$obj = $this->save_chat($this->post('offered_item_id'), $next_exchange_id);
 			}
@@ -449,14 +472,16 @@ class Chats extends API_Controller
 		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
 		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
 		// print_r($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id);exit;
-		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-		}
-		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-		}
-		if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		if($this->post('operation_type') == 1){
+			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
+			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
+			if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
 		}
 		$type = $this->post('type');
 		$chat_data = array(
@@ -499,7 +524,7 @@ class Chats extends API_Controller
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
 				if($this->post('operation_type') == 3){
-					$data['offered_item_id'][] = $offeredItemId;
+					$data['offered_item_id'] = explode(",",$offeredItemId);
 				}else{
 					$data['offered_item_id'] = $offeredItemId;
 				}
@@ -549,7 +574,7 @@ class Chats extends API_Controller
 				$data['requested_item_id'] = $requestedItemId;
 				// $data['offered_item_id'] = $offeredItemId;
 				if($this->post('operation_type') == 3){
-					$data['offered_item_id'][] = $offeredItemId;
+					$data['offered_item_id'] = explode(",",$offeredItemId);
 				}else{
 					$data['offered_item_id'] = $offeredItemId;
 				}
@@ -578,6 +603,7 @@ class Chats extends API_Controller
 			$this->Chat->save($chat_data);	
 			
 			$obj = $this->Chat->get_one_by($chat_data);
+			$obj->offered_item_id = explode(",",$obj->offered_item_id);
 			return $obj;
 		} else {
 			if ( $type == "to_buyer" ) {
@@ -605,7 +631,7 @@ class Chats extends API_Controller
 				$data['requested_item_id'] = $requestedItemId;
 				// $data['offered_item_id'] = $offeredItemId;
 				if($this->post('operation_type') == 3){
-					$data['offered_item_id'][] = $offeredItemId;
+					$data['offered_item_id'] = explode(",",$offeredItemId);
 				}else{
 					$data['offered_item_id'] = $offeredItemId;
 				}
@@ -650,7 +676,12 @@ class Chats extends API_Controller
 				$data['seller_user_id'] = $sellerUserId;
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
-				$data['offered_item_id'] = $offeredItemId;
+				// $data['offered_item_id'] = $offeredItemId;
+				if($this->post('operation_type') == 3){
+					$data['offered_item_id'] = explode(",",$offeredItemId);
+				}else{
+					$data['offered_item_id'] = $offeredItemId;
+				}
 				$data['type'] = $type;
 
 				$seller_unread_count = $chat_history_data->seller_unread_count;
@@ -678,6 +709,7 @@ class Chats extends API_Controller
 				//sending noti
 				$status = send_android_fcm_chat( $device_ids, $data );
 				$obj = $this->Chat->get_one_by($chat_data);
+				$obj->offered_item_id = explode(",",$obj->offered_item_id);
 				return $obj;
 			}
 		}
@@ -1673,4 +1705,22 @@ class Chats extends API_Controller
 		}
 	}
 
+	// GET FEES API	
+	function get_fees_detail_post(){
+		// API Configuration [Return Array: User Token Data]
+        // $user_data = $this->_apiConfig([
+        //     'methods' => ['POST'],
+        //     'requireAuthorization' => true,
+        // ]);
+
+		$config_data = $this->Backend_config->get_one_by();
+		$chat_data_update = array(
+			"selling_fees" => $config_data->selling_fees,
+			"processing_fees" => $config_data->processing_fees, 
+		);
+		
+		// $this->ps_adapter->convert_chathistory( $chat_data_update );
+		$this->custom_response( $chat_data_update );
+	}
+	
 }

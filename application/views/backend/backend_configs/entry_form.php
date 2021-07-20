@@ -66,6 +66,24 @@ echo form_open( '', $attributes);
 						?>
 					</div>
 
+					<!-- PROCESSING FEE -->
+					<div class="form-group">
+						<label><?php echo get_msg('processing_fees_label')?>  (<?php echo get_msg('in_percentage')?>)
+							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('service_fees_label')?>">
+								<span class='glyphicon glyphicon-info-sign menu-icon'>
+							</a>
+						</label>
+						<?php 
+							echo form_input( array(
+								'type' => 'text',
+								'name' => 'processing_fees',
+								'id' => 'processing_fees',
+								'class' => 'form-control',
+								'placeholder' => get_msg('processing_fees_label'),
+								'value' => set_value( 'processing_fees', show_data( @$backend->processing_fees ), false )
+							));
+						?>
+					</div>
 	          	</div>
 
 	          	<div class="col-md-6">
