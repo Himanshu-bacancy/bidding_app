@@ -1402,7 +1402,7 @@ class Chats extends API_Controller
 		$offset = $this->get( 'offset' );
                 //start new code
 		$type 	 = $this->post('type');
-                $condition = "type = '".$type."'";
+                $condition = "operation_type = '".$type."'";
                 if($type == 'direct_buy' || $type == 'request_item') {
                     $condition .= " AND buyer_user_id = '".$user_id."'";
                 } else if($type == 'selling ') {
