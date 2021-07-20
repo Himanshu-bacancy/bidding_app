@@ -153,3 +153,17 @@ ALTER TABLE `bs_chat_history` ADD `parent_id` VARCHAR(255) NULL AFTER `seller_un
 // Added 19-07-2021
 ALTER TABLE `bs_chat_history` ADD `exchange_id` VARCHAR(255) NULL AFTER `id`;
 ALTER TABLE `bs_chat_history` ADD `operation_type` VARCHAR(255) NULL AFTER `type`;
+
+// Added on 19-07-2021
+CREATE TABLE `bs_cart` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  `type_id` varchar(255) NOT NULL,
+  `color_id` varchar(255) DEFAULT NULL,
+  `size_id` varchar(255) DEFAULT NULL,
+  `quantity` varchar(255) DEFAULT NULL,
+  `brand` varchar(255) DEFAULT NULL,
+  `created_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
