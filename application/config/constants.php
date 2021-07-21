@@ -105,7 +105,7 @@ define( 'GET_ALL_CATEGORIES', 'GET_ALL_CATEGORIES' );
 define( 'GET_ALL_WALLPAPERS', 'GET_ALL_WALLPAPERS' );
 define( 'SEARCH_WALLPAPERS', 'SEARCH_WALLPAPERS' );
 
-define('request_item', 1);
-define('selling', 2);
-define('exchange', 3);
-define('direct_buy ', 4);
+define('REQUEST_ITEM', 1);
+define('SELLING', 2);
+define('EXCHANGE', 3);
+define('DIRECT_BUY ', 4);

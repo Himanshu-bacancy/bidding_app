@@ -250,14 +250,16 @@ class PS_Adapter {
 
 		// fetch exchange category
 		if (  $obj->is_exchange =='1') {
-
 			$this->CI->db->where('item_id', $obj->id);
     		$exchange_category = $this->CI->db->get('bs_item_exchange')->result();
-			//echo '<pre>'; print_r($exchange_category); die;
+			//echo '<pre>'; print_r($exchange_category); die('hello testing');
 			foreach($exchange_category as $key=>$categoryData){
+				$categoryDatail = $this->CI->Category->get_one($categoryData->cat_id);
+				$categoryData->cat_name = $categoryDatail->cat_name;
 				$this->convert_category($categoryData);
+				$obj->deal_option = $tmp_deal_option;
 			}
-			//$exchange_category = $this->CI->Itemexchangecategory->get_all_by( $itemconds )->result();
+			//$exchange_category = $this->CI->Category->get_one( $itemconds )->result();
 			$obj->exchange_category = $exchange_category ;
 		}
 		// fetch similar item creteria
@@ -271,7 +273,7 @@ class PS_Adapter {
 				$this->CI->db->where('bs_similar_criterias.id', $items->similarcreteria_id);
 				$variableChe = $this->CI->db->get()->row();
 				$similar_items[$key]->title = $variableChe->title;
-				$similar_items[$key]->similarcriteria_icon = $variableChe->icon;
+				$similar_items[$key]->default_icon = $this->get_default_photo( $items->similarcreteria_id, 'similarcriteria_icon' );
 			}
 			$obj->similar_items = $similar_items ;
 		}
@@ -387,8 +389,23 @@ class PS_Adapter {
 			}
 
 		}
-		//die;
-
+		//echo '<pre>'; print_r($obj);die;
+		if($obj->item_type_id == 1){
+			$conditionChatHistory['requested_item_id'] = $obj->id;
+			$chatHistory = $this->CI->Chat->get_all_by($conditionChatHistory)->result();
+			//echo $conditionChatHistory;
+			//$chatHistory = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$conditionChatHistory)->result();
+			$obj->big_count = count($chatHistory);
+			$lowestBid = 0;
+			foreach($chatHistory as $history){
+				if($lowestBid > $history->nego_price){
+					$lowestBid = $history->nego_price;
+				}
+			}
+			//echo $lowestBid; die(' hello testing');
+			$obj->big_count = count($chatHistory);
+			$obj->lowest_bid_amount = $lowestBid;
+		}
 		//print_r($obj->added_user_id);die;
 		//unset($obj->login_user_id_post);
 

@@ -257,7 +257,6 @@ class Items extends API_Controller
 			);
 			$this->Item->save($itm_data,$id);
 			///End
-
 		}
 		 
 		$obj = $this->Item->get_one( $id );
