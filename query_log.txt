@@ -171,3 +171,15 @@ CREATE TABLE `bs_cart` (
 
 // ADDED ON 20/07/2021
 ALTER TABLE `core_backend_config` ADD `processing_fees` DOUBLE NULL AFTER `selling_fees`;
+
+// Added on 21-07-2021
+CREATE TABLE `bs_card` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `card_holder_name` varchar(255) NOT NULL,
+  `card_number` varchar(255) NOT NULL,
+  `expiry_date` varchar(255) NOT NULL,
+  `address_id` varchar(255) NOT NULL,
+  `created_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1

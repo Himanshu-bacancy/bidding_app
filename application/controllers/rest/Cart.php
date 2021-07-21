@@ -44,9 +44,14 @@ class Cart extends API_Controller {
         $quantity = ($this->post('quantity')) ?? '';
         $brand = ($this->post('brand')) ?? '';
         
-        $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
+        $is_record_already_exists = $this->db->select('id')->from('bs_cart')->where('user_id', $user_id)->where('item_id', $item_id)->get()->num_rows();
+        $success_message = "Item already added to cart";
+        if(!$is_record_already_exists) {
+            $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
+            $success_message = "Item added to cart successfully";
+        }
     
-        $this->success_response( "Item added to cart successfully");
+        $this->success_response($success_message);
     }
     
     public function remove_cart_item_post() {
@@ -57,20 +62,25 @@ class Cart extends API_Controller {
         
         $rules = array(
             array(
-                'field' => 'user_id',
+                'field' => 'id',
                 'rules' => 'required'
             ),
-            array(
-                'field' => 'item_id',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'user_id',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'item_id',
+//                'rules' => 'required'
+//            ),
         );
         if ( !$this->is_valid( $rules )) exit;
 
-        $user_id = $this->post('user_id');
-        $item_id = $this->post('item_id');
+//        $user_id = $this->post('user_id');
+//        $item_id = $this->post('item_id');
+        $id = $this->post('id');
         
-        $this->db->delete('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id]);
+        $this->db->delete('bs_cart', ['id' => $id]);
     
         $this->success_response( "Item remove from cart successfully");
     }
@@ -91,11 +101,14 @@ class Cart extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->select('bs_cart.*, bs_items.title')->from('bs_cart')->join('bs_items', 'bs_cart.item_id = bs_items.id')
-                ->where('user_id', $user_id)->get()->result();
+        $obj = $this->db->select('bs_cart.* ,bs_items.id as item_id, bs_items.title, bs_items.dynamic_link, bs_items.price')->from('bs_cart')->join('bs_items', 'bs_cart.item_id = bs_items.id')
+                ->where('user_id', $user_id)->get()->result_array();
         $sum_of_cart = $this->db->query('SELECT sum(bs_items.price) as sum FROM bs_items JOIN bs_cart ON  bs_items.id = bs_cart.item_id WHERE bs_cart.user_id = "'.$user_id.'" GROUP BY bs_cart.user_id')->row();
-        
-        $this->response( ['status' => true, 'items' => $obj, 'sum' => ((float)$sum_of_cart->sum) ?? 0]);
+        foreach ($obj as $key => $value) {
+            $row[$key] = $value;
+            $row[$key]['default_photo'] = $this->ps_adapter->get_default_photo( $value['item_id'], 'item' );
+        }
+        $this->response( ['status' => "success", 'items' => $row, 'sum' => ($sum_of_cart->sum) ?? 0]);
     }
 
 }
