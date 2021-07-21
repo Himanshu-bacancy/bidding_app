@@ -166,4 +166,8 @@ CREATE TABLE `bs_cart` (
   `brand` varchar(255) DEFAULT NULL,
   `created_date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+// ADDED ON 20/07/2021
+ALTER TABLE `core_backend_config` ADD `processing_fees` DOUBLE NULL AFTER `selling_fees`;
