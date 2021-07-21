@@ -44,9 +44,14 @@ class Cart extends API_Controller {
         $quantity = ($this->post('quantity')) ?? '';
         $brand = ($this->post('brand')) ?? '';
         
-        $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
+        $is_record_already_exists = $this->db->select('id')->from('bs_cart')->where('user_id', $user_id)->where('item_id', $item_id)->get()->num_rows();
+        $success_message = "Item already added to cart";
+        if(!$is_record_already_exists) {
+            $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
+            $success_message = "Item added to cart successfully";
+        }
     
-        $this->success_response( "Item added to cart successfully");
+        $this->success_response($success_message);
     }
     
     public function remove_cart_item_post() {
