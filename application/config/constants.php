@@ -103,9 +103,13 @@ define( 'BAN', 'ban' );
 // api constatns
 define( 'GET_ALL_CATEGORIES', 'GET_ALL_CATEGORIES' );
 define( 'GET_ALL_WALLPAPERS', 'GET_ALL_WALLPAPERS' );
+<<<<<<< HEAD
 define( 'SEARCH_WALLPAPERS', 'SEARCH_WALLPAPERS' );
 
 define('REQUEST_ITEM', 1);
 define('SELLING', 2);
 define('EXCHANGE', 3);
 define('DIRECT_BUY ', 4);
+=======
+define( 'SEARCH_WALLPAPERS', 'SEARCH_WALLPAPERS' );
+>>>>>>> bdc6915162b1295ea93aebae1b70c5009e17ed91

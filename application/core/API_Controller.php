@@ -349,6 +349,7 @@ class API_Controller extends REST_Controller
 		}
 
 		$data = $this->ps_security->clean_output( $data );
+		echo '<pre>'; print_r($data); die;
 		$this->response( $data );
 	}
 
