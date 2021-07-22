@@ -159,6 +159,13 @@ class Chats extends API_Controller
 
 	/**
 	 * Update Price 
+	 * 
+	 * MAKE OFFER API 
+	 * 
+	 * AND CANCEL OFFER API 
+	 * 
+	 * ( WHEN PRICE = 0 AND IS_CANCEL = 1 THIS API WORK AS CANCEL OTHERWISE CREATE OFFER )
+	 * 
 	 */
 	function update_price_post(){
 		// validation rules for chat history
@@ -182,6 +189,10 @@ class Chats extends API_Controller
 	        array(
 	        	'field' => 'type',
 	        	'rules' => 'required'
+			),
+			array(
+	        	'field' => 'operation_type',
+	        	'rules' => 'required'
 	        )
         );
 
@@ -199,303 +210,84 @@ class Chats extends API_Controller
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
-		$next_exchange_id = $this->get_next_exchange_id();
 
-		if(!is_array($this->post('offered_item_id'))){
-			$obj = $this->save_chat($this->post('offered_item_id'), NULL);
-
-			/*$requestedItemId = $this->post('requested_item_id');
-			$offeredItemId = $this->post('offered_item_id');
-
-			$requestedItemDetails = $this->Item->get_one( $requestedItemId );
-			$offeredItemDetails = $this->Item->get_one( $offeredItemId );
-			
-			if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
-			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
-			if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
-			$type = $this->post('type');
-			$chat_data = array(
-				"requested_item_id" => $this->post('requested_item_id'),
-				"offered_item_id" => $this->post('offered_item_id'), 
-				"buyer_user_id" => $this->post('buyer_user_id'), 
-				"seller_user_id" => $this->post('seller_user_id')
-			);
-
-			$chat_history_data = $this->Chat->get_one_by($chat_data);
-			if($chat_history_data->id == "") {
-
-				if ( $type == "to_buyer" ) {
-
-					//prepare data for noti
-					$user_ids[] = $this->post('buyer_user_id');
-					
-					$devices = $this->Noti->get_all_device_in($user_ids)->result();
-					//echo '<pre>'; print_r($devices); die;	
-
-					$device_ids = array();
-					if ( count( $devices ) > 0 ) {
-						foreach ( $devices as $device ) {
-							$device_ids[] = $device->device_token;
-						}
-					}
-					
-					$user_id = $this->post('buyer_user_id');
-					$user_name = $this->User->get_one($user_id)->user_name;
-					
-					$price = $this->post('nego_price');
-					if ( $price == 0) {
-						$data['message'] = "Offer Rejected!";
-					} else {
-						$data['message'] = "Make Offer!";
-					}
-					$data['buyer_user_id'] = $this->post('buyer_user_id');
-					$data['seller_user_id'] = $this->post('seller_user_id');
-					$data['sender_name'] = $user_name;
-					$data['requested_item_id'] = $this->post('requested_item_id');
-					$data['offered_item_id'] = $this->post('offered_item_id');
-					$data["type"] = $type;
-
-					$buyer_unread_count = $chat_history_data->buyer_unread_count;
-					
-					$chat_data = array(
-						"requested_item_id" => $this->post('requested_item_id'),
-						"offered_item_id" => $this->post('offered_item_id'), 
-						"buyer_user_id" => $this->post('buyer_user_id'), 
-						"seller_user_id" => $this->post('seller_user_id'),
-						"buyer_unread_count" => $buyer_unread_count + 1,
-						"added_date" => date("Y-m-d H:i:s"),
-						"nego_price" => $this->post('nego_price'),
-						"size_id" => $this->post('size_id'),
-						"color_id" => $this->post('color_id'),
-						"quantity" => $this->post('quantity'),
-						"type" => $type
-					);
-				} elseif ( $type == "to_seller" ) {
-
-					//prepare data for noti
-					$user_ids[] = $this->post('seller_user_id');
-
-					$devices = $this->Noti->get_all_device_in($user_ids)->result();
-					//print_r($devices);die;	
-
-					$device_ids = array();
-					if ( count( $devices ) > 0 ) {
-						foreach ( $devices as $device ) {
-							$device_ids[] = $device->device_token;
-						}
-					}
-
-					$user_id = $this->post('seller_user_id');
-					$user_name = $this->User->get_one($user_id)->user_name;
-
-					$price = $this->post('nego_price');
-					if ( $price == 0) {
-						$data['message'] = "Offer Rejected!";
-					} else {
-						$data['message'] = "Make Offer!";
-					}
-					$data['buyer_user_id'] = $this->post('buyer_user_id');
-					$data['seller_user_id'] = $this->post('seller_user_id');
-					$data['sender_name'] = $user_name;
-					$data['requested_item_id'] = $this->post('requested_item_id');
-					$data['offered_item_id'] = $this->post('offered_item_id');
-					$data['type'] = $type;
-
-					$seller_unread_count = $chat_history_data->seller_unread_count;
-					
-					$chat_data = array(
-						"requested_item_id" => $this->post('requested_item_id'),
-						"offered_item_id" => $this->post('offered_item_id'),
-						"buyer_user_id" => $this->post('buyer_user_id'), 
-						"seller_user_id" => $this->post('seller_user_id'),
-						"seller_unread_count" => $seller_unread_count + 1,
-						"added_date" => date("Y-m-d H:i:s"),
-						"nego_price" => $this->post('nego_price'),
-						"size_id" => $this->post('size_id'),
-						"color_id" => $this->post('color_id'),
-						"quantity" => $this->post('quantity'),
-						"type" => $type
-					);
-				}
-				//sending noti
-				$status = send_android_fcm_chat( $device_ids, $data );
-
-				$this->Chat->save($chat_data);	
-				$obj = $this->Chat->get_one_by($chat_data);
-				$this->ps_adapter->convert_chathistory( $obj );
-				$this->custom_response( $obj );
-			} else {
-				if ( $type == "to_buyer" ) {
-					//prepare data for noti
-					$user_ids[] = $this->post('buyer_user_id');
-					$devices = $this->Noti->get_all_device_in($user_ids)->result();
-					//print_r($devices);die;	
-					$device_ids = array();
-					if ( count( $devices ) > 0 ) {
-						foreach ( $devices as $device ) {
-							$device_ids[] = $device->device_token;
-						}
-					}
-					$user_id = $this->post('buyer_user_id');
-					$user_name = $this->User->get_one($user_id)->user_name;
-
-					$price = $this->post('nego_price');
-					if ( $price == 0) {
-						$data['message'] = "Offer Rejected!";
-					} else {
-						$data['message'] = "Make Offer!";
-					}
-					$data['buyer_user_id'] = $this->post('buyer_user_id');
-					$data['seller_user_id'] = $this->post('seller_user_id');
-					$data['sender_name'] = $user_name;
-					$data['requested_item_id'] = $this->post('requested_item_id');
-					$data['offered_item_id'] = $this->post('offered_item_id');
-					$data['type'] = $type;
-
-
-					$buyer_unread_count = $chat_history_data->buyer_unread_count;
-					$chat_data = array(
-						"requested_item_id" => $this->post('requested_item_id'),
-						"offered_item_id" => $this->post('offered_item_id'), 
-						"buyer_user_id" => $this->post('buyer_user_id'), 
-						"seller_user_id" => $this->post('seller_user_id'),
-						"buyer_unread_count" => $buyer_unread_count + 1,
-						"added_date" => date("Y-m-d H:i:s"),
-						"nego_price" => $this->post('nego_price'),
-						"size_id" => $this->post('size_id'),
-						"color_id" => $this->post('color_id'),
-						"quantity" => $this->post('quantity'),
-						"type" => $type
-					);
-				} elseif ( $type == "to_seller" ) {
-					$user_ids[] = $this->post('seller_user_id');
-					$devices = $this->Noti->get_all_device_in($user_ids)->result();
-					$device_ids = array();
-					if ( count( $devices ) > 0 ) {
-						foreach ( $devices as $device ) {
-							$device_ids[] = $device->device_token;
-						}
-					}
-					$user_id = $this->post('seller_user_id');
-					$user_name = $this->User->get_one($user_id)->user_name;
-
-					$price = $this->post('nego_price');
-					if ( $price == 0) {
-						$data['message'] = "Offer Rejected!";
-					} else {
-						$data['message'] = "Make Offer!";
-					}
-					$data['buyer_user_id'] = $this->post('buyer_user_id');
-					$data['seller_user_id'] = $this->post('seller_user_id');
-					$data['sender_name'] = $user_name;
-					$data['requested_item_id'] = $this->post('requested_item_id');
-					$data['offered_item_id'] = $this->post('offered_item_id');
-					$data['type'] = $type;
-
-					$seller_unread_count = $chat_history_data->seller_unread_count;
-					
-					$chat_data = array(
-						"requested_item_id" => $this->post('requested_item_id'),
-						"offered_item_id" => $this->post('offered_item_id'),
-						"buyer_user_id" => $this->post('buyer_user_id'), 
-						"seller_user_id" => $this->post('seller_user_id'),
-						"seller_unread_count" => $seller_unread_count + 1,
-						"added_date" => date("Y-m-d H:i:s"),
-						"nego_price" => $this->post('nego_price'),
-						"size_id" => $this->post('size_id'),
-						"color_id" => $this->post('color_id'),
-						"quantity" => $this->post('quantity'),
-						"type" => $type
-					);
-				}
-				if( !$this->Chat->Save( $chat_data,$chat_history_data->id )) {
-					$this->error_response( get_msg( 'err_price_update' ));
-				} else {
-					//sending noti
-					$status = send_android_fcm_chat( $device_ids, $data );
-					$obj = $this->Chat->get_one_by($chat_data);
-					$this->ps_adapter->convert_chathistory( $obj );
-					$this->custom_response( $obj );
-				}
-			} */
+		$requestedItemId = $this->post('requested_item_id');
+		if(is_array($this->post('offered_item_id'))){
+			foreach($this->post('offered_item_id') as $offeredItemId){
+				$this->validation_chat_item_categories($requestedItemId, $offeredItemId);
+			}	
 		}else{
-			$requestedItemId = $this->post('requested_item_id');
-			// $offeredItemId = $this->post('offered_item_id');
-			$buyerUserId = $this->post('buyer_user_id');
-			$sellerUserId = $this->post('seller_user_id');
-			$requestedItemDetails = $this->Item->get_one( $requestedItemId );
-			
-			if(is_array($this->post('offered_item_id'))){	
-				$requestedItemDetails = $this->Item->get_one( $requestedItemId );
-				foreach($this->post('offered_item_id') as $offeredItemId){
-					$offeredItemDetails = $this->Item->get_one( $offeredItemId );
-					if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-					}
-					if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-					}
-					if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
-						$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-					}
-				}
-				$offeredItemId = implode(",", $this->post('offered_item_id'));
-				$obj = $this->save_chat($offeredItemId, $next_exchange_id);
-				// foreach($this->post('offered_item_id') as $offeredItemId){
-				// 	$obj[] = $this->save_chat($offeredItemId, $next_exchange_id);
-				// }
-			}else{
-				$obj = $this->save_chat($this->post('offered_item_id'), $next_exchange_id);
+			if($this->post('operation_type') == 1){
+				$this->validation_chat_item_categories($requestedItemId, $this->post('offered_item_id'));
 			}
 		}
-
+		
+		$obj = $this->save_chat($this->post('offered_item_id'));
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
 	}
 
-	// ADD CHAT FOR REQUEST SELLER AND EXCHANGE    -- Operation type = 3 means exchange
-	function save_chat($offeredItemId, $next_exchange_id){
-		$requestedItemId = $this->post('requested_item_id');
-		$offeredItemId = $this->post('offered_item_id');
-
+	//  VALIDATE REQUEST ITEM AND OFFERED ITEM CATEGORY, SUB CATEGORY AND CHILD SUBCATEGORY ARE SAME OR NOT
+	function validation_chat_item_categories($requestedItemId, $offeredItemId){
 		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
 		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
-		// print_r($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id);exit;
-		if($this->post('operation_type') == 1){
-			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
-			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
-			if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
-				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-			}
+
+		if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
 		}
-        $type = $this->post('type');
-		$chat_data = array(
-        	"requested_item_id" => $this->post('requested_item_id'),
-			"offered_item_id" => $this->post('offered_item_id'), 
-        	"buyer_user_id" => $this->post('buyer_user_id'), 
-        	"seller_user_id" => $this->post('seller_user_id')
-        );
+		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+		if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		}
+	}
 
-        $chat_history_data = $this->Chat->get_one_by($chat_data);
-        if($chat_history_data->id == "") {
+	// ADD CHAT FOR REQUEST SELLER AND EXCHANGE    -- Operation type = 3 means exchange, 1 = Request, 4 = Direct Buy
+	function save_chat($offeredItemId){
+		$requestedItemId = $this->post('requested_item_id');
 
-        	if ( $type == "to_buyer" ) {
+		$buyerUserId = $this->post('buyer_user_id');
+		$sellerUserId = $this->post('seller_user_id');
+		
+		if($this->post('operation_type') == 3){
+			$chat_data = array(
+				"requested_item_id" => $requestedItemId,
+				"buyer_user_id" => $buyerUserId, 
+				"seller_user_id" => $sellerUserId,
+				"operation_type" => 3
+			);
 
-        		//prepare data for noti
-		    	$user_ids[] = $this->post('buyer_user_id');
+			// GET ALL DATA 
+			$chat_history_data = $this->Chat->get_one_by($chat_data);
+			if($chat_history_data->id != ""){
+				$offer_details = array('chat_id' => $chat_history_data->id, 'offered_item_id' => $this->post('offered_item_id'));
+				$exchange_offer_id_data = $this->ExchangeChatHistory->get_all_in_exchange_chat_item($offer_details);
+				if(!empty($exchange_offer_id_data) && $exchange_offer_id_data[0]->id == ""){
+					$chat_history_data->id = "";
+				}
+			}
+		}else{
+			$chat_data = array(
+				"requested_item_id" => $requestedItemId,
+				"offered_item_id" => $offeredItemId, 
+				"buyer_user_id" => $buyerUserId, 
+				"seller_user_id" => $sellerUserId,
+			);
+			$chat_history_data = $this->Chat->get_one_by($chat_data);
+		}
+		$type = $this->post('type');
+		
+		if($chat_history_data->id == "") {
+			$operation_type = $this->post('operation_type');
+
+			if ( $type == "to_buyer" ) {
+
+				//prepare data for noti
+				$user_ids[] = $buyerUserId;
 				
-	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        	//echo '<pre>'; print_r($devices); die;	
+				$devices = $this->Noti->get_all_device_in($user_ids)->result();
+				//echo '<pre>'; print_r($devices); die;	
 
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
@@ -503,14 +295,13 @@ class Chats extends API_Controller
 						$device_ids[] = $device->device_token;
 					}
 				}
-	        	
-				$user_id = $this->post('buyer_user_id');
-	       		$user_name = $this->User->get_one($user_id)->user_name;
 				
 				$user_id = $buyerUserId;
 				$user_name = $this->User->get_one($user_id)->user_name;
 				
 				$price = $this->post('nego_price');
+				/*
+				NOTIFICATION SEND FROM SEPRATE API
 				if ( $price == 0) {
 					$data['message'] = "Offer Rejected!";
 				} else {
@@ -520,38 +311,37 @@ class Chats extends API_Controller
 				$data['seller_user_id'] = $sellerUserId;
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
-				if($this->post('operation_type') == 3){
-					$data['offered_item_id'] = explode(",",$offeredItemId);
-				}else{
+				
+				if($this->post('operation_type') != 3){
 					$data['offered_item_id'] = $offeredItemId;
 				}
-				$data["type"] = $type;
+				$data["type"] = $type;*/
+				$buyer_unread_count = $chat_history_data->buyer_unread_count;
+				
+				$chat_data = array(
+					"requested_item_id" => $requestedItemId,
+					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"buyer_user_id" => $buyerUserId, 
+					"seller_user_id" => $sellerUserId,
+					"buyer_unread_count" => $buyer_unread_count + 1,
+					"added_date" => date("Y-m-d H:i:s"),
+					"nego_price" => $this->post('nego_price'),
+					"size_id" => $this->post('size_id'),
+					"color_id" => $this->post('color_id'),
+					"quantity" => $this->post('quantity'),
+					"type" => $type,
+					"operation_type" => $this->post('operation_type'),
+					"is_cancel" => $this->post('is_cancel'),
+					"cancel_reason" => $this->post('cancel_reason'),
+					"delivery_to" => $this->post('delivery_to'),
+					"payment_method_id" => $this->post('payment_method_id'),
+				);
+			} elseif ( $type == "to_seller" ) {
 
-		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
-		    	
-		    	$chat_data = array(
+				//prepare data for noti
+				$user_ids[] = $sellerUserId;
 
-		        	"requested_item_id" => $this->post('requested_item_id'),
-					"offered_item_id" => $this->post('offered_item_id'), 
-		        	"buyer_user_id" => $this->post('buyer_user_id'), 
-		        	"seller_user_id" => $this->post('seller_user_id'),
-		        	"buyer_unread_count" => $buyer_unread_count + 1,
-		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price'),
-                    "size_id" => $this->post('size_id'),
-                    "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity'),
-					"type" => $type
-
-		        );
-	    	} elseif ( $type == "to_seller" ) {
-
-	    		//prepare data for noti
-		    	$user_ids[] = $this->post('seller_user_id');
-
-	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        	//print_r($devices);die;	
-
+				$devices = $this->Noti->get_all_device_in($user_ids)->result();
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
 					foreach ( $devices as $device ) {
@@ -559,8 +349,8 @@ class Chats extends API_Controller
 					}
 				}
 
-				$user_id = $this->post('seller_user_id');
-	       		$user_name = $this->User->get_one($user_id)->user_name;
+				$user_id = $sellerUserId;
+				$user_name = $this->User->get_one($user_id)->user_name;
 
 				$price = $this->post('nego_price');
 				if ( $price == 0) {
@@ -568,23 +358,21 @@ class Chats extends API_Controller
 				} else {
 					$data['message'] = "Make Offer!";
 				}
+				/*
+				NOTIFICATION SEND FROM SEPRATE FUNCTION
 				$data['buyer_user_id'] = $this->post('buyer_user_id');
 				$data['seller_user_id'] = $sellerUserId;
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
-				// $data['offered_item_id'] = $offeredItemId;
-				if($this->post('operation_type') == 3){
-					$data['offered_item_id'] = explode(",",$offeredItemId);
-				}else{
-					$data['offered_item_id'] = $offeredItemId;
-				}
+				
+				$data['offered_item_id'] = $offeredItemId;
 				$data['type'] = $type;
-				$data['operation_type'] = $operation_type;
+				$data['operation_type'] = $operation_type; */
 
 				$seller_unread_count = $chat_history_data->seller_unread_count;
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
-					"offered_item_id" => $offeredItemId,
+					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
 					"seller_unread_count" => $seller_unread_count + 1,
@@ -595,22 +383,35 @@ class Chats extends API_Controller
 					"quantity" => $this->post('quantity'),
 					"type" => $type,
 					"operation_type" => $this->post('operation_type'),
-					"exchange_id" => $exchange_id,
+					"is_cancel" => $this->post('is_cancel'),
+					"cancel_reason" => $this->post('cancel_reason'),
+					"delivery_to" => $this->post('delivery_to'),
+					"payment_method_id" => $this->post('payment_method_id'),
 				);
 			}
 			
-			$status = send_android_fcm_chat( $device_ids, $data );
+			// $status = send_android_fcm_chat( $device_ids, $data );
 			$this->Chat->save($chat_data);	
-			
 			$obj = $this->Chat->get_one_by($chat_data);
-			$obj->offered_item_id = explode(",",$obj->offered_item_id);
+			if($this->post('operation_type') == 3){
+				$this->ExchangeChatHistory->delete_by(array('chat_id' => $obj->id));
+
+				foreach($this->post('offered_item_id') as $offerId){
+					$exchange_store_data = array(
+						'chat_id' => $obj->id,
+						'operation_type' => $this->post('operation_type'),
+						'offered_item_id' => $offerId,
+						"date_added" => date("Y-m-d H:i:s"),
+					);
+					$this->ExchangeChatHistory->Save($exchange_store_data);
+				}
+			}
 			return $obj;
 		} else {
 			if ( $type == "to_buyer" ) {
-		    	//prepare data for noti
-		    	$user_ids[] = $this->post('buyer_user_id');
-	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        	//print_r($devices);die;	
+				//prepare data for noti
+				$user_ids[] = $buyerUserId;
+				$devices = $this->Noti->get_all_device_in($user_ids)->result();
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
 					foreach ( $devices as $device ) {
@@ -621,6 +422,9 @@ class Chats extends API_Controller
 				$user_name = $this->User->get_one($user_id)->user_name;
 
 				$price = $this->post('nego_price');
+				/*
+				NOTIFICATION SENDS FROM SEPRATE FUNCTIONS
+				
 				if ( $price == 0) {
 					$data['message'] = "Offer Rejected!";
 				} else {
@@ -630,32 +434,33 @@ class Chats extends API_Controller
 				$data['seller_user_id'] = $sellerUserId;
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
-				// $data['offered_item_id'] = $offeredItemId;
-				if($this->post('operation_type') == 3){
-					$data['offered_item_id'] = explode(",",$offeredItemId);
-				}else{
-					$data['offered_item_id'] = $offeredItemId;
-				}
-				$data['type'] = $type;
 
+				$data['offered_item_id'] = $offeredItemId;
 
-		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
-		    	$chat_data = array(
-		        	"requested_item_id" => $this->post('requested_item_id'),
-					"offered_item_id" => $this->post('offered_item_id'), 
-		        	"buyer_user_id" => $this->post('buyer_user_id'), 
-		        	"seller_user_id" => $this->post('seller_user_id'),
-		        	"buyer_unread_count" => $buyer_unread_count + 1,
-		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price'),
-                    "size_id" => $this->post('size_id'),
-                    "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity'),
-					"type" => $type
-		        );
+				$data['type'] = $type; */
+
+				$buyer_unread_count = $chat_history_data->buyer_unread_count;
+				$chat_data = array(
+					"requested_item_id" => $requestedItemId,
+					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"buyer_user_id" => $buyerUserId, 
+					"seller_user_id" => $sellerUserId,
+					"buyer_unread_count" => $buyer_unread_count + 1,
+					"added_date" => date("Y-m-d H:i:s"),
+					"nego_price" => $this->post('nego_price'),
+					"size_id" => $this->post('size_id'),
+					"color_id" => $this->post('color_id'),
+					"quantity" => $this->post('quantity'),
+					"type" => $type,
+					"operation_type" => $this->post('operation_type'),
+					"is_cancel" => $this->post('is_cancel'),
+					"cancel_reason" => $this->post('cancel_reason'),
+					"delivery_to" => $this->post('delivery_to'),
+					"payment_method_id" => $this->post('payment_method_id'),
+				);
 			} elseif ( $type == "to_seller" ) {
-		    	$user_ids[] = $this->post('seller_user_id');
-	        	$devices = $this->Noti->get_all_device_in($user_ids)->result();
+				$user_ids[] = $sellerUserId;
+				$devices = $this->Noti->get_all_device_in($user_ids)->result();
 				$device_ids = array();
 				if ( count( $devices ) > 0 ) {
 					foreach ( $devices as $device ) {
@@ -666,6 +471,9 @@ class Chats extends API_Controller
 				$user_name = $this->User->get_one($user_id)->user_name;
 
 				$price = $this->post('nego_price');
+				/*
+				NOTIFICATION SENDS FROM SEPRATE FUNCTIONS
+				
 				if ( $price == 0) {
 					$data['message'] = "Offer Rejected!";
 				} else {
@@ -675,41 +483,69 @@ class Chats extends API_Controller
 				$data['seller_user_id'] = $sellerUserId;
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
-				// $data['offered_item_id'] = $offeredItemId;
-				if($this->post('operation_type') == 3){
-					$data['offered_item_id'] = explode(",",$offeredItemId);
-				}else{
-					$data['offered_item_id'] = $offeredItemId;
-				}
-				$data['type'] = $type;
 
-		    	$seller_unread_count = $chat_history_data->seller_unread_count;
-		    	
-		    	$chat_data = array(
-		        	"requested_item_id" => $this->post('requested_item_id'),
-					"offered_item_id" => $this->post('offered_item_id'),
-		        	"buyer_user_id" => $this->post('buyer_user_id'), 
-		        	"seller_user_id" => $this->post('seller_user_id'),
-		        	"seller_unread_count" => $seller_unread_count + 1,
-		        	"added_date" => date("Y-m-d H:i:s"),
-		        	"nego_price" => $this->post('nego_price'),
-                    "size_id" => $this->post('size_id'),
-                    "color_id" => $this->post('color_id'),
-                    "quantity" => $this->post('quantity'),
-					"type" => $type
-		        );
+				$data['offered_item_id'] = $offeredItemId;
+				$data['type'] = $type; */
+
+				$seller_unread_count = $chat_history_data->seller_unread_count;
+				
+				$chat_data = array(
+					"requested_item_id" => $requestedItemId,
+					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"buyer_user_id" => $buyerUserId, 
+					"seller_user_id" => $sellerUserId,
+					"seller_unread_count" => $seller_unread_count + 1,
+					"added_date" => date("Y-m-d H:i:s"),
+					"nego_price" => $this->post('nego_price'),
+					"size_id" => $this->post('size_id'),
+					"color_id" => $this->post('color_id'),
+					"quantity" => $this->post('quantity'),
+					"type" => $type,
+					"operation_type" => $this->post('operation_type'),
+					"is_cancel" => $this->post('is_cancel'),
+					"cancel_reason" => $this->post('cancel_reason'),
+					"delivery_to" => $this->post('delivery_to'),
+					"payment_method_id" => $this->post('payment_method_id'),
+				);
 			}
-			if( !$this->Chat->Save( $chat_data,$chat_history_data->id )) {
+			
+			if(!$this->Chat->Save( $chat_data, $chat_history_data->id )) {
 				$this->error_response( get_msg( 'err_price_update' ));
 			} else {
 				//sending noti
-				$status = send_android_fcm_chat( $device_ids, $data );
+				// $status = send_android_fcm_chat( $device_ids, $data );
 				$obj = $this->Chat->get_one_by($chat_data);
-				$obj->offered_item_id = explode(",",$obj->offered_item_id);
+				if($this->post('operation_type') == 3){
+
+					$this->ExchangeChatHistory->delete_by(array('chat_id' => $obj->id));
+
+					foreach($this->post('offered_item_id') as $offerId){
+
+						$exchange_store_data = array(
+							'chat_id' => $obj->id,
+							'operation_type' => $this->post('operation_type'),
+							'offered_item_id' => $offerId,
+							"date_added" => date("Y-m-d H:i:s"),
+						);
+						$this->ExchangeChatHistory->Save($exchange_store_data);
+					}
+				}
 				return $obj;
 			}
-	    }
+		}
 	}
+
+	// GET NEXT EXCHANGE ID 
+	function get_next_exchange_id(){
+		$this->db->select_max('exchange_id');
+		$result = $this->db->get('bs_chat_history')->row(); 
+		if(isset($result)){
+			return $result->exchange_id + 1;
+		}else{
+			return 1;
+		}
+	}
+
 
 	/**
 	 * Update count
@@ -955,7 +791,7 @@ class Chats extends API_Controller
 
 			        );
 
-			    	}
+				}
 
 			    //sending noti
 		    	$status = send_android_fcm_chat( $device_ids, $data );	

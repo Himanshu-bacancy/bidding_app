@@ -716,7 +716,7 @@ class PS_Model extends CI_Model {
 		$this->custom_conds( $conds );
 		// query the record
 		$query = $this->db->get( $this->table_name );
-
+		
 		if ( $query->num_rows() == 1 ) {
 		// if there is one row, return the record
 			return $query->row();
@@ -2483,6 +2483,70 @@ class PS_Model extends CI_Model {
 
 
 
+	}
+
+	//get where in item id at chat history
+
+	function get_all_in_exchange_chat_item( $conds = array() ) {
+
+		// $sql = "SELECT * FROM `bs_chat_history` WHERE 1=1 ";
+
+		// // item id (id) check for item reported condition
+		// if ( isset( $conds['chat_id'] )) {
+					
+		// 	if ($conds['chat_id'] != "") {
+		// 		if($conds['chat_id'] != '0'){
+		// 			$sql .= " AND 'chat_id' INf" 
+		// 			$this->db->where_in( 'chat_id', $conds['chat_id'] );	
+		// 		}
+
+		// 	}			
+		// }
+
+		// if ( isset( $conds['offered_item_id'] )) {
+			
+		// 	if ($conds['offered_item_id'] != "") {
+		// 		if($conds['offered_item_id'] != '0'){
+				
+		// 			$this->db->where_in( 'offered_item_id', $conds['offered_item_id'] );	
+		// 		}
+
+		// 	}			
+		// }
+
+		// $query = $this->db->query($sql);
+		// //print_r($this->db->last_query());die;
+		// return $query;
+
+
+		$this->db->select('bs_exchange_chat_history.*');    
+  		$this->db->from('bs_exchange_chat_history');
+
+		// item id (id) check for item reported condition
+		if ( isset( $conds['chat_id'] )) {
+			
+			if ($conds['chat_id'] != "") {
+				if($conds['chat_id'] != '0'){
+				
+					$this->db->where_in( 'chat_id', $conds['chat_id'] );	
+				}
+
+			}			
+		}
+
+		if ( isset( $conds['offered_item_id'] )) {
+			
+			if ($conds['offered_item_id'] != "") {
+				if($conds['offered_item_id'] != '0'){
+				
+					$this->db->where_in( 'offered_item_id', $conds['offered_item_id'] );	
+				}
+
+			}			
+		}
+
+		return $this->db->get()->result();
+	
 	}
 
 	//get all chat when there is user blocked
