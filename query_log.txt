@@ -172,20 +172,33 @@ CREATE TABLE `bs_cart` (
 // ADDED ON 20/07/2021
 ALTER TABLE `core_backend_config` ADD `processing_fees` DOUBLE NULL AFTER `selling_fees`;
 
-// ADDED ON 21/07/2021
-ALTER TABLE `bs_chat_history` ADD `is_cancel` TINYINT(1) NULL DEFAULT '0' AFTER `is_accept`, 
-ADD `cancel_reason` VARCHAR(255) NULL AFTER `is_cancel`, 
-ADD `delivery_to` VARCHAR(255) NULL AFTER `cancel_reason`,  
+// Added on 21-07-2021
+CREATE TABLE `bs_card` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `card_holder_name` varchar(255) NOT NULL,
+  `card_number` varchar(255) NOT NULL,
+  `expiry_date` varchar(255) NOT NULL,
+  `address_id` varchar(255) NOT NULL,
+  `created_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+
+// SKV: ADDED ON 21/07/2021
+ALTER TABLE `bs_chat_history` ADD `is_cancel` TINYINT(1) NULL DEFAULT '0' AFTER `is_accept`,
+ADD `cancel_reason` VARCHAR(255) NULL AFTER `is_cancel`,
+ADD `delivery_to` VARCHAR(255) NULL AFTER `cancel_reason`,
 ADD `payment_method_id` VARCHAR(255) NULL AFTER `delivery_to`;
 
 
-CREATE TABLE `bidding_app`.`bs_exchange_chat_history` ( 
-  `id` VARCHAR(255) NOT NULL , 
-  `chat_id` VARCHAR(255) NOT NULL , 
-  `operation_type` VARCHAR(255) NOT NULL , 
-  `offered_item_id` VARCHAR(255) NOT NULL , 
-  `is_featured` TINYINT(1) NULL DEFAULT '0' , 
-  `date_added` DATETIME NOT NULL 
+CREATE TABLE `bidding_app`.`bs_exchange_chat_history` (
+  `id` VARCHAR(255) NOT NULL ,
+  `chat_id` VARCHAR(255) NOT NULL ,
+  `operation_type` VARCHAR(255) NOT NULL ,
+  `offered_item_id` VARCHAR(255) NOT NULL ,
+  `is_featured` TINYINT(1) NULL DEFAULT '0' ,
+  `date_added` DATETIME NOT NULL
 ) ENGINE = InnoDB;
 
 
