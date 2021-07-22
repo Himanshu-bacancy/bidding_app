@@ -204,3 +204,6 @@ CREATE TABLE `bidding_app`.`bs_exchange_chat_history` (
 
 // SKV: ADDED ON 22/07/2021
 ALTER TABLE `bs_chat_history` DROP `exchange_id`;
+
+// RB: ADDED ON 22/07/2021
+ALTER TABLE `bs_card` ADD `card_type` VARCHAR(255) NOT NULL AFTER `expiry_date`;
