@@ -403,7 +403,7 @@ class PS_Adapter {
 				}
 			}
 			//echo $lowestBid; die(' hello testing');
-			$obj->big_count = count($chatHistory);
+			$obj->bid_count = count($chatHistory);
 			$obj->lowest_bid_amount = $lowestBid;
 		}
 		//print_r($obj->added_user_id);die;
