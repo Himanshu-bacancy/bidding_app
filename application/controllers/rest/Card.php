@@ -59,7 +59,7 @@ class Card extends API_Controller {
                 $is_record_already_exists = $this->db->select('id')->from('bs_card')->where('user_id', $user_id)->where('card_number', $card_number)->get()->num_rows();
                 $success_message = "Card already added";
                 if(!$is_record_already_exists) {
-                    $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'address_id' => $address_id, 'created_date' => date('Y-m-d H:i:s')]);
+                    $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'card_type' => $card_type, 'address_id' => $address_id, 'created_date' => date('Y-m-d H:i:s')]);
                     $success_message = "Card added successfully";
                 }
                 $this->success_response( $success_message);
@@ -110,9 +110,9 @@ class Card extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->from('bs_card')->where('user_id', $user_id)->get()->result();
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, CONCAT(bs_addresses.address1,", ",bs_addresses.address2,", ",bs_addresses.zipcode,", ",bs_addresses.state,", ",bs_addresses.city,", ",bs_addresses.country) as address')->from('bs_card')->join('bs_addresses', 'bs_card.address_id = bs_addresses.id')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result();
         
-        $this->response( ['status' => "success", 'cards' => $obj]);
+        $this->response($obj);
     }
     
     
@@ -153,8 +153,6 @@ class Card extends API_Controller {
     function validate_customer_card($card_number = NULL){
 
         if (isset($card_number) && $card_number != ''){
-
-            global $type;
 
             $cardtype = array(
 
