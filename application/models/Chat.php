@@ -75,6 +75,11 @@ class Chat extends PS_Model {
 		if ( isset( $conds['quantity'] )) {
 			$this->db->where( 'quantity', $conds['quantity'] );
 		}
+
+		// operation type condition
+		if ( isset( $conds['operation_type'] )) {
+			$this->db->where( 'operation_type', $conds['operation_type'] );
+		}
 		
 	}
 }

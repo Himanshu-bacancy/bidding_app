@@ -1011,7 +1011,7 @@ class PS_Adapter {
 	 *
 	 * @param      <type>  $obj    The object
 	 */
-	function convert_chathistory( &$obj )
+	function convert_chathistory( &$obj , $is_exchange_detail_req = true )
 	{
 		if ( is_array( $obj )) {
 			for ($i=0; $i < count($obj) ; $i++) { 
@@ -1048,6 +1048,38 @@ class PS_Adapter {
 					$this->convert_user( $tmp_seller_user_id );
 
 					$obj[$i]->seller = $tmp_seller_user_id;
+				}
+
+				if ( isset( $obj[$i]->operation_type ) && $obj[$i]->operation_type == 3 && isset($obj[$i]->id) ) {
+					$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj[$i]->id) );
+
+					foreach($tmp_exchange_ids as $offered){
+						$obj[$i]->offered_item_id[] = $offered->offered_item_id;
+					}
+					$this->convert_exchange_chat_history( $tmp_exchange_ids );
+					$obj[$i]->exchange_chat_detail = $tmp_exchange_ids;
+					
+					foreach($obj[$i]->exchange_chat_detail as $exchange_data){
+						$obj[$i]->offered_item_detail[] = $exchange_data->offered_item_detail;
+					}
+				} else{
+					// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
+					if ( isset( $obj[$i]->offered_item_id )) {
+						$tmp_offered_item = $this->CI->Item->get_one( $obj[$i]->offered_item_id );
+	
+						$this->convert_item( $tmp_offered_item );
+	
+						$obj[$i]->offered_item_detail = $tmp_offered_item;
+					}
+				}
+	
+				// IF REQUESTED ITEM ID EXIST THEN GET DETAILS OF ITEM
+				if ( isset( $obj[$i]->requested_item_id )) {
+					$tmp_req_item = $this->CI->Item->get_one( $obj[$i]->requested_item_id );
+	
+					$this->convert_item( $tmp_req_item );
+	
+					$obj[$i]->requested_item_detail = $tmp_req_item;
 				}
 			}
 		} else {
@@ -1087,6 +1119,43 @@ class PS_Adapter {
 				$this->convert_user( $tmp_seller_user_id );
 
 				$obj->seller = $tmp_seller_user_id;
+			}
+
+			// IF OPERATION TYPE EXCHANGE THEN GET EXCHANGE DATA AND OFFER DETAIL ITEM DATA
+			if ( isset( $obj->operation_type ) && $obj->operation_type == 3 && isset($obj->id) ) {
+				
+				$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj->id) );
+
+				foreach($tmp_exchange_ids as $offered){
+					$obj->offered_item_id[] = $offered->offered_item_id;
+				}
+
+				if($is_exchange_detail_req == true){
+					$this->convert_exchange_chat_history( $tmp_exchange_ids );
+				}
+				$obj->exchange_chat_detail = $tmp_exchange_ids;
+				
+				foreach($obj->exchange_chat_detail as $exchange_data){
+					$obj->offered_item_detail[] = $exchange_data->offered_item_detail;
+				}
+			} else{
+				// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
+				if ( isset( $obj->offered_item_id )) {
+					$tmp_offered_item = $this->CI->Item->get_one( $obj->offered_item_id );
+
+					$this->convert_item( $tmp_offered_item );
+
+					$obj->offered_item_detail = $tmp_offered_item;
+				}
+			}
+
+			// IF REQUESTED ITEM ID EXIST THEN GET DETAILS OF ITEM
+			if ( isset( $obj->requested_item_id )) {
+				$tmp_req_item = $this->CI->Item->get_one( $obj->requested_item_id );
+
+				$this->convert_item( $tmp_req_item );
+
+				$obj->requested_item_detail = $tmp_req_item;
 			}
 
 		}	
@@ -1401,5 +1470,31 @@ class PS_Adapter {
 
 	}
 			
+	function convert_exchange_chat_history( &$obj, $item_detail_req = true )
+	{
+		// set user object
+		if ( is_array( $obj )) {
+			
+			for ($i=0; $i < count($obj) ; $i++) { 
+				if ( isset( $obj[$i]->offered_item_id )) {
+					
+					$tmp_item = $this->CI->Item->get_one( $obj[$i]->offered_item_id );
+					// $this->convert_item( $tmp_item );
+					$obj[$i]->offered_item_detail = $tmp_item;
+				}
+			}
+			
+
+		}else {
+
+			if ( isset( $obj->offered_item_id )) {
+					
+				$tmp_item = $this->CI->Item->get_one( $obj->offered_item_id );
+				// $this->convert_item( $tmp_item );
+				$obj->offered_item_detail = $tmp_item;
+			}
+
+		}
+	}
 
 }
