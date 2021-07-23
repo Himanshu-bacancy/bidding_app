@@ -57,12 +57,12 @@ class Card extends API_Controller {
             $card_type = $this->validate_customer_card($card_number);
             if($card_type != '') {
                 $is_record_already_exists = $this->db->select('id')->from('bs_card')->where('user_id', $user_id)->where('card_number', $card_number)->get()->num_rows();
-                $success_message = "Card already added";
                 if(!$is_record_already_exists) {
                     $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'card_type' => $card_type, 'address_id' => $address_id, 'created_date' => date('Y-m-d H:i:s')]);
-                    $success_message = "Card added successfully";
+                    $this->success_response("Card added successfully");
+                } else {
+                    $this->error_response("Card already added");
                 }
-                $this->success_response( $success_message);
             } else {
                 $this->error_response("Invalid card number");
             }
@@ -110,10 +110,13 @@ class Card extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result_array();
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result_array();
         
         foreach ($obj as $key => $value) {
             $row[$key] = $value;
+            $expiry_date = explode('/',$value['expiry_date']);
+            $expiry_date[1] = substr($expiry_date[1], 2);
+            $row[$key]['expiry_date'] = implode('/',$expiry_date);
             $row[$key]['address'] = $this->db->select('*')->from('bs_addresses')->where('id', $value['address_id'])->get()->row();
         }
         
