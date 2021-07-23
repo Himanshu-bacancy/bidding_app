@@ -110,9 +110,14 @@ class Card extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, CONCAT(bs_addresses.address1,", ",bs_addresses.address2,", ",bs_addresses.zipcode,", ",bs_addresses.state,", ",bs_addresses.city,", ",bs_addresses.country) as address')->from('bs_card')->join('bs_addresses', 'bs_card.address_id = bs_addresses.id')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result();
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result_array();
         
-        $this->response($obj);
+        foreach ($obj as $key => $value) {
+            $row[$key] = $value;
+            $row[$key]['address'] = $this->db->select('*')->from('bs_addresses')->where('id', $value['address_id'])->get()->row();
+        }
+        
+        $this->response($row);
     }
     
     
