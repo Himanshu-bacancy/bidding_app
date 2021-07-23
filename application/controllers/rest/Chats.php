@@ -196,12 +196,12 @@ class Chats extends API_Controller
 	        )
         );
 
-		if($this->post('operation_type') == 1){
+		if($this->post('operation_type') == REQUEST_ITEM){
 			array_push($rules, array(
 	        	'field' => 'offered_item_id',
 	        	'rules' => 'required'
 	        ));
-		}elseif($this->post('operation_type') == 3){
+		}elseif($this->post('operation_type') == EXCHANGE){
 			array_push($rules, array(
 	        	'field' => 'offered_item_id[]',
 	        	'rules' => 'required'
@@ -217,7 +217,7 @@ class Chats extends API_Controller
 				$this->validation_chat_item_categories($requestedItemId, $offeredItemId);
 			}	
 		}else{
-			if($this->post('operation_type') == 1){
+			if($this->post('operation_type') == REQUEST_ITEM){
 				$this->validation_chat_item_categories($requestedItemId, $this->post('offered_item_id'));
 			}
 		}
@@ -250,12 +250,12 @@ class Chats extends API_Controller
 		$buyerUserId = $this->post('buyer_user_id');
 		$sellerUserId = $this->post('seller_user_id');
 		
-		if($this->post('operation_type') == 3){
+		if($this->post('operation_type') == EXCHANGE){
 			$chat_data = array(
 				"requested_item_id" => $requestedItemId,
 				"buyer_user_id" => $buyerUserId, 
 				"seller_user_id" => $sellerUserId,
-				"operation_type" => 3
+				"operation_type" => EXCHANGE
 			);
 
 			// GET ALL DATA 
@@ -312,7 +312,7 @@ class Chats extends API_Controller
 				$data['sender_name'] = $user_name;
 				$data['requested_item_id'] = $requestedItemId;
 				
-				if($this->post('operation_type') != 3){
+				if($this->post('operation_type') != EXCHANGE){
 					$data['offered_item_id'] = $offeredItemId;
 				}
 				$data["type"] = $type;*/
@@ -320,7 +320,7 @@ class Chats extends API_Controller
 				
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
-					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
 					"buyer_unread_count" => $buyer_unread_count + 1,
@@ -372,7 +372,7 @@ class Chats extends API_Controller
 				$seller_unread_count = $chat_history_data->seller_unread_count;
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
-					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
 					"seller_unread_count" => $seller_unread_count + 1,
@@ -393,7 +393,7 @@ class Chats extends API_Controller
 			// $status = send_android_fcm_chat( $device_ids, $data );
 			$this->Chat->save($chat_data);	
 			$obj = $this->Chat->get_one_by($chat_data);
-			if($this->post('operation_type') == 3){
+			if($this->post('operation_type') == EXCHANGE){
 				$this->ExchangeChatHistory->delete_by(array('chat_id' => $obj->id));
 
 				foreach($this->post('offered_item_id') as $offerId){
@@ -442,7 +442,7 @@ class Chats extends API_Controller
 				$buyer_unread_count = $chat_history_data->buyer_unread_count;
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
-					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
 					"buyer_unread_count" => $buyer_unread_count + 1,
@@ -491,7 +491,7 @@ class Chats extends API_Controller
 				
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
-					"offered_item_id" => ($this->post('operation_type') != 3) ? $offeredItemId : NULL,
+					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
 					"seller_unread_count" => $seller_unread_count + 1,
@@ -515,7 +515,7 @@ class Chats extends API_Controller
 				//sending noti
 				// $status = send_android_fcm_chat( $device_ids, $data );
 				$obj = $this->Chat->get_one_by($chat_data);
-				if($this->post('operation_type') == 3){
+				if($this->post('operation_type') == EXCHANGE){
 
 					$this->ExchangeChatHistory->delete_by(array('chat_id' => $obj->id));
 
@@ -534,18 +534,6 @@ class Chats extends API_Controller
 			}
 		}
 	}
-
-	// GET NEXT EXCHANGE ID 
-	function get_next_exchange_id(){
-		$this->db->select_max('exchange_id');
-		$result = $this->db->get('bs_chat_history')->row(); 
-		if(isset($result)){
-			return $result->exchange_id + 1;
-		}else{
-			return 1;
-		}
-	}
-
 
 	/**
 	 * Update count
@@ -1252,27 +1240,30 @@ class Chats extends API_Controller
 
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
-                //start new code
+		
+		//start new code
 		$type 	 = $this->post('type');
-                $condition = "type = '".$type."'";
-                if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-                    if($return_type == "seller") {
-                        $condition .= " AND buyer_user_id = '".$user_id."'";
-                    } else {
-                        $condition .= " AND seller_user_id = '".$user_id."'";
-                    }
-                } else if($type == SELLING) {
-                    $condition .= " AND seller_user_id = '".$user_id."'";
-                } else if($type == EXCHANGE) {
-                    $condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
-                }
-                $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
-		$this->ps_adapter->convert_chathistory( $obj );
-                $this->custom_response( $obj );
-                // end of code
-			// get limit & offset
+		$condition = "operation_type = '".$type."'";
+		// $condition = "type = '".$type."'";
 
-			if ( $return_type == "buyer") {
+		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
+			if($return_type == "seller") {
+				$condition .= " AND buyer_user_id = '".$user_id."'";
+			} else {
+				$condition .= " AND seller_user_id = '".$user_id."'";
+			}
+		} else if($type == SELLING) {
+			$condition .= " AND seller_user_id = '".$user_id."'";
+		} else if($type == EXCHANGE) {
+			$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
+		}
+		$obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
+		$this->ps_adapter->convert_chathistory( $obj );
+		$this->custom_response( $obj );
+		// end of code
+		// get limit & offset
+
+		if ( $return_type == "buyer") {
 				
 			//pph modified @ 22 June 2019
 
@@ -1355,9 +1346,7 @@ class Chats extends API_Controller
 				$this->ps_adapter->convert_chathistory( $obj );
 				$this->custom_response( $obj );
 
-			}
-
-			
+			}		
 
 		} else if ( $return_type == "seller") {
 
@@ -1369,7 +1358,6 @@ class Chats extends API_Controller
 			//user block check with user_id
 			$conds_login_block['from_block_user_id'] = $user_id;
 			$login_block_count = $this->Block->count_all_by($conds_login_block);
-
 			// user blocked existed by user id
 			if ($login_block_count > 0) {
 				// get the blocked user by user id
@@ -1446,20 +1434,16 @@ class Chats extends API_Controller
 			//print_r($conds);die;
 				
 			if ( !empty( $limit ) && !empty( $offset )) {
-			// if limit & offset is not empty
-				
+			// if limit & offset is not empty			
 				$chats = $this->Chat->get_all_chat($conds,$limit, $offset)->result();
 			} else if ( !empty( $limit )) {
-			// if limit is not empty
-
-				
+			// if limit is not empty				
 				$chats = $this->Chat->get_all_chat($conds, $limit )->result();
 			} else {
-			// if both are empty
-				
+			// if both are empty				
 				$chats = $this->Chat->get_all_chat($conds)->result();
 			}
-			
+
 			if (!empty($chats)) {
 				foreach ( $chats as $chat ) {
 

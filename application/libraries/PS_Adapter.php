@@ -1068,7 +1068,7 @@ class PS_Adapter {
 					$obj[$i]->seller = $tmp_seller_user_id;
 				}
 
-				if ( isset( $obj[$i]->operation_type ) && $obj[$i]->operation_type == 3 && isset($obj[$i]->id) ) {
+				if ( isset( $obj[$i]->operation_type ) && $obj[$i]->operation_type == EXCHANGE && isset($obj[$i]->id) ) {
 					$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj[$i]->id) );
 
 					foreach($tmp_exchange_ids as $offered){
@@ -1140,7 +1140,7 @@ class PS_Adapter {
 			}
 
 			// IF OPERATION TYPE EXCHANGE THEN GET EXCHANGE DATA AND OFFER DETAIL ITEM DATA
-			if ( isset( $obj->operation_type ) && $obj->operation_type == 3 && isset($obj->id) ) {
+			if ( isset( $obj->operation_type ) && $obj->operation_type == EXCHANGE && isset($obj->id) ) {
 				
 				$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj->id) );
 
