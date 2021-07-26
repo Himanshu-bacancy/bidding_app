@@ -1072,13 +1072,13 @@ class PS_Adapter {
 					$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj[$i]->id) );
 
 					foreach($tmp_exchange_ids as $offered){
-						$obj[$i]->exchange_item_id[] = $offered->offered_item_id;
+						$obj[$i]->offered_item_id[] = $offered->offered_item_id;
 					}
 					$this->convert_exchange_chat_history( $tmp_exchange_ids );
 					$obj[$i]->exchange_chat_detail = $tmp_exchange_ids;
 					
 					foreach($obj[$i]->exchange_chat_detail as $exchange_data){
-						$obj[$i]->exchange_items[] = $exchange_data->offered_item_detail;
+						$obj[$i]->offered_item_detail[] = $exchange_data->offered_item_detail;
 					}
 				} else{
 					// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
@@ -1087,7 +1087,7 @@ class PS_Adapter {
 	
 						$this->convert_item( $tmp_offered_item );
 	
-						$obj[$i]->exchange_items = $tmp_offered_item;
+						$obj[$i]->offered_item_detail = $tmp_offered_item;
 					}
 				}
 	
@@ -1154,7 +1154,7 @@ class PS_Adapter {
 				$obj->exchange_chat_detail = $tmp_exchange_ids;
 				
 				foreach($obj->exchange_chat_detail as $exchange_data){
-					$obj->exchange_items[] = $exchange_data->offered_item_detail;
+					$obj->offered_item_detail[] = $exchange_data->offered_item_detail;
 				}
 			} else{
 				// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
@@ -1163,7 +1163,7 @@ class PS_Adapter {
 
 					$this->convert_item( $tmp_offered_item );
 
-					$obj->exchange_items = $tmp_offered_item;
+					$obj->offered_item_detail = $tmp_offered_item;
 				}
 			}
 
@@ -1498,7 +1498,7 @@ class PS_Adapter {
 					
 					$tmp_item = $this->CI->Item->get_one( $obj[$i]->offered_item_id );
 					// $this->convert_item( $tmp_item );
-					$obj[$i]->exchange_items = $tmp_item;
+					$obj[$i]->offered_item_detail = $tmp_item;
 				}
 			}
 			
@@ -1509,7 +1509,7 @@ class PS_Adapter {
 					
 				$tmp_item = $this->CI->Item->get_one( $obj->offered_item_id );
 				// $this->convert_item( $tmp_item );
-				$obj->exchange_items = $tmp_item;
+				$obj->offered_item_detail = $tmp_item;
 			}
 
 		}
