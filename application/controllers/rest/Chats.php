@@ -1247,12 +1247,8 @@ class Chats extends API_Controller
 		// $condition = "type = '".$type."'";
 
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-			if($return_type == "seller") {
-				$condition .= " AND buyer_user_id = '".$user_id."'";
-			} else {
-				$condition .= " AND seller_user_id = '".$user_id."'";
-			}
-		} else if($type == SELLING) {
+			$condition .= " AND buyer_user_id = '".$user_id."'";
+		}else if($type == SELLING) {
 			$condition .= " AND seller_user_id = '".$user_id."'";
 		} else if($type == EXCHANGE) {
 			$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";

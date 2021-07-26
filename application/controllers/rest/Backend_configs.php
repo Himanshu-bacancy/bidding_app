@@ -18,9 +18,10 @@ class Backend_configs extends API_Controller
 
 	// GET FEES API	
 	function get_fees_detail_get(){
+		
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
+            'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
 
