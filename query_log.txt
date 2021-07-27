@@ -207,3 +207,18 @@ ALTER TABLE `bs_chat_history` DROP `exchange_id`;
 
 // RB: ADDED ON 22/07/2021
 ALTER TABLE `bs_card` ADD `card_type` VARCHAR(255) NOT NULL AFTER `expiry_date`;
+
+// RB: ADDED ON 27/07/2021
+CREATE TABLE `bs_order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `items` text NOT NULL,
+  `delivery_method` varchar(255) NOT NULL,
+  `card_id` int(11) NOT NULL,
+  `address_id` varchar(255) NOT NULL,
+  `total_amount` varchar(255) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `transaction` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
