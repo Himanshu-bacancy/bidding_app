@@ -1246,14 +1246,38 @@ class Chats extends API_Controller
 		$condition = "operation_type = '".$type."'";
 		// $condition = "type = '".$type."'";
 
-		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-			$condition .= " AND buyer_user_id = '".$user_id."'";
-		}else if($type == SELLING) {
-			$condition .= " AND seller_user_id = '".$user_id."'";
+		// if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
+		// 	$condition .= " AND buyer_user_id = '".$user_id."'";
+		// }else if($type == SELLING) {
+		// 	$condition .= " AND seller_user_id = '".$user_id."'";
+		// } else if($type == EXCHANGE) {
+		// 	$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
+		// }
+
+
+		if($type == DIRECT_BUY || $type == REQUEST_ITEM || $type == SELLING) {
+			if($return_type == "seller") {
+				$condition .= " AND buyer_user_id = '".$user_id."'";
+			} else if($return_type == "buyer") {
+				$condition .= " AND seller_user_id = '".$user_id."'";
+			}
 		} else if($type == EXCHANGE) {
 			$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		}
 		$obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
+		
+		//  SEND USER COUNT AND Lowest Price
+		foreach($obj as $key => $data){
+			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
+				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE requested_item_id = "'.$obj[$key]->requested_item_id.'" and operation_type = "'.$obj[$key]->operation_type . '"')->row();
+				$obj[$key]->bid_count = $total->total_user;
+
+				$result_price = $this->db->query('SELECT MIN(nego_price) AS lowest_price FROM `bs_chat_history` WHERE requested_item_id = "'.$obj[$key]->requested_item_id.'" and operation_type = "'.$obj[$key]->operation_type . '"')->row();
+				$obj[$key]->lowest_price = $result_price->lowest_price;
+			}	
+		}
+
+		// print_r($obj);exit;
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
 		// end of code
@@ -1389,43 +1413,43 @@ class Chats extends API_Controller
 
 			/* For Item Report */
 
-				//item report check with login_user_id
-				$conds_report['reported_user_id'] = $user_id;
-				$reported_data_count = $this->Itemreport->count_all_by($conds_report);
+			//item report check with login_user_id
+			$conds_report['reported_user_id'] = $user_id;
+			$reported_data_count = $this->Itemreport->count_all_by($conds_report);
 
-				// item reported existed by login user
-				if ($reported_data_count > 0) {
-					// get the reported item data
-					$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
+			// item reported existed by login user
+			if ($reported_data_count > 0) {
+				// get the reported item data
+				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
 
-					foreach ( $item_reported_datas as $item_reported_data ) {
+				foreach ( $item_reported_datas as $item_reported_data ) {
 
-						$item_ids .= "'" .$item_reported_data->item_id . "',";
-				
-					}
-
-					// get block user's item
-
-					$result_reports = rtrim($item_ids,',');
-					$conds_item['item_id'] = $result_reports;
-
-					$item_reports = $this->Chat->get_all_in_chat_item( $conds_item )->result();
-
-					foreach ( $item_reports as $item_report ) {
-
-						$ids .= $item_report->id .",";
-					
-					}
-
-					// get all item without block user's item
-
-					$result_items = rtrim($ids,',');
-					$reported_item_id = explode(",", $result_items);
-					$conds['item_id'] = $reported_item_id;
+					$item_ids .= "'" .$item_reported_data->item_id . "',";
+			
 				}
 
-				$conds['buyer_user_id'] = $user_id;
-				$conds['nego_price'] = '0' ;
+				// get block user's item
+
+				$result_reports = rtrim($item_ids,',');
+				$conds_item['item_id'] = $result_reports;
+
+				$item_reports = $this->Chat->get_all_in_chat_item( $conds_item )->result();
+
+				foreach ( $item_reports as $item_report ) {
+
+					$ids .= $item_report->id .",";
+				
+				}
+
+				// get all item without block user's item
+
+				$result_items = rtrim($ids,',');
+				$reported_item_id = explode(",", $result_items);
+				$conds['item_id'] = $reported_item_id;
+			}
+
+			$conds['buyer_user_id'] = $user_id;
+			$conds['nego_price'] = '0' ;
 
 			//print_r($conds);die;
 				
@@ -1442,9 +1466,7 @@ class Chats extends API_Controller
 
 			if (!empty($chats)) {
 				foreach ( $chats as $chat ) {
-
-				$id .= "'" .$chat->id . "',";
-			
+					$id .= "'" .$chat->id . "',";
 				}
 			}
 
