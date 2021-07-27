@@ -1791,10 +1791,10 @@ class PS_Model extends CI_Model {
 				if($conds['added_user_id'] != '0'){
 				
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );
-					if(isset($conds['status']) && $conds['status'] == 0){
-						$this->db->where( 'bs_items.is_draft', 0);	
-					} else if(isset($conds['status']) && $conds['status'] == 1){
+					if(isset($conds['status']) && $conds['status'] == 1){
 						$this->db->where( 'bs_items.is_draft', 1);	
+					} else {
+						$this->db->where( 'bs_items.is_draft', 0);	
 					}
 				}
 
@@ -1984,7 +1984,7 @@ class PS_Model extends CI_Model {
 		}
 
 		// default where clause
-		if (isset( $conds['status'] )) {
+		if (isset( $conds['status'] ) && !isset( $conds['added_user_id'] )) {
 			$this->db->where( 'status', $conds['status'] );
 		}
 		
