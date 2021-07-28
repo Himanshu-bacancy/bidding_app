@@ -85,6 +85,27 @@ class Cart extends API_Controller {
         $this->success_response( "Item remove from cart successfully");
     }
     
+    public function clear_cart_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            )
+        );
+        if ( !$this->is_valid( $rules )) exit;
+        
+        $user_id = $this->post('user_id');
+        
+        $this->db->delete('bs_cart',['user_id' => $user_id]);
+        
+        $this->success_response("Cart clear successfully");
+    }
+    
     public function cart_detail_post() {
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
