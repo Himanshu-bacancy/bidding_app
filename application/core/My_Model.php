@@ -543,6 +543,21 @@ class PS_Model extends CI_Model {
 			}			
 		}
 		
+		// added_user_id
+		if ( isset( $conds['added_user_id'] )) {
+			
+			if ($conds['added_user_id'] != "") {
+				if($conds['added_user_id'] != '0'){
+				
+					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
+				}
+
+			}			
+		}
+
+		if ( isset( $conds['is_draft'] )) {
+			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );
+		}
 
 		// item check for brand condition
 		/*if ( isset( $conds['brand_items_id'] )) {
@@ -2018,9 +2033,9 @@ class PS_Model extends CI_Model {
 		}
 
 		// id condition
-		if ( isset( $conds['added_user_id'] )) {
-			$this->db->where( 'added_user_id', $conds['added_user_id'] );
-		}
+		// if ( isset( $conds['added_user_id'] )) {
+		// 	$this->db->where( 'added_user_id', $conds['added_user_id'] );
+		// }
 
 		// Type id
 		// if ( isset( $conds['item_type_id'] )) {
@@ -2121,6 +2136,13 @@ class PS_Model extends CI_Model {
 				}
 
 			}			
+		}
+		if ( isset( $conds['is_paid'] )) {
+			$this->db->where( 'bs_items.is_paid', (int)$conds['is_paid'] );	
+		}
+
+		if ( isset( $conds['is_draft'] )) {
+			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );	
 		}
 
 		// item id (id) check for item color condition
@@ -2261,7 +2283,8 @@ class PS_Model extends CI_Model {
 
 
 	  
-	  	
+	  	$this->db->get();
+		print_r($this->db->last_query());die;
 	  	// order by
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
@@ -2279,9 +2302,8 @@ class PS_Model extends CI_Model {
 
 	    $query = $this->db->query('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');
 	    //print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
-	   
 		return $query;
-	  	//print_r($this->db->last_query());die;
+	  	
 	}
 
 	// get name with status 0 or 1
