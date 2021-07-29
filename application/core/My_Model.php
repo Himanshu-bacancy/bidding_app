@@ -1725,50 +1725,39 @@ class PS_Model extends CI_Model {
 		    }
 		}
 		//End - Modify By PPH @ 12 May 2020
-
-
 		$this->db->from('bs_items');
-		$this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
-		$today_date = date('Y-m-d H:i:s');
-		$this->db->where( 'bs_items.status',$conds['status']);
-		$this->db->where( 'bs_items.is_paid',$conds['is_paid']);
-		$this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
-   		$this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
-		//$this->db->get();
-		//print_r($this->db->last_query());die;   		
-   		// location id
-		if ( isset( $conds['item_location_id'] )) {
-			
+		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
+		// $today_date = date('Y-m-d H:i:s');
+		$this->db->where( 'bs_items.status',(int)$conds['status']);
+		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
+		$this->db->where( 'bs_items.is_paid', (int)$conds['is_paid']);
+		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
+   		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
+		// location id
+		if ( isset( $conds['item_location_id'] )) {		
 			if ($conds['item_location_id'] != "") {
 				if($conds['item_location_id'] != '0'){
-				
 					$this->db->where( 'item_location_id', $conds['item_location_id'] );	
 				}
-
 			}			
 		}
 
+
 		//Start - Modify By PPH @ 12 May 2020
 		if ( isset( $conds['cat_id'] )) {
-			
 			if ($conds['cat_id'] != "") {
 				if($conds['cat_id'] != '0'){
-				
 					$this->db->where( 'cat_id', $conds['cat_id'] );	
 				}
-
 			}			
 		}
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
-			
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
 				}
-
 			}			
 		}
 
@@ -1790,17 +1779,12 @@ class PS_Model extends CI_Model {
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
 				
-					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );
-					if(isset($conds['status']) && $conds['status'] == 1){
-						$this->db->where( 'bs_items.is_draft', 1);	
-					} else {
-						$this->db->where( 'bs_items.is_draft', 0);	
-					}
+					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
 
 			}			
 		}
-
+		
 		// item id (id) check for item color condition
 		if ( isset( $conds['coloritem_id'] )) {
 			
@@ -1913,7 +1897,6 @@ class PS_Model extends CI_Model {
 			}			
 		}
 		
-		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
 			
@@ -1936,8 +1919,6 @@ class PS_Model extends CI_Model {
 			$this->db->group_end();
 		}
 
-		//$this->db->get();
-		//print_r($this->db->last_query());die;
 
 		//End - Modify By PPH @ 12 May 2020
 
@@ -1984,26 +1965,19 @@ class PS_Model extends CI_Model {
 		}
 
 		// default where clause
-		if (isset( $conds['status'] ) && !isset( $conds['added_user_id'] )) {
+		if (isset( $conds['status'] )) {
 			$this->db->where( 'status', $conds['status'] );
 		}
 		
 		if(isset($conds['min_price'])) {
-
-			if ($conds['min_price'] != "" || $conds['min_price'] != 0) {
-					
-					$this->db->where( 'price>=', $conds['min_price'] );	
-
+			if ($conds['min_price'] != "" || $conds['min_price'] != 0) {	
+				$this->db->where( 'price>=', $conds['min_price'] );	
 			}
-
 		}
 
 		if(isset($conds['max_price'])) {
-
-			if ($conds['max_price'] != "" || $conds['max_price'] != 0) {
-					
-					$this->db->where( 'price<=', $conds['max_price'] );	
-
+			if ($conds['max_price'] != "" || $conds['max_price'] != 0) {	
+				$this->db->where( 'price<=', $conds['max_price'] );
 			}
 
 		}
@@ -2304,10 +2278,9 @@ class PS_Model extends CI_Model {
 	    //print_r($query1);die;
 
 	    $query = $this->db->query('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');
-	    // print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
+	    //print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
 	   
-
-	  	return $query;
+		return $query;
 	  	//print_r($this->db->last_query());die;
 	}
 

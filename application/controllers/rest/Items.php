@@ -29,7 +29,7 @@ class Items extends API_Controller
 
 			// get default setting for GET_ALL_CATEGORIES
 			//$setting = $this->Api->get_one_by( array( 'api_constant' => GET_ALL_CATEGORIES ));
-
+			
 			$conds['order_by'] = 1;
 			$conds['order_by_field'] = $setting->order_by_field;
 			$conds['order_by_type'] = $setting->order_by_type;
@@ -118,6 +118,12 @@ class Items extends API_Controller
 				$conds['status']   = $this->post('status');
 			} else {
 				$conds['status']   = 1;
+			}
+
+			if($this->post('is_draft') != "") {
+				$conds['is_draft']   = $this->post('is_draft');
+			} else {
+				$conds['is_draft']   = 1;
 			}
 
 			$conds['item_search'] = 1;
@@ -625,7 +631,6 @@ class Items extends API_Controller
 		$conds = array_merge( $post_conds, $conds );
 
 		
-
 		// check empty condition
 		$final_conds = array();
 		foreach( $conds as $key => $value ) {
@@ -643,7 +648,6 @@ class Items extends API_Controller
 
 		}
 
-		
 		$conds = $final_conds;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
@@ -786,9 +790,18 @@ class Items extends API_Controller
 			
 			if ($conds['is_paid'] == "only_paid_item") {
 
-				$conds['item_id'] = $item_id;
-				$conds['reported_item_id'] = $reported_item_id;
+				//$conds['item_id'] = $item_id;
+				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
+
+				$conds['coloritem_id'] = $colored_item_id;
+				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
+				$conds['itemtype_item_id'] = $itemtype_item_id;
+				$conds['childsubcat_item_id'] = $childsubcat_item_id;
+				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+				$conds['itemcondition_item_id'] = $itemcondition_item_id;
+				$conds['brand_items_id'] = $brand_items_id;
 				
 				if ( !empty( $limit ) && !empty( $offset )) {
 				// if limit & offset is not empty
@@ -807,10 +820,18 @@ class Items extends API_Controller
 			} elseif ($conds['is_paid'] == "paid_item_first") {
 				$result = "";
 
-				$conds['item_id'] = $item_id;
-				$conds['reported_item_id'] = $reported_item_id;
+				//$conds['item_id'] = $item_id;
+				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1;
 				
+				$conds['coloritem_id'] = $colored_item_id;
+				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
+				$conds['itemtype_item_id'] = $itemtype_item_id;
+				$conds['childsubcat_item_id'] = $childsubcat_item_id;
+				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+				$conds['itemcondition_item_id'] = $itemcondition_item_id;
+				$conds['brand_items_id'] = $brand_items_id;
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_item_by_paid_date( $conds, $limit, $offset )->result();
@@ -829,9 +850,15 @@ class Items extends API_Controller
 
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
-
+				$conds['is_paid'] = 0;
 				$conds['coloritem_id'] = $colored_item_id;
 				$conds['sizeoption_item_id'] = $sizeoption_item_id;
+				$conds['address_item_id'] = $address_item_id;
+				$conds['itemtype_item_id'] = $itemtype_item_id;
+				$conds['childsubcat_item_id'] = $childsubcat_item_id;
+				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+				$conds['itemcondition_item_id'] = $itemcondition_item_id;
+				$conds['brand_items_id'] = $brand_items_id;
 				
 
 				if ( !empty( $limit ) && !empty( $offset )) {
