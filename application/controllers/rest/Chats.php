@@ -1188,6 +1188,30 @@ class Chats extends API_Controller
     /**
 	 * Offer list Api
 	 */
+    
+    public function offer_by_items_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+        array(
+	        	'field' => 'item_id',
+	        	'rules' => 'required'
+	        )
+        );
+
+
+		// exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        
+        $item_id = $this->post('item_id');
+        $condition = 'requested_item_id = "'.$item_id.'"';
+        $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
+        
+        $this->ps_adapter->convert_chathistory( $obj );
+		$this->custom_response( $obj );
+    }
 
 	function offer_list_post()
 	{
