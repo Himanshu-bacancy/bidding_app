@@ -141,12 +141,13 @@ if ( ! function_exists( 'smtp_config' ))
 
 		$config = Array(
 		    'protocol' => 'smtp',
-		    'smtp_host' => $smtp_host,
-		    'smtp_port' => $smtp_port,
-		    'smtp_user' => $smtp_user, //sender@blog.panacea-soft.com //azxcvbnm
-		    'smtp_pass' => $smtp_pass,
-		    'mailtype'  => 'text', 
-		    'charset'   => 'iso-8859-1'
+		    'smtp_host' => 'smtp.gmail.com',
+		    'smtp_port' => 465,
+		    'smtp_user' => 'himanshu.sharma@bacancy.com', //sender@blog.panacea-soft.com //azxcvbnm
+		    'smtp_pass' => 'lnkvpcsjefqgpszr',
+		    'mailtype'  => 'html', 
+		    'charset'   => 'iso-8859-1',
+			'smtp_crypto'=> 'ssl'
 		);
 		
 		return $config;

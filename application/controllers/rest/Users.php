@@ -393,8 +393,8 @@ class Users extends API_Controller
 					"<p>".get_msg( 'best_regards_label' ).",<br/>". $sender_name ."</p>";
 		// send email from admin
 		// Need to check this bunch of
+		
 		if ( ! $this->ps_mail->send_from_admin( $to, $subject, $msg ) ) {
-
 			$this->error_response( get_msg( 'err_email_not_send' ));
 		}
 		

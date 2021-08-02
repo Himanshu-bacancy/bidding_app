@@ -16,12 +16,9 @@ class PS_Mail {
 	{
 		// get CI instance
 		$this->CI =& get_instance();
-
+		$config = smtp_config();
 		// load mail library
-		$this->CI->load->library( 'email', array(
-       		'mailtype'  => 'html',
-        	'newline'   => '\r\n'
-		));
+		$this->CI->load->library( 'email', $config);
 	}
 
 	/**
@@ -37,12 +34,10 @@ class PS_Mail {
 	{
 		// // get system smtp enable
 		$smtp_enable = $this->CI->Backend_config->get_one('be1')->smtp_enable;
-
 		// // get system admin name
 		$from_name = $this->CI->Backend_config->get_one('be1')->sender_name;
 
 		if ( $smtp_enable == 0 ) {
-			
 			// get system admin email
 			$from = $this->CI->Backend_config->get_one('be1')->sender_email;
 			// send email
@@ -52,8 +47,7 @@ class PS_Mail {
 			$from = $this->CI->Backend_config->get_one('be1')->smtp_user;
 
 			$config = smtp_config();
-			
-			$this->CI->load->library('email', $config);
+			$this->CI->load->library('email');
 			$this->CI->email->set_newline("\r\n");
 
 			// Set to, from, message, etc.
@@ -61,10 +55,9 @@ class PS_Mail {
 	        $this->CI->email->to($to); 
 
 	        $this->CI->email->subject($subject);
-	        $this->CI->email->message($msg); 
-			return $this->CI->email->send();
+	        $this->CI->email->message($msg);
+			return $this->CI->email->send();	
 		}
-		
 	}
 
 	/**
