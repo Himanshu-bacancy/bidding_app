@@ -46,14 +46,14 @@ class Payments extends API_Controller {
                 'field' => 'total_amount',
                 'rules' => 'required'
             ),
-//            array(
-//                'field' => 'cvc',
-//                'rules' => 'required'
-//            ),
             array(
-                'field' => 'transaction_detail',
+                'field' => 'cvc',
                 'rules' => 'required'
-            )
+            ),
+//            array(
+//                'field' => 'transaction_detail',
+//                'rules' => 'required'
+//            )
         );
         if (!$this->is_valid($rules)) exit;
         
@@ -63,12 +63,52 @@ class Payments extends API_Controller {
         $address_id         = $this->post('address_id');
         $total_amount       = $this->post('total_amount');
         $card_id            = $this->post('card_id');
-//        $cvc                = $this->post('cvc');
-        $transaction_detail = $this->post('transaction_detail');
+        $cvc                = $this->post('cvc');
         
-        $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'success', 'transaction' => $transaction_detail,'created_at' => date('Y-m-d H:i:s')]);
+        if($delivery_method == 'card') {
+            $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+            $expiry_date = explode('/',$card_details->expiry_date);
+            $paid_config = $this->Paid_config->get_one('pconfig1');
+            # set stripe test key
+            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+            $record_id = 0;
+            try {
+                $response = \Stripe\PaymentMethod::create([
+                    'type' => 'card',
+                    'card' => [
+                        'number' => $card_details->card_number,
+                        'exp_month' => $expiry_date[0],
+                        'exp_year' => $expiry_date[1],
+                        'cvc' => $cvc
+                    ]
+                ]);
+                $response = \Stripe\PaymentIntent::create([
+                    'amount' => $this->post('total_amount') * 100,
+                    "currency" => trim($paid_config->currency_short_form),
+                    'payment_method' => $response->id,
+                    'payment_method_types' => ['card'],
+                    'capture_method' => 'manual'
+                ]);
+                
+                $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
+                $record_id = $this->db->insert_id();
+                if (isset($response->id)) {
+                    $this->db->where('id', $record_id)->update(['status' => 'initiate']);
+                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id]);
+                } else {
+                    $this->db->where('id', $record_id)->update(['status' => 'fail']);
+                    $this->error_response(get_msg('stripe_transaction_failed'));
+                }
+            } catch (exception $e) {
+                $this->db->where('id', $record_id)->update(['status' => 'fail']);
+                $this->error_response(get_msg('stripe_transaction_failed'));
+            }
+        }
+//        $transaction_detail = $this->post('transaction_detail');
         
-        $this->response(['status' => "success", 'order_status' => 'success']);
+//        $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'success', 'transaction' => $transaction_detail,'created_at' => date('Y-m-d H:i:s')]);
+//        
+//        $this->response(['status' => "success", 'order_status' => 'success']);
 //        if($delivery_method == 'card') {
 //            $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
 //            $expiry_date = explode('/',$card_details->expiry_date);

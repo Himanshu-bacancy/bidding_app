@@ -1201,7 +1201,6 @@ class Chats extends API_Controller
 	        )
         );
 
-
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
