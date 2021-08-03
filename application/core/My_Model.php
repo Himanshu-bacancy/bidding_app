@@ -2283,8 +2283,8 @@ class PS_Model extends CI_Model {
 
 
 	  
-	  	$this->db->get();
-		print_r($this->db->last_query());die;
+	  	// $this->db->get();
+		// print_r($this->db->last_query());die;
 	  	// order by
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
