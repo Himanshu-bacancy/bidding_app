@@ -119,9 +119,9 @@ class Items extends API_Controller
 			} else {
 				$conds['status']   = 1;
 			}
-
-			if($this->post('is_draft') != "") {
-				$conds['is_draft']   = $this->post('is_draft');
+			
+			if($this->post('is_draft') == "1") {
+				$conds['is_draft']   = 1;
 			} else {
 				$conds['is_draft']   = 0;
 			}
@@ -647,6 +647,7 @@ class Items extends API_Controller
 
 		}
 		$conds = $final_conds;
+		//echo '<pre>'; print_r($conds); die;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
 		
@@ -1174,6 +1175,37 @@ class Items extends API_Controller
 		$result['data'] = $items; 
         $result['item_count'] = count($items); 
         $this->custom_response($result);
+	}
+
+
+
+	/**
+	* Get drafted items from item database table
+	*/
+	function deactivate_item_get(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+		$userId = !empty($user_data['token_data']) && !empty($user_data['token_data']['user_id']) ? $user_data['token_data']['user_id'] : '';
+		$itemId = $this->get('id');
+
+		$this->db->where('added_user_id', $userId);
+		$this->db->where('id', $itemId);
+    	$itemData = $this->db->get('bs_items');
+        $items = $itemData->result_array();
+		if(!empty($items)){
+			$id = ($items && $items[0]['id']) ? $items[0]['id'] : 0;
+			$itm_data['status'] = 0 ;
+			if ( !$this->Item->save( $itm_data,$id )) {
+				return false;
+			}
+			$this->success_response( get_msg( 'success_deactivated' ));
+		} else {
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}
+		
 	}
 
 }

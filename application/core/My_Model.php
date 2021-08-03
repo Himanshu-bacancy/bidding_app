@@ -557,6 +557,8 @@ class PS_Model extends CI_Model {
 
 		if ( isset( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );
+		} else {
+			$this->db->where( 'bs_items.is_draft', 0 );
 		}
 
 		// item check for brand condition
@@ -2143,6 +2145,8 @@ class PS_Model extends CI_Model {
 
 		if ( isset( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );	
+		} else {
+			$this->db->where( 'bs_items.is_draft', 0 );
 		}
 
 		// item id (id) check for item color condition

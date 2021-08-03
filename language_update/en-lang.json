@@ -139,6 +139,7 @@
  "user_not_found" : "User not found",
  "accept_delivery_updated" : "User's delivery method updated successfully",
  "success_delete" : "Record deleted successfully",
+ "success_deactivated" : "Record deactivated successfully",
  "invalid_address_id" : "Invalid Address id",
  "invalid_user_id":"Invalid User id",
  "address_not_found" : "Address not found",
