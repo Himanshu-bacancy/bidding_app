@@ -123,7 +123,7 @@ class Items extends API_Controller
 			if($this->post('is_draft') != "") {
 				$conds['is_draft']   = $this->post('is_draft');
 			} else {
-				$conds['is_draft']   = 1;
+				$conds['is_draft']   = 0;
 			}
 
 			$conds['item_search'] = 1;
@@ -625,7 +625,6 @@ class Items extends API_Controller
 		$user_conds = $this->get();
 
 		$post_conds = $this->post();
-
 		$conds = array_merge( $default_conds, $user_conds );
 
 		$conds = array_merge( $post_conds, $conds );
@@ -647,7 +646,6 @@ class Items extends API_Controller
 
 
 		}
-
 		$conds = $final_conds;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
