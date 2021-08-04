@@ -35,6 +35,10 @@ class Payments extends API_Controller {
                 'rules' => 'required'
             ),
             array(
+                'field' => 'payment_method',
+                'rules' => 'required'
+            ),
+            array(
                 'field' => 'address_id',
                 'rules' => 'required'
             ),
@@ -58,14 +62,21 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $user_id            = $this->post('user_id');
-        $item_ids           = $this->post('item_ids');
+        $item_ids           = implode(',', $this->post('item_ids'));
         $delivery_method    = $this->post('delivery_method');
+        $payment_method     = $this->post('payment_method');
         $address_id         = $this->post('address_id');
         $total_amount       = $this->post('total_amount');
-        $card_id            = $this->post('card_id');
-        $cvc                = $this->post('cvc');
-        
-        if($delivery_method == 'card') {
+        $posts_var = $this->post();
+        if($payment_method == 'card') {
+            if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
+                $this->error_response("Please pass card id");
+            }
+            if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
+                $this->error_response("Please pass cvc");
+            }
+            $card_id = $this->post('card_id');
+            $cvc     = $this->post('cvc');
             $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
             $expiry_date = explode('/',$card_details->expiry_date);
             $paid_config = $this->Paid_config->get_one('pconfig1');
@@ -90,7 +101,7 @@ class Payments extends API_Controller {
                     'capture_method' => 'manual'
                 ]);
                 
-                $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) {
                     $this->db->where('id', $record_id)->update(['status' => 'initiate']);
@@ -103,6 +114,10 @@ class Payments extends API_Controller {
                 $this->db->where('id', $record_id)->update(['status' => 'fail']);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
+        } else if($payment_method == 'cash') {
+            $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'success', 'transaction' => '','created_at' => date('Y-m-d H:i:s')]);
+            
+            $this->response(['status' => "success", 'order_status' => 'success']);
         }
 //        $transaction_detail = $this->post('transaction_detail');
         
