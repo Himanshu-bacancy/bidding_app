@@ -1158,13 +1158,14 @@ class Items extends API_Controller
 	/**
 	* Get drafted items from item database table
 	*/
-	function get_drafted_item_get(){
+	function get_drafted_item_post(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
-		$userId = $this->get('user_id');
+		$userId = $this->post('user_id');
+		$itemId = $this->post('item_id');
 
 		$this->db->where('added_user_id', $userId);
 		$this->db->where('is_draft', 1);
@@ -1204,8 +1205,40 @@ class Items extends API_Controller
 			$this->success_response( get_msg( 'success_deactivated' ));
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
-		}
-		
+		}	
+	}
+
+	/**
+	* Get drafted items from item database table
+	*/
+	function get_exchange_item_post(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		$userId = $this->post('user_id');
+		$itemId = $this->post('item_id');
+
+		$itemData = $this->Item->get_one_by(array('id' => $itemId));
+		$itemTypeId = $itemData->item_type_id ? $itemData->item_type_id : 3;
+		$this->db->where('item_id', $itemId);
+    	$getExchangeData = $this->db->get('bs_item_exchange');
+		$itemsInExchange = $getExchangeData->result_array();
+		if(!empty($itemsInExchange)){
+			$catIds = [];
+			foreach($itemsInExchange as $categoryData){
+				$catIds[] = $categoryData['cat_id'];
+			}
+			$this->db->where('item_type_id', $itemTypeId);
+			$this->db->where('added_user_id', $userId);
+			$this->db->where_in('cat_id', $catIds);	
+			$exchangeItems = $this->db->get('bs_items');
+			$exchangeData = $exchangeItems->result_array();
+			$this->custom_response($exchangeData);
+		} else {
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}	
 	}
 
 }
