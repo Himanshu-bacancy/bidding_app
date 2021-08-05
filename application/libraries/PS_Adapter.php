@@ -1079,8 +1079,8 @@ class PS_Adapter {
 					
 					foreach($tmp_exchange_ids as $exchange_data){
 						$obj[$i]->exchange_item_id[] = $exchange_data->offered_item_id;
-//						$obj[$i]->exchange_item_detail[] = $exchange_data->offered_item_detail;
-						$obj[$i]->exchange_item_detail[] = $this->convert_item( $exchange_data->offered_item_detail );
+						$obj[$i]->exchange_item_detail[] = $exchange_data->offered_item_detail;
+						
 					}
 				} else{
 					// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
@@ -1157,8 +1157,7 @@ class PS_Adapter {
 				
 				foreach($tmp_exchange_ids as $exchange_data){
 					$obj->exchange_item_id[] = $offered->offered_item_id;
-//					$obj->exchange_item_detail[] = $exchange_data->offered_item_detail;
-                    $obj->exchange_item_detail[] = $this->convert_item( $exchange_data->offered_item_detail );
+					$obj->exchange_item_detail[] = $exchange_data->offered_item_detail;
 				}
 			} else{
 				// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
