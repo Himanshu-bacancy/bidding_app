@@ -223,5 +223,8 @@ CREATE TABLE `bs_order` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 
-// RB: ADDED ON 08/04/2021
+// RB: ADDED ON 04/08/2021
 ALTER TABLE `bs_order` ADD `payment_method` VARCHAR(100) NOT NULL AFTER `delivery_method`;
+
+// RB: ADDED ON 05/08/2021
+ALTER TABLE `bs_order` ADD `delivery_status` VARCHAR(100) NOT NULL AFTER `transaction`;
