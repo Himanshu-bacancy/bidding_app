@@ -64,7 +64,7 @@ class Payments extends API_Controller {
         $user_id            = $this->post('user_id');
 //        $item_ids           = implode(',', $this->post('item_ids'));
         $delivery_method    = $this->post('delivery_method');
-        $payment_method     = $this->post('payment_method');
+        $payment_method     = strtolower($this->post('payment_method'));
         $address_id         = $this->post('address_id');
         $total_amount       = $this->post('total_amount');
         $posts_var = $this->post();
@@ -201,6 +201,76 @@ class Payments extends API_Controller {
         
         if(count($orders)) {
             $this->response($orders);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
+    public function update_order_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'record_id',
+                'rules' => 'required'
+            ), array(
+                'field' => 'status',
+                'rules' => 'required'
+            ),array(
+                'field' => 'transaction_details',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $record_id = $this->post('record_id');
+        $status = $this->post('status');
+        $transaction = $this->post('transaction_details');
+        $this->db->where('id', $record_id)->update('bs_order',['status' => $status, 'transaction' => $transaction]);
+        
+        $this->response(['status' => 'success', 'message' => 'Record save successfully']);
+    }
+    
+    public function request_deals_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $user_id = $this->post('user_id');
+        $obj = $this->db->from('bs_chat_history')->where('buyer_user_id', $user_id)->get()->result();
+        
+        $this->ps_adapter->convert_chathistory( $obj );
+        $this->custom_response( $obj );
+        
+    }
+    
+    public function wayto_delivery_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $user_id = $this->post('user_id');
+        $obj = $this->db->from('bs_order')->where('status', "success")->where('delivery_status', "pending")->get()->result_array();
+        if(count($obj)) {
+            $this->response($obj);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
