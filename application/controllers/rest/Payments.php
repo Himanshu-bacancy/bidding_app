@@ -68,15 +68,15 @@ class Payments extends API_Controller {
         $address_id         = $this->post('address_id');
         $total_amount       = $this->post('total_amount');
         $posts_var = $this->post();
-        echo '<pre>';print_r($posts_var);
-        die();
+
         $item_ids = [];
         if(!isset($posts_var['item_ids']) || empty($posts_var['item_ids']) || is_null($posts_var['item_ids'])) { 
             $this->error_response("Please pass item ids");
         } else {
-            $item_ids = $posts_var['item_ids'];
             if(is_array($posts_var['item_ids'])) {
                 $item_ids = implode(',', $posts_var['item_ids']);
+            } else {
+                $item_ids = $posts_var['item_ids'];
             }
         }
         if($payment_method == 'card') {
