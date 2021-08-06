@@ -26,10 +26,10 @@ class Payments extends API_Controller {
                 'field' => 'user_id',
                 'rules' => 'required'
             ),
-            array(
-                'field' => 'item_ids',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'item_ids',
+//                'rules' => 'required'
+//            ),
             array(
                 'field' => 'delivery_method',
                 'rules' => 'required'
@@ -68,6 +68,8 @@ class Payments extends API_Controller {
         $address_id         = $this->post('address_id');
         $total_amount       = $this->post('total_amount');
         $posts_var = $this->post();
+        echo '<pre>';print_r($posts_var);
+        die();
         $item_ids = [];
         if(!isset($posts_var['item_ids']) || empty($posts_var['item_ids']) || is_null($posts_var['item_ids'])) { 
             $this->error_response("Please pass item ids");
