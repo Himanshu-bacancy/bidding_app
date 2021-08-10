@@ -108,8 +108,7 @@ class Payments extends API_Controller {
                     'amount' => $this->post('total_amount') * 100,
                     "currency" => trim($paid_config->currency_short_form),
                     'payment_method' => $response->id,
-                    'payment_method_types' => ['card'],
-                    'capture_method' => 'manual'
+                    'payment_method_types' => ['card']
                 ]);
                 
                 $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
