@@ -4,14 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Returnreason Controller
  */
-class Returnreason extends BE_Controller {
+class Reason extends BE_Controller {
 
 	/**
 	 * Construt required variables
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'Returnreason' );
+		parent::__construct( MODULE_CONTROL, 'Reason' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
@@ -29,17 +29,16 @@ class Returnreason extends BE_Controller {
 	 * List down the registered users
 	 */
 	function index() {
-		
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
 		$conds['order_by'] = 1;
 		$conds['order_by_field'] = "added_date";
 		$conds['order_by_type'] = "desc";
 		// get rows count
-		$this->data['rows_count'] = $this->Returnreasons->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Reasons->count_all_by( $conds );
 		
-		// get returnreasons
-		$this->data['returnreasons'] = $this->Returnreasons->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+		// get reasons
+		$this->data['reasons'] = $this->Reasons->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
 		// load index logic
 		parent::index();
 	}
@@ -51,7 +50,7 @@ class Returnreason extends BE_Controller {
 		
 
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'returnreason_search' );
+		$this->data['action_title'] = get_msg( 'reason_search' );
 		
 		// condition with search term
 		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )) );
@@ -63,10 +62,10 @@ class Returnreason extends BE_Controller {
 
 
 		// pagination
-		$this->data['rows_count'] = $this->Returnreasons->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Reasons->count_all_by( $conds );
 
 		// search data
-		$this->data['returnreasons'] = $this->Returnreasons->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['reasons'] = $this->Reasons->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
 		
 		// load add list
 		parent::search();
@@ -78,7 +77,7 @@ class Returnreason extends BE_Controller {
 	function add() {
 
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'returnreason_add' );
+		$this->data['action_title'] = get_msg( 'reason_add' );
 
 		// call the core add logic
 		parent::add();
@@ -90,10 +89,10 @@ class Returnreason extends BE_Controller {
 	function edit( $id ) {
 
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'returnreason_edit' );
+		$this->data['action_title'] = get_msg( 'reason_edit' );
 
 		// load user
-		$this->data['returnreason'] = $this->Returnreasons->get_one( $id );
+		$this->data['reason'] = $this->Reasons->get_one( $id );
 
 		// call the parent edit logic
 		parent::edit( $id );
@@ -102,7 +101,7 @@ class Returnreason extends BE_Controller {
 	/**
 	 * Saving Logic
 	 * 1) upload image
-	 * 2) save Returnreasons
+	 * 2) save Reasons
 	 * 3) save image
 	 * 4) check transaction status
 	 *
@@ -113,7 +112,7 @@ class Returnreason extends BE_Controller {
 		$this->db->trans_start();
 		
 		/** 
-		 * Insert Returnreasons Records 
+		 * Insert Reasons Records 
 		 */
 		$data = array();
 
@@ -122,9 +121,14 @@ class Returnreason extends BE_Controller {
 			$data['name'] = $this->get_data( 'name' );
 		}
 
+		// prepare reason type
+		if ( $this->has_data( 'type' )) {
+			$data['type'] = $this->get_data( 'type' );
+		}
 
-		// save Returnreasons
-		if ( ! $this->Returnreasons->save( $data, $id )) {
+
+		// save Reasons
+		if ( ! $this->Reasons->save( $data, $id )) {
 		// if there is an error in inserting user data,	
 
 			// rollback the transaction
@@ -151,11 +155,11 @@ class Returnreason extends BE_Controller {
 			if ( $id ) {
 			// if user id is not false, show success_add message
 				
-				$this->set_flash_msg( 'success', get_msg( 'success_returnreason_edit' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_reason_edit' ));
 			} else {
 			// if user id is false, show success_edit message
 
-				$this->set_flash_msg( 'success', get_msg( 'success_returnreason_add' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_reason_add' ));
 			}
 		}
 
@@ -167,7 +171,7 @@ class Returnreason extends BE_Controller {
 
 	/**
 	 * Delete the record
-	 * 1) delete Returnreasons
+	 * 1) delete Reasons
 	 * 2) delete image from folder and table
 	 * 3) check transactions
 	 */
@@ -179,8 +183,8 @@ class Returnreason extends BE_Controller {
 		// check access
 		$this->check_access( DEL );
 		
-		// delete returnreasons and images
-		if ( !$this->ps_delete->delete_returnreason( $id )) {
+		// delete reasons and images
+		if ( !$this->ps_delete->delete_reason( $id )) {
 
 			// set error message
 			$this->set_flash_msg( 'error', get_msg( 'err_model' ));
@@ -200,7 +204,7 @@ class Returnreason extends BE_Controller {
 			$this->set_flash_msg( 'error', get_msg( 'err_model' ));	
 		} else {
         	
-			$this->set_flash_msg( 'success', get_msg( 'success_returnreason_delete' ));
+			$this->set_flash_msg( 'success', get_msg( 'success_reason_delete' ));
 		}
 		
 		redirect( $this->module_site_url());
@@ -217,7 +221,7 @@ class Returnreason extends BE_Controller {
 
 		$rule = 'required|callback_is_valid_name['. $id  .']';
 
-		$this->form_validation->set_rules( 'name', get_msg( 'returnreason_name' ), $rule);
+		$this->form_validation->set_rules( 'name', get_msg( 'reason_name' ), $rule);
 
 		if ( $this->form_validation->run() == FALSE ) {
 		// if there is an error in validating,
@@ -240,10 +244,10 @@ class Returnreason extends BE_Controller {
 	{		
 		 $conds['name'] = $name;
 
-		 	if ( strtolower( $this->Returnreasons->get_one( $id )->name ) == strtolower( $name )) {
+		 	if ( strtolower( $this->Reasons->get_one( $id )->name ) == strtolower( $name )) {
 			// if the name is existing name for that user id,
 				return true;
-			} else if ( $this->Returnreasons->exists( ($conds ))) {
+			} else if ( $this->Reasons->exists( ($conds ))) {
 			// if the name is existed in the system,
 				$this->form_validation->set_message('is_valid_name', get_msg( 'err_dup_name' ));
 				return false;
@@ -251,23 +255,23 @@ class Returnreason extends BE_Controller {
 			return true;
 	}
 	/**
-	 * Check Returnreasons name via ajax
+	 * Check Reasons name via ajax
 	 *
 	 * @param      boolean  $cat_id  The cat identifier
 	 */
 	function ajx_exists( $id = false )
 	{
-		// get Returnreasons name
+		// get Reasons name
 
 		$name = $_REQUEST['name'];
 
 		if ( $this->is_valid_name( $name, $id )) {
 
-		// if the Returnreasons name is valid,
+		// if the Reasons name is valid,
 			
 			echo "true";
 		} else {
-		// if invalid Returnreasons name,
+		// if invalid Reasons name,
 			
 			echo "false";
 		}
@@ -276,7 +280,7 @@ class Returnreason extends BE_Controller {
 	/**
 	 * Publish the record
 	 *
-	 * @param      integer  $Returnreasons_id  The Returnreasons identifier
+	 * @param      integer  $Reasons_id  The Reasons identifier
 	 */
 	function ajx_publish( $id = 0 )
 	{
@@ -284,10 +288,10 @@ class Returnreason extends BE_Controller {
 		$this->check_access( PUBLISH );
 		
 		// prepare data
-		$returnreason_data = array( 'status'=> 1 );
+		$reason_data = array( 'status'=> 1 );
 			
 		// save data
-		if ( $this->Returnreasons->save( $returnreason_data, $id )) {
+		if ( $this->Reasons->save( $reason_data, $id )) {
 			echo 'true';
 		} else {
 			echo 'false';
@@ -297,7 +301,7 @@ class Returnreason extends BE_Controller {
 	/**
 	 * Unpublish the records
 	 *
-	 * @param      integer  $Returnreasons_id  The Returnreasons identifier
+	 * @param      integer  $Reasons_id  The Reasons identifier
 	 */
 	function ajx_unpublish( $id = 0 )
 	{
@@ -305,10 +309,10 @@ class Returnreason extends BE_Controller {
 		$this->check_access( PUBLISH );
 		
 		// prepare data
-		$returnreason_data = array( 'status'=> 0 );
+		$reason_data = array( 'status'=> 0 );
 			
 		// save data
-		if ( $this->Returnreasons->save( $returnreason_data, $id )) {
+		if ( $this->Reasons->save( $reason_data, $id )) {
 			echo 'true';
 		} else {
 			echo 'false';

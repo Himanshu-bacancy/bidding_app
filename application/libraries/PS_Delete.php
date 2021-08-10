@@ -928,9 +928,9 @@ class PS_Delete {
 	 *
 	 * @param      <type>  $id     The identifier
 	 */
-	function delete_returnreason( $price_id )
+	function delete_reason( $price_id )
 	{		
-		if ( ! $this->CI->Returnreasons->delete( $price_id )) {
+		if ( ! $this->CI->Reasons->delete( $price_id )) {
 			
 			return false;
 		}

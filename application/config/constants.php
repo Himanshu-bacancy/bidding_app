@@ -109,4 +109,4 @@ define( 'SEARCH_WALLPAPERS', 'SEARCH_WALLPAPERS' );
 define('REQUEST_ITEM', 1);
 define('SELLING', 2);
 define('EXCHANGE', 3);
-define('DIRECT_BUY ', 4);
+define('DIRECT_BUY', 4);

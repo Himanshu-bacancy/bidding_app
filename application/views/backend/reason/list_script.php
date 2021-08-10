@@ -71,10 +71,10 @@ function runAfterJQ() {
 <?php
 	// Delete Confirm Message Modal
 	$data = array(
-		'title' => get_msg( 'delete_returnreason_label' ),
-		'message' => get_msg( 'returnreason_delete_confirm_message' ) .'<br>',
-		'yes_all_btn' => get_msg( 'returnreason_yes_all_label' ),
-		'no_only_btn' => get_msg( 'returnreason_no_only_label' )
+		'title' => get_msg( 'delete_reason_label' ),
+		'message' => get_msg( 'reason_delete_confirm_message' ) .'<br>',
+		'yes_all_btn' => get_msg( 'reason_yes_all_label' ),
+		'no_only_btn' => get_msg( 'reason_no_only_label' )
 	);
 	
 	$this->load->view( $template_path .'/components/delete_confirm_modal', $data );

@@ -1220,7 +1220,6 @@ class Chats extends API_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
-		
 		// validation rules for chat history
 		// $rules = array(
 	    //     array(
@@ -1257,7 +1256,7 @@ class Chats extends API_Controller
 
 		// get the post data
 		$user_id = $this->post('user_id');
-		$return_type 	 = $this->post('return_type');
+		$return_type = $this->post('return_type');
 
 		$users = global_user_check($user_id);
 
@@ -1276,19 +1275,15 @@ class Chats extends API_Controller
 		// } else if($type == EXCHANGE) {
 		// 	$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		// }
-
-
-		if($type == DIRECT_BUY || $type == REQUEST_ITEM || $type == SELLING) {
-			if($return_type == "seller") {
-				$condition .= " AND buyer_user_id = '".$user_id."'";
-			} else if($return_type == "buyer") {
-				$condition .= " AND seller_user_id = '".$user_id."'";
-			}
+		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
+			$condition .= " AND buyer_user_id = '".$user_id."'";
+		} else if($type == SELLING){
+			$condition .= " AND seller_user_id = '".$user_id."'";
 		} else if($type == EXCHANGE) {
 			$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		}
-		$obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
-		
+		//echo $condition;die;
+		$obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." group by requested_item_id")->result();
 		//  SEND USER COUNT AND Lowest Price
 		foreach($obj as $key => $data){
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
@@ -1300,7 +1295,7 @@ class Chats extends API_Controller
 			}	
 		}
 
-		// print_r($obj);exit;
+		//print_r($obj);exit;
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
 		// end of code

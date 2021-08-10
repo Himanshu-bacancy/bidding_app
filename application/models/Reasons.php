@@ -4,14 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Model class for Returnreason table
  */
-class Returnreasons extends PS_Model {
+class Reasons extends PS_Model {
 
 	/**
 	 * Constructs the required data
 	 */
 	function __construct() 
 	{
-		parent::__construct( 'bs_returnreasons', 'id', '' );
+		parent::__construct( 'bs_reasons', 'id', '' );
 	}
 
 	/**
@@ -36,6 +36,12 @@ class Returnreasons extends PS_Model {
 			$this->db->where( 'name', $conds['name'] );
 		}
 
+
+		// type condition
+		if ( isset( $conds['type'] )) {
+			$this->db->where( 'type', $conds['type'] );
+		}
+		
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {
 			$this->db->like( 'name', $conds['searchterm'] );
@@ -47,7 +53,7 @@ class Returnreasons extends PS_Model {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
 
-			$this->db->order_by( 'bs_returnreasons.'.$order_by_field, $order_by_type );
+			$this->db->order_by( 'bs_reasons.'.$order_by_field, $order_by_type );
 		} else {
 
 			$this->db->order_by( 'added_date' );

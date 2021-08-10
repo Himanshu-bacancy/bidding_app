@@ -557,8 +557,6 @@ class PS_Model extends CI_Model {
 
 		if ( isset( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );
-		} else {
-			$this->db->where( 'bs_items.is_draft', 0 );
 		}
 
 		// item check for brand condition
@@ -581,6 +579,7 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
+
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
 			
@@ -595,13 +594,11 @@ class PS_Model extends CI_Model {
 		
 		// SKV: CHECK CONDITION FOR ITEM TYPE
 		if ( isset( $conds['item_type_id'] )) {
-			$itemTypeIdsArray = [];
-			foreach($conds['item_type_id'] as $itemTypeIds){
-				$itemTypeIdsArray[] = (int)$itemTypeIds;
-			}
-			if ($itemTypeIdsArray != "") {
-				if($itemTypeIdsArray != '0'){
-					$this->db->where_in( 'bs_items.item_type_id', $itemTypeIdsArray );	
+			
+			
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
 
 			}			
@@ -2058,7 +2055,7 @@ class PS_Model extends CI_Model {
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
 				
-					$this->db->where_in( 'item_type_id', (int)$conds['item_type_id'] );	
+					$this->db->where_in( 'item_type_id', $conds['item_type_id'] );	
 				}
 
 			}			
@@ -2146,8 +2143,6 @@ class PS_Model extends CI_Model {
 
 		if ( isset( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );	
-		} else {
-			$this->db->where( 'bs_items.is_draft', 0 );
 		}
 
 		// item id (id) check for item color condition
@@ -2288,8 +2283,8 @@ class PS_Model extends CI_Model {
 
 
 	  
-	  	// $this->db->get();
-		// print_r($this->db->last_query());die;
+	  	$this->db->get();
+		print_r($this->db->last_query());die;
 	  	// order by
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
