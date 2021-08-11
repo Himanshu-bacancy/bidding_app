@@ -212,5 +212,8 @@
  "shippo_object_id" : "Shippo object id",
  "err_shippo_object_id" : "Please provide shippo object id",
  "invalid_image_id" : "Invalid image id",
- "invalid_itemtype_id" : "Invalid item type id"
+ "invalid_itemtype_id" : "Invalid item type id",
+ "invalid_item_id":"Invalid Item id",
+ "invalid_promotingplan_id":"Invalid Promoting Item Plan id",
+ "invalid_card_id":"Invalid Card id"
 } 

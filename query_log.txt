@@ -228,3 +228,6 @@ ALTER TABLE `bs_order` ADD `payment_method` VARCHAR(100) NOT NULL AFTER `deliver
 
 // RB: ADDED ON 05/08/2021
 ALTER TABLE `bs_order` ADD `delivery_status` VARCHAR(100) NOT NULL AFTER `transaction`;
+
+// SS: ADDED ON 11/08/2021
+ALTER TABLE `bs_paid_items_history` ADD `transaction` text NULL, ADD `payment_id` VARCHAR(100) NULL,ADD `payment_status` VARCHAR(50) NOT NULL DEFAULT 'None' COMMENT 'None, initiate, fail';

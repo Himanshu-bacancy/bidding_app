@@ -296,6 +296,161 @@ class Paid_items extends API_Controller
 		
 	}
 
+	function add_promoteditems_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for add promoted item
+		$rules = array(
+			array(
+	        	'field' => 'item_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'plan_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'card_id',
+	        	'rules' => 'required'
+	        ),
+	       
+	        array(
+	        	'field' => 'cvc',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'start_date',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        )
+        );
+
+		// exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+		// check item id
+
+		$item_id = $this->post('item_id');
+		$conds['id'] = $item_id;
+		$item_data = $this->Item->get_one_by($conds);
+		if ( $item_data->id == "") {
+			$this->error_response( get_msg( 'invalid_item_id' ));
+		}
+
+		// check plan id
+		$plancheck  = $this->Promotingitemplans->get_one($this->post('plan_id'));
+		if(isset($plancheck->is_empty_object))
+		{
+			$this->error_response( get_msg( 'invalid_promotingplan_id' ));
+		}
+
+		// check user id
+		$usercheck  = $this->User->get_one($this->post('user_id'));
+		if(isset($usercheck->is_empty_object))
+		{
+			$this->error_response( get_msg( 'invalid_user_id' ));
+		}
+
+		// check card id
+		$cardcheck  = $this->db->from('bs_card')->where('id', $this->post('card_id'))->get()->row();
+		if(isset($cardcheck->is_empty_object))
+		{
+			$this->error_response( get_msg( 'invalid_card_id' ));
+		}
+
+		$card_id = $this->post('card_id');
+		$cvc     = $this->post('cvc');
+		$card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+		$expiry_date = explode('/',$card_details->expiry_date);
+		$paid_config = $this->Paid_config->get_one('pconfig1');
+		# set stripe test key
+		\Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+		$record_id = 0;
+		try {
+			$response = \Stripe\PaymentMethod::create([
+				'type' => 'card',
+				'card' => [
+					'number' => $card_details->card_number,
+					'exp_month' => $expiry_date[0],
+					'exp_year' => $expiry_date[1],
+					'cvc' => $cvc
+				]
+			]);
+			$response = \Stripe\PaymentIntent::create([
+				'amount' => $plancheck->price * 100,
+				"currency" => trim($paid_config->currency_short_form),
+				'payment_method' => $response->id,
+				'payment_method_types' => ['card'],
+				'capture_method' => 'manual'
+			]);
+			
+			$item_id = $this->post('item_id');
+			$item_data = array(
+				"is_paid" => "1"
+			);
+			$this->Item->save($item_data,$item_id);
+
+			$start_date = $this->post('start_date');
+			$day = $plancheck->days;
+			$start_timestamp = strtotime($this->post('start_date'));
+			$date = date("Y-m-d H:i:s");
+
+			$temp_start_date = date("Y-m-d H:i:s", substr($start_timestamp, 0, 10));
+
+			$vardate = explode(' ',$temp_start_date,2);
+
+			$convert_start_date = $vardate[0];
+			
+			$temp_end_date = date('Y-m-d H:i:s', strtotime($temp_start_date. ' + '.$day.' day'));
+			$varenddate = explode(' ',$temp_end_date,2);
+			$end_date = $varenddate[0];
+			$d = DateTime::createFromFormat('Y-m-d H:i:s', $temp_end_date);
+			$end_timestamp = $d->getTimestamp();
+
+			$paid_data = array(
+				"item_id" => $item_id,
+				"start_date" => $this->post('start_date'),
+				"start_timestamp" => $start_timestamp,
+				"end_date" => $end_date,
+				"end_timestamp" => $end_timestamp,
+				"amount" => $plancheck->price,
+				"payment_method" => 'stripe',
+				"transaction" => $response,
+				"payment_id" => $response->id,
+				"added_user_id" => $this->post('user_id')
+			);
+			
+			$this->Paid_item->save($paid_data);
+			$id = $paid_data['id'];
+			
+			if (isset($response->id)) {
+				$paydata['payment_status'] = 'initiate';
+				$this->db->where('id', $id);
+        		$this->db->update('bs_paid_items_history', $paydata);
+				
+				$this->response(['status' => "success", 'payment_status' => 'success', 'intent_id' => $response->id, 'record_id' => $id, 'client_secret' => $response->client_secret]);
+			} else {
+				$paydata['payment_status'] = 'fail';
+				$this->db->where('id', $id);
+        		$this->db->update('bs_paid_items_history', $paydata);
+				$this->error_response(get_msg('stripe_transaction_failed'));
+			}
+		} catch (exception $e) {
+			$paydata['payment_status'] = 'fail';
+			$this->db->where('id', $id);
+			$this->db->update('bs_paid_items_history', $paydata);
+			$this->error_response(get_msg('stripe_transaction_failed'));
+		}
+	}
+
 	/**
 	 * Convert Object
 	 */
