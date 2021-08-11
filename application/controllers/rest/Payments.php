@@ -114,7 +114,7 @@ class Payments extends API_Controller {
                 $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) {
-                    $this->db->where('id', $record_id)->update(['status' => 'initiate']);
+                    $this->db->where('id', $record_id)->update(['status' => 'initiate', 'transaction_id' => $response->id]);
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $record_id, 'client_secret' => $response->client_secret]);
                 } else {
                     $this->db->where('id', $record_id)->update(['status' => 'fail']);
