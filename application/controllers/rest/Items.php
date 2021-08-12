@@ -332,46 +332,67 @@ class Items extends API_Controller
 		} else {
 			$status = 1;
 		}
-		// validation rules for user register
-		$rules = array(
-			array(
-	        	'field' => 'cat_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'sub_cat_id',
-	        	'rules' => 'required'
-	        ),
-			array(
-	        	'field' => 'childsubcat_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'item_type_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'condition_of_item_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'title',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'delivery_method_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'address_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'price',
-	        	'rules' => 'required'
-	        )
 
-        );
+		// validation rules for add item
+		if(!empty($this->post('is_draft')) && $this->post('is_draft')=='1')
+		{
+			$rules = array(
+				array(
+					'field' => 'item_type_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'title',
+					'rules' => 'required'
+				)
+				
+	
+			);
+		}
+		else
+		{
+			$rules = array(
+				array(
+					'field' => 'cat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'sub_cat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'childsubcat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'item_type_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'condition_of_item_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'title',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'delivery_method_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'address_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'price',
+					'rules' => 'required'
+				)
+	
+			);
+		}
+		
+		
 
         // $lat = $this->post('lat');
 		// $lng = $this->post('lng');
@@ -435,19 +456,24 @@ class Items extends API_Controller
 
 		// check address id
 
-		$address_id = $this->post('address_id');
-		$conds['id'] = $address_id;
-		$address_data = $this->Addresses->get_one_by($conds);
-		if ( $address_data->id == "") {
-			$this->error_response( get_msg( 'invalid_address_id' ));
+		if(empty($this->post('is_draft')) || $this->post('is_draft')=='0')
+		{
+			$address_id = $this->post('address_id');
+			$conds['id'] = $address_id;
+			$address_data = $this->Addresses->get_one_by($conds);
+			if ( $address_data->id == "") {
+				$this->error_response( get_msg( 'invalid_address_id' ));
+			}
+
+			// check delivery method id
+			$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
+			if(isset($deliverycheck->is_empty_object))
+			{
+				$this->error_response( get_msg( 'delivery_method_not_found' ));
+			}
 		}
 
-		// check delivery method id
-		$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
-		if(isset($deliverycheck->is_empty_object))
-		{
-			$this->error_response( get_msg( 'delivery_method_not_found' ));
-		}
+		
 
 
 		$id = $item_data['id'];
