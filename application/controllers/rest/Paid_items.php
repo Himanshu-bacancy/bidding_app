@@ -436,7 +436,7 @@ class Paid_items extends API_Controller
 				$this->db->where('id', $id);
         		$this->db->update('bs_paid_items_history', $paydata);
 				
-				$this->response(['status' => "success", 'payment_status' => 'success', 'intent_id' => $response->id, 'record_id' => $id, 'client_secret' => $response->client_secret]);
+				$this->response(['status' => "success", 'payment_status' => 'success', 'intent_id' => $response->id, 'record_id' => $id, 'client_secret' => $response->client_secret, 'response' => ['payment_method' => $response->payment_method]]);
 			} else {
 				$paydata['payment_status'] = 'fail';
 				$this->db->where('id', $id);
