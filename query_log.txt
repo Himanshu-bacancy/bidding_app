@@ -231,3 +231,14 @@ ALTER TABLE `bs_order` ADD `delivery_status` VARCHAR(100) NOT NULL AFTER `transa
 
 // SS: ADDED ON 11/08/2021
 ALTER TABLE `bs_paid_items_history` ADD `transaction` text NULL, ADD `payment_id` VARCHAR(100) NULL,ADD `payment_status` VARCHAR(50) NOT NULL DEFAULT 'None' COMMENT 'None, initiate, fail';
+
+// RB: ADDED ON 05/08/2021
+CREATE TABLE `bs_order_confirm` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `item_id` VARCHAR(255) NOT NULL,
+  `seller_id` VARCHAR(255) NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
