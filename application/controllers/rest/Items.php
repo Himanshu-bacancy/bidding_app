@@ -1267,4 +1267,70 @@ class Items extends API_Controller
 		}	
 	}
 
+	function nearpolicestation_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'lat',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'lng',
+	        	'rules' => 'required'
+	        )
+
+        );
+
+        $lat = $this->post('lat');
+		$lng = $this->post('lng');
+        $location = location_check($lat,$lng);
+
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+		$ch = curl_init();
+    	curl_setopt($ch, CURLOPT_URL, 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='.$lat.','.$lng.'&radius=5000&type=police&key=AIzaSyDX4TVIqhXpfAI0u4zKKoieXHHC6qFkhYc');
+    	curl_setopt($ch, CURLOPT_GET, true);
+    	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);	
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    	$result = curl_exec($ch);				
+    	if ($result === FALSE) {
+    	    die('Curl failed: ' . curl_error($ch));
+    	}
+
+		$searchdata = json_decode($result);
+		
+
+		$mapdata =  new stdClass();
+
+		foreach($searchdata->results as $key => $data)
+		{
+			$mapdata->$key->name = $data->name;
+			$mapdata->$key->lat = $data->geometry->location->lat;
+			$mapdata->$key->lng = $data->geometry->location->lng;
+		}
+
+		$this->response(json_decode(json_encode($mapdata), TRUE));
+		//print_r( $mapdata);
+		return $this->output
+            ->set_content_type('application/json')
+            ->set_status_header(200)
+            ->set_output(json_encode(array(
+                    'status' => 'Success',
+                    'search_result' => $mapdata
+            )));
+		
+    	curl_close($ch);
+    	
+
+	}
+
 }
