@@ -332,46 +332,67 @@ class Items extends API_Controller
 		} else {
 			$status = 1;
 		}
-		// validation rules for user register
-		$rules = array(
-			array(
-	        	'field' => 'cat_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'sub_cat_id',
-	        	'rules' => 'required'
-	        ),
-			array(
-	        	'field' => 'childsubcat_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'item_type_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'condition_of_item_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'title',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'delivery_method_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'address_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'price',
-	        	'rules' => 'required'
-	        )
 
-        );
+		// validation rules for add item
+		if(!empty($this->post('is_draft')) && $this->post('is_draft')=='1')
+		{
+			$rules = array(
+				array(
+					'field' => 'item_type_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'title',
+					'rules' => 'required'
+				)
+				
+	
+			);
+		}
+		else
+		{
+			$rules = array(
+				array(
+					'field' => 'cat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'sub_cat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'childsubcat_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'item_type_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'condition_of_item_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'title',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'delivery_method_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'address_id',
+					'rules' => 'required'
+				),
+				array(
+					'field' => 'price',
+					'rules' => 'required'
+				)
+	
+			);
+		}
+		
+		
 
         // $lat = $this->post('lat');
 		// $lng = $this->post('lng');
@@ -435,19 +456,24 @@ class Items extends API_Controller
 
 		// check address id
 
-		$address_id = $this->post('address_id');
-		$conds['id'] = $address_id;
-		$address_data = $this->Addresses->get_one_by($conds);
-		if ( $address_data->id == "") {
-			$this->error_response( get_msg( 'invalid_address_id' ));
+		if(empty($this->post('is_draft')) || $this->post('is_draft')=='0')
+		{
+			$address_id = $this->post('address_id');
+			$conds['id'] = $address_id;
+			$address_data = $this->Addresses->get_one_by($conds);
+			if ( $address_data->id == "") {
+				$this->error_response( get_msg( 'invalid_address_id' ));
+			}
+
+			// check delivery method id
+			$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
+			if(isset($deliverycheck->is_empty_object))
+			{
+				$this->error_response( get_msg( 'delivery_method_not_found' ));
+			}
 		}
 
-		// check delivery method id
-		$deliverycheck  = $this->Deliverymethods->get_one($this->post('delivery_method_id'));
-		if(isset($deliverycheck->is_empty_object))
-		{
-			$this->error_response( get_msg( 'delivery_method_not_found' ));
-		}
+		
 
 
 		$id = $item_data['id'];
@@ -1239,6 +1265,72 @@ class Items extends API_Controller
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}	
+	}
+
+	function nearpolicestation_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'lat',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'lng',
+	        	'rules' => 'required'
+	        )
+
+        );
+
+        $lat = $this->post('lat');
+		$lng = $this->post('lng');
+        $location = location_check($lat,$lng);
+
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+
+		$ch = curl_init();
+    	curl_setopt($ch, CURLOPT_URL, 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='.$lat.','.$lng.'&radius=5000&type=police&key=AIzaSyDX4TVIqhXpfAI0u4zKKoieXHHC6qFkhYc');
+    	curl_setopt($ch, CURLOPT_GET, true);
+    	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);	
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    	$result = curl_exec($ch);				
+    	if ($result === FALSE) {
+    	    die('Curl failed: ' . curl_error($ch));
+    	}
+
+		$searchdata = json_decode($result);
+		
+
+		$mapdata =  new stdClass();
+
+		foreach($searchdata->results as $key => $data)
+		{
+			$mapdata->$key->name = $data->name;
+			$mapdata->$key->lat = $data->geometry->location->lat;
+			$mapdata->$key->lng = $data->geometry->location->lng;
+		}
+
+		$this->response(json_decode(json_encode($mapdata), TRUE));
+		//print_r( $mapdata);
+		return $this->output
+            ->set_content_type('application/json')
+            ->set_status_header(200)
+            ->set_output(json_encode(array(
+                    'status' => 'Success',
+                    'search_result' => $mapdata
+            )));
+		
+    	curl_close($ch);
+    	
+
 	}
 
 }

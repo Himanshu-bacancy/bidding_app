@@ -755,6 +755,18 @@ class PS_Adapter {
 
 		$obj->rating_details = $rating_std;
 
+		$this->CI->db->where('user_id', $obj->user_id);
+		$this->CI->db->where('is_default_address', 1);
+    	$default_address = $this->CI->db->get('bs_addresses')->row();
+		$obj->default_address = $default_address;
+
+		if(!empty($obj->accept_delivery_id))
+		{
+			$this->CI->db->where('id', $obj->accept_delivery_id);
+			$default_deliverymethod = $this->CI->db->get('bs_deliverymethod')->row();
+			$obj->default_deliverymethod = $default_deliverymethod;
+		}
+
 		if($need_return)
 		{
 			return $obj;
