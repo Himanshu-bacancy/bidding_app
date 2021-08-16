@@ -32,7 +32,7 @@ class Chats extends API_Controller
 		$rules = array(
 			array(
 	        	'field' => 'item_id',
-	        	'rules' => 'required'
+ 	        	'rules' => 'required'
 	        ),
 	        array(
 	        	'field' => 'buyer_user_id',
@@ -111,7 +111,7 @@ class Chats extends API_Controller
 	        }
 
 	    } else {
-
+ 
 	    	if ( $type == "to_buyer" ) {
 
 		    	$buyer_unread_count = $chat_history_data->buyer_unread_count;
@@ -194,7 +194,7 @@ class Chats extends API_Controller
 	        	'field' => 'operation_type',
 	        	'rules' => 'required'
 	        )
-        );
+         );
 
 		if($this->post('operation_type') == REQUEST_ITEM){
 			array_push($rules, array(
@@ -1463,7 +1463,7 @@ class Chats extends API_Controller
 
 				$result_items = rtrim($ids,',');
 				$reported_item_id = explode(",", $result_items);
-				$conds['item_id'] = $reported_item_id;
+                                 				$conds['item_id'] = $reported_item_id;
 			}
 
 			$conds['buyer_user_id'] = $user_id;

@@ -273,7 +273,7 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $user_id = $this->post('user_id');
-        $obj = $this->db->from('bs_order')->where('status', "success")->where('delivery_status', "pending")->get()->result_array();
+        $obj = $this->db->from('bs_order')->where('user_id', $user_id)->where('status', "succeeded")->where('delivery_status', "pending")->get()->result_array();
         if(count($obj)) {
             $this->response($obj);
         } else {
