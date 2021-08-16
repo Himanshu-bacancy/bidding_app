@@ -389,7 +389,6 @@ class Chats extends API_Controller
 					"payment_method_id" => $this->post('payment_method_id'),
 				);
 			}
-			
 			// $status = send_android_fcm_chat( $device_ids, $data );
 			$this->Chat->save($chat_data);	
 			$obj = $this->Chat->get_one_by($chat_data);
@@ -1265,7 +1264,9 @@ class Chats extends API_Controller
 		
 		//start new code
 		$type 	 = $this->post('type');
-		$condition = "operation_type = '".$type."'";
+		if($return_type == 'buyer'){
+			$condition = "operation_type = '".$type."'";
+		}
 		// $condition = "type = '".$type."'";
 
 		// if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
@@ -1276,16 +1277,21 @@ class Chats extends API_Controller
 		// 	$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		// }
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-			$condition .= " AND buyer_user_id = '".$user_id."'";
+			$condition .=  $condition != '' ? " AND buyer_user_id = '".$user_id."'" : "buyer_user_id = '".$user_id."'"; 
 		} else if($type == SELLING){
-			$condition .= " AND seller_user_id = '".$user_id."'";
+			$condition .= $condition != '' ? " AND seller_user_id = '".$user_id."'" : "seller_user_id = '".$user_id."'";
 		} else if($type == EXCHANGE) {
-			$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
+			$condition .= $condition != '' ? " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') " : "(buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		}
-		//echo $condition;die;
-		$obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." group by requested_item_id")->result();
+		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition)->result();
+		$obj = [];
 		//  SEND USER COUNT AND Lowest Price
+		foreach($records as $key => $data){
+			$details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->requested_item_id."'")->row();
+			$obj[] = isset($details) && !empty($details) ? $details : [];
+		}
 		foreach($obj as $key => $data){
+		//	echo '<pre>'; print_r($obj[$key]->requested_item_id);
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
 				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE requested_item_id = "'.$obj[$key]->requested_item_id.'" and operation_type = "'.$obj[$key]->operation_type . '"')->row();
 				$obj[$key]->bid_count = $total->total_user;
@@ -1294,8 +1300,6 @@ class Chats extends API_Controller
 				$obj[$key]->lowest_price = $result_price->lowest_price;
 			}	
 		}
-
-		//print_r($obj);exit;
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
 		// end of code
