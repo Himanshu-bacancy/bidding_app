@@ -115,7 +115,7 @@ class Payments extends API_Controller {
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) { 
                     $this->db->where('id', $record_id)->update(['status' => 'initiate', 'transaction_id' => $response->id]);
-                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $record_id, 'client_secret' => $response->client_secret]);
+                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $record_id, 'client_secret' => $response->client_secret, 'response' => $response]);
                 } else {
                     $this->db->where('id', $record_id)->update(['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
