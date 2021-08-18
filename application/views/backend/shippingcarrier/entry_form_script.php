@@ -31,6 +31,9 @@
 				shippo_object_id:{
 					required: true
 				}
+				shippo_servicelevel_token:{
+					required: true
+				}
 			},
 			messages:{
 				name:{
@@ -57,6 +60,9 @@
 		      	},
 				shippo_object_id:{
 					required: "<?php echo get_msg( 'err_shippo_object_id' ) ;?>"
+				},
+				shippo_servicelevel_token:{
+					required: "<?php echo get_msg( 'err_shippo_servicelevel_token' ) ;?>"
 				},
 			}
 		});
