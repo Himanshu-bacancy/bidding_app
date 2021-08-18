@@ -111,11 +111,17 @@ class Payments extends API_Controller {
                     'payment_method_types' => ['card']
                 ]);
                 
-                $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order', ['order_id' => 'odr_'.time().$user_id,'user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) { 
                     $this->db->where('id', $record_id)->update(['status' => 'initiate', 'transaction_id' => $response->id]);
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $record_id, 'client_secret' => $response->client_secret, 'response' => $response]);
+                    
+                    $items = $this->db->from('bs_items')->where_in('id', $item_ids)->get()->result_array();
+                    foreach ($items as $key => $value) {
+                        $seller_device_token = $this->db->select('device_token')->from('core_users')->where('user_id', $value['added_user_id'])->get()->row();
+                        send_push( $seller_device_token->device_token, ["message" => "New order arrived", "flag" => "new_order"] );
+                    }
                 } else {
                     $this->db->where('id', $record_id)->update(['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
@@ -182,6 +188,29 @@ class Payments extends API_Controller {
 //        }
     }
     
+    public function seller_orders_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $user_id = $this->post('user_id');
+        $orders = $this->db->select('bs_order_confirm.*')->from('bs_order_confirm')->join('bs_order', 'bs_order.id = bs_order_confirm.order_id')->where('seller_id', $user_id)->get()->result_array();
+        
+        if(count($orders)) {
+            $this->response($orders);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
     public function orders_post() {
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
@@ -197,6 +226,29 @@ class Payments extends API_Controller {
         
         $user_id = $this->post('user_id');
         $orders = $this->db->from('bs_order')->where('user_id', $user_id)->get()->result_array();
+        
+        if(count($orders)) {
+            $this->response($orders);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
+    public function order_byid_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $order_id = $this->post('order_id');
+        $orders = $this->db->from('bs_order')->where('order_id', $order_id)->get()->row_array();
         
         if(count($orders)) {
             $this->response($orders);
@@ -248,10 +300,15 @@ class Payments extends API_Controller {
                 'field' => 'user_id',
                 'rules' => 'required'
             ),
+            array(
+                'field' => 'operation_type',
+                'rules' => 'required'
+            ),
         );
         if (!$this->is_valid($rules)) exit;
         
         $user_id = $this->post('user_id');
+        $operation_type = $this->post('operation_type');
         $obj = $this->db->from('bs_chat_history')->where('buyer_user_id', $user_id)->get()->result();
         
         $this->ps_adapter->convert_chathistory( $obj );
