@@ -493,6 +493,10 @@ class PS_Model extends CI_Model {
 		   
 		// }
 
+		if ( empty( $conds['is_draft'] )) {
+			$this->db->where( 'bs_items.is_draft', 0);
+		}
+
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
 			
@@ -505,6 +509,7 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+		
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
 			
@@ -674,7 +679,7 @@ class PS_Model extends CI_Model {
 		}
 
 	 	return $this->db->get();
-		// print_r($this->db->last_query());die;
+		//print_r($this->db->last_query());die;
 
 	}
 
