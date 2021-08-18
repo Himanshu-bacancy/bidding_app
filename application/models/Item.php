@@ -33,7 +33,7 @@ class Item extends PS_Model {
 		}
 		
 		// is_paid condition
-		if (isset( $conds['is_paid'] )) {
+		if (!empty( $conds['is_paid'] )) {
 			$this->db->where( 'is_paid', $conds['is_paid'] );
 		}
 
@@ -233,7 +233,7 @@ class Item extends PS_Model {
 		}
 
 		// is_paid condition
-		if ( isset( $conds['is_paid'] )) {
+		if ( !empty( $conds['is_paid'] )) {
 			$this->db->like( 'is_paid', $conds['is_paid'] );
 		}
 
