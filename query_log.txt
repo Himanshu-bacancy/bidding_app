@@ -242,5 +242,8 @@ CREATE TABLE `bs_order_confirm` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 
+
+// SS: ADDED ON 18/08/2021
+ALTER TABLE `bs_shippingcarriers` ADD `shippo_servicelevel_token` VARCHAR(255) NULL;
 // RB: ADDED ON 18/08/2021
 ALTER TABLE `bs_order` ADD `order_id` TEXT NOT NULL AFTER `id`;

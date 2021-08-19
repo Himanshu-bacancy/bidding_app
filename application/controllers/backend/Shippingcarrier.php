@@ -137,6 +137,10 @@ class Shippingcarrier extends BE_Controller {
 			$data['shippo_object_id'] = $this->get_data( 'shippo_object_id' );
 		}
 
+		if ( $this->has_data( 'shippo_servicelevel_token' )) {
+			$data['shippo_servicelevel_token'] = $this->get_data( 'shippo_servicelevel_token' );
+		}
+
 
 		// save Shippingcarriers
 		if ( ! $this->Shippingcarriers->save( $data, $id )) {

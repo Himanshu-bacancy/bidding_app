@@ -215,5 +215,7 @@
  "invalid_itemtype_id" : "Invalid item type id",
  "invalid_item_id":"Invalid Item id",
  "invalid_promotingplan_id":"Invalid Promoting Item Plan id",
- "invalid_card_id":"Invalid Card id"
+ "invalid_card_id":"Invalid Card id",
+ "shippo_servicelevel_token" : "Shippo service level token",
+ "err_shippo_servicelevel_token" : "Please provide shippo service level token"
 } 
