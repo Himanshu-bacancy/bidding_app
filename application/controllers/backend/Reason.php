@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Returnreason Controller
+ * Reason Controller
  */
 class Reason extends BE_Controller {
 
@@ -242,7 +242,7 @@ class Reason extends BE_Controller {
 	 */
 	function is_valid_name( $name, $id = 0 )
 	{		
-		 $conds['name'] = $name;
+		$conds['name'] = $name;
 
 		 	if ( strtolower( $this->Reasons->get_one( $id )->name ) == strtolower( $name )) {
 			// if the name is existing name for that user id,

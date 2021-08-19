@@ -4,9 +4,8 @@ require_once( APPPATH .'libraries/REST_Controller.php' );
 /**
  * REST API for News
  */
-class Reasons extends API_Controller
+class Reason extends API_Controller
 {
-    
     /**
      * Constructs Parent Constructor
      */
@@ -15,14 +14,13 @@ class Reasons extends API_Controller
         parent::__construct('Reasons');
     }
 
-    
-    public function report_item_reason_get() {
+    public function get_reasons_post() {
         $user_data = $this->_apiConfig([
-            'methods' => ['GET'],
+            'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
-        
-        $data = $this->db->select('id,name')->from('bs_reportitemreasons')->where('status', 1)->order_by('id','desc')->get()->result_array();
+        $type = $this->post('type');
+        $data = $this->db->select('id, type, name')->from('bs_reasons')->where(array('status' => 1 ,'type' => $type))->order_by('id','desc')->get()->result_array();
         if(count($data)) {
             $this->response($data);
         } else {

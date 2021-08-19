@@ -1,4 +1,3 @@
-
 <?php
 	$attributes = array( 'id' => 'reason-form', 'enctype' => 'multipart/form-data');
 	echo form_open( '', $attributes);
@@ -29,7 +28,7 @@
 							$options['block_user'] = 'Block User Reason';
 							$options['report_item'] = 'Report Item Reason';
 							$options['return_item'] = 'Return Item Reason';
-							$options['cancek_offer'] = 'Cancel Offer Reason';
+							$options['cancel_offer'] = 'Cancel Offer Reason';
 							
 							echo form_dropdown(
 								'type',
@@ -68,19 +67,11 @@
 	            <button type="submit" class="btn btn-sm btn-primary">
 					<?php echo get_msg('btn_save')?>
 				</button>
-
 				<a href="<?php echo $module_site_url; ?>" class="btn btn-sm btn-primary">
 					<?php echo get_msg('btn_cancel')?>
 				</a>
 	        </div>
-	       
 		</div>
-
 	</div>
 </section>
-				
-
-	
-	
-
 <?php echo form_close(); ?>

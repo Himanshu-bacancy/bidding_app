@@ -4,14 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Model class for Reason table
  */
-class Reasons extends PS_Model {
+class Reason_operation extends PS_Model {
 
 	/**
 	 * Constructs the required data
 	 */
 	function __construct() 
 	{
-		parent::__construct( 'bs_reasons', 'id', '' );
+		parent::__construct( 'bs_reason_operations', 'id', '' );
 	}
 
 	/**
@@ -31,9 +31,9 @@ class Reasons extends PS_Model {
 			$this->db->where( 'id', $conds['id'] );
 		}
 
-		// name condition
-		if ( isset( $conds['name'] )) {
-			$this->db->where( 'name', $conds['name'] );
+		// reason_id condition
+		if ( isset( $conds['reason_id'] )) {
+			$this->db->where( 'reason_id', $conds['reason_id'] );
 		}
 
 
@@ -42,9 +42,19 @@ class Reasons extends PS_Model {
 			$this->db->where( 'type', $conds['type'] );
 		}
 		
-		// searchterm
-		if ( isset( $conds['searchterm'] )) {
-			$this->db->like( 'name', $conds['searchterm'] );
+		// operation_id
+		if ( isset( $conds['operation_id'] )) {
+			$this->db->like( 'operation_id', $conds['operation_id'] );
+		}
+
+		// other_reason
+		if ( isset( $conds['other_reason'] )) {
+			$this->db->like( 'other_reason', $conds['other_reason'] );
+		}
+
+		// user_id
+		if ( isset( $conds['user_id'] )) {
+			$this->db->like( 'user_id', $conds['user_id'] );
 		}
 
 		// order_by
@@ -53,7 +63,7 @@ class Reasons extends PS_Model {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
 
-			$this->db->order_by( 'bs_reasons.'.$order_by_field, $order_by_type );
+			$this->db->order_by( 'bs_reason_operations.'.$order_by_field, $order_by_type );
 		} else {
 
 			$this->db->order_by( 'added_date' );
