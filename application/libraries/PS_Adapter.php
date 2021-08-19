@@ -1088,9 +1088,10 @@ class PS_Adapter {
 					// }
 					$this->convert_exchange_chat_history( $tmp_exchange_ids );
 					// $obj[$i]->exchange_chat_detail = $tmp_exchange_ids;
-					
+				
 					foreach($tmp_exchange_ids as $exchange_data){
 						$obj[$i]->exchange_item_id[] = $exchange_data->offered_item_id;
+						$this->convert_item( $exchange_data->offered_item_detail );
 						$obj[$i]->exchange_item_detail[] = $exchange_data->offered_item_detail;
 						
 					}
