@@ -1315,12 +1315,15 @@ class Chats extends API_Controller
 				$obj[$key]->bid_count = $total->total_user;
 
 				$result_price = $this->db->query('SELECT MIN(nego_price) AS lowest_price FROM `bs_chat_history` WHERE '.$condition.' AND requested_item_id = "'.$obj[$key]->requested_item_id.'"')->row();
-				$obj[$key]->lowest_price = $result_price->lowest_price;
+				$obj[$key]->lowest_price = $result_price->lowest_price ? $result_price->lowest_price : $obj[$key]->nego_price;
 				// if($obj[$key]->operation_type==3){
 				// 	$exchangeOfferedItems = $this->db->query('SELECT * FROM `bs_exchange_chat_history` WHERE chat_id = "'.$obj[$key]->id.'"')->result();
 				// 	$obj[$key]->exchange_offered_items_detail = $exchangeOfferedItems;
 				// }
-			}			
+			} else {
+				$obj[$key]->lowest_price = $obj[$key]->nego_price;
+			}
+			$obj[$key]->quantity = $obj[$key]->quantity != 0 ? $obj[$key]->quantity : 1;	 		
 		}
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
@@ -1559,11 +1562,14 @@ class Chats extends API_Controller
 			$this->error_response(get_msg('err_chat_history_not_available'));
 		}else{
 			$chat_data_update = array(
-				"item_id" => $chat_history_data->item_id,
+				"requested_item_id" => $chat_history_data->requested_item_id,
+				"offered_item_id" => $chat_history_data->offered_item_id,
 				"buyer_user_id" => $chat_history_data->buyer_user_id, 
 				"seller_user_id" => $chat_history_data->seller_user_id, 
 				"nego_price" => $this->post('price'), 
-				"parent_id" => $chat_history_id, 
+				"parent_id" => $chat_history_id,
+				"operation_type" => $chat_history_data->operation_type,
+				"type" => $chat_history_data->type,  
 				"is_accept" => 0,
 			);
 
