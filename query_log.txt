@@ -247,3 +247,9 @@ CREATE TABLE `bs_order_confirm` (
 ALTER TABLE `bs_shippingcarriers` ADD `shippo_servicelevel_token` VARCHAR(255) NULL;
 // RB: ADDED ON 18/08/2021
 ALTER TABLE `bs_order` ADD `order_id` TEXT NOT NULL AFTER `id`;
+// RB: ADDED ON 19/08/2021
+ALTER TABLE `bs_order` ADD `confirm_by_seller` VARCHAR(10) NOT NULL DEFAULT 'no' COMMENT 'yes or no' AFTER `transaction_id`;
+// RB: ADDED ON 20/08/2021
+ALTER TABLE `bs_order` ADD `seller_charge` VARCHAR(50) NOT NULL AFTER `confirm_by_seller`;
+ALTER TABLE `bs_order` ADD `seller_transaction` TEXT NULL AFTER `seller_charge`;
+ALTER TABLE `bs_order` ADD `seller_transaction_id` TEXT NULL AFTER `seller_transaction`, ADD `seller_transaction_status` VARCHAR(50) NULL AFTER `seller_transaction_id`;
