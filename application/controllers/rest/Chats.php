@@ -1281,8 +1281,11 @@ class Chats extends API_Controller
 		
 		//start new code
 		$type 	 = $this->post('type');
+		
 		if($return_type == 'buyer'){
 			$condition = "operation_type = '".$type."'";
+		} else if($return_type == 'seller'){
+			$condition = "operation_type = '2'";	
 		}
 		// $condition = "type = '".$type."'";
 

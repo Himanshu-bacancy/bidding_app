@@ -659,6 +659,16 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+		if ( isset( $conds['order_by_field'] )) {
+			$order_by_field = $conds['order_by_field'];
+			$order_by_type = $conds['order_by_type'];
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by( 'bs_items.'.$order_by_field, $order_by_type);
+		} else {
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by('added_date', 'desc' );
+		}
+
 		// where clause
 		$this->custom_conds( $conds );
 		
@@ -1690,6 +1700,15 @@ class PS_Model extends CI_Model {
 			$this->db->or_like( 'condition_of_item_id', $conds['searchterm'] );
 			$this->db->or_like( 'highlight_info', $conds['searchterm'] );
 			$this->db->group_end();
+		}
+		if ( isset( $conds['order_by_field'] )) {
+			$order_by_field = $conds['order_by_field'];
+			$order_by_type = $conds['order_by_type'];
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by( 'bs_items.'.$order_by_field, $order_by_type);
+		} else {
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by('added_date', 'desc' );
 		}
 
    		return $this->db->get();
