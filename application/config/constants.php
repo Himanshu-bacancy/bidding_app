@@ -110,3 +110,4 @@ define('REQUEST_ITEM', '1');
 define('SELLING', '2');
 define('EXCHANGE', '3');
 define('DIRECT_BUY', '4');
+define('SHIPPO_AUTH_TOKEN', 'shippo_test_74fbe972f439460ea46efaaa264d8cfb97cf4cf3');

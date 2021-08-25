@@ -46,16 +46,18 @@ class Cart extends API_Controller {
         
         $is_record_already_exists = $this->db->select('id')->from('bs_cart')->where('user_id', $user_id)->where('item_id', $item_id)->get()->num_rows();
         $success_message = "Item already added to cart";
+        $alraedy_in_cart = "0";
         if(!$is_record_already_exists) {
-            $is_multi_item = $this->db->select('id')->from('bs_cart')->where('user_id', $user_id)->get()->num_rows();
-            $success_message = "Multiple item not allowed";
+            $is_multi_item = $this->db->select('id')->from('bs_cart')->where('item_id', $item_id)->get()->num_rows();
+            $alraedy_in_cart = "1";
             if(!$is_multi_item) {
-                $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
+                $alraedy_in_cart = "0";
                 $success_message = "Item added to cart successfully";
             }
+            $this->db->insert('bs_cart', ['user_id' => $user_id, 'item_id' => $item_id, 'type_id' => $type_id, 'color_id' => $color_id, 'size_id' => $size_id, 'quantity' => $quantity, 'brand' => $brand, 'created_date' => date('Y-m-d H:i:s')]);
         }
     
-        $this->success_response($success_message);
+        $this->response(['status' => 'success', 'message' => $success_message, 'alraedy_in_cart' => $alraedy_in_cart]);
     }
     
     public function remove_cart_item_post() {
@@ -127,10 +129,12 @@ class Cart extends API_Controller {
         $user_id = $this->post('user_id');
         
         $obj = $this->db->select('bs_cart.* ,bs_items.id as item_id, bs_items.title, bs_items.dynamic_link, bs_items.price, bs_items.delivery_method_id')->from('bs_cart')->join('bs_items', 'bs_cart.item_id = bs_items.id')
-                ->where('user_id', $user_id)->get()->row();
+                ->where('user_id', $user_id)->get()->result();
         $sum_of_cart = $this->db->query('SELECT sum(bs_items.price) as sum FROM bs_items JOIN bs_cart ON  bs_items.id = bs_cart.item_id WHERE bs_cart.user_id = "'.$user_id.'" GROUP BY bs_cart.user_id')->row();
-        $row = $this->Item->get_one( $obj->item_id );
-        $this->ps_adapter->convert_item($row);
+        foreach ($obj as $key => $value) {
+            $row[$key] = $this->Item->get_one( $value->item_id );
+            $this->ps_adapter->convert_item($row[$key]);
+        }
 //        print_r($tmp_req_item);
 //        die();
 //        foreach ($obj as $key => $value) {

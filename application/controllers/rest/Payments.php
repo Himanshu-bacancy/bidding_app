@@ -247,6 +247,7 @@ class Payments extends API_Controller {
 //        $order_id = $this->post('order_id');
 //        $card_id = $this->post('card_id');
         $amount = 0;
+        $track_number = '';
         if( (!isset($posts_var['shipping_carrier_id']) || empty($posts_var['shipping_carrier_id']) || is_null($posts_var['shipping_carrier_id'])) && (!isset($posts_var['package_size']) || empty($posts_var['package_size']) || is_null($posts_var['package_size'])) ) {
             if(!isset($posts_var['amount']) || empty($posts_var['amount']) || is_null($posts_var['amount'])) {
                 $this->error_response("Please provide shipping info");
@@ -256,6 +257,89 @@ class Payments extends API_Controller {
         } else {
             $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $posts_var['shipping_carrier_id'])->get()->row();
             $amount = $shippingcarriers_details->price;
+            
+            $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
+            
+            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                    ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                    ->where('order_id', $posts_var['order_id'])->get()->row();
+            
+            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order_confirm')
+                    ->join('core_users', 'bs_order_confirm.seller_id = core_users.user_id')
+                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                    ->where('order_id', $posts_var['order_id'])->get()->row();
+            /*Shippo integration Start*/
+            $headers = array(
+                "Content-Type: application/json",
+                "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+                                  );
+
+            $url = 'https://api.goshippo.com/transactions/';
+
+            $address_from = array(
+                "name"=> $seller_detail->user_name,
+                "street1"=> $seller_detail->address1.','.$seller_detail->address2,
+                "city"=> $seller_detail->city,
+                "state"=> $seller_detail->state,
+                "zip" => $seller_detail->zipcode,
+                "country" => $seller_detail->country,
+                "phone" => $seller_detail->user_phone,
+                "email" => $seller_detail->user_email
+                          );    
+
+            $address_to = array(
+                "name"=> $buyer_detail->user_name,
+                "street1"=> $buyer_detail->address1.','.$buyer_detail->address2,
+                "city"=> $buyer_detail->city,
+                "state"=> $buyer_detail->state,
+                "zip" => $buyer_detail->zipcode,
+                "country" => $buyer_detail->country,
+                "phone" => $buyer_detail->user_phone,
+                "email" => $buyer_detail->user_email
+                          );
+
+            $parcel = array(
+                "length"=> $package_details->length,
+                "width"=> $package_details->width,
+                "height"=> $package_details->height,
+                "distance_unit"=> "in",
+                "weight"=> $package_details->weight,
+                "mass_unit" => "lb"
+                          ); 
+
+                $shipment = 
+                        array(
+                            "address_to" =>$address_to,
+                            "address_from" =>$address_from,
+                            "parcels"=> $parcel
+                                 );
+
+                $shipmentdata = 
+                array(
+                    "shipment"=> $shipment,
+                    "carrier_account"=> $posts_var['shipping_carrier_id'],
+                    "servicelevel_token"=> "usps_priority"
+                            );                   
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($shipmentdata));
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+                $response = curl_exec($ch); 
+//                echo '<pre>';
+//                print_r($response);
+                curl_close($ch);	
+                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => '', 'status' => '', 'tracking_number' => '', 'tracking_url' => '', 'label_url' => '', 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
+                $track_number = $response->tracking_number;
+            /*Shippo integration End*/
+        }
+        if(is_null($track_number)) {
+            $this->error_response("Something wrong with shipping provided detail");
         }
         
         $card_id = $this->post('card_id');
@@ -286,7 +370,7 @@ class Payments extends API_Controller {
             $this->db->where('order_id', $posts_var['order_id'])->update('bs_order', ['seller_transaction' => $response]);
             if (isset($response->id)) { 
                 $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => 'initiate', 'seller_transaction_id' => $response->id]);
-                $this->response(['status' => "success", 'response' => $response]);
+                $this->response(['status' => "success", 'response' => $response, 'track_number' => $track_number]);
             } else {
                 $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
                 $this->error_response(get_msg('stripe_transaction_failed'));
@@ -295,6 +379,43 @@ class Payments extends API_Controller {
             $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
             $this->error_response(get_msg('stripe_transaction_failed'));
         }
+    }
+    
+    public function track_order_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'track_number',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $track_number = $this->post('track_number');
+        $headers = array(
+            "Content-Type: application/json",
+            "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+                              );
+
+            $url = 'https://api.goshippo.com/tracks/shippo/'.$track_number;
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+            $response = curl_exec($ch); 
+
+//            echo '<pre>';
+//            print_r($response);
+            curl_close($ch);
+            
+        $this->response(['status' => 'success', 'response' => json_decode($response)]);
     }
     
     public function seller_update_order_post() {
@@ -402,7 +523,7 @@ class Payments extends API_Controller {
             $items = $this->db->from('bs_items')->where_in('id', explode(',', $get_record->items))->get()->result_array();
             
             foreach ($items as $key => $value) {
-                $this->db->insert('bs_order_confirm', ['order_id' => $record_id, 'item_id' => $value['id'], 'seller_id' => $value['added_user_id'], 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order_confirm', ['order_id' => $get_record->order_id, 'item_id' => $value['id'], 'seller_id' => $value['added_user_id'], 'created_at' => date('Y-m-d H:i:s')]);
             }
         }
         
