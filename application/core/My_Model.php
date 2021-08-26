@@ -471,28 +471,7 @@ class PS_Model extends CI_Model {
 
 	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
 		//print_r($conds);die;
-
-		// if($conds['lat'] != "" && $conds['lng'] != "") {
-		// 	$this->db->select('*,( 3959
-		//       * acos( cos( radians('. $conds['lat'] .') )
-		//               * cos(  radians( lat )   )
-		//               * cos(  radians( lng ) - radians('. $conds['lng'] .') )
-		//             + sin( radians('. $conds['lat'] .') )
-		//               * sin( radians( lat ) )
-		//             )
-		//     ) as distance');
-
-		//     if ($conds['miles'] == "") {
-		//     	$conds['miles'] = 0;
-		//     	$this->db->having('distance < ' .  $conds['miles'] );
-		//     } else {
-		//     	$this->db->having('distance < ' .  $conds['miles'] );
-
-		//     }
-
-		   
-		// }
-
+		
 		if ( empty( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', 0);
 		}
@@ -678,14 +657,30 @@ class PS_Model extends CI_Model {
 
 		if ( $limit ) {
 		// if there is limit, set the limit
-			
 			$this->db->limit($limit);
 		}
 		
 		if ( $offset ) {
-		// if there is offset, set the offset,
-			
+		// if there is offset, set the offset,			
 			$this->db->offset($offset);
+		}
+
+		if($conds['lat'] != "" && $conds['lng'] != "") {
+			$this->db->select('*,( 3959
+		      * acos( cos( radians('. $conds['lat'] .') )
+		              * cos(  radians( lat )   )
+		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		            + sin( radians('. $conds['lat'] .') )
+		              * sin( radians( lat ) )
+		            )
+		    ) as distance');
+
+		    if ($conds['miles'] == "") {
+		    	$conds['miles'] = 0;
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+		    } else {
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+		    }
 		}
 
 	 	return $this->db->get();
@@ -1528,6 +1523,7 @@ class PS_Model extends CI_Model {
 	// }
 
 	function get_all_item_by_paid ( $conds ) {
+		
 		$this->db->select('bs_items.*'); 
 		$this->db->from('bs_items');
 		$this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
@@ -1710,6 +1706,26 @@ class PS_Model extends CI_Model {
 			$this->db->order_by( 'bs_items.is_paid', 'desc');
 			$this->db->order_by('added_date', 'desc' );
 		}
+		if($conds['lat'] != "" && $conds['lng'] != "") {
+			
+			//$this->db->select("'distance' as distance"); 
+			$this->db->select('( 3959
+		      * acos( cos( radians('. $conds['lat'] .') )
+		              * cos(  radians( lat )   )
+		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		            + sin( radians('. $conds['lat'] .') )
+		              * sin( radians( lat ) )
+		            )
+		    ) as distance');
+
+		    if ($conds['miles'] == "") {
+		    	$conds['miles'] = 0;
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+		    } else {
+		    	$this->db->having('distance < ' .  $conds['miles'] );
+
+		    }
+		}
 
    		return $this->db->get();
    		//print_r($this->db->last_query());die;
@@ -1743,26 +1759,7 @@ class PS_Model extends CI_Model {
 		/* query 1 start */
 		$this->db->select('bs_items.*'); 
 
-		//Start - Modify By PPH @ 12 May 2020
-		if($conds['lat'] != "" && $conds['lng'] != "") {
-			//$this->db->select("'distance' as distance"); 
-			$this->db->select('( 3959
-		      * acos( cos( radians('. $conds['lat'] .') )
-		              * cos(  radians( lat )   )
-		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
-		            + sin( radians('. $conds['lat'] .') )
-		              * sin( radians( lat ) )
-		            )
-		    ) as distance');
-
-		    if ($conds['miles'] == "") {
-		    	$conds['miles'] = 0;
-		    	$this->db->having('distance < ' .  $conds['miles'] );
-		    } else {
-		    	$this->db->having('distance < ' .  $conds['miles'] );
-
-		    }
-		}
+		
 		//End - Modify By PPH @ 12 May 2020
 		$this->db->from('bs_items');
 		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');

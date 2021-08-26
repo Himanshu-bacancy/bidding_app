@@ -206,9 +206,34 @@ class Users extends API_Controller
 					$this->error_response( get_msg( 'user_register_success_but_email_not_send' ));
 				} 
 			}
-       		$this->custom_response($this->User->get_one($user_id));
+			
+			$userdatacs = $this->User->get_one($user_id);
+
+			$payload = [
+				'user_id' => $userdatacs->user_id ? $userdatacs->user_id : 0,
+				'user_email' => $userdatacs->user_email ? $userdatacs->user_email : '',
+				'user_phone' => $userdatacs->user_phone ? $userdatacs->user_phone : '',
+				'device_token' => $userdatacs->device_token ? $userdatacs->device_token : '',
+			];
+
+			$token = $this->authorization_token->generateToken($payload);
+			$userdatacs->token = $token;
+       		$this->custom_response($userdatacs);
+       		
        	}
-        $this->custom_response($this->User->get_one($user_data["user_id"]));
+		$userdatac = $this->User->get_one($user_data["user_id"]);
+
+		$payload = [
+			'user_id' => $userdatac->user_id ? $userdatac->user_id : 0,
+			'user_email' => $userdatac->user_email ? $userdatac->user_email : '',
+			'user_phone' => $userdatac->user_phone ? $userdatac->user_phone : '',
+			'device_token' => $userdatac->device_token ? $userdatac->device_token : '',
+		];
+
+		$token = $this->authorization_token->generateToken($payload);
+		$userdatac->token = $token;
+        $this->custom_response($userdatac);
+        //$this->custom_response($this->User->get_one($user_data["user_id"]));
 
 	}
 
@@ -2952,26 +2977,21 @@ class Users extends API_Controller
 	/**
 	 * Users Logout
 	 */
-	function logout_post()
-	{
-
+	function logout_post(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
 
-		if(!empty($user_data) && $user_data['token_data'])
-		{
+		if(!empty($user_data) && $user_data['token_data']){
 			// validation rules for user register
-			$rules = array(
-				
+			$rules = array(	
 				array(
 					'field' => 'user_id',
 					'rules' => 'required|callback_id_check[User]'
 				)
 			);
-
 			// exit if there is an error in validation,
 			if ( !$this->is_valid( $rules )) exit;
 			
@@ -2980,18 +3000,17 @@ class Users extends API_Controller
 
 			$headers = $this->input->request_headers();
 			$token_data = array(
-
 				"token" => $headers['Authorization'],
 				"user_id" => $user_data['token_data']['user_id'], 
 				"added_date" => date("Y-m-d H:i:s")
 			);
-
 			$this->Blacklists->save($token_data);
-
 			$this->success_response( get_msg( 'success_logout' ));
 		}
-		
+	}
 
+	public function block_user_post(){
+		
 	}
 	
 

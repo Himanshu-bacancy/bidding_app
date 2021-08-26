@@ -672,8 +672,13 @@ class Items extends API_Controller
 
 
 		}
+		$userAddressCond['user_id'] = $final_conds['added_user_id'] ? $final_conds['added_user_id'] : '';
+		$userAddressCond['is_default_address'] = 1; 
+		$address_data = $this->Addresses->get_one_by($userAddressCond);
+		$final_conds['lat'] = $address_data->latitude ? $address_data->latitude : '';
+		$final_conds['lng'] = $address_data->longitude ? $address_data->longitude : '';
 		$conds = $final_conds;
-		//echo '<pre>'; print_r($conds); die;
+		// echo '<pre>'; print_r($address_data); die;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
 		
