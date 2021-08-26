@@ -135,6 +135,7 @@ class Cart extends API_Controller {
             $row[$key] = $this->Item->get_one( $value->item_id );
             $this->ps_adapter->convert_item($row[$key]);
         }
+        $row = $this->ps_security->clean_output( $row );
 //        print_r($tmp_req_item);
 //        die();
 //        foreach ($obj as $key => $value) {
