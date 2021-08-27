@@ -648,23 +648,6 @@ class PS_Model extends CI_Model {
 			$this->db->order_by('added_date', 'desc' );
 		}
 
-		// where clause
-		$this->custom_conds( $conds );
-		
-		
-		// from table
-		$this->db->from( $this->table_name );
-
-		if ( $limit ) {
-		// if there is limit, set the limit
-			$this->db->limit($limit);
-		}
-		
-		if ( $offset ) {
-		// if there is offset, set the offset,			
-			$this->db->offset($offset);
-		}
-
 		if($conds['lat'] != "" && $conds['lng'] != "") {
 			$this->db->select('*,( 3959
 		      * acos( cos( radians('. $conds['lat'] .') )
@@ -682,6 +665,24 @@ class PS_Model extends CI_Model {
 		    	$this->db->having('distance < ' .  $conds['miles'] );
 		    }
 		}
+
+		// where clause
+		$this->custom_conds( $conds );
+		
+		
+		// from table
+		$this->db->from( $this->table_name );
+
+		if ( $limit ) {
+		// if there is limit, set the limit
+			$this->db->limit($limit);
+		}
+		
+		if ( $offset ) {
+		// if there is offset, set the offset,			
+			$this->db->offset($offset);
+		}
+
 
 	 	return $this->db->get();
 		//print_r($this->db->last_query());die;

@@ -19,12 +19,27 @@ class Reason extends API_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
+
+
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'type',
+	        	'rules' => 'required'
+	        )
+        );
+
+        if ( !$this->is_valid( $rules )) exit;
         $type = $this->post('type');
-        $data = $this->db->select('id, type, name')->from('bs_reasons')->where(array('status' => 1 ,'type' => $type))->order_by('id','desc')->get()->result_array();
+        $this->db->where('type', $type);
+		$this->db->where('status', 1);
+        $this->db->order_by('id','desc');
+    	$data = $this->db->get('bs_reasons')->result();
+        //echo '<pre>'; print_r($data); die(' hello testing');
         if(count($data)) {
-            $this->response($data);
+            $this->custom_response($data);
         } else {
-            $this->error_response($this->config->item( 'record_not_found'));
+            $this->error_response('record_not_found');
         }
     }
 }

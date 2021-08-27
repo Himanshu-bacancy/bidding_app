@@ -248,6 +248,16 @@ class PS_Adapter {
 			$obj->sizegroup = $tmp_sizegroup;
 		}
 
+		if ( isset( $obj->shippingcarrier_id )) {
+			$tmp_shippingCarrier = $this->CI->Shippingcarriers->get_one( $obj->shippingcarrier_id );
+			$obj->shipping_carrier = $tmp_shippingCarrier;
+		}
+
+		if ( isset( $obj->packagesize_id )) {
+			$tmp_packageSize = $this->CI->Packagesizes->get_one( $obj->packagesize_id );
+			$obj->package_size = $tmp_packageSize;
+		}
+
 		// fetch exchange category
 		if (  $obj->is_exchange =='1') {
 

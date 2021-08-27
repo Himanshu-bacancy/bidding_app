@@ -1281,12 +1281,14 @@ class Chats extends API_Controller
 		
 		//start new code
 		$type 	 = $this->post('type');
-		
-		if($return_type == 'buyer'){
+		if($type != '' && $type != 2){
 			$condition = "operation_type = '".$type."'";
-		} else if($return_type == 'seller'){
-			$condition = "operation_type = '2'";	
 		}
+		// if($return_type == 'buyer'){
+			
+		// } else if($return_type == 'seller'){
+		// 	$condition = "operation_type = '2'";	
+		// }
 		// $condition = "type = '".$type."'";
 
 		// if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
@@ -1297,11 +1299,11 @@ class Chats extends API_Controller
 		// 	$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		// }
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-			$condition .=  $condition != '' ? " AND buyer_user_id = '".$user_id."'" : "buyer_user_id = '".$user_id."'"; 
-		} else if($type == SELLING){
-			$condition .= $condition != '' ? " AND seller_user_id = '".$user_id."'" : "seller_user_id = '".$user_id."'";
-		} else if($type == EXCHANGE) {
-			$condition .= $condition != '' ? " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') " : "(buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
+			$condition .=  $condition != '' ? " AND buyer_user_id = '".$user_id."'" : "buyer_user_id = '".$user_id."' AND operation_type = '1' OR operation_type = '4'"; 
+		} else if($type == EXCHANGE){
+			$condition .= $condition != '' ? " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3'" : "(buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' ";
+		} else {
+			$condition .= $condition != '' ? " AND seller_user_id = '".$user_id."'" : "seller_user_id = '".$user_id."' AND operation_type != '3'";		
 		}
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
 		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition)->result();
