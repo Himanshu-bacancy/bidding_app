@@ -266,3 +266,5 @@ CREATE TABLE `bs_track_order` (
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+// RB: ADDED ON 24/08/2021
+ALTER TABLE `bs_card` ADD `status` TINYINT NOT NULL DEFAULT '1' AFTER `address_id`;

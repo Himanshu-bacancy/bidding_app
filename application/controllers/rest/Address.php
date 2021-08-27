@@ -530,7 +530,8 @@ class Address extends API_Controller
 
         } else {
 			
-			$this->Addresses->delete( $this->post('address_id') );
+//			$this->Addresses->delete( $this->post('address_id') );
+            $this->db->where('id', $this->post('address_id'))->update('bs_addresses', ['status' => 0]);
 			
 			$this->success_response( get_msg( 'success_delete' ));
 

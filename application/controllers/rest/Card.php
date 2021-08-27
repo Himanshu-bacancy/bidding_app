@@ -89,7 +89,8 @@ class Card extends API_Controller {
 
         $id = $this->post('card_id');
         
-        $this->db->delete('bs_card', ['id' => $id]);
+        $this->db->where('id', $id)->update('bs_card', ['status' => 0]);
+//        $this->db->delete('bs_card', ['id' => $id]);
     
         $this->success_response( "Card remove successfully");
     }
@@ -110,7 +111,7 @@ class Card extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->order_by('id', 'desc')->get()->result_array();
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1)->order_by('id', 'desc')->get()->result_array();
         
         foreach ($obj as $key => $value) {
             $row[$key] = $value;

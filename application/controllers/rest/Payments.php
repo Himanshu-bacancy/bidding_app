@@ -521,8 +521,8 @@ class Payments extends API_Controller {
             $get_record = $this->db->from('bs_order')->where('order_id', $record_id)->get()->row();
             
             $items = $this->db->from('bs_items')->where_in('id', explode(',', $get_record->items))->get()->result_array();
-            
             foreach ($items as $key => $value) {
+                $this->db->where('id', $value['id'])->update('bs_items', ['pieces' => $value['pieces']-1]);
                 $this->db->insert('bs_order_confirm', ['order_id' => $get_record->order_id, 'item_id' => $value['id'], 'seller_id' => $value['added_user_id'], 'created_at' => date('Y-m-d H:i:s')]);
             }
         }
