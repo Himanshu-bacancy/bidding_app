@@ -422,6 +422,7 @@ class PS_Adapter {
 
 		$obj->is_favourited = $obj->is_favourited;
 		$obj->is_owner = $obj->is_owner;
+		$obj->gallery_images = $img = $this->CI->Image->get_all_by( array( 'img_parent_id' => $obj->id, 'img_type' => 'item' ))->result();
 
 	}
 

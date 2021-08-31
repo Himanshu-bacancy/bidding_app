@@ -1637,4 +1637,33 @@ class Chats extends API_Controller
 		}
 	}
 
+
+	public function get_offer_details_post(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		// validation rules for cancel offer
+		$rules = array(
+			array(
+	        	'field' => 'offer_id',
+	        	'rules' => 'required'
+	        )
+        );
+		if ( !$this->is_valid( $rules )) exit;
+		$offerId = $this->post('offer_id');
+		$conds['id'] = $offerId;
+
+        // check user id
+
+        $offer_data = $this->Chat->get_one_by($conds);
+		$this->ps_adapter->convert_chathistory( $offer_data );
+		if($offer_data){
+			$this->custom_response( $offer_data );
+		} else {
+			$this->error_response(get_msg( 'offer_not_found'));
+		}
+	}
+
 }
