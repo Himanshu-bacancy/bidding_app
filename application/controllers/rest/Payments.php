@@ -488,7 +488,9 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->from('bs_order')->where('order_id', $order_id)->get()->row_array();
+        $orders = $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url')->from('bs_order')
+                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id')
+                ->where('bs_order.order_id', $order_id)->get()->row_array();
         
         if(count($orders)) {
             $this->response($orders);
