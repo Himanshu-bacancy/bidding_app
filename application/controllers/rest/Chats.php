@@ -1598,46 +1598,6 @@ class Chats extends API_Controller
 		$this->custom_response( $chat_data_update );
 	}
 	
-	public function cancel_offer_post(){
-		// API Configuration [Return Array: User Token Data]
-        $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
-            'requireAuthorization' => true,
-        ]);
-		// validation rules for cancel offer
-		$rules = array(
-			array(
-	        	'field' => 'user_id',
-	        	'rules' => 'required'
-	        ),
-			array(
-	        	'field' => 'operation_id',
-	        	'rules' => 'required'
-	        )
-        );
-		if ( !$this->is_valid( $rules )) exit;
-		
-		$chatId = $this->post('operation_id');
-		$chatHistoryData = array('is_cancel'=>1);
-		if(!$this->Chat->Save( $chatHistoryData, $chatId )) {
-			$this->error_response( get_msg( 'err_cancel_offer' ));
-		} else {
-			$reasonOperationData =  array(
-				'reason_id'=>$this->post('reason_id') ? $this->post('reason_id') : '',
-				'other_reason'=>$this->post('other_reason') ? $this->post('other_reason') : '',
-				'operation_id'=>$this->post('operation_id') ? $this->post('operation_id') : '',
-				'type'=>'cancel_offer',
-				'user_id'=>$this->post('user_id') ? $this->post('user_id') : '',
-			);
-			if($this->Reason_operation->Save($reasonOperationData)){
-				$this->success_response(get_msg('offer_cancelled_success'));
-			} else {
-				$this->error_response(get_msg( 'err_cancel_offer'));
-			}
-		}
-	}
-
-
 	public function get_offer_details_post(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
