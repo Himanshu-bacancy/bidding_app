@@ -981,8 +981,7 @@ class Items extends API_Controller
 
 	/**
 	 * auto suggestion item with category
-	 * @param      <type>   $text  The  to search the item
-	 
+	 * @param <type> $text The to search the item	 
 	 */
 	function autosearch_post()
 	{
