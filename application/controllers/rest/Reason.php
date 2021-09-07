@@ -133,20 +133,20 @@ class Reason extends API_Controller
         $data = array( 'user_id' => $user_id, 'operation_id' => $operation_id );
         $block_data = array( 'operation_id' => $user_id, 'user_id' => $operation_id );
 
-        $query1 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
+        $query1 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
         $data_count = $query1->num_rows();
-        $query2 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
+        $query2 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
         $block_data_count = $query2->num_rows();
         //delete block count is more than 0
         // echo '<pre>'; print_r($this->post());
         if ($data_count > 0 || $block_data_count > 0) {
             $this->db->where('user_id', $user_id);
             $this->db->where('operation_id', $operation_id);
-            $this->db->delete('bs_reason_operations');
+            $this->db->delete('bs_reason_operation');
 
             $this->db->where('operation_id', $user_id);
             $this->db->where('user_id', $operation_id);
-            $this->db->delete('bs_reason_operations');
+            $this->db->delete('bs_reason_operation');
         }
         $data['reason_id'] = !empty($this->post('reason_id')) ? $this->post('reason_id') : 0;
         $data['other_reason'] = !empty($this->post('other_reason')) ? $this->post('other_reason') : '';
@@ -190,20 +190,20 @@ class Reason extends API_Controller
         $block_data = array( 'operation_id' => $user_id, 'user_id' => $operation_id );
      		
         // unblock user ( just need to delete )
-        $query1 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
+        $query1 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
         $data_count = $query1->num_rows();
-        $query2 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
+        $query2 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
         $block_data_count = $query2->num_rows();
         //delete block count is more than 0
         // echo '<pre>'; print_r($this->post());
         if ($data_count > 0 || $block_data_count > 0) {
             $this->db->where('user_id', $user_id);
             $this->db->where('operation_id', $operation_id);
-            $this->db->delete('bs_reason_operations');
+            $this->db->delete('bs_reason_operation');
 
             $this->db->where('operation_id', $user_id);
             $this->db->where('user_id', $operation_id);
-            $this->db->delete('bs_reason_operations');
+            $this->db->delete('bs_reason_operation');
         } else {
             $this->success_response( get_msg( 'no_user_unblock' ));
         }
@@ -236,7 +236,7 @@ class Reason extends API_Controller
         $data = array('id' => $operation_id );
         if($this->Item->exists( $data )){	
             $reasonData = $this->db->select('id')
-                            ->from('bs_reason_operations')
+                            ->from('bs_reason_operation')
                             ->where('operation_id', $operation_id)
                             ->where('user_id', $user_id)
                             ->where('type', 'report_item')

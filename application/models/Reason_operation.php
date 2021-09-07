@@ -6,12 +6,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Reason_operation extends PS_Model {
 
-	/**
+	/**Reason_operations
 	 * Constructs the required data
 	 */
 	function __construct() 
-	{
-		parent::__construct( 'bs_reason_operations', 'id', '' );
+	{	
+		parent::__construct( 'bs_reason_operation', 'id');
 	}
 
 	/**
@@ -21,11 +21,6 @@ class Reason_operation extends PS_Model {
 	 */
 	function custom_conds( $conds = array())
 	{
-		// default where clause
-		if ( !isset( $conds['no_publish_filter'] )) {
-			$this->db->where( 'status', 1 );
-		}
-
 		// id condition
 		if ( isset( $conds['id'] )) {
 			$this->db->where( 'id', $conds['id'] );
@@ -56,17 +51,30 @@ class Reason_operation extends PS_Model {
 		if ( isset( $conds['user_id'] )) {
 			$this->db->like( 'user_id', $conds['user_id'] );
 		}
-
 		// order_by
 		if ( isset( $conds['order_by'] )) {
 
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
 
-			$this->db->order_by( 'bs_reason_operations.'.$order_by_field, $order_by_type );
+			$this->db->order_by( 'bs_reason_operation.'.$order_by_field, $order_by_type );
 		} else {
 
 			$this->db->order_by( 'added_date' );
 		}
+	}
+
+
+	function count_all_reported_items_for_today(){
+		
+		$this->db->from('bs_reason_operation');
+		$date = date('Y-m-d');
+		
+		$this->db->where('DATE(added_date)', $date);
+		$this->db->where('type', 'report_item');
+		// return the count all results
+		//echo '<pre>'; print_r($this->db->result()); die('hello testing');
+		return $this->db->count_all_results();
+		//print_r($this->db->last_query());die;
 	}
 }

@@ -22,7 +22,7 @@
             <?php 
               $data = array(
                 'url' => site_url() . "/admin/categories" ,
-                'total_count' => $this->Category->count_all(),
+                'total_count' => $this->Category->count_all_for_today(),
                 'label' => get_msg( 'total_category_count_label'),
                 'icon' => "fa fa-th-list",
                 'color' => "bg-primary"
@@ -36,9 +36,9 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url() . "/admin/subcategories" ,
-                'total_count' => $this->Subcategory->count_all_by(),
-                'label' => get_msg( 'total_sub_cat_count_label'),
+                'url' => site_url() . "/admin/registered_users" ,
+                'total_count' => $this->User->count_all_for_today(),
+                'label' => get_msg( 'total_users_count_label'),
                 'icon' => "fa fa-list",
                 'color' => "bg-success"
               );
@@ -51,9 +51,9 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url() . "/admin/blogs" ,
-                'total_count' => $this->Feed->count_all_by(),
-                'label' => get_msg( 'total_blog_count_label'),
+                'url' => site_url() . "/admin/reported_items" ,
+                'total_count' => $this->Reason_operation->count_all_reported_items_for_today(),
+                'label' => get_msg( 'total_reported_items_count_label'),
                 'icon' => "fa fa-wpforms",
                 'color' => "bg-warning"
               );
@@ -67,7 +67,7 @@
             <?php 
               $data = array(
                 'url' => site_url() . "/admin/contacts" ,
-                'total_count' => $this->Contact->count_all_by(),
+                'total_count' => $this->Contact->count_all_for_today(),
                 'label' => get_msg( 'total_contact_count_label'),
                 'icon' => "fa fa-comment",
                 'color' => "bg-danger"

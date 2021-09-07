@@ -2921,49 +2921,46 @@ class Users extends API_Controller
 		$default_conds = $this->default_conds();
 		$user_conds = $this->get();
 		$conds = array_merge( $default_conds, $user_conds );
-		$conds_block['from_block_user_id'] = $this->get( 'login_user_id' );
-
-		$blocked_datas = $this->Block->get_all_by($conds_block)->result();
+		$conds_report['user_id'] = $this->get( 'login_user_id' );
+		//echo '<pre>'; print_r($this->Reason_operation);
+		$query1 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$conds_report['user_id']."' AND type = 'block_user'");
+        $blocked_datas = $query1->result();
+		//$blocked_datas = $this->Block->get_all_by($conds_block)->result();
 		//print_r(count( $blocked_datas ));die;
-		$user_data = $this->_apiConfig([
-            'methods' => ['GET'],
-            'requireAuthorization' => true,
-        ]);
-		//echo '<pre>'; print_R($user_data); die('  himanshu sharma');
 		if ( count( $blocked_datas ) > 0 ) {
 			foreach ($blocked_datas as $blocked_data) {
-		  	$result .= "'" .$blocked_data->to_block_user_id ."',";
+		  	$result .= "'" .$blocked_data->operation_id ."',";
 
 		  	//"'" .$to_block_user_data->to_block_user_id . "',";
 
-		}
+			}
 
 
-		if ( !empty( $limit ) && !empty( $offset )) {
-		// if limit & offset is not empty
-			//$data = $this->model->get_wallpaper_delete_by_userid( $conds, $limit, $offset )->result();
-			$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
-		} else if ( !empty( $limit )) {
-		// if limit is not empty
+			if ( !empty( $limit ) && !empty( $offset )) {
+			// if limit & offset is not empty
+				//$data = $this->model->get_wallpaper_delete_by_userid( $conds, $limit, $offset )->result();
+				$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
+			} else if ( !empty( $limit )) {
+			// if limit is not empty
 
-			//$data = $this->model->get_wallpaper_delete_by_userid( $conds, $limit )->result();
-			$data = $this->model->get_all_by( $conds, $limit )->result();
-		} else {
-		// if both are empty
-			//$data = $this->model->get_wallpaper_delete_by_userid( $conds )->result();
-			$data = $this->model->get_all_by( $conds )->result();
-		}
+				//$data = $this->model->get_wallpaper_delete_by_userid( $conds, $limit )->result();
+				$data = $this->model->get_all_by( $conds, $limit )->result();
+			} else {
+			// if both are empty
+				//$data = $this->model->get_wallpaper_delete_by_userid( $conds )->result();
+				$data = $this->model->get_all_by( $conds )->result();
+			}
 
 
-		$blocked_user = rtrim($result,",");
+			$blocked_user = rtrim($result,",");
 
-		$conds['user_id'] = $blocked_user;
+			$conds['user_id'] = $blocked_user;
 
-		$user_list = $this->User->get_all_in_blocked_user($conds, $limit, $offset)->result();
-		//print_r($user_list);die;
-		
-		//$this->ps_adapter->convert_item( $user_list );
-		$this->custom_response( $user_list );
+			$user_list = $this->User->get_all_in_blocked_user($conds, $limit, $offset)->result();
+			//print_r($user_list);die;
+			
+			//$this->ps_adapter->convert_item( $user_list );
+			$this->custom_response( $user_list );
 
 		} else {
 			$this->error_response($this->config->item( 'record_not_found'));
