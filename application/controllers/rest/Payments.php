@@ -48,8 +48,9 @@ class Payments extends API_Controller {
         if(!isset($posts_var['items']) || empty($posts_var['items']) || is_null($posts_var['items'])) { 
             $this->error_response("Please pass items");
         } else {
-            $clean_json = html_entity_decode($posts_var['items']);
-            $items = json_decode($clean_json,TRUE);
+//            $clean_json = html_entity_decode($posts_var['items']);
+//            $items = json_decode($clean_json,TRUE);
+            $items = $posts_var['items'];
         }
         if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
             $this->error_response("Please pass card id");
@@ -64,12 +65,13 @@ class Payments extends API_Controller {
         $paid_config = $this->Paid_config->get_one('pconfig1');
         $card_total_amount = 0;
         $records = [];
+        
         foreach ($items as $key => $value) {
             $item_price = $value['price'];
             $new_odr_id = 'odr_'.time().$user_id;
             
-            $card_total_amount += $item_price;
             if($value['delivery_method_id'] == DELIVERY_ONLY) {
+                $card_total_amount += $item_price;
                 $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $value['item_id'])->get()->row();
                 
                 if($get_item->pay_shipping_by == '1') {
@@ -91,6 +93,7 @@ class Payments extends API_Controller {
 
             }
         }
+        
         if($card_total_amount) {
             # set stripe test key
             \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
@@ -113,25 +116,25 @@ class Payments extends API_Controller {
                 ]);
                 
                 if (isset($response->id)) { 
-                    $this->db->where_in('id', $records)->update(['status' => 'initiate', 'transaction_id' => $response->id]);
+                    $this->db->where_in('id', $records)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
                     
                     $item_ids = array_column($items,'item_id');
                     $seller = $this->db->select('device_token')->from('bs_items')
                             ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                             ->where_in('bs_items.id', $item_ids)->get()->row();
                     send_push( $seller->device_token, ["message" => "New order arrived", "flag" => "new_order"] );
-                    
-                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $new_odr_id, 'client_secret' => $response->client_secret, 'response' => $response]);
+                    $response = $this->ps_security->clean_output( $response );
+                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card']);
                 } else {
-                    $this->db->where_in('id', $records)->update(['status' => 'fail']);
+                    $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
             } catch (exception $e) {
-                $this->db->where_in('id', $records)->update(['status' => 'fail']);
+                $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
         } else {
-            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[]]);
+            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
         }
     }
 
@@ -246,7 +249,7 @@ class Payments extends API_Controller {
                 $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) { 
-                    $this->db->where('id', $record_id)->update(['status' => 'initiate', 'transaction_id' => $response->id]);
+                    $this->db->where('id', $record_id)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'record_id' => $new_odr_id, 'client_secret' => $response->client_secret, 'response' => $response]);
                     
                     $items = $this->db->from('bs_items')->where_in('id', $item_ids)->get()->result_array();
@@ -255,11 +258,11 @@ class Payments extends API_Controller {
                         send_push( $seller_device_token->device_token, ["message" => "New order arrived", "flag" => "new_order"] );
                     }
                 } else {
-                    $this->db->where('id', $record_id)->update(['status' => 'fail']);
+                    $this->db->where('id', $record_id)->update('bs_order',['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
             } catch (exception $e) {
-                $this->db->where('id', $record_id)->update(['status' => 'fail']);
+                $this->db->where('id', $record_id)->update('bs_order',['status' => 'fail']);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
         } else if($payment_method == 'cash') {
@@ -582,8 +585,7 @@ class Payments extends API_Controller {
             ),
             array(
                 'field' => 'operation_type',
-                'rules' => 'required'
-            ),
+                'rules' => 'required'            ),
         );
         if (!$this->is_valid($rules)) exit;
         
@@ -645,7 +647,7 @@ class Payments extends API_Controller {
         
         $record_id = $this->post('record_id');
         $status = $this->post('status');
-        $this->db->where('order_id', $record_id)->update('bs_order',['status' => $status]);
+        $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $status]);
         
         if($status == 'succeeded') {
             $get_record = $this->db->from('bs_order')->where('order_id', $record_id)->get()->row();
