@@ -708,7 +708,7 @@ class PS_Model extends CI_Model {
 		 //print_r($this->db->last_query());die;
 	}
 
-		/**
+	/**
 	 * Counts the number of all by the conditions
 	 *
 	 * @param      array   $conds  The conds
@@ -724,6 +724,26 @@ class PS_Model extends CI_Model {
 		
 		$this->db->where('DATE(added_date)', $date);
 		// return the count all results
+		return $this->db->count_all_results();
+		//print_r($this->db->last_query());die;
+	}
+
+
+	/**
+	 * Counts the number of all by the conditions
+	 *
+	 * @param      array   $conds  The conds
+	 *
+	 * @return     <type>  Number of all by.
+	 */
+	function count_all_reported_items_for_today( $conds = array()) {
+		$this->db->from('bs_reason_operation');
+		$date = date('Y-m-d');
+		
+		//$this->db->where('DATE(added_date)', $date);
+		$this->db->where('type', 'report_item');
+		// return the count all results
+		//echo '<pre>'; print_r($this->db->result()); die('hello testing');
 		return $this->db->count_all_results();
 		//print_r($this->db->last_query());die;
 	}

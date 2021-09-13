@@ -405,7 +405,7 @@ class PS_Adapter {
 			$conditionChatHistory['requested_item_id'] = $obj->id;
 			$chatHistory = $this->CI->Chat->get_all_by($conditionChatHistory)->result();
 			//echo $conditionChatHistory;
-			//$chatHistory = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$conditionChatHistory)->result();
+			//$chatHistory = $this->db->`query`("SELECT * FROM `bs_chat_history` WHERE ".$conditionChatHistory)->result();
 			$obj->big_count = count($chatHistory);
 			$lowestBid = 0;
 			foreach($chatHistory as $history){
@@ -776,6 +776,7 @@ class PS_Adapter {
 			$this->CI->db->where('id', $obj->accept_delivery_id);
 			$default_deliverymethod = $this->CI->db->get('bs_deliverymethod')->row();
 			$obj->default_deliverymethod = $default_deliverymethod;
+			$obj->default_deliverymethod->pickup_search_distance = $obj->pickup_search_distance;
 		}
 
 		if($need_return)
@@ -831,10 +832,7 @@ class PS_Adapter {
 			} else {
 				$obj->is_read = 1;
 			}
-		} 
-		
-
-
+		}
 		// set default photo
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'noti' );
 	}
@@ -863,7 +861,7 @@ class PS_Adapter {
 	/**
 	 * Customize request childsubcategory object
 	 *
-	 * @param      <type>  $obj    The object
+	 * @param <type> $obj The object
 	 */
 	function convert_childsubcategory( &$obj )
 	{
@@ -897,9 +895,7 @@ class PS_Adapter {
 				$options=array();
 				
 				foreach($selectedSizeGroups as $sizekey => $sgroups) {
-					$sizearray = $this->CI->Sizegroups->get_one($sgroups);
-					
-					
+					$sizearray = $this->CI->Sizegroups->get_one($sgroups);					
 					$sizearr = json_decode(json_encode($sizearray), true);
 
 					if(count($sizearray)>0)
@@ -935,7 +931,7 @@ class PS_Adapter {
 	/*
 	 * Customize feed object
 	 *
-	 * @param      <type>  $obj    The object
+	 * @param <type> $obj The object
 	 */
 	function convert_feed( &$obj )
 	{
@@ -947,7 +943,7 @@ class PS_Adapter {
 	/*
 	 * Customize feed object
 	 *
-	 * @param      <type>  $obj    The object
+	 * @param <type> $obj The object
 	 */
 	function convert_paid_history( &$obj )
 	{
@@ -982,18 +978,15 @@ class PS_Adapter {
 		if ( isset( $obj->item_id )) {
 			$tmp_item = $this->CI->Item->get_one( $obj->item_id );
 			$tmp_item->history_id = $obj->id;
-
 			$this->convert_item( $tmp_item );
-
 			$obj->item = $tmp_item;
 		}
-
 	}
 
 	/**
 	 * Customize tag object
 	 *
-	 * @param      <type>  $obj    The object
+	 * @param <type> $obj The object
 	 */
 	function convert_rating( &$obj )
 	{
@@ -1023,7 +1016,7 @@ class PS_Adapter {
 			}
 			
 
-		}else {
+		} else {
 
 			if ( isset( $obj->from_user_id )) {
 

@@ -738,9 +738,7 @@ class Items extends API_Controller
 				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
 
 				foreach ( $item_reported_datas as $item_reported_data ) {
-
-					$item_ids .= "'" .$item_reported_data->item_id . "',";
-			
+					$item_ids .= "'" .$item_reported_data->item_id . "',";			
 				}
 
 				// get block user's item
@@ -1274,7 +1272,6 @@ class Items extends API_Controller
 	}
 
 	function nearpolicestation_post() {
-
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
@@ -1311,19 +1308,14 @@ class Items extends API_Controller
     	if ($result === FALSE) {
     	    die('Curl failed: ' . curl_error($ch));
     	}
-
 		$searchdata = json_decode($result);
-		
 
 		$mapdata =  new stdClass();
-
-		foreach($searchdata->results as $key => $data)
-		{
+		foreach($searchdata->results as $key => $data){
 			$mapdata->$key->name = $data->name;
 			$mapdata->$key->lat = $data->geometry->location->lat;
 			$mapdata->$key->lng = $data->geometry->location->lng;
 		}
-
 		$this->response(json_decode(json_encode($mapdata), TRUE));
 		//print_r( $mapdata);
 		return $this->output
@@ -1333,10 +1325,53 @@ class Items extends API_Controller
                     'status' => 'Success',
                     'search_result' => $mapdata
             )));
-		
     	curl_close($ch);
-    	
-
 	}
 
+
+	/**
+	 * Himanshu Sharma
+	 * Function to get sold items as a complete order
+	*/
+	public function get_all_sold_items_get(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        )
+        );
+		$userId = $this->get('user_id');
+		if ( !$this->is_valid( $rules )) exit;
+
+		$this->db->select('id');
+		$this->db->where('added_user_id', $userId);
+		$this->db->from('bs_items');
+		$itemIds = $this->db->get()->result_array();
+		$itemIdsArray = [];
+		$soldItems = [];
+		if(!empty($itemIds)){
+			foreach($itemIds as $ids){
+				$itemIdsArray[] = $ids['id'];
+			}
+			if(!empty($itemIdsArray)){
+				$this->db->select('*');
+				$this->db->where('status', 'succeeded');
+				$this->db->where_in('items', $itemIdsArray);
+				$this->db->from('bs_order');
+				$soldItems = $this->db->get()->result();
+				$this->custom_response($soldItems);
+			} else {
+				$this->error_response( get_msg( 'record_not_found' ) );
+			}
+		} else {
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}
+	}
 }
