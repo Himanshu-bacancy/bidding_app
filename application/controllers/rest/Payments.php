@@ -592,7 +592,10 @@ class Payments extends API_Controller {
         $user_id = $this->post('user_id');
         $operation_type = $this->post('operation_type');
 //        $this->db->from('bs_order')->where('user_id', $user_id)->get()->result_array();
-        $orders =  $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url')->from('bs_order')
+        $orders =  $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
+                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_chat_history', 'bs_order.items = bs_chat_history.requested_item_id', 'left')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
                 ->where('bs_chat_history.operation_type', $operation_type)->where('bs_order.user_id', $user_id)->get()->result_array();   
@@ -618,7 +621,10 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url')->from('bs_order')
+        $orders = $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
+                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
                 ->where('bs_order.order_id', $order_id)->get()->row_array();
         if(count($orders)) {
@@ -698,10 +704,15 @@ class Payments extends API_Controller {
                 'field' => 'user_id',
                 'rules' => 'required'
             ),
+            array(
+                'field' => 'operation_type',
+                'rules' => 'required'
+            )
         );
         if (!$this->is_valid($rules)) exit;
         
         $user_id = $this->post('user_id');
+        $operation_type = $this->post('operation_type');
         $obj = $this->db->from('bs_order')->where('user_id', $user_id)->where('status', "succeeded")->where('delivery_status', "pending")->get()->result_array();
         if(count($obj)) {
             $this->response($obj);

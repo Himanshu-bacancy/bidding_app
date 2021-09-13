@@ -268,3 +268,15 @@ CREATE TABLE `bs_track_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 // RB: ADDED ON 24/08/2021
 ALTER TABLE `bs_card` ADD `status` TINYINT NOT NULL DEFAULT '1' AFTER `address_id`;
+// RB: ADDED ON 13/09/2021
+CREATE TABLE `bs_meeting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `location_list` text NOT NULL,
+  `confirm_location` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
