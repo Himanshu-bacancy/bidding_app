@@ -280,3 +280,6 @@ CREATE TABLE `bs_meeting` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+// RB: ADDED ON 14/09/2021
+ALTER TABLE `bs_order` ADD `operation_type` TINYINT NOT NULL DEFAULT '4' AFTER `delivery_status`;
+ALTER TABLE `bs_order` ADD `qrcode` TEXT NOT NULL AFTER `operation_type`;
