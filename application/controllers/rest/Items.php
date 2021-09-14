@@ -685,7 +685,6 @@ class Items extends API_Controller
 		$offset = $this->get( 'offset' );
 		
 		if ($conds['item_search']==1) {
-
 			/* For User Block */
 
 			//user block check with login_user_id
@@ -819,7 +818,6 @@ class Items extends API_Controller
 			}
 			
 			if ($conds['is_paid'] == "only_paid_item") {
-
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
@@ -877,7 +875,6 @@ class Items extends API_Controller
 
 				}
 			} else {
-
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 0;

@@ -601,12 +601,12 @@ class PS_Model extends CI_Model {
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['deliverymethod_item_id'] )) {
+		if ( isset( $conds['delivery_method_id'] )) {
 			
 			
-			if ($conds['deliverymethod_item_id'] != "") {
-				if($conds['deliverymethod_item_id'] != '0'){
-					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
+					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
 				}
 
 			}			
@@ -740,7 +740,7 @@ class PS_Model extends CI_Model {
 		$this->db->from('bs_reason_operation');
 		$date = date('Y-m-d');
 		
-		//$this->db->where('DATE(added_date)', $date);
+		$this->db->where('DATE(added_date)', $date);
 		$this->db->where('type', 'report_item');
 		// return the count all results
 		//echo '<pre>'; print_r($this->db->result()); die('hello testing');
@@ -1693,12 +1693,12 @@ class PS_Model extends CI_Model {
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['deliverymethod_item_id'] )) {
+		if ( isset( $conds['delivery_method_id'] )) {
 			
 			
-			if ($conds['deliverymethod_item_id'] != "") {
-				if($conds['deliverymethod_item_id'] != '0'){
-					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
+					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
 				}
 
 			}			
@@ -1951,12 +1951,12 @@ class PS_Model extends CI_Model {
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['deliverymethod_item_id'] )) {
+		if ( isset( $conds['delivery_method_id'] )) {
 			
 			
-			if ($conds['deliverymethod_item_id'] != "") {
-				if($conds['deliverymethod_item_id'] != '0'){
-					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
+					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
 				}
 
 			}			
@@ -2295,12 +2295,12 @@ class PS_Model extends CI_Model {
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['deliverymethod_item_id'] )) {
+		if ( isset( $conds['delivery_method_id'] )) {
 			
 			
-			if ($conds['deliverymethod_item_id'] != "") {
-				if($conds['deliverymethod_item_id'] != '0'){
-					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
+					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
 				}
 
 			}			
