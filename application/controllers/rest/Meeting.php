@@ -101,7 +101,7 @@ class Meeting extends API_Controller {
         $params['savename'] = FCPATH.$file_path;
         $this->ciqrcode->generate($params);
         
-        $this->db->update('bs_order',['qrcode' => $file_path]);
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['qrcode' => $file_path]);
         
         $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
         

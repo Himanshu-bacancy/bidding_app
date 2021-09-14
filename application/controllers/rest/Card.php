@@ -56,7 +56,7 @@ class Card extends API_Controller {
         if($validate_date) {
             $card_type = $this->validate_customer_card($card_number);
             if($card_type != '') {
-                $is_record_already_exists = $this->db->select('id')->from('bs_card')->where('user_id', $user_id)->where('card_number', $card_number)->get()->num_rows();
+                $is_record_already_exists = $this->db->select('id')->from('bs_card')->where('user_id', $user_id)->where('card_number', $card_number)->where('status', 1)->get()->num_rows();
                 if(!$is_record_already_exists) {
                     $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'card_type' => $card_type, 'address_id' => $address_id, 'created_date' => date('Y-m-d H:i:s')]);
                     $this->success_response("Card added successfully");

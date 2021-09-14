@@ -85,11 +85,11 @@ class Payments extends API_Controller {
                         $card_total_amount += $item_price;
                     }
                 }
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
                 $records[$key] = $this->db->insert_id();
                 
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
 
             }
         }
@@ -621,7 +621,7 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->select('bs_order.*, bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
+        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
                 ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
@@ -713,9 +713,25 @@ class Payments extends API_Controller {
         
         $user_id = $this->post('user_id');
         $operation_type = $this->post('operation_type');
-        $obj = $this->db->from('bs_order')->where('user_id', $user_id)->where('status', "succeeded")->where('delivery_status', "pending")->get()->result_array();
-        if(count($obj)) {
-            $this->response($obj);
+        $obj = $this->db->select('bs_order.*,bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
+                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
+                ->where('bs_order.user_id', $user_id)
+                ->where('bs_order.operation_type', $operation_type)->get()->result();
+//                ->where('bs_order.status', "succeeded")
+//                ->where('bs_order.delivery_status', "pending")->get()->result();
+        if(!empty($obj)) {
+            $row = [];
+            foreach ($obj as $key => $value) {
+                $row[$key] = $value;
+                $item_details = $this->Item->get_one( $value->items );
+                $this->ps_adapter->convert_item($item_details);
+                $row[$key]->item_details = $item_details;
+            }
+            $row = $this->ps_security->clean_output( $row );
+            $this->response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
