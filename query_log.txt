@@ -283,3 +283,6 @@ CREATE TABLE `bs_meeting` (
 // RB: ADDED ON 14/09/2021
 ALTER TABLE `bs_order` ADD `operation_type` TINYINT NOT NULL DEFAULT '4' AFTER `delivery_status`;
 ALTER TABLE `bs_order` ADD `qrcode` TEXT NOT NULL AFTER `operation_type`;
+// RB: ADDED ON 15/09/2021
+ALTER TABLE `bs_order` CHANGE `status` `status` VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'payment status of buyer';
+ALTER TABLE `bs_order` ADD `processed_date` DATETIME NULL AFTER `created_at`, ADD `pickup_date` DATETIME NULL AFTER `processed_date`, ADD `scanqr_date` DATETIME NULL AFTER `pickup_date`, ADD `rate_date` DATETIME NULL AFTER `scanqr_date`, ADD `completed_date` DATETIME NULL AFTER `rate_date`;

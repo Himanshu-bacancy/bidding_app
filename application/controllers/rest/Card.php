@@ -112,7 +112,7 @@ class Card extends API_Controller {
         $user_id = $this->post('user_id');
         
         $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1)->order_by('id', 'desc')->get()->result_array();
-        
+        if(count($obj)) {
         foreach ($obj as $key => $value) {
             $row[$key] = $value;
             $expiry_date = explode('/',$value['expiry_date']);
@@ -122,8 +122,11 @@ class Card extends API_Controller {
         }
         
         $this->response($row);
+            
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
     }
-    
     
     public function validate_expirydate($expiry_date = NULL){
 

@@ -132,6 +132,7 @@ class Meeting extends API_Controller {
 
         $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
         if($get_user->user_id == $posts['user_id']) {
+            $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'qr-verified','scanqr_date' => date('Y-m-d H:i:s')]);
             $this->response(['status' => 'success', 'message' => 'Qr code verified']);
         } else {
             $this->response(['status' => 'error', 'message' => 'Invalid']);

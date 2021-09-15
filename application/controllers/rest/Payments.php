@@ -491,7 +491,7 @@ class Payments extends API_Controller {
             ]);
             $this->db->where('order_id', $posts_var['order_id'])->update('bs_order', ['seller_transaction' => $response]);
             if (isset($response->id)) { 
-                $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => 'initiate', 'seller_transaction_id' => $response->id]);
+                $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => 'initiate', 'seller_transaction_id' => $response->id, 'processed_date' => date("Y-m-d H:i:s")]);
                 $this->response(['status' => "success", 'response' => $response, 'track_number' => $track_number]);
             } else {
                 $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
@@ -621,13 +621,22 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
-                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
+        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url,seller.user_id as seller_id')->from('bs_order')
+//                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
                 ->where('bs_order.order_id', $order_id)->get()->row_array();
         if(count($orders)) {
+            $item_details = $this->Item->get_one( $orders['items'] );
+            $this->ps_adapter->convert_item($item_details);
+            $orders['item_details'] = $item_details;
+            $buyer = $this->User->get_one( $orders['user_id'] );
+            $this->ps_adapter->convert_user( $buyer );
+            $orders['buyer'] = $buyer;
+            $seller = $this->User->get_one( $orders['seller_id'] );
+            $this->ps_adapter->convert_user( $seller );
+            $orders['seller'] = $seller;
             $orders = $this->ps_security->clean_output( $orders );
             $this->response($orders);
         } else {
@@ -713,8 +722,8 @@ class Payments extends API_Controller {
         
         $user_id = $this->post('user_id');
         $operation_type = $this->post('operation_type');
-        $obj = $this->db->select('bs_order.*,bs_track_order.status as tracking_status, bs_track_order.tracking_url, order_user.user_name as order_user_name, order_user.user_email as order_user_email, order_user.user_phone as order_user_phone, seller.user_name as seller_user_name, seller.user_email as seller_user_email, seller.user_phone as seller_user_phone')->from('bs_order')
-                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
+        $obj = $this->db->select('bs_order.*,bs_track_order.status as tracking_status, bs_track_order.tracking_url,seller.user_id as seller_id')->from('bs_order')
+//                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
@@ -729,11 +738,62 @@ class Payments extends API_Controller {
                 $item_details = $this->Item->get_one( $value->items );
                 $this->ps_adapter->convert_item($item_details);
                 $row[$key]->item_details = $item_details;
+                $buyer = $this->User->get_one( $value->user_id );
+                $this->ps_adapter->convert_user( $buyer );
+                $row[$key]->buyer = $buyer;
+                $seller = $this->User->get_one( $value->seller_id );
+                $this->ps_adapter->convert_user( $seller );
+                $row[$key]->seller = $seller;
             }
             $row = $this->ps_security->clean_output( $row );
             $this->response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
+    }
+    
+    public function confirm_shipment_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $posts = $this->post();
+        
+        $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        $buyer = $this->db->select('device_token')->from('core_users')
+                            ->where('user_id', $get_user->buyer_id)->get()->row();
+        send_push( $buyer->device_token, ["message" => "Shipment confirm for the order", "flag" => "confirm_shipment"] );
+        
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'pickup','pickup_date' => date('Y-m-d H:i:s')]);
+    
+        $this->response(['status' => 'success', 'message' => 'Shipment confimed successfully']);
+    }
+    
+    public function confirm_delivery_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $posts = $this->post();
+        
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'delivered','completed_date' => date('Y-m-d H:i:s')]);
+    
+        $this->response(['status' => 'success', 'message' => 'Order delivered']);
     }
 }
