@@ -635,14 +635,17 @@ class Items extends API_Controller
 	 * @param      <type>   $sizegroupoption_id  array
 	 */
 
-	function searchitem_post()
-	{
+	
+	function searchitem_post(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);	
 
+		
+		//echo $user_data['token_data']['user_id'];
+		
 		// add flag for default query
 		$this->is_search = true;
 
@@ -651,40 +654,39 @@ class Items extends API_Controller
 		$user_conds = $this->get();
 
 		$post_conds = $this->post();
+
 		$conds = array_merge( $default_conds, $user_conds );
 
 		$conds = array_merge( $post_conds, $conds );
 
 		
+
 		// check empty condition
 		$final_conds = array();
 		foreach( $conds as $key => $value ) {
-    
 		    if($key != "status") {
 			    if ( !empty( $value )) {
 			     $final_conds[$key] = $value;
 			    }
 		    }
-
 		    if($key == "status") {
 		    	$final_conds[$key] = $value;
 		    }
-
-
 		}
-		if($final_conds['miles']){
-			$userAddressCond['user_id'] = $final_conds['added_user_id'] ? $final_conds['added_user_id'] : '';
-			$userAddressCond['is_default_address'] = 1; 
-			$address_data = $this->Addresses->get_one_by($userAddressCond);
-			$final_conds['lat'] = $address_data->latitude ? $address_data->latitude : '';
-			$final_conds['lng'] = $address_data->longitude ? $address_data->longitude : '';
-		}
+		// if($final_conds['miles']){
+		// 	$userAddressCond['user_id'] = $final_conds['added_user_id'] ? $final_conds['added_user_id'] : '';
+		// 	$userAddressCond['is_default_address'] = 1; 
+		// 	$address_data = $this->Addresses->get_one_by($userAddressCond);
+		// 	$final_conds['lat'] = $address_data->latitude ? $address_data->latitude : '';
+		// 	$final_conds['lng'] = $address_data->longitude ? $address_data->longitude : '';
+		// }
+		
 		$conds = $final_conds;
-		//echo '<pre>'; print_r($conds); die;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
 		
 		if ($conds['item_search']==1) {
+
 			/* For User Block */
 
 			//user block check with login_user_id
@@ -707,22 +709,15 @@ class Items extends API_Controller
 
 				$result_users = rtrim($to_block_user_id,',');
 				$conds_user['added_user_id'] = $result_users;
-
 				$item_users = $this->Item->get_all_in_item( $conds_user )->result();
-
 				foreach ( $item_users as $item_user ) {
-
 					$id .= $item_user->id .",";
-				
 				}
-
 				// get all item without block user's item
-
 				$result_items = rtrim($id,',');
 				$item_id = explode(",", $result_items);
 				//print_r($item_id);die;
 				//$conds['id'] = $result_items;
-
 			}	
 
 			/* For Item Report */
@@ -737,7 +732,9 @@ class Items extends API_Controller
 				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
 
 				foreach ( $item_reported_datas as $item_reported_data ) {
-					$item_ids .= "'" .$item_reported_data->item_id . "',";			
+
+					$item_ids .= "'" .$item_reported_data->item_id . "',";
+			
 				}
 
 				// get block user's item
@@ -763,28 +760,22 @@ class Items extends API_Controller
 			//  color id condition 
 			if ( isset( $conds['color_id'] ) && !empty( $conds['color_id'] )) {
 
-				foreach($conds['color_id'] as $colorid)
-				{
+				foreach($conds['color_id'] as $colorid){
 					if ( $colorid != "") {
 						if( $colorid != '0'){
-						
 							$this->db->select('*');
 							$this->db->from('bs_item_colors');
 							$this->db->where( 'color_id', $colorid );
 							$colorfilter = $this->db->get();
-							foreach($colorfilter->result() as $coloritem)
-							{
+							foreach($colorfilter->result() as $coloritem){
 								$colorids .= $coloritem->item_id .",";
 							}
 						}
 					}	
-				}
-				
-						
+				}						
 			}
 
-			if(isset($colorids) && $colorids !='')
-			{
+			if(isset($colorids) && $colorids !=''){
 				$color_items = rtrim($colorids,',');
 				$colored_item_id = explode(",", $color_items);	
 			}
@@ -793,8 +784,7 @@ class Items extends API_Controller
 
 			if ( isset( $conds['sizegroupoption_id'] ) && !empty( $conds['sizegroupoption_id'] )) {
 
-				foreach($conds['sizegroupoption_id'] as $optionid)
-				{
+				foreach($conds['sizegroupoption_id'] as $optionid){
 					if ( $optionid != "") {
 						if( $optionid != '0'){
 						
@@ -802,8 +792,7 @@ class Items extends API_Controller
 							$this->db->from('bs_item_sizegroupoptions');
 							$this->db->where( 'sizegroup_option_id', $optionid );
 							$sizeoptionfilter = $this->db->get();
-							foreach($sizeoptionfilter->result() as $sizeoptionitem)
-							{
+							foreach($sizeoptionfilter->result() as $sizeoptionitem){
 								$sizeoptionids .= $sizeoptionitem->item_id .",";
 							}
 						}
@@ -811,39 +800,205 @@ class Items extends API_Controller
 				}
 			}
 
-			if(isset($sizeoptionids) && $sizeoptionids !='')
-			{
+			if(isset($sizeoptionids) && $sizeoptionids !=''){
 				$sizeoption_items = rtrim($sizeoptionids,',');
 				$sizeoption_item_id = explode(",", $sizeoption_items);	
 			}
 			
+			
+			//  item type id condition 
+			if ( isset( $conds['item_type_id'] ) && !empty( $conds['item_type_id'] )) {
+
+				foreach($conds['item_type_id'] as $itemtypeid){
+					if ( $itemtypeid != "") {
+						if( $itemtypeid != '0'){
+						
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'item_type_id', $itemtypeid );
+							$itemtypefilter = $this->db->get();
+							foreach($itemtypefilter->result() as $itemtypeitem){
+								$itemtype_itemids .= $itemtypeitem->id .",";
+							}
+						}
+					}	
+				}		
+			}
+
+			
+			if(isset($itemtype_itemids) && $itemtype_itemids !=''){
+				$itemtype_items = rtrim($itemtype_itemids,',');
+				$itemtype_item_id = explode(",", $itemtype_items);	
+			}
+
+			//  childsubcat id condition 
+			if ( isset( $conds['childsubcat_id'] ) && !empty( $conds['childsubcat_id'] )) {
+				foreach($conds['childsubcat_id'] as $childsubcatid){
+					if ( $childsubcatid != "") {
+						if( $childsubcatid != '0'){
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'childsubcat_id', $childsubcatid );
+							$childsubcatfilter = $this->db->get();
+							foreach($childsubcatfilter->result() as $childsubcat_item){
+								$childsubcat_itemids .= $childsubcat_item->id .",";
+							}
+						}
+					}	
+				}		
+			}
+
+			
+			if(isset($childsubcat_itemids) && $childsubcat_itemids !=''){
+				$childsubcat_items = rtrim($childsubcat_itemids,',');
+				$childsubcat_item_id = explode(",", $childsubcat_items);	
+			}
+
+			//  delivery method id condition 
+			if ( isset( $conds['delivery_method_id'] ) && !empty( $conds['delivery_method_id'] )) {
+				foreach($conds['delivery_method_id'] as $deliverymethodid){
+					if ( $deliverymethodid != "") {
+						if( $deliverymethodid != '0'){
+						    $this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'delivery_method_id', $deliverymethodid );
+							$deliverymethodfilter = $this->db->get();
+							foreach($deliverymethodfilter->result() as $deliverymethod_item){
+								$deliverymethod_itemids .= $deliverymethod_item->id .",";
+							}
+						}
+					}	
+				}	
+			}
+
+			
+			if(isset($deliverymethod_itemids) && $deliverymethod_itemids !=''){
+				$deliverymethod_items = rtrim($deliverymethod_itemids,',');
+				$deliverymethod_item_id = explode(",", $deliverymethod_items);	
+			}
+
+			//  item condition id condition 
+			if ( isset( $conds['condition_of_item_id'] ) && !empty( $conds['condition_of_item_id'] )) {
+
+				foreach($conds['condition_of_item_id'] as $itemconditionid){
+					if ( $itemconditionid != "") {
+						if( $itemconditionid != '0'){
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'condition_of_item_id', $itemconditionid );
+							$itemconditionfilter = $this->db->get();
+							foreach($itemconditionfilter->result() as $itemcondition_item){
+								$itemcondition_itemids .= $itemcondition_item->id .",";
+							}
+						}
+					}	
+				}
+			}
+
+			
+			if(isset($itemcondition_itemids) && $itemcondition_itemids !=''){
+				$itemcondition_items = rtrim($itemcondition_itemids,',');
+				$itemcondition_item_id = explode(",", $itemcondition_items);	
+			}
+
+			//  Brand id condition 
+			if ( isset( $conds['brand_search'] ) && !empty( $conds['brand_search'] )) {
+
+				foreach($conds['brand_search'] as $brand_id){
+					if ( $brand_id != "") {
+						if( $brand_id != '0'){
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'brand', $brand_id );
+							$brandfilter = $this->db->get();
+							foreach($brandfilter->result() as $brand_item){
+								$brand_itemids .= $brand_item->id .",";
+							}
+						}
+					}	
+				}
+			}
+
+			
+			if(isset($brand_itemids) && $brand_itemids !=''){
+				$brand_item = rtrim($brand_itemids,',');
+				$brand_items_id = explode(",", $brand_item);	
+			}
+			
+
+			//  lat long condition 
+			if ( isset( $conds['miles'] ) && $conds['miles'] != '' ) {
+
+				$this->db->select('*');
+				$this->db->from('bs_addresses');
+				$this->db->where( 'user_id', $user_data['token_data']['user_id'] );
+				$this->db->where( 'is_default_address', '1');
+				$addrfilter = $this->db->get();
+
+				
+				if(count($addrfilter->row())>0){
+					$this->db->select('*,( 3959
+					* acos( cos( radians('. $addrfilter->row()->latitude .') )
+							* cos(  radians( latitude )   )
+							* cos(  radians( longitude ) - radians('. $addrfilter->row()->longitude .') )
+							+ sin( radians('. $addrfilter->row()->latitude .') )
+							* sin( radians( latitude ) )
+							)
+					) as distance');
+
+					$this->db->from('bs_addresses');
+
+					if ($conds['miles'] == "") {
+						$conds['miles'] = 0;
+						$this->db->having('distance < ' .  $conds['miles'] );
+					} else {
+						$this->db->having('distance < ' .  $conds['miles'] );
+
+					}
+					$addressdatas = $this->db->get();
+					if(count($addressdatas->result())>0){
+						foreach($addressdatas->result() as $address){
+							$this->db->select('*');
+							$this->db->from('bs_items');
+							$this->db->where( 'Address_id', $address->id );
+							$addressfilter = $this->db->get();
+							
+							foreach($addressfilter->result() as $addressitem){
+								$addressitemids .= $addressitem->id .",";
+							}
+						}
+					}
+				}
+			}
+
+			if(isset($addressitemids) && $addressitemids !=''){
+				$address_items = rtrim($addressitemids,',');
+				$address_item_id = explode(",", $address_items);	
+			}
+
+			$conds['coloritem_id'] = $colored_item_id;
+			$conds['sizeoption_item_id'] = $sizeoption_item_id;
+			$conds['address_item_id'] = $address_item_id;
+			$conds['itemtype_item_id'] = $itemtype_item_id;
+			$conds['childsubcat_item_id'] = $childsubcat_item_id;
+			$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
+			$conds['itemcondition_item_id'] = $itemcondition_item_id;
+			$conds['brand_items_id'] = $brand_items_id;
+
 			if ($conds['is_paid'] == "only_paid_item") {
+
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
-
-				$conds['coloritem_id'] = $colored_item_id;
-				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
-				
 				if ( !empty( $limit ) && !empty( $offset )) {
-				// if limit & offset is not empty
-				$data = $this->model->get_all_item_by_paid( $conds, $limit, $offset )->result();
-
-
+					// if limit & offset is not empty
+				 	$data = $this->model->get_all_item_by_paid( $conds, $limit, $offset )->result();
 				} else if ( !empty( $limit )) {
 					// if limit is not empty
 					$data = $this->model->get_all_item_by_paid( $conds, $limit )->result();
-
 				} else {
 					// if both are empty
 					$data = $this->model->get_all_item_by_paid( $conds )->result();
-
 				}
 			} elseif ($conds['is_paid'] == "paid_item_first") {
 				$result = "";
@@ -851,15 +1006,6 @@ class Items extends API_Controller
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1;
-				
-				$conds['coloritem_id'] = $colored_item_id;
-				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_item_by_paid_date( $conds, $limit, $offset )->result();
@@ -875,55 +1021,34 @@ class Items extends API_Controller
 
 				}
 			} else {
+
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
-				$conds['is_paid'] = 0;
-				$conds['coloritem_id'] = $colored_item_id;
-				$conds['sizeoption_item_id'] = $sizeoption_item_id;
-				$conds['address_item_id'] = $address_item_id;
-				$conds['itemtype_item_id'] = $itemtype_item_id;
-				$conds['childsubcat_item_id'] = $childsubcat_item_id;
-				$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
-				$conds['itemcondition_item_id'] = $itemcondition_item_id;
-				$conds['brand_items_id'] = $brand_items_id;
-				
-
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_by_itemnew( $conds, $limit, $offset )->result();
-
-
-					} else if ( !empty( $limit )) {
-						// if limit is not empty
-						$data = $this->model->get_all_by_itemnew( $conds, $limit )->result();
-
-					} else {
-						// if both are empty
-						$data = $this->model->get_all_by_itemnew( $conds )->result();
-
-					}
-				
-				}	
-			
+				} else if ( !empty( $limit )) {
+					// if limit is not empty
+					$data = $this->model->get_all_by_itemnew( $conds, $limit )->result();
+				} else {
+					// if both are empty
+					$data = $this->model->get_all_by_itemnew( $conds )->result();
+				}
+			}	
 		} else {
 			if ( !empty( $limit ) && !empty( $offset )) {
-			// if limit & offset is not empty
-			$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
-
-
+				// if limit & offset is not empty
+				$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
 			} else if ( !empty( $limit )) {
 				// if limit is not empty
 				$data = $this->model->get_all_by( $conds, $limit )->result();
-
 			} else {
 				// if both are empty
 				$data = $this->model->get_all_by( $conds )->result();
-
 			}
 		}
-
 		$this->custom_response( $data );
-	}
+	} 
 
 	/**
 	 * Delete image from database and folder

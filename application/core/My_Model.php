@@ -478,64 +478,48 @@ class PS_Model extends CI_Model {
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
-			
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
 				}
-
 			}			
 		}
 
-		
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
-			
 			if ($conds['reported_item_id'] != "") {
 				if($conds['reported_item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item id (id) check for item color condition
 		if ( isset( $conds['coloritem_id'] )) {
-			
 			if ($conds['coloritem_id'] != "") {
 				if($conds['coloritem_id'] != '0'){
-					
 					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item id (id) check for sizegroupoption condition
 		if ( isset( $conds['sizeoption_item_id'] )) {
-			
 			if ($conds['sizeoption_item_id'] != "") {
 				if($conds['sizeoption_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
 				}
-
 			}			
 		}
 		
 		// added_user_id
 		if ( isset( $conds['added_user_id'] )) {
-			
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
-				
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
-
 			}			
 		}
 
@@ -566,75 +550,57 @@ class PS_Model extends CI_Model {
 
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
-			
-			
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
 				}
-
 			}			
 		}
 		
 		// SKV: CHECK CONDITION FOR ITEM TYPE
 		if ( isset( $conds['item_type_id'] )) {
-			
-			
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
 					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
-			
-			
 			if ($conds['childsubcat_item_id'] != "") {
 				if($conds['childsubcat_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['delivery_method_id'] )) {
-			
-			
-			if ($conds['delivery_method_id'] != "") {
-				if($conds['delivery_method_id'] != '0'){
-					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
 				}
-
 			}			
 		}
 
 		
 		// item check for item condition
 		if ( isset( $conds['itemcondition_item_id'] )) {
-			
-			
 			if ($conds['itemcondition_item_id'] != "") {
 				if($conds['itemcondition_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
 				}
-
 			}			
 		}
 		
 		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
-			
 			if ($conds['address_item_id'] != "") {
 				if($conds['address_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
-
 			}			
 		}
 
@@ -657,7 +623,6 @@ class PS_Model extends CI_Model {
 		              * sin( radians( lat ) )
 		            )
 		    ) as distance');
-
 		    if ($conds['miles'] == "") {
 		    	$conds['miles'] = 0;
 		    	$this->db->having('distance < ' .  $conds['miles'] );
@@ -668,7 +633,6 @@ class PS_Model extends CI_Model {
 
 		// where clause
 		$this->custom_conds( $conds );
-		
 		
 		// from table
 		$this->db->from( $this->table_name );
@@ -682,11 +646,7 @@ class PS_Model extends CI_Model {
 		// if there is offset, set the offset,			
 			$this->db->offset($offset);
 		}
-
-
 	 	return $this->db->get();
-		//print_r($this->db->last_query());die;
-
 	}
 
 
@@ -1575,62 +1535,47 @@ class PS_Model extends CI_Model {
 
    		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
-			
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
 				}
-
 			}			
 		}
 
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
-			
 			if ($conds['reported_item_id'] != "") {
 				if($conds['reported_item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
 				}
-
 			}			
 		}
 
 		//is_paid
 		if ( isset( $conds['is_paid'] )) {
-			
 			if ($conds['is_paid'] != "") {
 				if($conds['is_paid'] != '0'){
-				
 					$this->db->where( 'bs_items.is_paid', $conds['is_paid'] );	
 				}
-
 			}			
 		}
 
 		// item id (id) check for item color condition
 		if ( isset( $conds['coloritem_id'] )) {
-			
 			if ($conds['coloritem_id'] != "") {
 				if($conds['coloritem_id'] != '0'){
-					
 					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item id (id) check for sizegroupoption condition
 		if ( isset( $conds['sizeoption_item_id'] )) {
-			
 			if ($conds['sizeoption_item_id'] != "") {
 				if($conds['sizeoption_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
 				}
-
 			}			
 		}
 		
@@ -1658,75 +1603,57 @@ class PS_Model extends CI_Model {
 
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
-			
-			
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
 				}
-
 			}			
 		}
 
         // SKV: CHECK CONDITION FOR ITEM TYPE
 		if ( isset( $conds['item_type_id'] )) {
-			
-			
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['item_type_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
-			
-			
 			if ($conds['childsubcat_item_id'] != "") {
 				if($conds['childsubcat_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['delivery_method_id'] )) {
-			
-			
-			if ($conds['delivery_method_id'] != "") {
-				if($conds['delivery_method_id'] != '0'){
-					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
 				}
-
 			}			
 		}
 
 		
 		// item check for item condition
 		if ( isset( $conds['itemcondition_item_id'] )) {
-			
-			
 			if ($conds['itemcondition_item_id'] != "") {
 				if($conds['itemcondition_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
 				}
-
 			}			
 		}
 		
 		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
-			
 			if ($conds['address_item_id'] != "") {
 				if($conds['address_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
-
 			}			
 		}
 
@@ -1748,27 +1675,26 @@ class PS_Model extends CI_Model {
 			$this->db->order_by( 'bs_items.is_paid', 'desc');
 			$this->db->order_by('added_date', 'desc' );
 		}
-		if($conds['lat'] != "" && $conds['lng'] != "") {
+		// if($conds['lat'] != "" && $conds['lng'] != "") {
 			
-			//$this->db->select("'distance' as distance"); 
-			$this->db->select('( 3959
-		      * acos( cos( radians('. $conds['lat'] .') )
-		              * cos(  radians( lat )   )
-		              * cos(  radians( lng ) - radians('. $conds['lng'] .') )
-		            + sin( radians('. $conds['lat'] .') )
-		              * sin( radians( lat ) )
-		            )
-		    ) as distance');
+		// 	//$this->db->select("'distance' as distance"); 
+		// 	$this->db->select('( 3959
+		//       * acos( cos( radians('. $conds['lat'] .') )
+		//               * cos(  radians( lat )   )
+		//               * cos(  radians( lng ) - radians('. $conds['lng'] .') )
+		//             + sin( radians('. $conds['lat'] .') )
+		//               * sin( radians( lat ) )
+		//             )
+		//     ) as distance');
 
-		    if ($conds['miles'] == "") {
-		    	$conds['miles'] = 0;
-		    	$this->db->having('distance < ' .  $conds['miles'] );
-		    } else {
-		    	$this->db->having('distance < ' .  $conds['miles'] );
+		//     if ($conds['miles'] == "") {
+		//     	$conds['miles'] = 0;
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
+		//     } else {
+		//     	$this->db->having('distance < ' .  $conds['miles'] );
 
-		    }
-		}
-
+		//     }
+		// }
    		return $this->db->get();
    		//print_r($this->db->last_query());die;
 	}
@@ -1800,9 +1726,7 @@ class PS_Model extends CI_Model {
 	function get_all_item_by_paid_date ( $conds = array(), $limit = false, $offset = false ) {
 		/* query 1 start */
 		$this->db->select('bs_items.*'); 
-
 		
-		//End - Modify By PPH @ 12 May 2020
 		$this->db->from('bs_items');
 		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
 		// $today_date = date('Y-m-d H:i:s');
@@ -1841,149 +1765,114 @@ class PS_Model extends CI_Model {
 
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
-			
 			if ($conds['reported_item_id'] != "") {
 				if($conds['reported_item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
 				}
-
 			}			
 		}
 
 		// added_user_id
 		if ( isset( $conds['added_user_id'] )) {
-			
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
-				
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
-
 			}			
 		}
 		
 		// item id (id) check for item color condition
 		if ( isset( $conds['coloritem_id'] )) {
-			
 			if ($conds['coloritem_id'] != "") {
 				if($conds['coloritem_id'] != '0'){
-					
 					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item id (id) check for sizegroupoption condition
 		if ( isset( $conds['sizeoption_item_id'] )) {
-			
 			if ($conds['sizeoption_item_id'] != "") {
 				if($conds['sizeoption_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item check for brand condition
 		if ( isset( $conds['brand_items_id'] )) {
-			
-			
 			if ($conds['brand_items_id'] != "") {
 				if($conds['brand_items_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
-
 			}			
 		}
 
 		// SKV: CHECK CONDITION FOR BRAND
 		if ( isset( $conds['brand_search'] )) {
-			
-			
 			if ($conds['brand_search'] != "") {
 				if($conds['brand_search'] != '0'){
 					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
 				}
-
 			}			
 		}
 
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
-			
-			
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
 				}
-
 			}			
 		}
 
 
         // SKV: CHECK CONDITION FOR ITEM TYPE
 		if ( isset( $conds['item_type_id'] )) {
-			
-			
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
 					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
-			
-			
 			if ($conds['childsubcat_item_id'] != "") {
 				if($conds['childsubcat_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for delivery method condition
-		if ( isset( $conds['delivery_method_id'] )) {
-			
-			
-			if ($conds['delivery_method_id'] != "") {
-				if($conds['delivery_method_id'] != '0'){
-					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
+		if ( isset( $conds['deliverymethod_item_id'] )) {
+			if ($conds['deliverymethod_item_id'] != "") {
+				if($conds['deliverymethod_item_id'] != '0'){
+					$this->db->where_in( 'bs_items.id', $conds['deliverymethod_item_id'] );	
 				}
-
 			}			
 		}
 
 		
 		// item check for item condition
 		if ( isset( $conds['itemcondition_item_id'] )) {
-			
-			
 			if ($conds['itemcondition_item_id'] != "") {
 				if($conds['itemcondition_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
 				}
-
 			}			
 		}
 		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
-			
 			if ($conds['address_item_id'] != "") {
 				if($conds['address_item_id'] != '0'){
 				
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
-
 			}			
 		}
 
@@ -2003,13 +1892,11 @@ class PS_Model extends CI_Model {
 		
    		if ( $limit ) {
 		  	// if there is limit, set the limit
-		   
 		   	$this->db->limit($limit);
 	  	}
 	  
 	  	if ( $offset ) {
 		  	// if there is offset, set the offset,
-		   
 		   	$this->db->offset($offset);
 	  	}
 
@@ -2044,13 +1931,11 @@ class PS_Model extends CI_Model {
 		              * sin( radians( lat ) )
 		            )
 		    ) as distance');
-
 		    if ($conds['miles'] == "") {
 		    	$conds['miles'] = 0;
 		    	$this->db->having('distance < ' .  $conds['miles'] );
 		    } else {
 		    	$this->db->having('distance < ' .  $conds['miles'] );
-
 		    }
 		}
 
@@ -2069,42 +1954,25 @@ class PS_Model extends CI_Model {
 			if ($conds['max_price'] != "" || $conds['max_price'] != 0) {	
 				$this->db->where( 'price<=', $conds['max_price'] );
 			}
-
 		}
 
 		if(isset($conds['deal_option_id'])) {
-
 			if ($conds['deal_option_id'] != "" || $conds['deal_option_id'] != 0) {
-					
-					$this->db->where( 'deal_option_id', $conds['deal_option_id'] );	
-
+				$this->db->where( 'deal_option_id', $conds['deal_option_id'] );	
 			}
-
 		}
 
-		
-
 		//End - Modify By PPH @ 12 May 2020
-
-
    		if(isset($conds['cat_id'])) {
-
 			if ($conds['cat_id'] != "" || $conds['cat_id'] != 0) {
-					
-					$this->db->where( 'cat_id', $conds['cat_id'] );	
-
+				$this->db->where( 'cat_id', $conds['cat_id'] );	
 			}
-
 		}
 
 		if(isset($conds['sub_cat_id'])) {
-
 			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
-					
-					$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
-
+				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
 			}
-
 		}
 
 		// id condition
@@ -2114,102 +1982,78 @@ class PS_Model extends CI_Model {
 
 		// Type id
 		// if ( isset( $conds['item_type_id'] )) {
-			
 		// 	if ($conds['item_type_id'] != "") {
 		// 		if($conds['item_type_id'] != '0'){
-				
 		// 			$this->db->where( 'item_type_id', $conds['item_type_id'] );	
 		// 		}
-
 		// 	}			
 		// }
 
         // SKV: CHECK CONDITION FOR ITEM TYPE
 		if ( isset( $conds['item_type_id'] )) {
-			
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
-				
 					$this->db->where_in( 'item_type_id', $conds['item_type_id'] );	
 				}
-
-			}			
+			}		
 		}
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
-			
 			if ($conds['item_price_type_id'] != "") {
 				if($conds['item_price_type_id'] != '0'){
-				
 					$this->db->where( 'item_price_type_id', $conds['item_price_type_id'] );	
 				}
-
 			}			
 		}
 
 		// location id
 		if ( isset( $conds['item_location_id'] )) {
-			
 			if ($conds['item_location_id'] != "") {
 				if($conds['item_location_id'] != '0'){
-				
 					$this->db->where( 'item_location_id', $conds['item_location_id'] );	
 				}
-
-			}			
+			}		
 		}
 	   
 		// Currency id
 		if ( isset( $conds['item_currency_id'] )) {
-			
 			if ($conds['item_currency_id'] != "") {
 				if($conds['item_currency_id'] != '0'){
-				
 					$this->db->where( 'item_currency_id', $conds['item_currency_id'] );	
 				}
-
 			}			
 		}
 
 		// condition_of_item id condition
 		// if ( isset( $conds['condition_of_item_id'] )) {
-		// 	$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
+			// $this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
 		// }
 
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
-			
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
 				}
-
 			}			
 		}
 
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
-			
 			if ($conds['reported_item_id'] != "") {
 				if($conds['reported_item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
 				}
-
 			}			
 		}
 
 		// added_user_id id
 		if ( isset( $conds['added_user_id'] )) {
-			
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
-				
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
-
 			}			
 		}
 		if ( isset( $conds['is_paid'] )) {
@@ -2222,116 +2066,85 @@ class PS_Model extends CI_Model {
 
 		// item id (id) check for item color condition
 		if ( isset( $conds['coloritem_id'] )) {
-			
 			if ($conds['coloritem_id'] != "") {
 				if($conds['coloritem_id'] != '0'){
-					
 					$this->db->where_in( 'bs_items.id', $conds['coloritem_id'] );	
 				}
-
 			}			
 		}
-		
 
 		// item id (id) check for sizegroupoption condition
 		if ( isset( $conds['sizeoption_item_id'] )) {
-			
 			if ($conds['sizeoption_item_id'] != "") {
 				if($conds['sizeoption_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['sizeoption_item_id'] );	
 				}
-
 			}			
 		}
 		
 
 		// item check for brand condition
 		/*if ( isset( $conds['brand_items_id'] )) {
-			
-			
 			if ($conds['brand_items_id'] != "") {
 				if($conds['brand_items_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['brand_items_id'] );	
 				}
-
 			}			
 		}*/
 
 		// SKV: CHECK CONDITION FOR BRAND
 		if ( isset( $conds['brand_search'] )) {
-			
-			
 			if ($conds['brand_search'] != "") {
 				if($conds['brand_search'] != '0'){
 					$this->db->where_in( 'bs_items.brand', $conds['brand_search'] );	
 				}
-
 			}			
 		}
 
 		// item check for itemtype condition
 		if ( isset( $conds['itemtype_item_id'] )) {
-			
-			
 			if ($conds['itemtype_item_id'] != "") {
 				if($conds['itemtype_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemtype_item_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for child subcat condition
 		if ( isset( $conds['childsubcat_item_id'] )) {
-			
-			
 			if ($conds['childsubcat_item_id'] != "") {
 				if($conds['childsubcat_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['childsubcat_item_id'] );	
 				}
-
 			}			
 		}
 
 		// item check for delivery method condition
 		if ( isset( $conds['delivery_method_id'] )) {
-			
-			
 			if ($conds['delivery_method_id'] != "") {
 				if($conds['delivery_method_id'] != '0'){
 					$this->db->where_in( 'bs_items.delivery_method_id', $conds['delivery_method_id'] );	
 				}
-
 			}			
 		}
 
-		
 		// item check for item condition
 		if ( isset( $conds['itemcondition_item_id'] )) {
-			
-			
 			if ($conds['itemcondition_item_id'] != "") {
 				if($conds['itemcondition_item_id'] != '0'){
 					$this->db->where_in( 'bs_items.id', $conds['itemcondition_item_id'] );	
 				}
-
 			}			
 		}
-		
 		
 		// address id (id) check for lat long 
 		if ( isset( $conds['address_item_id'] )) {
-			
 			if ($conds['address_item_id'] != "") {
 				if($conds['address_item_id'] != '0'){
-				
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
-
 			}			
 		}
-
 
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {
@@ -2346,13 +2159,11 @@ class PS_Model extends CI_Model {
 
 	  	if ( $limit ) {
 		  	// if there is limit, set the limit
-		   
 		   	$this->db->limit($limit);
 	  	}
 	  
 	  	if ( $offset ) {
 		  	// if there is offset, set the offset,
-		   
 		   	$this->db->offset($offset);
 	  	}
 
