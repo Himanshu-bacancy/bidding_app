@@ -456,11 +456,11 @@ class Payments extends API_Controller {
 //                echo '<pre>';
 //                print_r($response);
                 curl_close($ch);	
-                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => '', 'status' => '', 'tracking_number' => '', 'tracking_url' => '', 'label_url' => '', 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
-                $track_number = $response->tracking_number;
+                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
+                $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
             /*Shippo integration End*/
         }
-        if(is_null($track_number)) {
+        if(is_null($track_number) || empty($track_number)) {
             $this->error_response("Something wrong with shipping provided detail");
         }
         
@@ -585,7 +585,7 @@ class Payments extends API_Controller {
             ),
             array(
                 'field' => 'operation_type',
-                'rules' => 'required'            ),
+                'rules' => 'required'),
         );
         if (!$this->is_valid($rules)) exit;
         
@@ -673,7 +673,9 @@ class Payments extends API_Controller {
                 $this->db->insert('bs_order_confirm', ['order_id' => $get_record->order_id, 'item_id' => $value['id'], 'seller_id' => $value['added_user_id'], 'created_at' => date('Y-m-d H:i:s')]);
             }
         }
-        
+        /*Temporary hide code as per discussion with dipak for currently it's only for direct buy
+         * $this->db->where('user_id', $get_record->user_id)->where('item_id', $get_record->items)->delete('bs_cart);
+         */
         $this->response(['status' => 'success', 'message' => 'Record save successfully']);
     }
     
@@ -795,5 +797,29 @@ class Payments extends API_Controller {
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'delivered','completed_date' => date('Y-m-d H:i:s')]);
     
         $this->response(['status' => 'success', 'message' => 'Order delivered']);
+    }
+    
+    public function return_shipping_label_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit;
+        
+        $posts = $this->post();
+        
+        $get_label = $this->db->select('label_url')->from('bs_track_order')->where('order_id', $posts['order_id'])->get()->row();
+        
+        if(!empty($get_label)) {
+            $this->response(['status' => 'success', 'message' => '', 'label_url' => $get_label->label_url]);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
     }
 }
