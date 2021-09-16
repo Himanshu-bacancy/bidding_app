@@ -1368,42 +1368,40 @@ class PS_Model extends CI_Model {
 	 */
 	function get_item_favourite( $conds = array(), $limit = false, $offset = false  )
 	{
-		
 		$this->db->select('bs_items.*'); 
 		$this->db->from('bs_items');
 		$this->db->join('bs_favourite', 'bs_favourite.item_id = bs_items.id');
 
 		if(isset($conds['user_id'])) {
-
 			if ($conds['user_id'] != "" || $conds['user_id'] != 0) {
-					
 					$this->db->where( 'user_id', $conds['user_id'] );	
-
 			}
-
 		}
 
 		// item id (id) check for user block condition
-		if ( isset( $conds['item_id'] )) {
-			
+		if (isset($conds['item_id'] )) {
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
 				}
+			}			
+		}
 
+		// item type (type) check this condition
+		if (isset($conds['item_type_id'] )) {
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
+					$this->db->where( 'bs_items.item_type_id', $conds['item_type_id'] );	
+				}
 			}			
 		}
 
 		// item id (id) check for item reported condition
-		if ( isset( $conds['reported_item_id'] )) {
-			
+		if (isset($conds['reported_item_id'] )) {			
 			if ($conds['reported_item_id'] != "") {
 				if($conds['reported_item_id'] != '0'){
-				
 					$this->db->where_not_in( 'bs_items.id', $conds['reported_item_id'] );	
 				}
-
 			}			
 		}
 
@@ -1425,7 +1423,7 @@ class PS_Model extends CI_Model {
 		}
 		
 		return $this->db->get();
-		// print_r($this->db->last_query());die;
+		print_r($this->db->last_query());die;
  	}
 
  	// get user with status 2 for request code

@@ -555,23 +555,22 @@ class API_Controller extends REST_Controller
 		$user_conds = $this->get();
 		$conds = array_merge( $default_conds, $user_conds );
 		$conds['user_id'] = $this->get_login_user_id();
+		$conds['item_type_id'] = $this->get('item_type');
 
 		/* For User Block */
 
 		//user block check with login_user_id
-		$conds_login_block['from_block_user_id'] = $this->get_login_user_id();
-		$login_block_count = $this->Block->count_all_by($conds_login_block);
-		//print_r($login_block_count);die;
-
+		$conds_login_block['user_id'] = $this->get_login_user_id();
+		$conds_login_block['type'] = 'block_user';
+		$login_block_count = $this->Reason_operation->count_all_by($conds_login_block);
+		
 		// user blocked existed by login user
 		if ($login_block_count > 0) {
 			// get the blocked user by login user
-			$to_block_user_datas = $this->Block->get_all_by($conds_login_block)->result();
+			$to_block_user_datas = $this->Reason_operation->get_all_by($conds_login_block)->result();
 
 			foreach ( $to_block_user_datas as $to_block_user_data ) {
-
 				$to_block_user_id .= "'" .$to_block_user_data->to_block_user_id . "',";
-		
 			}
 
 			// get block user's item
@@ -582,30 +581,25 @@ class API_Controller extends REST_Controller
 			$item_users = $this->Item->get_all_in_item( $conds_user )->result();
 
 			foreach ( $item_users as $item_user ) {
-
 				$id .= $item_user->id .",";
-			
 			}
-
 			// get all item without block user's item
-
 			$result_items = rtrim($id,',');
 			$item_id = explode(",", $result_items);
-			//print_r($item_id);die;
 			//$conds['id'] = $result_items;
-
 		}	
 
 		/* For Item Report */
 
 		//item report check with login_user_id
-		$conds_report['reported_user_id'] = $this->get_login_user_id();
-		$reported_data_count = $this->Itemreport->count_all_by($conds_report);
+		$conds_report['user_id'] = $this->get_login_user_id();
+		$conds_report['type'] = 'report_item';
+		$reported_data_count = $this->Reason_operation->count_all_by($conds_report);
 
 		// item reported existed by login user
 		if ($reported_data_count > 0) {
 			// get the reported item data
-			$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
+			$item_reported_datas = $this->Reason_operation->get_all_by($conds_report)->result();
 
 			foreach ( $item_reported_datas as $item_reported_data ) {
 
@@ -632,9 +626,8 @@ class API_Controller extends REST_Controller
 			$reported_item_id = explode(",", $result_items);
 			//$conds['id'] = $result_items;
 		}
-
-		$conds['item_id'] = $item_id;
-		$conds['reported_item_id'] = $reported_item_id;
+		$conds['item_id'] = $item_id ? $item_id : '';
+		$conds['reported_item_id'] = $reported_item_id ? $reported_item_id : ''; 
 		$conds['status'] = 1;
 
 		if ( $limit ) {

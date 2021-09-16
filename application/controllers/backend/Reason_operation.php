@@ -4,14 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Item Itemreport Controller
  */
-class Item_reports extends BE_Controller {
+class Reason_operation extends BE_Controller {
 
 	/**
 	 * Construt required variables
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'ITEM_REPORTS' );
+		parent::__construct( MODULE_CONTROL, 'Reason_operation' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
@@ -32,12 +32,13 @@ class Item_reports extends BE_Controller {
 		
 		// no publish filter
 		$conds['status'] = 1;
+		//$conds['type'] = 'report_item';
 		
 		// get rows count
-		$this->data['rows_count'] = $this->Itemreport->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Reason_operation->count_all_by( $conds );
 		
 		// get Item reports
-		$this->data['reports'] = $this->Itemreport->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['reports'] = $this->Reason_operation->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
 		// load index logic
 		parent::index();
 	}
@@ -49,7 +50,7 @@ class Item_reports extends BE_Controller {
 		
 
 		// breadcrumb urls
-		$this->data['action_title'] = get_msg( 'report_search' );
+		$this->data['item_reports'] = get_msg( 'report_search' );
 		
 		// condition with search term
 		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )) );
@@ -61,10 +62,10 @@ class Item_reports extends BE_Controller {
 
 
 		// pagination
-		$this->data['rows_count'] = $this->Itemreport->count_all_by( $conds );
+		$this->data['rows_count'] = $this->Reason_operation->count_all_by( $conds );
 
 		// search data
-		$this->data['reports'] = $this->Itemreport->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['reports'] = $this->Reason_operation->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
 		
 		// load add list
 		parent::search();

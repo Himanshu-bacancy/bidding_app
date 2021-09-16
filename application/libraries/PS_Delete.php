@@ -888,7 +888,7 @@ class PS_Delete {
 	}
 
 	/**
-	 * Delete the Returnreason record
+	 * Delete the Reason record
 	 *
 	 * @param      <type>  $id     The identifier
 	 */
