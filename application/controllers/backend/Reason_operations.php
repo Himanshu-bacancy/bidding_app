@@ -4,14 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Item Itemreport Controller
  */
-class Reason_operation extends BE_Controller {
+class Reason_operations extends BE_Controller {
 
 	/**
 	 * Construt required variables
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'Reason_operation' );
+		parent::__construct( MODULE_CONTROL, 'Reason_operations' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
@@ -32,7 +32,7 @@ class Reason_operation extends BE_Controller {
 		
 		// no publish filter
 		$conds['status'] = 1;
-		//$conds['type'] = 'report_item';
+		$conds['type'] = 'report_item';
 		
 		// get rows count
 		$this->data['rows_count'] = $this->Reason_operation->count_all_by( $conds );
@@ -56,6 +56,7 @@ class Reason_operation extends BE_Controller {
 		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )) );
 		// no publish filter
 		$conds['status'] = 1;
+		$conds['type'] = 'report_item';
 		$conds['order_by'] = 1;
 		$conds['order_by_field'] = "added_date";
 		$conds['order_by_report'] = "desc";
@@ -92,9 +93,9 @@ class Reason_operation extends BE_Controller {
 		$this->data['action_title'] = get_msg( 'report_edit' );
 
 		// load user
-		$report = $this->Itemreport->get_one( $id );
+		$report = $this->Reason_operation->get_one( $id );
 
-		$this->data['item_id'] = $report->item_id;
+		$this->data['item_id'] = $report->operation_id;
 
 		$item_id = $this->data['item_id'];
 
@@ -120,11 +121,11 @@ class Reason_operation extends BE_Controller {
 		
 			$logged_in_user = $this->ps_auth->get_user_info();
 
-			$report = $this->Itemreport->get_one( $id );
+			$report = $this->Reason_operation->get_one( $id );
 
-			$item_id = $report->item_id;
+			$item_id = $report->operation_id;
 
-			$user_id = $report->reported_user_id;
+			$user_id = $report->user_id;
 			//print_r($user_id);die;
 
 			$conds['item_id'] = $item_id;
@@ -133,7 +134,7 @@ class Reason_operation extends BE_Controller {
 
 
 			if( isset($item_id) && isset($user_id) ){
-				$this->Itemreport->delete_by( $conds );
+				$this->Reason_operation->delete_by( $conds );
 			}
 
 			$data['status'] = 2;

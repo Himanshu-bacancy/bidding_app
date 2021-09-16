@@ -2,7 +2,7 @@
 	<table class="table m-0 table-striped">
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
-			<th><?php echo get_msg('item_name'); ?></th>
+			<th><?php echo get_msg('operation_title'); ?></th>
 			<th><?php echo get_msg('user_name'); ?></th>
 			
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
@@ -28,8 +28,9 @@
 			
 			<tr>
 				<td><?php echo ++$count;?></td>
-				<td><?php echo $this->Item->get_one( $report->item_id )->title; ?></td>
-				<td><?php echo $this->User->get_one( $report->reported_user_id )->user_name; ?></td>
+				<td><?php echo $this->Item->get_one( $report->operation_id )->title; ?></td>
+				
+				<td><?php echo $this->User->get_one( $report->user_id )->user_name ? $this->User->get_one( $report->user_id )->user_name : 'N/A'; ?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 			
