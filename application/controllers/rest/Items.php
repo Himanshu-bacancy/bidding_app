@@ -1496,4 +1496,25 @@ class Items extends API_Controller
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}
 	}
+
+
+	/**
+	 * Himanshu Sharma
+	 * Function to get total sales amount
+	 */
+	public function get_total_sales_amount_get(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+
+		$userId = $this->get('user_id');
+
+		$this->db->select('id');
+		$this->db->where('added_user_id', $userId);
+		$this->db->from('bs_items');
+		$itemIds = $this->db->get()->result_array();
+	}
+
 }
