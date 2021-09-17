@@ -63,6 +63,7 @@ $route['reset_email/(.*)'] = "main/reset_email/$1";
 
 $route['success_reset_password'] = "main/success_reset_password";
 $route['remove-item-from-cart'] = "crons/remove_item_from_cart";
+$route['track-order'] = "crons/update_order_status";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";

@@ -629,12 +629,17 @@ class Payments extends API_Controller {
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
                 ->where('bs_order.order_id', $order_id)->get()->row_array();
         if(count($orders)) {
+            $address_details = $this->Addresses->get_one( $orders['address_id'] );
+            $orders['address_details'] = $address_details;
+                
             $item_details = $this->Item->get_one( $orders['items'] );
             $this->ps_adapter->convert_item($item_details);
             $orders['item_details'] = $item_details;
+            
             $buyer = $this->User->get_one( $orders['user_id'] );
             $this->ps_adapter->convert_user( $buyer );
             $orders['buyer'] = $buyer;
+            
             $seller = $this->User->get_one( $orders['seller_id'] );
             $this->ps_adapter->convert_user( $seller );
             $orders['seller'] = $seller;
@@ -729,21 +734,31 @@ class Payments extends API_Controller {
 //                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
-                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
-                ->where('bs_order.user_id', $user_id)
-                ->where('bs_order.operation_type', $operation_type)->get()->result();
+                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left');
+                if($operation_type == SELLING) {
+                  $obj = $obj->where('bs_items.added_user_id', $user_id);
+                } else {
+                    $obj = $obj->where('bs_order.user_id', $user_id);
+                }
+                $obj = $obj->get()->result();
 //                ->where('bs_order.status', "succeeded")
 //                ->where('bs_order.delivery_status', "pending")->get()->result();
         if(!empty($obj)) {
             $row = [];
             foreach ($obj as $key => $value) {
                 $row[$key] = $value;
+                
+                $address_details = $this->Addresses->get_one( $value->address_id );
+                $row[$key]->address_details = $address_details;
+                
                 $item_details = $this->Item->get_one( $value->items );
                 $this->ps_adapter->convert_item($item_details);
                 $row[$key]->item_details = $item_details;
+                
                 $buyer = $this->User->get_one( $value->user_id );
                 $this->ps_adapter->convert_user( $buyer );
                 $row[$key]->buyer = $buyer;
+                
                 $seller = $this->User->get_one( $value->seller_id );
                 $this->ps_adapter->convert_user( $seller );
                 $row[$key]->seller = $seller;
@@ -877,7 +892,8 @@ class Payments extends API_Controller {
         if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
             $this->error_response("Please pass cvc");
         }
-
+        $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['user_id'])->get()->row();
+        if($offer_details->seller_user_id != $posts_var['user_id']) {
         $card_id = $posts_var['card_id'];
         $cvc     = $posts_var['cvc'];
         $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -941,5 +957,10 @@ class Payments extends API_Controller {
             $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
         }
+        } else {
+            $buyer = $this->db->select('device_token')->from('core_users')
+                    ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+            send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
+    }
     }
 }

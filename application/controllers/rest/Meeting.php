@@ -21,10 +21,10 @@ class Meeting extends API_Controller {
             'requireAuthorization' => true,
         ]);
         $rules = array(
-            array(
-                'field' => 'location_list',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'location_list',
+//                'rules' => 'required'
+//            ),
             array(
                 'field' => 'order_id',
                 'rules' => 'required'
@@ -41,6 +41,10 @@ class Meeting extends API_Controller {
         if ( !$this->is_valid( $rules )) exit;
 
         $posts = $this->post();
+        
+        if(!isset($posts['location_list']) || empty($posts['location_list']) || is_null($posts['location_list'])) { 
+            $this->error_response("Please pass location list");
+        } 
         
         $this->db->insert('bs_meeting', ['sender_id' => $posts['user_id'], 'receiver_id' => $posts['buyer_id'], 'order_id' => $posts['order_id'], 'location_list' => $posts['location_list'], 'created_at' => date('Y-m-d H:i:s')]);
         $buyer = $this->db->select('device_token')->from('core_users')
@@ -95,6 +99,7 @@ class Meeting extends API_Controller {
         $posts = $this->post();
         
         $file_path = 'uploads/qrcode/qr_'.$posts['order_id'].'.png';
+        $return_file_path2 = 'qrcode/qr_'.$posts['order_id'].'.png';
         $params['data'] = $posts['order_id'];
         $params['level'] = 'H';
         $params['size'] = 10;
@@ -109,7 +114,7 @@ class Meeting extends API_Controller {
                             ->where('user_id', $get_user->buyer_id)->get()->row();
         send_push( $buyer->device_token, ["message" => "Qr code received for order", "flag" => "qr-code_request"] );
         
-        $this->response(['status' => 'success', 'message' => 'Qr code generated', 'file_path' => $file_path]);
+        $this->response(['status' => 'success', 'message' => 'Qr code generated', 'file_path' => $return_file_path2]);
     }
     
     public function scan_qr_post() {
