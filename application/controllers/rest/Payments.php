@@ -892,75 +892,86 @@ class Payments extends API_Controller {
         if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
             $this->error_response("Please pass cvc");
         }
-        $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['user_id'])->get()->row();
-        if($offer_details->seller_user_id != $posts_var['user_id']) {
-        $card_id = $posts_var['card_id'];
-        $cvc     = $posts_var['cvc'];
-        $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
-        $expiry_date = explode('/',$card_details->expiry_date);
-        $paid_config = $this->Paid_config->get_one('pconfig1');
-        $item_price = $posts_var['price'];
-        $new_odr_id = 'odr_'.time().$posts_var['user_id'];
-        if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
-            $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
+        
+        $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['offer_id'])->get()->row();
+        
+        if(!$offer_details->is_offer_complete) {
+            if($offer_details->seller_user_id != $posts_var['user_id']) {
+                $card_id = $posts_var['card_id'];
+                $cvc     = $posts_var['cvc'];
+                $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+                $expiry_date = explode('/',$card_details->expiry_date);
+                $paid_config = $this->Paid_config->get_one('pconfig1');
+                $item_price = $posts_var['price'];
+                $new_odr_id = 'odr_'.time().$posts_var['user_id'];
+                if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
+                    $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
-            if($get_item->pay_shipping_by == '1') {
-                if($get_item->shipping_type == '1') {
-                    $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+                    if($get_item->pay_shipping_by == '1') {
+                        if($get_item->shipping_type == '1') {
+                            $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
-                    $item_price = $item_price + (float)$get_shiping_detail->price;
-                } else if($get_item->shipping_type == '2'){
-                    $item_price = $item_price + $get_item->shipping_cost_by_seller;   
+                            $item_price = $item_price + (float)$get_shiping_detail->price;
+                        } else if($get_item->shipping_type == '2'){
+                            $item_price = $item_price + $get_item->shipping_cost_by_seller;   
+                        }
+                    }
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $record = $this->db->insert_id();
+
+                    # set stripe test key
+                    \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                    try {
+                        $response = \Stripe\PaymentMethod::create([
+                            'type' => 'card',
+                            'card' => [
+                                'number' => $card_details->card_number,
+                                'exp_month' => $expiry_date[0],
+                                'exp_year' => $expiry_date[1],
+                                'cvc' => $cvc
+                            ]
+                        ]);
+                        $response = \Stripe\PaymentIntent::create([
+                            'amount' => $item_price * 100,
+                            "currency" => trim($paid_config->currency_short_form),
+                            'payment_method' => $response->id,
+                            'payment_method_types' => ['card']
+                        ]);
+
+                        if (isset($response->id)) { 
+                            $this->db->where('id', $record)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
+
+                            $seller = $this->db->select('device_token')->from('bs_items')
+                                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                                    ->where('bs_items.id', $posts_var['item_id'])->get()->row();
+                            send_push( $seller->device_token, ["message" => "New order arrived", "flag" => "new_order"] );
+                            $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $record]);
+                            $response = $this->ps_security->clean_output( $response );
+                            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
+                        } else {
+                            $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
+                            $this->error_response(get_msg('stripe_transaction_failed'));
+                        }
+                    } catch (exception $e) {
+                        $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
+                        $this->error_response(get_msg('stripe_transaction_failed'));
+                    }
+
+                } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $record = $this->db->insert_id();
+
+                    $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $record]);
+
+                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id]);
                 }
-            }
-            $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
-            $record = $this->db->insert_id();
-           
-            # set stripe test key
-            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
-            try {
-                $response = \Stripe\PaymentMethod::create([
-                    'type' => 'card',
-                    'card' => [
-                        'number' => $card_details->card_number,
-                        'exp_month' => $expiry_date[0],
-                        'exp_year' => $expiry_date[1],
-                        'cvc' => $cvc
-                    ]
-                ]);
-                $response = \Stripe\PaymentIntent::create([
-                    'amount' => $item_price * 100,
-                    "currency" => trim($paid_config->currency_short_form),
-                    'payment_method' => $response->id,
-                    'payment_method_types' => ['card']
-                ]);
-
-                if (isset($response->id)) { 
-                    $this->db->where('id', $record)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
-
-                    $seller = $this->db->select('device_token')->from('bs_items')
-                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                            ->where('bs_items.id', $posts_var['item_id'])->get()->row();
-                    send_push( $seller->device_token, ["message" => "New order arrived", "flag" => "new_order"] );
-                    $response = $this->ps_security->clean_output( $response );
-                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card']);
                 } else {
-                    $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
-                    $this->error_response(get_msg('stripe_transaction_failed'));
-                }
-            } catch (exception $e) {
-                $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
-                $this->error_response(get_msg('stripe_transaction_failed'));
+                    $buyer = $this->db->select('device_token')->from('core_users')
+                            ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+                    send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
             }
-
-        } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-            $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
-            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
-        }
         } else {
-            $buyer = $this->db->select('device_token')->from('core_users')
-                    ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
-            send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
-    }
+            $this->error_response("Offer already completed");
+        }
     }
 }

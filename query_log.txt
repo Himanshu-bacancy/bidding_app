@@ -288,4 +288,7 @@ ALTER TABLE `bs_order` CHANGE `status` `status` VARCHAR(50) CHARACTER SET latin1
 ALTER TABLE `bs_order` ADD `processed_date` DATETIME NULL AFTER `created_at`, ADD `pickup_date` DATETIME NULL AFTER `processed_date`, ADD `scanqr_date` DATETIME NULL AFTER `pickup_date`, ADD `rate_date` DATETIME NULL AFTER `scanqr_date`, ADD `completed_date` DATETIME NULL AFTER `rate_date`;
 // RB: ADDED ON 17/09/2021
 ALTER TABLE `bs_order` ADD `offer_id` TEXT NULL AFTER `order_id`;
+// RB: ADDED ON 20/09/2021
+ALTER TABLE `bs_order` ADD `generate_qr_date` DATETIME NULL AFTER `completed_date`, ADD `share_meeting_list_date` DATETIME NULL AFTER `generate_qr_date`, ADD `confirm_meeting_date` DATETIME NULL AFTER `share_meeting_list_date`;
 
+ALTER TABLE `bs_chat_history` ADD `is_offer_complete` INT NOT NULL DEFAULT '0' AFTER `added_date`, ADD `order_id` INT NOT NULL DEFAULT '0' AFTER `is_offer_complete`;
