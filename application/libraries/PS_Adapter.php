@@ -1086,7 +1086,7 @@ class PS_Adapter {
 
 				if ( isset( $obj[$i]->operation_type ) && $obj[$i]->operation_type == EXCHANGE && isset($obj[$i]->id) ) {
 					$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj[$i]->id) );
-
+					
 					// foreach($tmp_exchange_ids as $offered){
 					// 	$obj[$i]->offered_item_id[] = $offered->offered_item_id;
 					// }
@@ -1162,7 +1162,6 @@ class PS_Adapter {
 			if ( isset( $obj->operation_type ) && $obj->operation_type == EXCHANGE && isset($obj->id) ) {
 				
 				$tmp_exchange_ids = $this->CI->ExchangeChatHistory->get_all_in_exchange_chat_item( array('chat_id' => $obj->id) );
-
 				// foreach($tmp_exchange_ids as $offered){
 				// 	$obj->offered_item_id[] = $offered->offered_item_id;
 				// }
@@ -1173,7 +1172,8 @@ class PS_Adapter {
 				// $obj->exchange_chat_detail = $tmp_exchange_ids;
 				
 				foreach($tmp_exchange_ids as $exchange_data){
-					$obj->exchange_item_id[] = $offered->offered_item_id;
+					$obj->exchange_item_id[] = $exchange_data->offered_item_id;
+					$this->convert_item( $exchange_data->offered_item_detail );
 					$obj->exchange_item_detail[] = $exchange_data->offered_item_detail;
 				}
 			} else{

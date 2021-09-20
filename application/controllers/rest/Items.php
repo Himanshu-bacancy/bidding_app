@@ -1103,8 +1103,7 @@ class Items extends API_Controller
 	 * auto suggestion item with category
 	 * @param <type> $text The to search the item	 
 	 */
-	function autosearch_post()
-	{
+	function autosearch_post(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
@@ -1130,8 +1129,7 @@ class Items extends API_Controller
 
 		$typeArr = array($requesttype,$sellingtype,$sellingexchangetype);
 
-		foreach($typeArr as $typekey => $type)
-		{
+		foreach($typeArr as $typekey => $type){
 			$this->db->select('bs_items.id,bs_items.title, bs_categories.cat_name as catname, CONCAT(bs_items.title, " in ", bs_categories.cat_name) AS display_text'); 
 			$this->db->from('bs_categories');
 			$this->db->join('bs_items', 'bs_categories.cat_id = bs_items.cat_id');
@@ -1140,27 +1138,17 @@ class Items extends API_Controller
 			$this->db->where('bs_items.status', 1);
 			$searchresult = $this->db->get()->result();
 			//echo count($searchresult);
-			if(count($searchresult)<='0')
-			{
+			if(count($searchresult)<='0'){
 				unset($typeArr[$typekey]);
-			}
-			else
-			{
+			} else {
 				$typeArr[$typekey]->searchresult = $searchresult;
-			}
-			
+			}			
 		}
-
-		if(count($typeArr)>0)
-		{
+		if(count($typeArr)>0){
 			$this->response($typeArr);
-		}
-		else
-		{
+		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}
-
-		
 
 	}
 
@@ -1509,12 +1497,39 @@ class Items extends API_Controller
             'requireAuthorization' => true,
         ]);
 
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        )
+        );
 		$userId = $this->get('user_id');
+		if ( !$this->is_valid( $rules )) exit;
 
 		$this->db->select('id');
 		$this->db->where('added_user_id', $userId);
 		$this->db->from('bs_items');
 		$itemIds = $this->db->get()->result_array();
+		$itemIdsArray = [];
+		$soldItems = [];
+		if(!empty($itemIds)){
+			foreach($itemIds as $ids){
+				$itemIdsArray[] = $ids['id'];
+			}
+			if(!empty($itemIdsArray)){
+				$this->db->select('SUM(total_amount) as total_sale');
+				$this->db->where('status', 'succeeded');
+				$this->db->where_in('items', $itemIdsArray);
+				$this->db->from('bs_order');
+				$soldItems = $this->db->get()->result_array();
+				$this->custom_response($soldItems);
+			} else {
+				$this->error_response( get_msg( 'record_not_found' ) );
+			}
+		} else {
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}
 	}
 
 }

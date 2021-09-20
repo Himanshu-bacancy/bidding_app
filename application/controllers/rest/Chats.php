@@ -1299,11 +1299,17 @@ class Chats extends API_Controller
 		// 	$condition .= " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') ";
 		// }
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
-			$condition .=  $condition != '' ? " AND buyer_user_id = '".$user_id."'" : "buyer_user_id = '".$user_id."' AND operation_type = '1' OR operation_type = '4'"; 
+			$condition .=  $condition != '' ? 
+			" AND buyer_user_id = '".$user_id."' AND requested_item_id != ''" : 
+			"buyer_user_id = '".$user_id."' AND (operation_type = '1' OR operation_type = '4') AND requested_item_id != ''"; 
 		} else if($type == EXCHANGE){
-			$condition .= $condition != '' ? " AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3'" : "(buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' ";
+			$condition .= $condition != '' ? 
+			" AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' AND requested_item_id != ''" : 
+			"(buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' AND requested_item_id != '' ";
 		} else {
-			$condition .= $condition != '' ? " AND seller_user_id = '".$user_id."'" : "seller_user_id = '".$user_id."' AND operation_type != '3'";		
+			$condition .= $condition != '' ? 
+			" AND seller_user_id = '".$user_id."' AND requested_item_id != ''" : 
+			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != ''";		
 		}
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
 		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition)->result();
@@ -1314,7 +1320,6 @@ class Chats extends API_Controller
 			$obj[] = isset($details) && !empty($details) ? $details : [];
 		}
 		foreach($obj as $key => $data){
-		//	echo '<pre>'; print_r($obj[$key]->requested_item_id);
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
 				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' AND requested_item_id = "'.$obj[$key]->requested_item_id.'"')->row();
 				$obj[$key]->bid_count = $total->total_user;

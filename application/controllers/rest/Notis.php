@@ -163,13 +163,11 @@ class Notis extends API_Controller
 		$noti = $this->Noti_message->get_one( $obj->id );
 		
 		$this->ps_adapter->convert_noti( $noti );
-		$this->custom_response_noti( $noti );
-    		
+		$this->custom_response_noti( $noti );	
     	
 	}
 
-	function send_chat_noti_post() 
-	{
+	function send_chat_noti_post(){
 		
 		// validation rules for user register
 		$rules = array(
@@ -202,7 +200,7 @@ class Notis extends API_Controller
 					'field' => 'requested_item_id',
 					'rules' => 'required'
 				));
-		}else{
+		} else {
 			array_push($rules, array(
 				'field' => 'offered_item_id',
 				'rules' => 'required'
@@ -253,7 +251,7 @@ class Notis extends API_Controller
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 
 	        $update_chat_data = array(
-				"requested_item_id" => $this->post('item_id'), 
+				//"requested_item_id" => $this->post('item_id'), 
 	        	// "item_id" => $this->post('item_id'), 
 	        	"buyer_user_id" => $this->post('buyer_user_id'), 
 	        	"seller_user_id" => $this->post('seller_user_id'),
@@ -285,7 +283,7 @@ class Notis extends API_Controller
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 	        
 	        $update_chat_data = array(
-				"offered_item_id" => $this->post('item_id'), 
+				//"offered_item_id" => $this->post('item_id'), 
 	        	// "item_id" => $this->post('item_id'), 
 	        	"buyer_user_id" => $this->post('buyer_user_id'), 
 	        	"seller_user_id" => $this->post('seller_user_id'),
@@ -294,7 +292,6 @@ class Notis extends API_Controller
 	        );
 
 	    }
-
 		if( !$this->Chat->Save( $update_chat_data,$chat_id )) {
     		$this->error_response( get_msg( 'err_count_update' ));    	
     	} else {
@@ -308,12 +305,9 @@ class Notis extends API_Controller
 	    	$data['sender_profle_photo'] = $user_profile_photo;
 			$status = send_android_fcm_chat( $device_ids, $data );
 			if($status) {				
-				$this->success_response( get_msg( 'success_noti_send'));
-
+				$this->success_response( get_msg('success_noti_send'));
 			} else {
-
-				$this->error_response( get_msg( 'error_noti_send' ));
-
+				$this->error_response( get_msg('error_noti_send'));
 			}
     	}
 	}
