@@ -39,7 +39,8 @@ class Summary extends API_Controller {
         $request_arr['saved_later'] = $this->db->select('id')->from('bs_items')->where('item_type_id',REQUEST_ITEM)->where('added_user_id', $posts['user_id'])->where('is_draft', 1)->get()->num_rows();
         
         $request_arr['deals'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',REQUEST_ITEM)->where('buyer_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->num_rows();
-        
+        $request_arr['savings'] = 0;
+                
         $direct_buy_arr = [];
         $direct_buy_arr['items_in_cart'] = $this->db->select('id')->from('bs_cart')->where('type_id',DIRECT_BUY)->where('user_id', $posts['user_id'])->get()->num_rows();
         
@@ -50,6 +51,8 @@ class Summary extends API_Controller {
         $direct_buy_arr['deals'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',DIRECT_BUY)->where('buyer_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->num_rows();
         
         $direct_buy_arr['in_process_orders'] = $this->db->select('id')->from('bs_order')->where('operation_type',DIRECT_BUY)->where('user_id', $posts['user_id'])->get()->num_rows();
+        
+        $direct_buy_arr['discounts'] = $this->db->select('SUM(bs_items.price - bs_chat_history.nego_price) as discount')->from('bs_chat_history')->join('bs_items', 'bs_chat_history.requested_item_id = bs_items.id')->where('bs_chat_history.operation_type',DIRECT_BUY)->where('bs_chat_history.buyer_user_id', $posts['user_id'])->where('bs_chat_history.is_offer_complete', 1)->get()->row()->discount;
         
         $selling_arr = [];
         $selling_arr['posted_items'] = $this->db->select('id')->from('bs_items')->where('item_type_id',SELLING)->where('added_user_id', $posts['user_id'])->get()->num_rows();
@@ -62,6 +65,8 @@ class Summary extends API_Controller {
         
         $selling_arr['deals'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',SELLING)->where('seller_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->num_rows();
         
+        $selling_arr['total_sales'] = $this->db->select('SUM(nego_price) as total_sales')->from('bs_chat_history')->where('operation_type',SELLING)->where('seller_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->row()->total_sales;
+                
         $exchange_arr = [];
         $exchange_arr['request_items'] = $this->db->select('id')->from('bs_items')->where('item_type_id',EXCHANGE)->where('added_user_id', $posts['user_id'])->get()->num_rows();
         
@@ -72,6 +77,8 @@ class Summary extends API_Controller {
         $exchange_arr['saved_later'] = $this->db->select('id')->from('bs_items')->where('item_type_id',EXCHANGE)->where('added_user_id', $posts['user_id'])->where('is_draft', 1)->get()->num_rows();
         
         $exchange_arr['deals'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',EXCHANGE)->where('buyer_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->num_rows();
+        
+        $exchange_arr['total_sales'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',EXCHANGE)->where('seller_user_id', $posts['user_id'])->get()->num_rows();
         
         $request_arr = $this->ps_security->clean_output( $request_arr );
         $direct_buy_arr = $this->ps_security->clean_output( $direct_buy_arr );
