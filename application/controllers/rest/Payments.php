@@ -762,6 +762,8 @@ class Payments extends API_Controller {
                 $seller = $this->User->get_one( $value->seller_id );
                 $this->ps_adapter->convert_user( $seller );
                 $row[$key]->seller = $seller;
+                
+                $row[$key]->order_state = is_null($value->completed_date) ? 'in_process' : 'complete';
             }
             $row = $this->ps_security->clean_output( $row );
             $this->response($row);
@@ -850,53 +852,67 @@ class Payments extends API_Controller {
                 'field' => 'user_id',
                 'rules' => 'required'
             ),
-            array(
-                'field' => 'card_id',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'card_id',
+//                'rules' => 'required'
+//            ),
             array(
                 'field' => 'offer_id',
                 'rules' => 'required'
             ),
-            array(
-                'field' => 'cvc',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'delivery_method_id',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'price',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'item_id',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'delivery_address',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'operation_type',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'cvc',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'delivery_method_id',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'price',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'item_id',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'delivery_address',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'operation_type',
+//                'rules' => 'required'
+//            ),
         );
         if (!$this->is_valid($rules)) exit;
         $posts_var = $this->post();
-        
-        if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
-            $this->error_response("Please pass card id");
-        }
-        if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
-            $this->error_response("Please pass cvc");
-        }
         
         $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['offer_id'])->get()->row();
         
         if(!$offer_details->is_offer_complete) {
             if($offer_details->seller_user_id != $posts_var['user_id']) {
+                if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
+                    $this->error_response("Please pass card id");
+                }
+                if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
+                    $this->error_response("Please pass cvc");
+                }
+                if(!isset($posts_var['delivery_method_id']) || empty($posts_var['delivery_method_id']) || is_null($posts_var['delivery_method_id'])) {
+                    $this->error_response("Please pass delivery_method_id");
+                }
+                if(!isset($posts_var['price']) || empty($posts_var['price']) || is_null($posts_var['price'])) {
+                    $this->error_response("Please pass price");
+                }
+                if(!isset($posts_var['item_id']) || empty($posts_var['item_id']) || is_null($posts_var['item_id'])) {
+                    $this->error_response("Please pass item_id");
+                }
+                if(!isset($posts_var['delivery_address']) || empty($posts_var['delivery_address']) || is_null($posts_var['delivery_address'])) {
+                    $this->error_response("Please pass delivery_address");
+                }
+                if(!isset($posts_var['operation_type']) || empty($posts_var['operation_type']) || is_null($posts_var['operation_type'])) {
+                    $this->error_response("Please pass operation_type");
+                }
                 $card_id = $posts_var['card_id'];
                 $cvc     = $posts_var['cvc'];
                 $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -916,7 +932,7 @@ class Payments extends API_Controller {
                             $item_price = $item_price + $get_item->shipping_cost_by_seller;   
                         }
                     }
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
 
                     # set stripe test key
@@ -958,10 +974,12 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
 
                     $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $record]);
+                    
+                    
 
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id]);
                 }
