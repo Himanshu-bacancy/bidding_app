@@ -222,6 +222,38 @@
               ?>
 
             </div>
+            <div class="form-group">
+              <label> <span style="font-size: 17px; color: red;">*</span>
+                <?php echo get_msg('Prd_search_child_subcat')?>
+              </label>
+              <?php
+                if(isset($item)) {
+                  $options=array();
+                  $options[0]=get_msg('Prd_search_child_subcat');
+                  $conds['sub_cat_id'] = $item->sub_cat_id;
+                  $child_sub_cat = $this->Childsubcategory->get_all_by($conds);
+                  foreach($child_sub_cat->result() as $childSubcat) {
+                    $options[$childSubcat->id]=$childSubcat->name;
+                  }
+                  echo form_dropdown(
+                    'childsubcat_id',
+                    $options,
+                    set_value( 'childsubcat_id', show_data( @$item->childsubcat_id), false ),
+                    'class="form-control form-control-sm mr-3" id="childsubcat_id"'
+                  );
+                } else {
+                  $conds['sub_cat_id'] = $selected_cat_id;
+                  $options=array();
+                  $options[0]=get_msg('Prd_search_child_subcat');
+                  echo form_dropdown(
+                    'childsubcat_id',
+                    $options,
+                    set_value( 'childsubcat_id', show_data( @$item->childsubcat_id), false ),
+                    'class="form-control form-control-sm mr-3" id="childsubcat_id"'
+                  );
+                }
+              ?>
+            </div>
 
             <div class="form-group">
               <label> <span style="font-size: 17px; color: red;"></span>
@@ -387,6 +419,87 @@
                 'id' => 'brand'
                 
               )); ?>
+            </div>
+
+            <div class="form-group">
+              <label> <span style="font-size: 17px; color: red;">*</span>
+                <?php echo get_msg('Prd_search_color')?>
+              </label>
+
+              <?php
+                $options=array();
+                $options[0]=get_msg('Prd_search_color');
+                $colors = $this->Color->get_all_by();
+                foreach($colors->result() as $color) {
+                    $options[$color->id] = $color->name;
+                }
+                echo form_dropdown(
+                  'color_ids[]',
+                  $options,
+                  set_value( 'color_ids[]', show_data( @$item->color_id), false ),
+                  'class="form-control form-control-sm mr-3" id="color_ids" multiple'
+                );
+              ?>
+            </div>
+
+            <div class="form-group">
+              <label> <span style="font-size: 17px; color: red;"></span>
+                <?php echo get_msg('Select_SizeGroup')?>
+              </label>
+
+              <?php
+                $options=array();
+                $conds['status'] = 1;
+                $options[0]=get_msg('Select_SizeGroup');
+                $sizegroups = $this->Sizegroups->get_all_by($conds);
+                foreach($sizegroups->result() as $sizegroup) {
+                    $options[$sizegroup->id] = $sizegroup->name;
+                }
+
+                echo form_dropdown(
+                  'sizegroup_id',
+                  $options,
+                  set_value( 'sizegroup_id', show_data( @$item->sizegroup_id), false ),
+                  'class="form-control form-control-sm mr-3" id="sizegroup_id"'
+                );
+              ?>
+            </div>
+
+            <div class="form-group">
+              <label> <span style="font-size: 17px; color: red;">*</span>
+                <?php echo get_msg('Prd_search_sizegroup_option')?>
+              </label>
+
+              <?php
+                if(isset($item)) {
+                  $options=array();
+                  $options[0]=get_msg('Prd_search_sizegroup_option');
+                  $conds['sizegroup_id'] = $item->sizegroup_id;
+                  $sizegroupOption = $this->Sizegroup_option->get_all_by($conds);
+                  foreach($sizegroupOption->result() as $sizegroupoptions) {
+                    $options[$sizegroupoptions->id]=$sizegroupoptions->title;
+                  }
+                  echo form_dropdown(
+                    'sizegroupoption_ids[]',
+                    $options,
+                    set_value( 'sizegroupoption_ids[]', show_data( @$item->sizegroupoption_ids), false ),
+                    'class="form-control form-control-sm mr-3" id="sizegroupoption_ids" multiple'
+                  );
+
+                } else {
+                  $conds['sizegroup_id'] = $selected_sizegroup_id;
+                  $options=array();
+                  $options[0]=get_msg('Prd_search_sizegroup_option');
+
+                  echo form_dropdown(
+                    'sizegroupoption_ids[]',
+                    $options,
+                    set_value( 'sizegroupoption_ids[]', show_data( @$item->sizegroupoption_ids), false ),
+                    'class="form-control form-control-sm mr-3" id="sizegroupoption_ids" multiple'
+                  );
+                }
+                
+              ?>
 
             </div>
 

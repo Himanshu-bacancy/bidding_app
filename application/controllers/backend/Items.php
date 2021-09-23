@@ -394,12 +394,36 @@ class Items extends BE_Controller {
 
 	//get all subcategories when select category
 
-	function get_all_sub_categories( $cat_id )
-    {
+	function get_all_sub_categories( $cat_id ){
     	$conds['cat_id'] = $cat_id;
     	
     	$sub_categories = $this->Subcategory->get_all_by($conds);
 		echo json_encode($sub_categories->result());
+    }
+
+	/**
+	 * Himanshu Sharma
+	 * Function to get child subcategories of selected sub category
+	 */
+	function get_all_childsub_categories( $subcat_id = null, $cat_id = null ){
+    	$conds['sub_cat_id'] = $subcat_id;
+		$conds['cat_id'] = $cat_id;
+    	
+    	$childSub_categories = $this->Childsubcategory->get_all_by($conds);
+		echo json_encode($childSub_categories->result());
+    }
+
+
+
+	/**
+	 * Himanshu Sharma
+	 * Function to get sizegroup options of selected sizegroup
+	 */
+	function get_all_sizegroup_option( $sizegroup_id = null ){
+    	$conds['sizegroup_id'] = $sizegroup_id;
+    	
+    	$sizegroup_options = $this->Sizegroup_option->get_all_by($conds);
+		echo json_encode($sizegroup_options->result());
     }
 
 
