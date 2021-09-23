@@ -78,12 +78,22 @@ class Summary extends API_Controller {
         
         $exchange_arr['deals'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',EXCHANGE)->where('buyer_user_id', $posts['user_id'])->where('is_offer_complete', 1)->get()->num_rows();
         
-        $exchange_arr['total_sales'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',EXCHANGE)->where('seller_user_id', $posts['user_id'])->get()->num_rows();
+        $exchange_arr['offer_sent'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',EXCHANGE)->where('seller_user_id', $posts['user_id'])->get()->num_rows();
         
         $request_arr = $this->ps_security->clean_output( $request_arr );
         $direct_buy_arr = $this->ps_security->clean_output( $direct_buy_arr );
         $selling_arr = $this->ps_security->clean_output( $selling_arr );
         $exchange_arr = $this->ps_security->clean_output( $exchange_arr );
+        
+        if(empty($exchange_arr['offer_sent'])) {
+            $exchange_arr['offer_sent'] = "0";
+        }
+        if(empty($selling_arr['total_sales'])) {
+            $selling_arr['total_sales'] = "0";
+        }
+        if(empty($direct_buy_arr['discounts'])) {
+            $direct_buy_arr['discounts'] = "0";
+        }
         
         $this->response(['status' => 'success', 'request' => $request_arr, 'direct_buy' => $direct_buy_arr ,'selling' => $selling_arr, 'exchange' => $exchange_arr]);
     }

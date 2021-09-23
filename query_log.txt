@@ -294,3 +294,5 @@ ALTER TABLE `bs_order` ADD `generate_qr_date` DATETIME NULL AFTER `completed_dat
 ALTER TABLE `bs_chat_history` ADD `is_offer_complete` INT NOT NULL DEFAULT '0' AFTER `added_date`, ADD `order_id` INT NOT NULL DEFAULT '0' AFTER `is_offer_complete`;
 // RB: ADDED ON 22/09/2021
 ALTER TABLE `bs_order` CHANGE `confirm_by_seller` `confirm_by_seller` INT NOT NULL DEFAULT '0';
+// RB: ADDED ON 23/09/2021
+ALTER TABLE `bs_order` ADD `qty` VARCHAR(50) NOT NULL DEFAULT '' AFTER `items`;
