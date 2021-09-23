@@ -1551,7 +1551,6 @@ class Chats extends API_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
-
 		// validation rules for chat history
 		$rules = array(
 			array(
@@ -1570,20 +1569,11 @@ class Chats extends API_Controller
 
 		if($chat_history_data->id == ""){
 			$this->error_response(get_msg('err_chat_history_not_available'));
-		}else{
+		} else {
 			$chat_data_update = array(
-				"requested_item_id" => $chat_history_data->requested_item_id,
-				"offered_item_id" => $chat_history_data->offered_item_id,
-				"buyer_user_id" => $chat_history_data->buyer_user_id, 
-				"seller_user_id" => $chat_history_data->seller_user_id, 
 				"nego_price" => $this->post('price'), 
-				"parent_id" => $chat_history_id,
-				"operation_type" => $chat_history_data->operation_type,
-				"type" => $chat_history_data->type,  
-				"is_accept" => 0,
 			);
-
-			if(!$this->Chat->Save( $chat_data_update)) {
+			if(!$this->Chat->Save($chat_data_update, $chat_history_id)) {
 				$this->error_response(get_msg( 'err_count_update'));
 			} else {
 				$this->success_response(get_msg('offer_change_success'));
@@ -1598,7 +1588,6 @@ class Chats extends API_Controller
 			"selling_fees" => $config_data->selling_fees,
 			"processing_fees" => $config_data->processing_fees, 
 		);
-		
 		// $this->ps_adapter->convert_chathistory( $chat_data_update );
 		$this->custom_response( $chat_data_update );
 	}

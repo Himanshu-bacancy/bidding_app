@@ -1205,20 +1205,16 @@ class PS_Adapter {
 	 *
 	 * @param      <type>  $obj    The object
 	 */
-	function convert_follow_user( &$obj )
-	{
+	function convert_follow_user( &$obj ){
 		// user object
 		if ( isset( $obj->user_id )) {
 			$tmp_user = $this->CI->User->get_one( $obj->user_id );
-
 			$this->convert_user( $tmp_user );
-
 			$obj->user_followed = $tmp_user;
 		}
 	}
 
-	function convert_follow_user_list( &$obj, $followed_user_id )
-	{
+	function convert_follow_user_list( &$obj, $followed_user_id ){
 
 		if ( is_array( $obj )) {
 
@@ -1508,11 +1504,9 @@ class PS_Adapter {
 
 	}
 			
-	function convert_exchange_chat_history( &$obj, $item_detail_req = true )
-	{
+	function convert_exchange_chat_history( &$obj, $item_detail_req = true ){
 		// set user object
-		if ( is_array( $obj )) {
-			
+		if ( is_array( $obj )) {			
 			for ($i=0; $i < count($obj) ; $i++) { 
 				if ( isset( $obj[$i]->offered_item_id )) {
 					
@@ -1520,19 +1514,55 @@ class PS_Adapter {
 					// $this->convert_item( $tmp_item );
 					$obj[$i]->offered_item_detail = $tmp_item;
 				}
-			}
-			
-
-		}else {
-
-			if ( isset( $obj->offered_item_id )) {
-					
+			}			
+		} else {
+			if ( isset( $obj->offered_item_id )) {	
 				$tmp_item = $this->CI->Item->get_one( $obj->offered_item_id );
 				// $this->convert_item( $tmp_item );
 				$obj->offered_item_detail = $tmp_item;
 			}
-
 		}
 	}
-
+	
+	/**
+	 * Himanshu Sharma
+	 * convert order function
+	 */
+	function convert_order( &$obj ){
+		if ( is_array( $obj )) {
+			for ($i=0; $i < count($obj) ; $i++) { 
+				if ( isset( $obj[$i]->offer_id )) {
+					$tmp_offer = $this->CI->Chat->get_one( $obj[$i]->offer_id );
+					$this->convert_chathistory( $tmp_offer );
+					$obj[$i]->offer_details = $tmp_offer;
+				}
+				if ( isset( $obj[$i]->user_id )) {
+					$tmp_user = $this->CI->User->get_one( $obj[$i]->user_id );
+					$this->convert_user( $tmp_user );
+					$obj[$i]->user_details = $tmp_user;
+				}
+				if ( isset( $obj[$i]->items )) {
+					$tmp_item = $this->CI->Item->get_one( $obj[$i]->items );
+					$this->convert_item( $tmp_item );
+					$obj[$i]->item_details = $tmp_item;
+				}
+			}
+		} else {
+			if ( isset( $obj->offer_id )) {
+				$tmp_offer = $this->CI->Chat->get_one( $obj->offer_id );
+				$this->convert_chathistory( $tmp_offer );
+				$obj->offer_details = $tmp_offer;
+			}
+			if ( isset( $obj->user_id )) {
+				$tmp_user = $this->CI->User->get_one( $obj->user_id );
+				$this->convert_user( $tmp_user );
+				$obj->user_details = $tmp_user;
+			}
+			if ( isset( $obj->items )) {
+				$tmp_item = $this->CI->Item->get_one( $obj->items );
+				$this->convert_item( $tmp_item );
+				$obj->item_details = $tmp_item;
+			}
+		}
+	}
 }

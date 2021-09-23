@@ -730,15 +730,15 @@ class Payments extends API_Controller {
         
         $user_id = $this->post('user_id');
         $operation_type = $this->post('operation_type');
-        $obj = $this->db->select('bs_order.*,bs_track_order.status as tracking_status, bs_track_order.tracking_url,seller.user_id as seller_id')->from('bs_order')
+        $obj = $this->db->select('bs_order.*, bs_items.item_type_id, bs_track_order.status as tracking_status, bs_track_order.tracking_url,seller.user_id as seller_id')->from('bs_order')
 //                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left');
                 if($operation_type == SELLING) {
-                  $obj = $obj->where('bs_items.added_user_id', $user_id);
+                    $obj = $obj->where('bs_items.added_user_id', $user_id);
                 } else {
-                    $obj = $obj->where('bs_order.user_id', $user_id);
+                    $obj = $obj->where(['bs_order.user_id'=> $user_id, 'bs_order.operation_type'=> $operation_type]);
                 }
                 $obj = $obj->get()->result();
 //                ->where('bs_order.status', "succeeded")
@@ -973,5 +973,29 @@ class Payments extends API_Controller {
         } else {
             $this->error_response("Offer already completed");
         }
+    }
+
+
+    /**
+     * Himanshu Sharma
+     * Order/Payment receipt
+     */
+    public function order_receipt_get(){
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $order_id = $this->get('order_id');
+        //$orderData = $this->Order->get_one_by(array('order_id' => $order_id));
+        $orderData = $this->db->query("SELECT * FROM `bs_order` WHERE order_id = '".$order_id."'")->result();
+        $this->ps_adapter->convert_order($orderData);
+        $this->custom_response($orderData);
     }
 }
