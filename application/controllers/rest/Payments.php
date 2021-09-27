@@ -673,6 +673,12 @@ class Payments extends API_Controller {
                 $orders['meeting_location'] = ""; 
             }
             
+            if(!is_null($orders['confirm_meeting_date'])) {
+                $orders['confirm_location'] = json_decode($this->db->from('bs_meeting')->where('order_id', $orders['order_id'])->get()->row()->confirm_location, true);
+            } else {
+                $orders['confirm_location'] = "";
+            }
+            
             $orders = $this->ps_security->clean_output( $orders );
             $this->response($orders);
         } else {
