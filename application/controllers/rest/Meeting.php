@@ -69,17 +69,15 @@ class Meeting extends API_Controller {
             array(
                 'field' => 'order_id',
                 'rules' => 'required'
-            ),
-            array(
-                'field' => 'location_id',
-                'rules' => 'required'
             )
         );
         if ( !$this->is_valid( $rules )) exit;
-
         $posts = $this->post();
+        if(!isset($posts['location_id']) || empty($posts['location_id']) || is_null($posts['location_id'])) { 
+            $this->error_response("Please pass location id");
+        } 
         $date = date('Y-m-d H:i:s');
-        $this->db->where('receiver_id',$posts['user_id'])->where('order_id',$posts['order_id'])->update('bs_meeting',['confirm_location' => $posts['location_id'], 'updated_at' => $date]);
+        $this->db->where('receiver_id',$posts['user_id'])->where('order_id',$posts['order_id'])->update('bs_meeting',['confirm_location' => json_encode($posts['location_id']), 'updated_at' => $date]);
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['confirm_meeting_date' => $date]);
         
