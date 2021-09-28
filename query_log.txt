@@ -296,3 +296,11 @@ ALTER TABLE `bs_chat_history` ADD `is_offer_complete` INT NOT NULL DEFAULT '0' A
 ALTER TABLE `bs_order` CHANGE `confirm_by_seller` `confirm_by_seller` INT NOT NULL DEFAULT '0';
 // RB: ADDED ON 23/09/2021
 ALTER TABLE `bs_order` ADD `qty` VARCHAR(50) NOT NULL DEFAULT '' AFTER `items`;
+// RB: ADDED ON 24/09/2021
+CREATE TABLE `bacancy_biddingapp`.`bs_translation` ( `id` INT NOT NULL AUTO_INCREMENT , `language_id` INT NOT NULL , `lang_key` TEXT NOT NULL , `lang_value` TEXT NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+// RB: ADDED ON 27/09/2021
+ALTER TABLE `bs_meeting` CHANGE `updated_at` `updated_at` DATETIME NULL;
+ALTER TABLE `bs_meeting` CHANGE `sender_id` `sender_id` VARCHAR(255) NOT NULL;
+ALTER TABLE `bs_meeting` CHANGE `receiver_id` `receiver_id` VARCHAR(255) NOT NULL;
+ALTER TABLE `bs_meeting` CHANGE `order_id` `order_id` VARCHAR(255) NOT NULL;
+ALTER TABLE `bs_chat_history` CHANGE `order_id` `order_id` VARCHAR(255) NULL;

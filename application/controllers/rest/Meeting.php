@@ -45,9 +45,10 @@ class Meeting extends API_Controller {
         if(!isset($posts['location_list']) || empty($posts['location_list']) || is_null($posts['location_list'])) { 
             $this->error_response("Please pass location list");
         } 
-        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['share_meeting_list_date' => date('Y-m-d H:i:s')]);
+        $date = date('Y-m-d H:i:s');
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['share_meeting_list_date' => $date]);
         
-        $this->db->insert('bs_meeting', ['sender_id' => $posts['user_id'], 'receiver_id' => $posts['buyer_id'], 'order_id' => $posts['order_id'], 'location_list' => $posts['location_list'], 'created_at' => date('Y-m-d H:i:s')]);
+        $this->db->insert('bs_meeting', ['sender_id' => $posts['user_id'], 'receiver_id' => $posts['buyer_id'], 'order_id' => $posts['order_id'], 'location_list' => json_encode($posts['location_list']), 'created_at' => $date]);
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $posts['buyer_id'])->get()->row();
         send_push( $buyer->device_token, ["message" => "Meeting request arrived from seller", "flag" => "meeting_request"] );
@@ -77,10 +78,10 @@ class Meeting extends API_Controller {
         if ( !$this->is_valid( $rules )) exit;
 
         $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        $this->db->where('receiver_id',$posts['user_id'])->where('order_id',$posts['order_id'])->update('bs_meeting',['confirm_location' => $posts['location_id'], 'updated_at' => $date]);
         
-        $this->db->where('receiver_id',$posts['user_id'])->where('order_id',$posts['order_id'])->update('bs_meeting',['confirm_location' => $posts['location_id']]);
-        
-        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['confirm_meeting_date' => date('Y-m-d H:i:s')]);
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['confirm_meeting_date' => $date]);
         
         $this->response(['status' => 'success', 'message' => 'Locations confirmed']);
     }
