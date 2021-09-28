@@ -1423,8 +1423,8 @@ class Items extends API_Controller
 		$mapdata =  new stdClass();
 		foreach($searchdata->results as $key => $data){
 			$mapdata->$key->name = $data->name;
-			$mapdata->$key->lat = $data->geometry->location->lat;
-			$mapdata->$key->lng = $data->geometry->location->lng;
+			$mapdata->$key->lat = strval($data->geometry->location->lat);
+			$mapdata->$key->lng = strval($data->geometry->location->lng);
 		}
 		$this->response(json_decode(json_encode($mapdata), TRUE));
 		//print_r( $mapdata);
