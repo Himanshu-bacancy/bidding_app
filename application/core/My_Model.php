@@ -470,7 +470,7 @@ class PS_Model extends CI_Model {
 	}
 
 	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
-		//print_r($conds);die;
+		//echo '<pre>'; print_r($conds);die;
 		
 		if ( empty( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', 0);
@@ -647,6 +647,7 @@ class PS_Model extends CI_Model {
 			$this->db->offset($offset);
 		}
 	 	return $this->db->get();
+		//print_r($this->db->last_query());die;
 	}
 
 

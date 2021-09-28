@@ -1050,6 +1050,10 @@ class PS_Adapter {
 		if ( is_array( $obj )) {
 			for ($i=0; $i < count($obj) ; $i++) { 
 
+				if ( $obj[$i]->quantity == '0') {
+					$obj[$i]->quantity = 1;
+				}
+
 				if ( $obj[$i]->nego_price == '0') {
 					$obj[$i]->is_offer = 0;
 					$obj[$i]->offer_amount = 0;
@@ -1062,9 +1066,7 @@ class PS_Adapter {
 				// item object
 				if ( isset( $obj[$i]->item_id )) {
 					$tmp_item = $this->CI->Item->get_one( $obj[$i]->item_id );
-
 					$this->convert_item( $tmp_item );
-
 					$obj[$i]->item = $tmp_item;
 				}
 
@@ -1121,15 +1123,15 @@ class PS_Adapter {
 			}
 		} else {
 
-
+			if ( $obj->quantity == '0') {
+				$obj->quantity = 1;
+			}
 			if ( $obj->nego_price == '0') {
 				$obj->is_offer = 0;
-				$obj->offer_amount = 0;
-				
+				$obj->offer_amount = 0;	
 			} else {
 				$obj->is_offer = 1;
 				$obj->offer_amount = $obj->nego_price;
-
 			}
 
 			if ( isset( $obj->item_id )) {

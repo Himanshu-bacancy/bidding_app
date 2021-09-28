@@ -986,7 +986,6 @@ class Items extends API_Controller
 					$data_paid = $this->model->get_all_item_by_paid_date( $conds )->result();
 				}
 			} else {
-				die('hello testing');
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				if ( !empty( $limit ) && !empty( $offset )) {
@@ -1001,7 +1000,6 @@ class Items extends API_Controller
 				}
 			}	
 		} else {
-			die('hello testing 1');
 			if ( !empty( $limit ) && !empty( $offset )) {
 				// if limit & offset is not empty
 				$data = $this->model->get_all_by( $conds, $limit, $offset )->result();
