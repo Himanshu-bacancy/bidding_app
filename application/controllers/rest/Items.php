@@ -642,10 +642,7 @@ class Items extends API_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);	
-
-		
 		//echo $user_data['token_data']['user_id'];
-		
 		// add flag for default query
 		$this->is_search = true;
 
@@ -659,14 +656,12 @@ class Items extends API_Controller
 
 		$conds = array_merge( $post_conds, $conds );
 
-		
-
 		// check empty condition
 		$final_conds = array();
 		foreach( $conds as $key => $value ) {
 		    if($key != "status") {
 			    if ( !empty( $value )) {
-			     $final_conds[$key] = $value;
+			     	$final_conds[$key] = $value;
 			    }
 		    }
 		    if($key == "status") {
@@ -688,7 +683,6 @@ class Items extends API_Controller
 		if ($conds['item_search']==1) {
 
 			/* For User Block */
-
 			//user block check with login_user_id
 			$conds_login_block['from_block_user_id'] = $this->get_login_user_id();
 			$login_block_count = $this->Block->count_all_by($conds_login_block);
@@ -700,13 +694,10 @@ class Items extends API_Controller
 				$to_block_user_datas = $this->Block->get_all_by($conds_login_block)->result();
 
 				foreach ( $to_block_user_datas as $to_block_user_data ) {
-
 					$to_block_user_id .= "'" .$to_block_user_data->to_block_user_id . "',";
-			
 				}
 
 				// get block user's item
-
 				$result_users = rtrim($to_block_user_id,',');
 				$conds_user['added_user_id'] = $result_users;
 				$item_users = $this->Item->get_all_in_item( $conds_user )->result();
@@ -718,7 +709,7 @@ class Items extends API_Controller
 				$item_id = explode(",", $result_items);
 				//print_r($item_id);die;
 				//$conds['id'] = $result_items;
-			}	
+			}
 
 			/* For Item Report */
 
@@ -732,22 +723,15 @@ class Items extends API_Controller
 				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
 
 				foreach ( $item_reported_datas as $item_reported_data ) {
-
-					$item_ids .= "'" .$item_reported_data->item_id . "',";
-			
+					$item_ids .= "'" .$item_reported_data->item_id . "',";			
 				}
-
 				// get block user's item
 
 				$result_reports = rtrim($item_ids,',');
 				$conds_item['id'] = $result_reports;
-
 				$item_reports = $this->Item->get_all_in_report( $conds_item )->result();
-
 				foreach ( $item_reports as $item_report ) {
-
 					$ids .= $item_report->id .",";
-				
 				}
 
 				// get all item without block user's item
@@ -756,10 +740,8 @@ class Items extends API_Controller
 				$reported_item_id = explode(",", $result_items);
 				//$conds['id'] = $result_items;
 			}
-
 			//  color id condition 
 			if ( isset( $conds['color_id'] ) && !empty( $conds['color_id'] )) {
-
 				foreach($conds['color_id'] as $colorid){
 					if ( $colorid != "") {
 						if( $colorid != '0'){
@@ -781,13 +763,10 @@ class Items extends API_Controller
 			}
 			
 			//  sizegroupoption id condition 
-
 			if ( isset( $conds['sizegroupoption_id'] ) && !empty( $conds['sizegroupoption_id'] )) {
-
 				foreach($conds['sizegroupoption_id'] as $optionid){
 					if ( $optionid != "") {
 						if( $optionid != '0'){
-						
 							$this->db->select('*');
 							$this->db->from('bs_item_sizegroupoptions');
 							$this->db->where( 'sizegroup_option_id', $optionid );
@@ -804,15 +783,12 @@ class Items extends API_Controller
 				$sizeoption_items = rtrim($sizeoptionids,',');
 				$sizeoption_item_id = explode(",", $sizeoption_items);	
 			}
-			
-			
+						
 			//  item type id condition 
 			if ( isset( $conds['item_type_id'] ) && !empty( $conds['item_type_id'] )) {
-
 				foreach($conds['item_type_id'] as $itemtypeid){
 					if ( $itemtypeid != "") {
 						if( $itemtypeid != '0'){
-						
 							$this->db->select('*');
 							$this->db->from('bs_items');
 							$this->db->where( 'item_type_id', $itemtypeid );
@@ -879,7 +855,6 @@ class Items extends API_Controller
 
 			//  item condition id condition 
 			if ( isset( $conds['condition_of_item_id'] ) && !empty( $conds['condition_of_item_id'] )) {
-
 				foreach($conds['condition_of_item_id'] as $itemconditionid){
 					if ( $itemconditionid != "") {
 						if( $itemconditionid != '0'){
@@ -903,7 +878,6 @@ class Items extends API_Controller
 
 			//  Brand id condition 
 			if ( isset( $conds['brand_search'] ) && !empty( $conds['brand_search'] )) {
-
 				foreach($conds['brand_search'] as $brand_id){
 					if ( $brand_id != "") {
 						if( $brand_id != '0'){
@@ -918,23 +892,19 @@ class Items extends API_Controller
 					}	
 				}
 			}
-
 			
 			if(isset($brand_itemids) && $brand_itemids !=''){
 				$brand_item = rtrim($brand_itemids,',');
 				$brand_items_id = explode(",", $brand_item);	
 			}
 			
-
 			//  lat long condition 
 			if ( isset( $conds['miles'] ) && $conds['miles'] != '' ) {
-
 				$this->db->select('*');
 				$this->db->from('bs_addresses');
 				$this->db->where( 'user_id', $user_data['token_data']['user_id'] );
 				$this->db->where( 'is_default_address', '1');
 				$addrfilter = $this->db->get();
-
 				
 				if(count($addrfilter->row())>0){
 					$this->db->select('*,( 3959
@@ -986,7 +956,6 @@ class Items extends API_Controller
 			$conds['brand_items_id'] = $brand_items_id;
 
 			if ($conds['is_paid'] == "only_paid_item") {
-
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
@@ -1009,19 +978,15 @@ class Items extends API_Controller
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_item_by_paid_date( $conds, $limit, $offset )->result();
-
-
 				} else if ( !empty( $limit )) {
 					// if limit is not empty
 					$data = $this->model->get_all_item_by_paid_date( $conds, $limit )->result();
-
 				} else {
 					// if both are empty
 					$data_paid = $this->model->get_all_item_by_paid_date( $conds )->result();
-
 				}
 			} else {
-
+				die('hello testing');
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;
 				if ( !empty( $limit ) && !empty( $offset )) {
@@ -1036,6 +1001,7 @@ class Items extends API_Controller
 				}
 			}	
 		} else {
+			die('hello testing 1');
 			if ( !empty( $limit ) && !empty( $offset )) {
 				// if limit & offset is not empty
 				$data = $this->model->get_all_by( $conds, $limit, $offset )->result();

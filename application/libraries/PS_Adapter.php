@@ -1170,32 +1170,36 @@ class PS_Adapter {
 					$this->convert_exchange_chat_history( $tmp_exchange_ids );
 				}
 				// $obj->exchange_chat_detail = $tmp_exchange_ids;
-				
 				foreach($tmp_exchange_ids as $exchange_data){
 					$obj->exchange_item_id[] = $exchange_data->offered_item_id;
 					$this->convert_item( $exchange_data->offered_item_detail );
+					//echo $exchange_data->offered_item_detail->price;
+					$obj->total_exchange_amount = $obj->total_offered_amount + ($exchange_data->offered_item_detail->price ? $exchange_data->offered_item_detail->price : 0);
 					$obj->exchange_item_detail[] = $exchange_data->offered_item_detail;
 				}
 			} else{
 				// IF OFFERED ITEM ID EXIST THEN GET DETAILS OF ITEM
 				if ( isset( $obj->offered_item_id )) {
 					$tmp_offered_item = $this->CI->Item->get_one( $obj->offered_item_id );
-
 					$this->convert_item( $tmp_offered_item );
-
+					$obj->total_exchange_amount = $obj->total_offered_amount + ($exchange_data->offered_item_detail->price ? $exchange_data->offered_item_detail->price : 0);
 					$obj->offered_item_detail = $tmp_offered_item;
 				}
 			}
-
 			// IF REQUESTED ITEM ID EXIST THEN GET DETAILS OF ITEM
 			if ( isset( $obj->requested_item_id )) {
 				$tmp_req_item = $this->CI->Item->get_one( $obj->requested_item_id );
-
 				$this->convert_item( $tmp_req_item );
-
 				$obj->requested_item_detail = $tmp_req_item;
 			}
-
+			if(isset($obj->requested_item_detail->price) && isset($obj->total_exchange_amount) && $obj->requested_item_detail->price > $obj->total_exchange_amount){
+				$obj->remaining_exchange_amount = (float)$obj->requested_item_detail->price - (float)$obj->total_exchange_amount;
+			} elseif(isset($obj->requested_item_detail->price) && isset($obj->total_exchange_amount)) {
+				$obj->remaining_exchange_amount = (float)$obj->total_exchange_amount - (float)$obj->requested_item_detail->price;
+			} else {
+				$obj->remaining_exchange_amount = '0';
+			}
+			
 		}	
 	}
 

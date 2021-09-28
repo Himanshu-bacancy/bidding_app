@@ -192,11 +192,9 @@ class Items extends BE_Controller {
 	function save( $id = false ) {
 		
 			$logged_in_user = $this->ps_auth->get_user_info();
-
 			// Item id
 		   	if ( $this->has_data( 'id' )) {
 				$data['id'] = $this->get_data( 'id' );
-
 			}
 
 		   	// Category id
@@ -207,6 +205,11 @@ class Items extends BE_Controller {
 			// Sub Category id
 		   	if ( $this->has_data( 'sub_cat_id' )) {
 				$data['sub_cat_id'] = $this->get_data( 'sub_cat_id' );
+			}
+
+			// Sub Category id
+			if ( $this->has_data( 'childsubcat_id' )) {
+				$data['childsubcat_id'] = $this->get_data( 'childsubcat_id' );
 			}
 
 			// Type id
@@ -269,6 +272,51 @@ class Items extends BE_Controller {
 				$data['deal_option_id'] = $this->get_data( 'deal_option_id' );
 			}
 
+			// brand
+		   	if ( $this->has_data( 'sizegroup_id' )) {
+				$data['sizegroup_id'] = $this->get_data( 'sizegroup_id' );
+			}
+
+
+			// deal_option_id
+		   	if ( $this->has_data( 'delivery_method_id' )) {
+				$data['delivery_method_id'] = $this->get_data( 'delivery_method_id' );
+			}
+
+			// price
+			if ( $this->has_data( 'pay_shipping_by' )) {
+				$data['pay_shipping_by'] = $this->get_data( 'pay_shipping_by' );
+			}
+
+			// brand
+		   	if ( $this->has_data( 'shipping_type' )) {
+				$data['shipping_type'] = $this->get_data( 'shipping_type' );
+			}
+
+			// address
+		   	// if ( $this->has_data( 'package_size_id' )) {
+			// 	$data['package_size_id'] = $this->get_data( 'package_size_id' );
+			// }
+
+			// deal_option_id
+		   	if ( $this->has_data( 'shippingcarrier_id' )) {
+				$data['shippingcarrier_id'] = $this->get_data( 'shippingcarrier_id' );
+			}
+			// deal_option_id
+		   	if ( $this->has_data( 'expiration_date' )) {
+				$data['expiration_date'] = $this->get_data( 'expiration_date' );
+			}
+
+			// price
+			if ( $this->has_data( 'shipping_cost_by_seller' )) {
+				$data['shipping_cost_by_seller'] = $this->get_data( 'shipping_cost_by_seller' );
+			}
+
+			// brand
+		   	if ( $this->has_data( 'pickup_distance' )) {
+				$data['pickup_distance'] = $this->get_data( 'shipping_type' );
+			}
+
 			// prepare Item lat
 			if ( $this->has_data( 'lat' )) {
 				$data['lat'] = $this->get_data( 'lat' );
@@ -293,6 +341,34 @@ class Items extends BE_Controller {
 				$data['business_mode'] = 0;
 			}
 
+			// if 'is_confirm_with_seller' is checked,
+			if ( $this->has_data( 'is_confirm_with_seller' )) {
+				$data['is_confirm_with_seller'] = 1;
+			} else {
+				$data['is_confirm_with_seller'] = 0;
+			}
+
+			// if 'is_exchange' is checked,
+			if ( $this->has_data( 'is_exchange' )) {
+				$data['is_exchange'] = 1;
+			} else {
+				$data['is_exchange'] = 0;
+			}
+
+			// if 'is_accept_similar' is checked,
+			if ( $this->has_data( 'is_accept_similar' )) {
+				$data['is_accept_similar'] = 1;
+			} else {
+				$data['is_accept_similar'] = 0;
+			}
+
+			// if 'is_confirm' is checked,
+			if ( $this->has_data( 'is_confirm' )) {
+				$data['is_confirm'] = 1;
+			} else {
+				$data['is_confirm'] = 0;
+			}
+
 			// if 'status' is checked,
 			if ( $this->has_data( 'status' )) {
 				$data['status'] = 1;
@@ -305,27 +381,23 @@ class Items extends BE_Controller {
 			if($id == "") {
 				//save
 				$data['added_date'] = date("Y-m-d H:i:s");
-				$data['added_user_id'] = $logged_in_user->user_id;
+				//$data['added_user_id'] = $logged_in_user->user_id;
 
 			} else {
 				//edit
 				unset($data['added_date']);
 				$data['updated_date'] = date("Y-m-d H:i:s");
-				$data['updated_user_id'] = $logged_in_user->user_id;
+				//$data['updated_user_id'] = $logged_in_user->user_id;
 			}
 			//save item
 			if ( ! $this->Item->save( $data, $id )) {
-			// if there is an error in inserting user data,	
-
+				// if there is an error in inserting user data,	
 				// rollback the transaction
 				$this->db->trans_rollback();
-
 				// set error message
-				$this->data['error'] = get_msg( 'err_model' );
-				
+				$this->data['error'] = get_msg( 'err_model' );	
 				return;
 			}
-
 			/** 
 			* Upload Image Records 
 			*/
@@ -335,31 +407,22 @@ class Items extends BE_Controller {
 
 				if ( ! $this->insert_images( $_FILES, 'item', $data['id'] )) {
 				// if error in saving image
-
-				}
-
-				
+				}	
 			}
-			
-			
 			/** 
 			 * Check Transactions 
 			 */
-
 			// commit the transaction
 			if ( ! $this->check_trans()) {
 	        	
 				// set flash error message
 				$this->set_flash_msg( 'error', get_msg( 'err_model' ));
 			} else {
-
 				if ( $id ) {
 				// if user id is not false, show success_add message
-					
 					$this->set_flash_msg( 'success', get_msg( 'success_prd_edit' ));
 				} else {
 				// if user id is false, show success_edit message
-
 					$this->set_flash_msg( 'success', get_msg( 'success_prd_add' ));
 				}
 			}
@@ -377,7 +440,38 @@ class Items extends BE_Controller {
 		);
 
 		$this->Item->save($itm_data,$id);
-		///End
+
+		if(count($this->get_data( 'color_ids' ))>0)
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_colors');
+
+			foreach($this->get_data( 'color_ids' ) as $colorid)
+			{
+				$color_data = array(
+					"color_id" => $colorid, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemcolors->save($color_data);
+			}
+		}
+
+		if(count($this->get_data( 'sizegroupoption_ids' ))>0)
+		{
+			$this->db->where('item_id', $id);
+    		$this->db->delete('bs_item_sizegroupoptions');
+
+			foreach($this->get_data( 'sizegroupoption_ids' ) as $optionid)
+			{
+				$option_data = array(
+					"sizegroup_option_id" => $optionid, 
+					"item_id" => $id,
+					"added_date" =>  date("Y-m-d H:i:s")
+				);
+				$this->Itemsizegroupoptions->save($option_data);
+			}
+		}
 
 		// Item Id Checking 
 		if ( $this->has_data( 'gallery' )) {
@@ -413,6 +507,16 @@ class Items extends BE_Controller {
 		echo json_encode($childSub_categories->result());
     }
 
+	/**
+	 * Himanshu Sharma
+	 * Function to get child subcategories of selected sub category
+	 */
+	function get_all_shipping_carrier($packageSizeId = null){
+    	$conds['packagesize_id'] = $packageSizeId;
+		
+    	$shippingCarriers = $this->Shippingcarriers->get_all_by($conds);
+		echo json_encode($shippingCarriers->result());
+    }
 
 
 	/**

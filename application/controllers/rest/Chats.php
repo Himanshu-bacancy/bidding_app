@@ -1613,6 +1613,7 @@ class Chats extends API_Controller
 
         $offer_data = $this->Chat->get_one_by($conds);
 		$this->ps_adapter->convert_chathistory( $offer_data );
+		//echo '<pre>'; print_r($offer_data); die('rukooo');
 		if($offer_data){
 			$this->custom_response( $offer_data );
 		} else {

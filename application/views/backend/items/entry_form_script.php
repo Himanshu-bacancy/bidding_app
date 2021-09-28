@@ -159,6 +159,25 @@
 				}
 			});
 		});
+
+
+		$('#package_size_id').on('change', function() {
+			var value = $('option:selected', this).text().replace(/Value\s/, '');
+			var packageSizeId = $(this).val();
+			$.ajax({
+				url: '<?php echo $module_site_url . '/get_all_shipping_carrier/';?>' + packageSizeId,
+				method: 'GET',
+				dataType: 'JSON',
+				success:function(data){
+					$('#shippingcarrier_id').html("");
+					$.each(data, function(i, obj){
+						$('#shippingcarrier_id').append('<option value="'+ obj.id +'">' + obj.name+ '</option>');
+					});
+					$('#name').val($('#name').val() + " ").blur();
+					$('#shippingcarrier_id').trigger('change');
+				}
+			});
+		});
         
 		$(function() {
 			var selectedClass = "";

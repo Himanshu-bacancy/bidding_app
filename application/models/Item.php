@@ -92,28 +92,28 @@ class Item extends PS_Model {
 		}
 
 		//  delivery method id condition 
-		// if ( isset( $conds['delivery_method_id'] )) {
+		if ( isset( $conds['delivery_method_id'] )) {
 			
-		// 	if ($conds['delivery_method_id'] != "") {
-		// 		if($conds['delivery_method_id'] != '0'){
+			if ($conds['delivery_method_id'] != "") {
+				if($conds['delivery_method_id'] != '0'){
 				
-		// 			$this->db->where( 'delivery_method_id', $conds['delivery_method_id'] );	
-		// 		}
+					$this->db->where( 'delivery_method_id', $conds['delivery_method_id'] );	
+				}
 
-		// 	}			
-		// }
+			}			
+		}
 
 		//  child sub category id condition 
-		// if ( isset( $conds['childsubcat_id'] )) {
+		if ( isset( $conds['childsubcat_id'] )) {
 			
-		// 	if ($conds['childsubcat_id'] != "") {
-		// 		if($conds['childsubcat_id'] != '0'){
+			if ($conds['childsubcat_id'] != "") {
+				if($conds['childsubcat_id'] != '0'){
 				
-		// 			$this->db->where( 'childsubcat_id', $conds['childsubcat_id'] );	
-		// 		}
+					$this->db->where( 'childsubcat_id', $conds['childsubcat_id'] );	
+				}
 
-		// 	}			
-		// }
+			}			
+		}
 
 		//  sizegroup id condition 
 		if ( isset( $conds['sizegroup_id'] )) {
@@ -128,33 +128,33 @@ class Item extends PS_Model {
 		}
 
 		// //  sizegroupoption id condition 
-		// if ( isset( $conds['sizegroupoption_id'] )) {
+		if ( isset( $conds['sizegroupoption_id'] )) {
 			
-		// 	if ($conds['sizegroupoption_id'] != "") {
-		// 		if($conds['sizegroupoption_id'] != '0'){
+			if ($conds['sizegroupoption_id'] != "") {
+				if($conds['sizegroupoption_id'] != '0'){
 				
-		// 			$this->db->select('*');
-		// 			$this->db->from('bs_item_sizegroupoptions');
-		// 			$this->db->where( 'sizegroup_option_id', $conds['sizegroupoption_id'] );
+					$this->db->select('*');
+					$this->db->from('bs_item_sizegroupoptions');
+					$this->db->where( 'sizegroup_option_id', $conds['sizegroupoption_id'] );
 
-		// 		}
+				}
 
-		// 	}			
-		// }
+			}			
+		}
 
 		
 
 		// Type id
-		// if ( isset( $conds['item_type_id'] )) {
+		if ( isset( $conds['item_type_id'] )) {
 			
-		// 	if ($conds['item_type_id'] != "") {
-		// 		if($conds['item_type_id'] != '0'){
+			if ($conds['item_type_id'] != "") {
+				if($conds['item_type_id'] != '0'){
 				
-		// 			$this->db->where( 'item_type_id', $conds['item_type_id'] );	
-		// 		}
+					$this->db->where( 'item_type_id', $conds['item_type_id'] );	
+				}
 
-		// 	}			
-		// }
+			}			
+		}
 	  
 		// Price id
 		if ( isset( $conds['item_price_type_id'] )) {
@@ -193,9 +193,9 @@ class Item extends PS_Model {
 		}
 
 		// condition_of_item id condition
-		// if ( isset( $conds['condition_of_item_id'] )) {
-		// 	$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
-		// }
+		if ( isset( $conds['condition_of_item_id'] )) {
+			$this->db->where( 'condition_of_item_id', $conds['condition_of_item_id'] );
+		}
 
 		// description condition
 		if ( isset( $conds['description'] )) {
@@ -213,14 +213,42 @@ class Item extends PS_Model {
 		}
 
 		// brand condition
-		// if ( isset( $conds['brand'] )) {
-		// 	$this->db->where( 'brand', $conds['brand'] );
-		// }
+		if ( isset( $conds['brand'] )) {
+			$this->db->where( 'brand', $conds['brand'] );
+		}
 
 		// business_mode condition
 		if ( isset( $conds['business_mode'] )) {
 			$this->db->where( 'business_mode', $conds['business_mode'] );
 		}
+
+
+		// business_mode condition
+		if ( isset( $conds['is_confirm'] )) {
+			$this->db->where( 'is_confirm', $conds['is_confirm'] );
+		}
+
+		// business_mode condition
+		if ( isset( $conds['is_confirm_with_seller'] )) {
+			$this->db->where( 'is_confirm_with_seller', $conds['is_confirm_with_seller'] );
+		}
+
+		// business_mode condition
+		if ( isset( $conds['is_exchange'] )) {
+			$this->db->where( 'is_exchange', $conds['is_exchange'] );
+		}
+
+
+		// business_mode condition
+		if ( isset( $conds['is_accept_similar'] )) {
+			$this->db->where( 'is_accept_similar', $conds['is_accept_similar'] );
+		}
+
+		// business_mode condition
+		if ( isset( $conds['is_sold_out'] )) {
+			$this->db->where( 'is_sold_out', $conds['is_sold_out'] );
+		}
+
 
 		// title condition
 		if ( isset( $conds['title'] )) {
