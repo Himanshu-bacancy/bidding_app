@@ -678,6 +678,38 @@ class Payments extends API_Controller {
             } else {
                 $orders['confirm_location'] = "";
             }
+            $orders['service_fee'] = "0";
+            $orders['processing_fee'] = "0";
+            $orders['you_earn'] = "0";
+            $orders['tax_charged_to_buyer'] = "0";
+            
+            if($orders['operation_type'] == EXCHANGE) {
+                $offered_item_details = $this->db->select('offered_item_id')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $orders['offer_id'])->get()->result();
+                
+                foreach ($offered_item_details as $key => $value) {
+                    $row_item_details[$key] = $this->Item->get_one( $value->offered_item_id );
+                    $this->ps_adapter->convert_item($row_item_details[$key]);
+            
+                    if(!empty($row_item_details[$key]->packagesize_id)) {
+                        $package_details = $this->Packagesizes->get_one( $row_item_details[$key]->packagesize_id );
+                        $this->ps_adapter->convert_packagesize( $package_details );
+                        $row_item_details[$key]->package_details = $package_details;
+                    } else {
+                        $row_item_details[$key]->package_details = (object)[];
+                    }
+            
+                    if(!empty($row_item_details[$key]->shippingcarrier_id)) {
+                        $shipping_details = $this->Shippingcarriers->get_one( $row_item_details[$key]->shippingcarrier_id );
+                        $this->ps_adapter->convert_shippingcarrier( $shipping_details );
+                        $row_item_details[$key]->shipping_details = $shipping_details;
+                    } else {
+                        $row_item_details[$key]->shipping_details = (object)[];
+                    }
+                }
+                $orders['offered_item_details'] = $row_item_details;
+            } else {
+                $orders['offered_item_details'] = (object)[];
+            }
             
             $orders = $this->ps_security->clean_output( $orders );
             $this->response($orders);
@@ -707,16 +739,23 @@ class Payments extends API_Controller {
         $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $status]);
         
         if($status == 'succeeded') {
-            $get_record = $this->db->from('bs_order')->where('order_id', $record_id)->get()->row();
-            
-            $items = $this->db->from('bs_items')->where('id', $get_record)->get()->row_array();
-            $stock_update = $items['pieces']-1;
-            $update_array['pieces'] = $stock_update;
-            if(!$stock_update) {
-                $update_array['is_sold_out'] = 1;
+            $get_records = $this->db->from('bs_order')->where('transaction_id', $record_id)->get()->result();
+            foreach ($get_records as $key => $value) {
+                $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+                if($value->operation_type == DIRECT_BUY) {
+                    $stock_update = $item_detail->pieces - $value->qty;
+                } else {
+                    $stock_update = $item_detail->pieces - 1;
+                }
+                
+                $update_array['pieces'] = $stock_update;
+                if(!$stock_update) {
+                    $update_array['is_sold_out'] = 1;
+                }
+                $this->db->where('id', $value->items)->update('bs_items', $update_array);
+                $this->db->insert('bs_order_confirm', ['order_id' => $value->order_id, 'item_id' => $value->items, 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
             }
-            $this->db->where('id', $items['id'])->update('bs_items', $update_array);
-            $this->db->insert('bs_order_confirm', ['order_id' => $record_id, 'item_id' => $items['id'], 'seller_id' => $items['added_user_id'], 'created_at' => date('Y-m-d H:i:s')]);
+            
         }
         /*Temporary hide code as per discussion with dipak for currently it's only for direct buy
          * $this->db->where('user_id', $get_record->user_id)->where('item_id', $get_record->items)->delete('bs_cart);
@@ -793,52 +832,51 @@ class Payments extends API_Controller {
             foreach ($obj as $key => $value) {
                 if($order_state) {
                     if(!is_null($value->completed_date)) {
-                $row[$key] = $value;
-                
-                $address_details = $this->Addresses->get_one( $value->address_id );
-                $row[$key]->address_details = $address_details;
-                
-                $item_details = $this->Item->get_one( $value->items );
-                $this->ps_adapter->convert_item($item_details);
-               
-                if(!empty($item_details->packagesize_id)) {
-                    $package_details = $this->Packagesizes->get_one( $item_details->packagesize_id );
-                    $this->ps_adapter->convert_packagesize( $package_details );
-                    $item_details->package_details = $package_details;
-                } else {
-                    $item_details->package_details = (object)[];
-                }
-                if(!empty($item_details->shippingcarrier_id)) {
-                    $shipping_details = $this->Shippingcarriers->get_one( $item_details->shippingcarrier_id );
-                    $this->ps_adapter->convert_shippingcarrier( $shipping_details );
-                    $item_details->shipping_details = $shipping_details;
-                } else {
-                    $item_details->shipping_details = (object)[];
-                }
-                $row[$key]->item_details = $item_details;
-                
-                $buyer = $this->User->get_one( $value->user_id );
-                $this->ps_adapter->convert_user( $buyer );
-                $row[$key]->buyer = $buyer;
-                
-                $seller = $this->User->get_one( $value->seller_id );
-                $this->ps_adapter->convert_user( $seller );
-                $row[$key]->seller = $seller;
-                
+                        $row[$key] = $value;
 
-                $row[$key]->order_state = is_null($value->completed_date) ? 'in_process' : 'complete';
+                        $address_details = $this->Addresses->get_one( $value->address_id );
+                        $row[$key]->address_details = $address_details;
+
+                        $item_details = $this->Item->get_one( $value->items );
+                        $this->ps_adapter->convert_item($item_details);
+
+                        if(!empty($item_details->packagesize_id)) {
+                            $package_details = $this->Packagesizes->get_one( $item_details->packagesize_id );
+                            $this->ps_adapter->convert_packagesize( $package_details );
+                            $item_details->package_details = $package_details;
+                        } else {
+                            $item_details->package_details = (object)[];
+                        }
+                        if(!empty($item_details->shippingcarrier_id)) {
+                            $shipping_details = $this->Shippingcarriers->get_one( $item_details->shippingcarrier_id );
+                            $this->ps_adapter->convert_shippingcarrier( $shipping_details );
+                            $item_details->shipping_details = $shipping_details;
+                        } else {
+                            $item_details->shipping_details = (object)[];
+                        }
+                        $row[$key]->item_details = $item_details;
                 
-                if(!is_null($value->share_meeting_list_date)) {
-                    $row[$key]->meeting_location = $this->db->from('bs_meeting')->where('order_id', $value->order_id)->get()->row()->location_list;
-                } else {
-                    $row[$key]->meeting_location = "";
-            }
+                        $buyer = $this->User->get_one( $value->user_id );
+                        $this->ps_adapter->convert_user( $buyer );
+                        $row[$key]->buyer = $buyer;
+
+                        $seller = $this->User->get_one( $value->seller_id );
+                        $this->ps_adapter->convert_user( $seller );
+                        $row[$key]->seller = $seller;
+
+                        $row[$key]->order_state = is_null($value->completed_date) ? 'in_process' : 'complete';
+
+                        if(!is_null($value->share_meeting_list_date)) {
+                            $row[$key]->meeting_location = $this->db->from('bs_meeting')->where('order_id', $value->order_id)->get()->row()->location_list;
+                        } else {
+                            $row[$key]->meeting_location = "";
+                        }
                         
                         if(!is_null($value->confirm_meeting_date)) {
                             $row[$key]->confirm_location = json_decode($this->db->from('bs_meeting')->where('order_id', $value->order_id)->get()->row()->confirm_location, true);
                         } else {
                             $row[$key]->confirm_location = "";
-            }
+                        }
                         $get_tracking = $this->db->from('bs_track_order')->where('order_id', $value->order_id)->order_by('id', 'desc')->get()->row();
                         if(!empty($get_tracking)) {
                             $row[$key]->tracking_status = $get_tracking->status;
@@ -1131,23 +1169,56 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $date = date('Y-m-d H:i:s');
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
-
+                    /*manage stock :start*/
+                    $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
+                    $stock_update = $item_detail->pieces - 1;
+                    $update_array['pieces'] = $stock_update;
+                    if(!$stock_update) {
+                        $update_array['is_sold_out'] = 1;
+                    }
+                    $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
+                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+                    /*manage stock :end*/
+                    
                     $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $new_odr_id]);
                     
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id]);
                 }
-                } else {
+            } else {
+                $date = date('Y-m-d H:i:s');
                 $requested_item_id = $this->db->from('bs_chat_history')->where('id',$posts_var['offer_id'])->get()->row()->requested_item_id;
                 $item_price = $posts_var['price'];
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                 $record = $this->db->insert_id();
+                
+                /*manage stock :start*/
+                $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.id = bs_items.offered_item_id')->where('bs_exchange_chat_history.chat_id', $posts_var['offer_id'])->get()->result();
+                foreach($item_details as $key => $value) {
+                    $stock_update = $value->pieces - 1;
+                    $update_array['pieces'] = $stock_update;
+                    if(!$stock_update) {
+                        $update_array['is_sold_out'] = 1;
+                    }
+                    $this->db->where('id', $value->item_id)->update('bs_items', $update_array);
+                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $value->item_id, 'seller_id' => $value->added_user_id, 'created_at' => $date]);
+                } 
+                $item_detail = $this->db->from('bs_items')->where('id', $requested_item_id)->get()->row();
+                $stock_update = $item_detail->pieces - 1;
+                $update_array['pieces'] = $stock_update;
+                if(!$stock_update) {
+                    $update_array['is_sold_out'] = 1;
+                }
+                $this->db->where('id', $requested_item_id)->update('bs_items', $update_array);
+                $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $requested_item_id, 'seller_id' => $item_detail->added_user_id, 'created_at' => $date]);
+                /*manage stock :end*/
 
                 $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $new_odr_id]);
-                    $buyer = $this->db->select('device_token')->from('core_users')
-                            ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
-                    send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
+                $buyer = $this->db->select('device_token')->from('core_users')
+                        ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+                send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
                 $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id]);
             }
         } else {
