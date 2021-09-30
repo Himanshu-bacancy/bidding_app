@@ -759,9 +759,8 @@ class Payments extends API_Controller {
             }
             
         }
-        /*Temporary hide code as per discussion with dipak for currently it's only for direct buy
-         * $this->db->where('user_id', $get_record->user_id)->where('item_id', $get_record->items)->delete('bs_cart);
-         */
+        $this->db->where('user_id', $get_record->user_id)->where('item_id', $get_record->items)->delete('bs_cart');
+         
         $this->response(['status' => 'success', 'message' => 'Record save successfully']);
     }
     
@@ -825,7 +824,8 @@ class Payments extends API_Controller {
                     $obj = $obj->where(['bs_items.added_user_id'=> $user_id, 'bs_order.operation_type'=> $operation_type]);
                 } else if($operation_type == EXCHANGE){
                     $obj = $obj->group_start()->where('bs_items.added_user_id', $user_id)
-                            ->or_where('bs_order.user_id', $user_id)->group_end();
+                            ->or_where('bs_order.user_id', $user_id)->group_end()
+                            ->where('bs_order.operation_type', $operation_type);
                 } else {
                     $obj = $obj->where(['bs_order.user_id'=> $user_id, 'bs_order.operation_type'=> $operation_type]);
                 }
