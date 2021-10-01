@@ -79,10 +79,10 @@ class Payments extends API_Controller {
                         $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
                         $item_price = $item_price + (float)$get_shiping_detail->price;
-                        $card_total_amount += $item_price;
+                        $card_total_amount += (float)$get_shiping_detail->price;
                     } else if($get_item->shipping_type == '2'){
                         $item_price = $item_price + $get_item->shipping_cost_by_seller;   
-                        $card_total_amount += $item_price;
+                        $card_total_amount += $get_item->shipping_cost_by_seller;
                     }
                 }
                 $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
@@ -756,10 +756,11 @@ class Payments extends API_Controller {
                 }
                 $this->db->where('id', $value->items)->update('bs_items', $update_array);
                 $this->db->insert('bs_order_confirm', ['order_id' => $value->order_id, 'item_id' => $value->items, 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+                
+                $this->db->where('user_id', $value->user_id)->where('item_id', $value->items)->delete('bs_cart');
             }
             
         }
-        $this->db->where('user_id', $get_record->user_id)->where('item_id', $get_record->items)->delete('bs_cart');
          
         $this->response(['status' => 'success', 'message' => 'Record save successfully']);
     }
@@ -821,7 +822,7 @@ class Payments extends API_Controller {
 //                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left');
                 if($operation_type == SELLING) {
                     
-                    $obj = $obj->where(['bs_items.added_user_id'=> $user_id, 'bs_order.operation_type'=> $operation_type]);
+                    $obj = $obj->where(['bs_items.added_user_id'=> $user_id, 'bs_items.item_type_id'=> $operation_type]);
                 } else if($operation_type == EXCHANGE){
                     $obj = $obj->group_start()->where('bs_items.added_user_id', $user_id)
                             ->or_where('bs_order.user_id', $user_id)->group_end()
