@@ -307,3 +307,6 @@ ALTER TABLE `bs_chat_history` CHANGE `order_id` `order_id` VARCHAR(255) NULL;
 
 // RB: ADDED ON 30/09/2021
 ALTER TABLE `bs_order` CHANGE `qty` `qty` VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '1';
+
+// RB: ADDED ON 06/10/2021
+ALTER TABLE `bs_addresses` ADD `address_title` VARCHAR(255) NULL AFTER `id`;

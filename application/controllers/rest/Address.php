@@ -94,6 +94,10 @@ class Address extends API_Controller
 			// validation rules for add address
 			$rules = array(
 				array(
+					'field' => 'address_title',
+					'rules' => 'required'
+				),
+				array(
 					'field' => 'address1',
 					'rules' => 'required'
 				),
@@ -138,6 +142,7 @@ class Address extends API_Controller
 			
 			$address_data = array(
 
+				"address_title" => $this->post('address_title'),
 				"address1" => $this->post('address1'),
 				"address2" => (!empty($this->post('address2')))?$this->post('address2'):'', 
 				"zipcode" => $this->post('zipcode'),
