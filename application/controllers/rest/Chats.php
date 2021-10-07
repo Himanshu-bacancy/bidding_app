@@ -194,8 +194,8 @@ class Chats extends API_Controller
 	        	'field' => 'operation_type',
 	        	'rules' => 'required'
 	        )
-         );
-
+        );
+		//echo '<pre>'; print_r($this->post()); die;
 		if($this->post('operation_type') == REQUEST_ITEM){
 			array_push($rules, array(
 	        	'field' => 'offered_item_id',
@@ -210,13 +210,12 @@ class Chats extends API_Controller
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
-
 		$requestedItemId = $this->post('requested_item_id');
 		if(is_array($this->post('offered_item_id'))){
 			foreach($this->post('offered_item_id') as $offeredItemId){
-				$this->validation_chat_item_categories($requestedItemId, $offeredItemId);
+				$this->validation_chat_item_categories($requestedItemId, $offeredItemId,'exchange');
 			}	
-		}else{
+		} else {
 			if($this->post('operation_type') == REQUEST_ITEM){
 				$this->validation_chat_item_categories($requestedItemId, $this->post('offered_item_id'));
 			}
@@ -228,18 +227,31 @@ class Chats extends API_Controller
 	}
 
 	//  VALIDATE REQUEST ITEM AND OFFERED ITEM CATEGORY, SUB CATEGORY AND CHILD SUBCATEGORY ARE SAME OR NOT
-	function validation_chat_item_categories($requestedItemId, $offeredItemId){
+	function validation_chat_item_categories($requestedItemId, $offeredItemId, $operation_type = null){
 		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
+		$this->ps_adapter->convert_item($requestedItemDetails);
 		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
-
-		if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-		}
-		if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
-		}
-		if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
-			$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+		if(isset($operation_type) && $operation_type=='exchange'){
+			$exchangeCategoriesFlag = false;
+			foreach($requestedItemDetails->exchange_category as $exchangeCat){
+				$exchangeCategoriesArray[] = $exchangeCat->cat_id;
+				if($exchangeCat->cat_id == $offeredItemDetails->cat_id){
+					$exchangeCategoriesFlag = true;
+				}
+			}
+			if(!$exchangeCategoriesFlag){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
+		} else {
+			if($requestedItemDetails->cat_id != $offeredItemDetails->cat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
+			if($requestedItemDetails->sub_cat_id != $offeredItemDetails->sub_cat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
+			if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
+				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
+			}
 		}
 	}
 
@@ -728,7 +740,6 @@ class Chats extends API_Controller
 							$device_ids[] = $device->device_token;
 						}
 					}
-
 
 					$user_id = $this->post('buyer_user_id');
 		       		$user_name = $this->User->get_one($user_id)->user_name;

@@ -783,7 +783,6 @@ class Items extends API_Controller
 				$sizeoption_items = rtrim($sizeoptionids,',');
 				$sizeoption_item_id = explode(",", $sizeoption_items);	
 			}
-						
 			//  item type id condition 
 			if ( isset( $conds['item_type_id'] ) && !empty( $conds['item_type_id'] )) {
 				foreach($conds['item_type_id'] as $itemtypeid){
@@ -798,15 +797,14 @@ class Items extends API_Controller
 							}
 						}
 					}	
-				}		
+				}
 			}
 
-			
 			if(isset($itemtype_itemids) && $itemtype_itemids !=''){
 				$itemtype_items = rtrim($itemtype_itemids,',');
 				$itemtype_item_id = explode(",", $itemtype_items);	
 			}
-
+			//echo '<pre>'; print_r($itemtype_item_id); die;
 			//  childsubcat id condition 
 			if ( isset( $conds['childsubcat_id'] ) && !empty( $conds['childsubcat_id'] )) {
 				foreach($conds['childsubcat_id'] as $childsubcatid){
@@ -852,7 +850,7 @@ class Items extends API_Controller
 				$deliverymethod_items = rtrim($deliverymethod_itemids,',');
 				$deliverymethod_item_id = explode(",", $deliverymethod_items);	
 			}
-
+			
 			//  item condition id condition 
 			if ( isset( $conds['condition_of_item_id'] ) && !empty( $conds['condition_of_item_id'] )) {
 				foreach($conds['condition_of_item_id'] as $itemconditionid){
@@ -954,7 +952,6 @@ class Items extends API_Controller
 			$conds['deliverymethod_item_id'] = $deliverymethod_item_id;
 			$conds['itemcondition_item_id'] = $itemcondition_item_id;
 			$conds['brand_items_id'] = $brand_items_id;
-
 			if ($conds['is_paid'] == "only_paid_item") {
 				//$conds['item_id'] = $item_id;
 				//$conds['reported_item_id'] = $reported_item_id;

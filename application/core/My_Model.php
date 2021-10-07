@@ -574,7 +574,7 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
-
+		
 		// item check for delivery method condition
 		if ( isset( $conds['deliverymethod_item_id'] )) {
 			if ($conds['deliverymethod_item_id'] != "") {
@@ -632,7 +632,7 @@ class PS_Model extends CI_Model {
 		}
 
 		// where clause
-		$this->custom_conds( $conds );
+		//$this->custom_conds( $conds );
 		
 		// from table
 		$this->db->from( $this->table_name );
@@ -647,7 +647,7 @@ class PS_Model extends CI_Model {
 			$this->db->offset($offset);
 		}
 	 	return $this->db->get();
-		//print_r($this->db->last_query());die;
+		// print_r($this->db->last_query());die;
 	}
 
 
@@ -1524,19 +1524,31 @@ class PS_Model extends CI_Model {
 	// }
 
 	function get_all_item_by_paid ( $conds ) {
-		
+		//echo '<pre>'; print_R($conds); die;
 		$this->db->select('bs_items.*'); 
+		
 		$this->db->from('bs_items');
-		$this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
-		$today_date = date('Y-m-d H:i:s');
-		$this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
-   		$this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
+		$this->db->where( 'bs_items.status',(int)$conds['status']);
+		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
+		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
+		// $today_date = date('Y-m-d H:i:s');
+		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
+   		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
 
    		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
 			if ($conds['item_id'] != "") {
 				if($conds['item_id'] != '0'){
 					$this->db->where_not_in( 'bs_items.id', $conds['item_id'] );	
+				}
+			}			
+		}
+
+		// added_user_id
+		if ( isset( $conds['added_user_id'] )) {
+			if ($conds['added_user_id'] != "") {
+				if($conds['added_user_id'] != '0'){
+					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
 			}			
 		}
@@ -1613,7 +1625,7 @@ class PS_Model extends CI_Model {
 		if ( isset( $conds['item_type_id'] )) {
 			if ($conds['item_type_id'] != "") {
 				if($conds['item_type_id'] != '0'){
-					$this->db->where_in( 'bs_items.id', $conds['item_type_id'] );	
+					$this->db->where_in( 'bs_items.item_type_id', $conds['item_type_id'] );	
 				}
 			}			
 		}

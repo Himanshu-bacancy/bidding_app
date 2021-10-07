@@ -2,7 +2,7 @@
 	$attributes = array( 'id' => 'item-form', 'enctype' => 'multipart/form-data');
 	echo form_open( '', $attributes);
 ?>
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <section class="content animated fadeInRight">
   			
   <div class="card card-info">
@@ -383,9 +383,9 @@
                     $options[$packageSize->id] = $packageSize->name;
                 }
                 echo form_dropdown(
-                  'package_size_id',
+                  'packagesize_id',
                   $options,
-                  set_value('package_size_id', show_data( @$item->package_size_id), false ),
+                  set_value('packagesize_id', show_data( @$item->packagesize_id), false ),
                   'class="form-control form-control-sm mr-3" id="package_size_id"'
                 );
               ?>
@@ -413,7 +413,7 @@
                   );
                 } else {
                   $options=array();
-                  $options[0]=get_msg('Prd_search_subcat');
+                  $options[0]=get_msg('Prd_shippingcarrier');
                   echo form_dropdown(
                     'shippingcarrier_id',
                     $options,
@@ -489,20 +489,31 @@
 
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label> <span style="font-size: 17px; color: red;"></span>
-                <?php echo get_msg('prd_dynamic_link_label') ." : ".$item->dynamic_link; ?>
-              </label>
+          <?php if($item->dynamic_link != '' || $item->added_user_id != ''){
+          ?>
+            <div class="col-md-6">
+            <?php if(isset($item->dynamic_link) && !empty($item->dynamic_link)){ ?>
+              <div class="form-group">
+                <label> <span style="font-size: 17px; color: red;"></span>
+                  <?php echo get_msg('prd_dynamic_link_label') ." : ".$item->dynamic_link; ?>
+                </label>
+              </div>
+            <?php } ?> 
+            <?php if(isset($item->added_user_id) && !empty($item->added_user_id)){ ?>
+              <div class="form-group">
+                <label>
+                  <?php echo get_msg('owner_of_item') ." : ".$this->User->get_one( $item->added_user_id )->user_name; ?>
+                </label>
+              </div>
+            <?php } ?>
+              <!-- form group -->
             </div>
-
-            <div class="form-group">
-              <label>
-                <?php echo get_msg('owner_of_item') ." : ".$this->User->get_one( $item->added_user_id )->user_name; ?>
-              </label>
-            </div>
-            <!-- form group -->
-          </div>
+          <?php } else {
+          ?>
+          <div class="col-md-6"></div>
+          <?php
+          } ?>
+          
           <div class="col-md-6">
             <div class="form-group">
               <label> <span style="font-size: 17px; color: red;"></span>

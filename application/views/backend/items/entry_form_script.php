@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 	<?php if ( $this->config->item( 'client_side_validation' ) == true ): ?>
 
@@ -103,6 +104,12 @@
 	}
 
 	<?php endif; ?>
+
+	jQuery(document).ready(function(){
+		$('#sizegroupoption_ids').select2();
+		$('#color_ids').select2();
+	});
+
 	function runAfterJQ() {
 
 		$('#cat_id').on('change', function() {

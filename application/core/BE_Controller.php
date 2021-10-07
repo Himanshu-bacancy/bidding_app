@@ -693,19 +693,16 @@ class BE_Controller extends PS_Controller {
 
 	function insert_icon_images( $files, $img_type, $img_parent_id, $type )
 	{
-		
 		// return false if the image type is empty
 		if ( empty( $img_type )) return false;
 
 		// return false if the parent id is empty
 		if ( empty( $img_parent_id )) return false;
 
-		
 		if($type == "cover") {
-
 			// upload images
 			$upload_data = $this->ps_image->upload_cover( $files );
-				
+			
 			if ( isset( $upload_data['error'] )) {
 			// if there is an error in uploading
 
@@ -734,7 +731,6 @@ class BE_Controller extends PS_Controller {
 
 			// upload images
 			$upload_data = $this->ps_image->upload_icon( $files );
-				
 			if ( isset( $upload_data['error'] )) {
 			// if there is an error in uploading
 

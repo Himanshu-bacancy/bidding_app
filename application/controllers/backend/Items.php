@@ -294,9 +294,9 @@ class Items extends BE_Controller {
 			}
 
 			// address
-		   	// if ( $this->has_data( 'package_size_id' )) {
-			// 	$data['package_size_id'] = $this->get_data( 'package_size_id' );
-			// }
+		   	if ( $this->has_data( 'packagesize_id' )) {
+				$data['packagesize_id'] = $this->get_data( 'packagesize_id' );
+			}
 
 			// deal_option_id
 		   	if ( $this->has_data( 'shippingcarrier_id' )) {
@@ -555,15 +555,28 @@ class Items extends BE_Controller {
 	/**
  	* Update the existing one
 	*/
-	function edit( $id ) 
-	{
-		
+	function edit( $id ) {
 		// breadcrumb urls
 		$this->data['action_title'] = get_msg( 'prd_edit' );
-
 		// load user
 		$this->data['item'] = $this->Item->get_one( $id );
+		$this->db->where('item_id', $id);
+		$this->db->select('color_id');
+    	$colordata = $this->db->get('bs_item_colors')->result_array();
+		$color_ids = [];
+		foreach($colordata as $colors){
+			$color_ids[] = $colors['color_id'];
+		}
+		$this->data['item']->color_id = $color_ids;
 
+		$this->db->where('item_id', $id);
+		$this->db->select('sizegroup_option_id');
+		$sizeGroupOptiondata = $this->db->get('bs_item_sizegroupoptions')->result_array();
+		$sizegrouOptions = [];
+		foreach($sizeGroupOptiondata as $sizegroupOption){
+			$sizegrouOptions[] = $sizegroupOption['sizegroup_option_id'];
+		}
+		$this->data['item']->sizegroupoption_ids = $sizegrouOptions;
 		// call the parent edit logic
 		parent::edit( $id );
 
