@@ -603,11 +603,17 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
+        
+        if ( isset( $conds['searchterm'] )) {
+			if ($conds['searchterm'] != "") {
+                $this->db->like( 'bs_items.title', $conds['searchterm'] );	
+			}			
+		}
 
 		if ( isset( $conds['order_by_field'] )) {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
-			$this->db->order_by( 'bs_items.is_paid', 'desc');
+//			$this->db->order_by( 'bs_items.is_paid', 'desc');
 			$this->db->order_by( 'bs_items.'.$order_by_field, $order_by_type);
 		} else {
 			$this->db->order_by( 'bs_items.is_paid', 'desc');
@@ -1530,7 +1536,7 @@ class PS_Model extends CI_Model {
 		$this->db->from('bs_items');
 		$this->db->where( 'bs_items.status',(int)$conds['status']);
 		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
-		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
+        $this->db->join('bs_paid_items_history', 'bs_items.id = bs_paid_items_history.item_id', 'left');
 		// $today_date = date('Y-m-d H:i:s');
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
    		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
@@ -1683,8 +1689,15 @@ class PS_Model extends CI_Model {
 			$this->db->order_by( 'bs_items.is_paid', 'desc');
 			$this->db->order_by( 'bs_items.'.$order_by_field, $order_by_type);
 		} else {
-			$this->db->order_by( 'bs_items.is_paid', 'desc');
-			$this->db->order_by('added_date', 'desc' );
+            if($conds['is_paid']) {
+                $this->db->order_by('CASE  
+                    WHEN `bs_paid_items_history.end_timestamp` > '.time().' THEN 1 
+                    ELSE 0 END 
+                DESC');    
+            } else {
+                $this->db->order_by( 'bs_items.is_paid', 'desc');
+            }
+            $this->db->order_by('added_date', 'desc' );
 		}
 		// if($conds['lat'] != "" && $conds['lng'] != "") {
 			
@@ -1739,7 +1752,7 @@ class PS_Model extends CI_Model {
 		$this->db->select('bs_items.*'); 
 		
 		$this->db->from('bs_items');
-		// $this->db->join('bs_paid_items_history', 'bs_paid_items_history.item_id = bs_items.id');
+        $this->db->join('bs_paid_items_history', 'bs_items.id = bs_paid_items_history.item_id', 'left');
 		// $today_date = date('Y-m-d H:i:s');
 		$this->db->where( 'bs_items.status',(int)$conds['status']);
 		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
@@ -1917,7 +1930,14 @@ class PS_Model extends CI_Model {
 			$this->db->order_by( 'bs_items.is_paid', 'desc');
 			$this->db->order_by( 'bs_items.'.$order_by_field, $order_by_type);
 		} else {
-			$this->db->order_by( 'bs_items.is_paid', 'desc');
+            if ($conds['is_paid']) { 
+                $this->db->order_by('CASE  
+                    WHEN `bs_paid_items_history.end_timestamp` > '.time().' THEN 1 
+                    ELSE 0 END 
+                DESC');
+            } else {
+                $this->db->order_by( 'bs_items.is_paid', 'desc');
+            }
 			$this->db->order_by('added_date', 'desc' );
 		}
    		$query1 = $this->db->get_compiled_select();
