@@ -522,6 +522,24 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
+        
+        // remove added_user_id
+		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
+			if ($conds['login_user_id'] != "") {
+				if($conds['login_user_id'] != '0'){
+					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+				}
+			}			
+		}
+        
+        // remove sold_item
+		if ( isset( $conds['excpet_sold_item'] ) && $conds['excpet_sold_item']) {
+			if ($conds['excpet_sold_item'] != "") {
+				if($conds['excpet_sold_item'] != '0'){
+					$this->db->where( 'bs_items.is_sold_out <> 1');	
+				}
+			}			
+		}
 
 		if ( isset( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', (int)$conds['is_draft'] );
@@ -603,7 +621,7 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
-        
+
         if ( isset( $conds['searchterm'] )) {
 			if ($conds['searchterm'] != "") {
                 $this->db->like( 'bs_items.title', $conds['searchterm'] );	
@@ -1558,6 +1576,24 @@ class PS_Model extends CI_Model {
 				}
 			}			
 		}
+        
+		// remove added_user_id
+		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
+			if ($conds['login_user_id'] != "") {
+				if($conds['login_user_id'] != '0'){
+					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+				}
+			}			
+		}
+        
+        // remove sold_item
+		if ( isset( $conds['excpet_sold_item'] ) && $conds['excpet_sold_item']) {
+			if ($conds['excpet_sold_item'] != "") {
+				if($conds['excpet_sold_item'] != '0'){
+					$this->db->where( 'bs_items.is_sold_out <> 1');	
+				}
+			}			
+		}
 
 		// item id (id) check for item reported condition
 		if ( isset( $conds['reported_item_id'] )) {
@@ -1695,9 +1731,9 @@ class PS_Model extends CI_Model {
                     ELSE 0 END 
                 DESC');    
             } else {
-                $this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
             }
-            $this->db->order_by('added_date', 'desc' );
+			$this->db->order_by('added_date', 'desc' );
 		}
 		// if($conds['lat'] != "" && $conds['lng'] != "") {
 			
@@ -1801,6 +1837,24 @@ class PS_Model extends CI_Model {
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
+				}
+			}			
+		}
+        
+        // remove added_user_id
+		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
+			if ($conds['login_user_id'] != "") {
+				if($conds['login_user_id'] != '0'){
+					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+				}
+			}			
+		}
+        
+        // remove sold_item
+		if ( isset( $conds['excpet_sold_item'] ) && $conds['excpet_sold_item']) {
+			if ($conds['excpet_sold_item'] != "") {
+				if($conds['excpet_sold_item'] != '0'){
+					$this->db->where( 'bs_items.is_sold_out <> 1');	
 				}
 			}			
 		}
@@ -1936,7 +1990,7 @@ class PS_Model extends CI_Model {
                     ELSE 0 END 
                 DESC');
             } else {
-                $this->db->order_by( 'bs_items.is_paid', 'desc');
+			$this->db->order_by( 'bs_items.is_paid', 'desc');
             }
 			$this->db->order_by('added_date', 'desc' );
 		}
