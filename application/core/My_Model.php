@@ -527,7 +527,7 @@ class PS_Model extends CI_Model {
 		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
 			if ($conds['login_user_id'] != "") {
 				if($conds['login_user_id'] != '0'){
-					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+					$this->db->where( 'bs_items.added_user_id <> "'.$conds['login_user_id'].'"' );	
 				}
 			}			
 		}
@@ -620,6 +620,18 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
 			}			
+		}
+        
+        if(isset($conds['min_price'])) {
+			if ($conds['min_price'] != "" || $conds['min_price'] != 0) {	
+				$this->db->where( 'price>=', $conds['min_price'] );	
+			}
+		}
+        
+        if(isset($conds['max_price'])) {
+			if ($conds['max_price'] != "" || $conds['max_price'] != 0) {	
+				$this->db->where( 'price<=', $conds['max_price'] );
+			}
 		}
 
         if ( isset( $conds['searchterm'] )) {
@@ -1581,7 +1593,7 @@ class PS_Model extends CI_Model {
 		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
 			if ($conds['login_user_id'] != "") {
 				if($conds['login_user_id'] != '0'){
-					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+					$this->db->where( 'bs_items.added_user_id <> "'.$conds['login_user_id'].'"' );	
 				}
 			}			
 		}
@@ -1708,6 +1720,18 @@ class PS_Model extends CI_Model {
 					$this->db->where_in( 'bs_items.id', $conds['address_item_id'] );	
 				}
 			}			
+		}
+        
+        if(isset($conds['min_price'])) {
+			if ($conds['min_price'] != "" || $conds['min_price'] != 0) {	
+				$this->db->where( 'price>=', $conds['min_price'] );	
+			}
+		}
+        
+        if(isset($conds['max_price'])) {
+			if ($conds['max_price'] != "" || $conds['max_price'] != 0) {	
+				$this->db->where( 'price<=', $conds['max_price'] );
+			}
 		}
 
 		// searchterm
@@ -1845,7 +1869,7 @@ class PS_Model extends CI_Model {
 		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
 			if ($conds['login_user_id'] != "") {
 				if($conds['login_user_id'] != '0'){
-					$this->db->where( 'bs_items.added_user_id <> '.$conds['login_user_id'] );	
+					$this->db->where( 'bs_items.added_user_id <> "'.$conds['login_user_id'].'"' );	
 				}
 			}			
 		}
