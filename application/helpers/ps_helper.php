@@ -60,13 +60,14 @@ if ( ! function_exists( 'ago' ))
 
 		$periods = array("second_ago", "minute_ago", "hour_ago", "day_ago", "week_ago", "month_ago", "year_ago", "decade_ago");
 		$lengths = array("60","60","24","7","4.35","12","10");
-
+		// echo $time;
+		// echo '<br>'; 
+		// echo $now;  die;
 		$difference = $now - $time;
-
 		for ($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
 			$difference /= $lengths[$j];
 		}
-
+		
 		$difference = round($difference);
 
 		// if ($difference != 1) {
@@ -86,11 +87,12 @@ if ( ! function_exists( 'ago' ))
 		$conds_ago['language_id'] = $language_id;
 		$ago_string = $CI->Language_string->get_one_by( $conds_ago );
 		$ago = $ago_string->value;
-		if ($difference==0) {
-			return '"'.$just_now.'"';
+		if ($difference==0 || $message == 'seconds' ) {
+			$sending_response = $just_now;
 		} else {
-			return "$difference $message $ago";
+			$sending_response = $difference.' '.$message.' '.$ago;
 		}
+		return $sending_response;
 	}
 }
 

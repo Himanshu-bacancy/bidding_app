@@ -24,7 +24,7 @@
 
         $selected_menu_child_name = $this->uri->segment(2); 
         // print_r($selected_menu_child_name); die;
-
+        
         if($selected_menu_child_name == "multipleupload") {
           $selected_menu_child_name = "multipleupload/upload";
         }

@@ -734,7 +734,7 @@ class PS_Model extends CI_Model {
 	 * @return     <type>  Number of all by.
 	 */
 	function count_all_reported_items_for_today( $conds = array()) {
-		$this->db->from('bs_reason_operation');
+		$this->db->from('bs_reason_operations');
 		$date = date('Y-m-d');
 		
 		$this->db->where('DATE(added_date)', $date);
@@ -1564,8 +1564,8 @@ class PS_Model extends CI_Model {
 		$this->db->select('bs_items.*'); 
 		
 		$this->db->from('bs_items');
-		$this->db->where( 'bs_items.status',(int)$conds['status']);
-		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
+		$this->db->where('bs_items.status',(int)$conds['status']);
+		$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
         $this->db->join('bs_paid_items_history', 'bs_items.id = bs_paid_items_history.item_id', 'left');
 		// $today_date = date('Y-m-d H:i:s');
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );

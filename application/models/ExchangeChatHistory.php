@@ -31,6 +31,12 @@ class ExchangeChatHistory extends PS_Model {
 			$this->db->where( 'chat_id', $conds['chat_id'] );
 		}
 
+
+		// Chat history who_pay condition
+		if ( isset( $conds['who_pay'] )) {
+			$this->db->where( 'who_pay', $conds['who_pay'] );
+		}
+
 		// offered_item_id condition
 		if ( isset( $conds['offered_item_id'] ) || (!empty($conds['offered_item_id'])) ) {
 			if(is_array($conds['offered_item_id'])){

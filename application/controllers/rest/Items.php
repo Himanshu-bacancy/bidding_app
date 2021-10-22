@@ -684,17 +684,18 @@ class Items extends API_Controller
 
 			/* For User Block */
 			//user block check with login_user_id
-			$conds_login_block['from_block_user_id'] = $this->get_login_user_id();
-			$login_block_count = $this->Block->count_all_by($conds_login_block);
+			$conds_login_block['user_id'] = $this->get_login_user_id();
+			$conds_login_block['type'] = 'block_user';
+			$login_block_count = $this->Reason_operation->count_all_by($conds_login_block);
 			//print_r($login_block_count);die;
 
 			// user blocked existed by login user
 			if ($login_block_count > 0) {
 				// get the blocked user by login user
-				$to_block_user_datas = $this->Block->get_all_by($conds_login_block)->result();
+				$to_block_user_datas = $this->Reason_operation->get_all_by($conds_login_block)->result();
 
 				foreach ( $to_block_user_datas as $to_block_user_data ) {
-					$to_block_user_id .= "'" .$to_block_user_data->to_block_user_id . "',";
+					$to_block_user_id .= "'" .$to_block_user_data->operation_id . "',";
 				}
 
 				// get block user's item
@@ -714,16 +715,17 @@ class Items extends API_Controller
 			/* For Item Report */
 
 			//item report check with login_user_id
-			$conds_report['reported_user_id'] = $this->get_login_user_id();
-			$reported_data_count = $this->Itemreport->count_all_by($conds_report);
+			$conds_report['user_id'] = $this->get_login_user_id();
+			$conds_report['type'] = 'report_item';
+			$reported_data_count = $this->Reason_operation->count_all_by($conds_report);
 
 			// item reported existed by login user
 			if ($reported_data_count > 0) {
 				// get the reported item data
-				$item_reported_datas = $this->Itemreport->get_all_by($conds_report)->result();
+				$item_reported_datas = $this->Reason_operation->get_all_by($conds_report)->result();
 
 				foreach ( $item_reported_datas as $item_reported_data ) {
-					$item_ids .= "'" .$item_reported_data->item_id . "',";			
+					$item_ids .= "'" .$item_reported_data->operation_id . "',";			
 				}
 				// get block user's item
 

@@ -11,7 +11,7 @@ class Reason_operation extends PS_Model {
 	 */
 	function __construct() 
 	{	
-		parent::__construct( 'bs_reason_operation', 'id');
+		parent::__construct( 'bs_reason_operations', 'id');
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Reason_operation extends PS_Model {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
 
-			$this->db->order_by( 'bs_reason_operation.'.$order_by_field, $order_by_type );
+			$this->db->order_by( 'bs_reason_operations.'.$order_by_field, $order_by_type );
 		} else {
 
 			$this->db->order_by( 'added_date' );

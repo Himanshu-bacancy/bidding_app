@@ -73,7 +73,7 @@ class Reason extends API_Controller
             $offersData = $this->db->select('id')->from('bs_chat_history')->where('id', $chatId)->where('is_cancel', 0)->get()->row();
             if(!empty($offersData)){
                 $chatHistoryData = array('is_cancel'=>1);
-                if(!$this->Chat->Save( $chatHistoryData, $chatId )) {
+                if(!$this->Chat->save( $chatHistoryData, $chatId )) {
                     $this->error_response( get_msg( 'err_cancel_offer' ));
                 } else {
                     $reasonOperationData =  array(
@@ -84,7 +84,7 @@ class Reason extends API_Controller
                         'user_id'=>$this->post('user_id') ? $this->post('user_id') : '',
                     );
                     
-                    if($this->Reason_operation->Save($reasonOperationData)){
+                    if($this->Reason_operation->save($reasonOperationData)){
                         $this->success_response(get_msg('offer_cancelled_success'));
                     } else {
                         $this->error_response(get_msg( 'err_cancel_offer'));
@@ -133,20 +133,20 @@ class Reason extends API_Controller
         $data = array( 'user_id' => $user_id, 'operation_id' => $operation_id );
         $block_data = array( 'operation_id' => $user_id, 'user_id' => $operation_id );
 
-        $query1 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
+        $query1 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
         $data_count = $query1->num_rows();
-        $query2 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
+        $query2 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
         $block_data_count = $query2->num_rows();
         //delete block count is more than 0
         // echo '<pre>'; print_r($this->post());
         if ($data_count > 0 || $block_data_count > 0) {
             $this->db->where('user_id', $user_id);
             $this->db->where('operation_id', $operation_id);
-            $this->db->delete('bs_reason_operation');
+            $this->db->delete('bs_reason_operations');
 
             $this->db->where('operation_id', $user_id);
             $this->db->where('user_id', $operation_id);
-            $this->db->delete('bs_reason_operation');
+            $this->db->delete('bs_reason_operations');
         }
         $data['reason_id'] = !empty($this->post('reason_id')) ? $this->post('reason_id') : 0;
         $data['other_reason'] = !empty($this->post('other_reason')) ? $this->post('other_reason') : '';
@@ -190,20 +190,20 @@ class Reason extends API_Controller
         $block_data = array( 'operation_id' => $user_id, 'user_id' => $operation_id );
      		
         // unblock user ( just need to delete )
-        $query1 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
+        $query1 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$user_id."' AND  operation_id = '".$operation_id."'");
         $data_count = $query1->num_rows();
-        $query2 = $this->db->query("SELECT * FROM bs_reason_operation WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
+        $query2 = $this->db->query("SELECT * FROM bs_reason_operations WHERE user_id = '".$operation_id."' AND  operation_id = '".$user_id."'");
         $block_data_count = $query2->num_rows();
         //delete block count is more than 0
         // echo '<pre>'; print_r($this->post());
         if ($data_count > 0 || $block_data_count > 0) {
             $this->db->where('user_id', $user_id);
             $this->db->where('operation_id', $operation_id);
-            $this->db->delete('bs_reason_operation');
+            $this->db->delete('bs_reason_operations');
 
             $this->db->where('operation_id', $user_id);
             $this->db->where('user_id', $operation_id);
-            $this->db->delete('bs_reason_operation');
+            $this->db->delete('bs_reason_operations');
         } else {
             $this->success_response( get_msg( 'no_user_unblock' ));
         }
@@ -234,27 +234,32 @@ class Reason extends API_Controller
 		$operation_id = $this->post('operation_id');// Item Id
         // prep data
         $data = array('id' => $operation_id );
+        $reasonData = [];
         if($this->Item->exists( $data )){	
             $reasonData = $this->db->select('id')
-                            ->from('bs_reason_operation')
+                            ->from('bs_reason_operations')
                             ->where('operation_id', $operation_id)
                             ->where('user_id', $user_id)
                             ->where('type', 'report_item')
                             ->get()->row();
             if(empty($reasonData)){
                 $reasonOperationData =  array(
-                    'reason_id'=>$this->post('reason_id') ? $this->post('reason_id') : '',
-                    'other_reason'=>$this->post('other_reason') ? $this->post('other_reason') : '',
-                    'operation_id'=>$this->post('operation_id') ? $this->post('operation_id') : '',
-                    'type'=>'report_item',
-                    'user_id'=>$this->post('user_id') ? $this->post('user_id') : '',
+                    'operation_id' => $this->post('operation_id') ? $this->post('operation_id') : '',
+                    'type' => 'report_item',
+                    'user_id' => $this->post('user_id') ? $this->post('user_id') : '',
                 );
-                if($this->Reason_operation->Save($reasonOperationData)){
+                if(!empty($this->post('other_reason'))){
+                    $reasonOperationData['other_reason'] = $this->post('other_reason');
+                } else if(!empty($this->post('reason_id'))){
+                    $reasonOperationData['reason_id'] = $this->post('reason_id');
+                }
+                if($this->Reason_operation->save($reasonOperationData)){
                     $this->success_response(get_msg('success_item_reported'));
                 } else {
                     $this->error_response(get_msg( 'no_item_reported'));
                 }
             } else {
+                die('hello himanshu');
                 $this->error_response(get_msg( 'item_already_reported'));
             }
         } else {

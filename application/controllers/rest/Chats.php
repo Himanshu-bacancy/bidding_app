@@ -411,6 +411,7 @@ class Chats extends API_Controller
 						$exchange_store_data = array(
 							'chat_id' => $obj->id,
 							'operation_type' => $this->post('operation_type'),
+							'who_pay' => $this->post('who_pay'),
 							'offered_item_id' => $offerId,
 							"date_added" => date("Y-m-d H:i:s"),
 						);
@@ -420,6 +421,7 @@ class Chats extends API_Controller
 					$exchange_store_data = array(
 						'chat_id' => $obj->id,
 						'operation_type' => $this->post('operation_type'),
+						'who_pay' => $this->post('who_pay'),
 						'offered_item_id' => $this->post('offered_item_id'),
 						"date_added" => date("Y-m-d H:i:s"),
 					);
@@ -542,6 +544,7 @@ class Chats extends API_Controller
 							$exchange_store_data = array(
 								'chat_id' => $obj->id,
 								'operation_type' => $this->post('operation_type'),
+								'who_pay' => $this->post('who_pay'),
 								'offered_item_id' => $offerId,
 								"date_added" => date("Y-m-d H:i:s"),
 							);
@@ -551,6 +554,7 @@ class Chats extends API_Controller
 						$exchange_store_data = array(
 							'chat_id' => $obj->id,
 							'operation_type' => $this->post('operation_type'),
+							'who_pay' => $this->post('who_pay'),
 							'offered_item_id' => $this->post('offered_item_id'),
 							"date_added" => date("Y-m-d H:i:s"),
 						);
@@ -1624,7 +1628,7 @@ class Chats extends API_Controller
 
         $offer_data = $this->Chat->get_one_by($conds);
 		$this->ps_adapter->convert_chathistory( $offer_data );
-		//echo '<pre>'; print_r($offer_data); die('rukooo');
+		// echo '<pre>'; print_r($offer_data); die('rukooo');
 		if($offer_data){
 			$this->custom_response( $offer_data );
 		} else {
