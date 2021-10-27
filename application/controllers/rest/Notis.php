@@ -176,22 +176,30 @@ class Notis extends API_Controller
 	        // 	'rules' => 'required'
 	        // ),
 
+//			array(
+//	        	'field' => 'buyer_user_id',
+//	        	'rules' => 'required'
+//	        ),
+//			array(
+//	        	'field' => 'seller_user_id',
+//	        	'rules' => 'required'
+//	        ),
 			array(
-	        	'field' => 'buyer_user_id',
+	        	'field' => 'user_id',
 	        	'rules' => 'required'
 	        ),
 			array(
-	        	'field' => 'seller_user_id',
+	        	'field' => 'chat_id',
 	        	'rules' => 'required'
 	        ),
 			array(
 	        	'field' => 'message',
 	        	'rules' => 'required'
 	        ),
-	        array(
-	        	'field' => 'type',
-	        	'rules' => 'required'
-	        )
+//	        array(
+//	        	'field' => 'type',
+//	        	'rules' => 'required'
+//	        )
 
         );
 
@@ -212,26 +220,33 @@ class Notis extends API_Controller
 
         //Get Device Tokens
 
-        
+        $get_chat_detail = $this->db->from('bs_chat_history')->where('chat_id', $this->post('chat_id'))->get()->row();
+        if($get_chat_detail->seller_user_id == $this->post('user_id')) {
+            $seller_user_id = $this->post('user_id');
+            $buyer_user_id = $get_chat_detail->buyer_user_id;
+        } else {
+            $buyer_user_id = $this->post('user_id');
+            $seller_user_id = $get_chat_detail->seller_user_id;
+        }
 
-		if($this->post('type') == "to_seller"){
+		if($get_chat_detail->seller_user_id == $this->post('user_id')){
 			$chat_data = array(
-				"requested_item_id" => $this->post('requested_item_id'), 
-				"buyer_user_id" => $this->post('buyer_user_id'), 
-				"seller_user_id" => $this->post('seller_user_id')
+				"requested_item_id" => $get_chat_detail->requested_item_id, 
+				"buyer_user_id" => $get_chat_detail->buyer_user_id, 
+				"seller_user_id" => $get_chat_detail->seller_user_id
 			);
 		}else{
 			$chat_data = array(
-				"offered_item_id" => $this->post('offered_item_id'), 
-				"buyer_user_id" => $this->post('buyer_user_id'), 
-				"seller_user_id" => $this->post('seller_user_id')	
+				"offered_item_id" => $get_chat_detail->offered_item_id, 
+				"buyer_user_id" => $get_chat_detail->buyer_user_id, 
+				"seller_user_id" => $get_chat_detail->seller_user_id	
 			);
 		}
 		
 
-		if($this->post('type') == "to_seller") {
+		if($get_chat_detail->seller_user_id == $this->post('user_id')) {
 
-			$user_ids[] = $this->post('seller_user_id');
+			$user_ids[] = $get_chat_detail->seller_user_id;
 
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
 
@@ -246,26 +261,24 @@ class Notis extends API_Controller
 
  	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
-	        $user_id = $this->post('buyer_user_id');
+	        $user_id = $get_chat_detail->buyer_user_id;
 	        $user_name = $this->User->get_one($user_id)->user_name;
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 
 	        $update_chat_data = array(
 				//"requested_item_id" => $this->post('item_id'), 
 	        	// "item_id" => $this->post('item_id'), 
-	        	"buyer_user_id" => $this->post('buyer_user_id'), 
-	        	"seller_user_id" => $this->post('seller_user_id'),
-	        	"seller_unread_count" => $chat_old_count
+	        	"buyer_user_id" => $get_chat_detail->buyer_user_id, 
+	        	"seller_user_id" => $get_chat_detail->seller_user_id,
+	        	"seller_unread_count" => $chat_old_count+1
 
 	        );
 
-	    } else if ($this->post('type') == "to_buyer"){
+	    } else if ($get_chat_detail->buyer_user_id == $this->post('user_id')){
 
-	    	$user_ids[] = $this->post('buyer_user_id');
+	    	$user_ids[] = $get_chat_detail->buyer_user_id;
 
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
-	        
-
 
 			$device_ids = array();
 			if ( count( $devices ) > 0 ) {
@@ -278,16 +291,16 @@ class Notis extends API_Controller
 
 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
-	        $user_id = $this->post('seller_user_id');
+	        $user_id = $get_chat_detail->seller_user_id;
 	        $user_name = $this->User->get_one($user_id)->user_name;
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 	        
 	        $update_chat_data = array(
 				//"offered_item_id" => $this->post('item_id'), 
 	        	// "item_id" => $this->post('item_id'), 
-	        	"buyer_user_id" => $this->post('buyer_user_id'), 
-	        	"seller_user_id" => $this->post('seller_user_id'),
-	        	"buyer_unread_count" => $chat_old_count
+	        	"buyer_user_id" => $get_chat_detail->buyer_user_id, 
+	        	"seller_user_id" => $get_chat_detail->seller_user_id,
+	        	"buyer_unread_count" => $chat_old_count+1   
 
 	        );
 
@@ -298,8 +311,8 @@ class Notis extends API_Controller
 
     		//$this->success_response( get_msg( 'count_update_success' ));
     		$data['message'] = $this->post('message');
-	    	$data['buyer_user_id'] = $this->post('buyer_user_id');
-	    	$data['seller_user_id'] = $this->post('seller_user_id');
+	    	$data['buyer_user_id'] = $buyer_user_id;
+	    	$data['seller_user_id'] = $seller_user_id;
 	    	$data['sender_name'] = $user_name;
 	    	$data['item_id'] = $this->post('item_id');
 	    	$data['sender_profle_photo'] = $user_profile_photo;

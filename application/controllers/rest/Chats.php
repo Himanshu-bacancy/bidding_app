@@ -575,83 +575,118 @@ class Chats extends API_Controller
 		// validation rules for chat history
 		$rules = array(
 			array(
-	        	'field' => 'item_id',
+	        	'field' => 'chat_id',
 	        	'rules' => 'required'
 	        ),
+//			array(
+//	        	'field' => 'item_id',
+//	        	'rules' => 'required'
+//	        ),
+//	        array(
+//	        	'field' => 'buyer_user_id',
+//	        	'rules' => 'required'
+//	        ),
+//	        array(
+//	        	'field' => 'seller_user_id',
+//	        	'rules' => 'required'
+//	        ),
 	        array(
-	        	'field' => 'buyer_user_id',
+	        	'field' => 'user_id',
 	        	'rules' => 'required'
 	        ),
-	        array(
-	        	'field' => 'seller_user_id',
-	        	'rules' => 'required'
-	        ),
-	        array(
-	        	'field' => 'type',
-	        	'rules' => 'required'
-	        )
+//	        array(
+//	        	'field' => 'type',
+//	        	'rules' => 'required'
+//	        )
         );
 
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
+        
+        $get_chat_detail = $this->db->from('bs_chat_history')->where('chat_id', $this->post('chat_id'))->get()->row();
+        if($get_chat_detail->seller_user_id == $this->post('user_id')) {
+            
+            $chat_data_update = array(
+                "chat_id" => $this->post('chat_id'), 
+                "seller_unread_count" => 0
+            );
 
+        } else {
+            $chat_data_update = array(
+                "chat_id" => $this->post('chat_id'), 
+                "buyer_unread_count" => 0
+            );
+
+        }
         $chat_data = array(
-
-        	"item_id" => $this->post('item_id'), 
-        	"buyer_user_id" => $this->post('buyer_user_id'), 
-        	"seller_user_id" => $this->post('seller_user_id')
-
+        	"chat_id" => $this->post('chat_id'), 
         );
-
         $chat_history_data = $this->Chat->get_one_by($chat_data);
+        if( !$this->Chat->Save( $chat_data_update,$chat_history_data->id )) {
+            $this->error_response( get_msg( 'err_count_update' ));
+        } else {
+            $obj = $this->Chat->get_one_by($chat_data);
+            $this->ps_adapter->convert_chathistory( $obj );
+            $this->custom_response( $obj );
+        }
+        
+//        $chat_data = array(
+//
+//        	"item_id" => $this->post('item_id'), 
+//        	"buyer_user_id" => $this->post('buyer_user_id'), 
+//        	"seller_user_id" => $this->post('seller_user_id')
+//
+//        );
 
-
-        if($chat_history_data->id == "") {
-	        	
-	        $this->error_response( get_msg( 'err_chat_history_not_exist' ));
-
-
-	    } else {
+//        $chat_history_data = $this->Chat->get_one_by($chat_data);
+//
+//
+//        if($chat_history_data->id == "") {
+//	        	
+//	        $this->error_response( get_msg( 'err_chat_history_not_exist' ));
+//
+//
+//	    } else {
 	    	
-	    	if($this->post('type') == "to_seller") {
-
-		    	$chat_data_update = array(
-
-		        	"item_id" => $this->post('item_id'), 
-		        	"buyer_user_id" => $this->post('buyer_user_id'), 
-		        	"seller_user_id" => $this->post('seller_user_id'),
-		        	"seller_unread_count" => 0
-
-		        );
-
-		    } else if($this->post('type') == "to_buyer") {
-
-		    	$chat_data_update = array(
-
-		        	"item_id" => $this->post('item_id'), 
-		        	"buyer_user_id" => $this->post('buyer_user_id'), 
-		        	"seller_user_id" => $this->post('seller_user_id'),
-		        	"buyer_unread_count" => 0
-
-		        );
-		    }
-
-	    	if( !$this->Chat->Save( $chat_data_update,$chat_history_data->id )) {
-
-	    		$this->error_response( get_msg( 'err_count_update' ));
-
-	    	
-	    	} else {
-
-	    		$obj = $this->Chat->get_one_by($chat_data);
-				$this->ps_adapter->convert_chathistory( $obj );
-				$this->custom_response( $obj );
-
-	    	}
-
-
-	    }
+//	    	if($this->post('type') == "to_seller") {
+//
+//		    	$chat_data_update = array(
+//
+//		        	"item_id" => $this->post('item_id'), 
+//		        	"buyer_user_id" => $this->post('buyer_user_id'), 
+//		        	"seller_user_id" => $this->post('seller_user_id'),
+//		        	"seller_unread_count" => 0
+//
+//		        );
+//
+//		    } else if($this->post('type') == "to_buyer") {
+//
+//		    	$chat_data_update = array(
+//
+//		        	"item_id" => $this->post('item_id'), 
+//		        	"buyer_user_id" => $this->post('buyer_user_id'), 
+//		        	"seller_user_id" => $this->post('seller_user_id'),
+//		        	"buyer_unread_count" => 0
+//
+//		        );
+//		    }
+//
+//	    	if( !$this->Chat->Save( $chat_data_update,$chat_history_data->id )) {
+//
+//	    		$this->error_response( get_msg( 'err_count_update' ));
+//
+//	    	
+//	    	} else {
+//
+//	    		$obj = $this->Chat->get_one_by($chat_data);
+//				$this->ps_adapter->convert_chathistory( $obj );
+//				$this->custom_response( $obj );
+//
+//	    	}
+//
+//
+//	    }
 
 
 	}
