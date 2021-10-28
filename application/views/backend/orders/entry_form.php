@@ -6,517 +6,474 @@
 <section class="content animated fadeInRight">
 	<div class="card card-info">
 	    <div class="card-header">
-	        <h3 class="card-title"><?php echo get_msg('order_info')?></h3>
+	        <h3 class="card-title"><?php echo get_msg('Order Info')?></h3>
 	    </div>
         <!-- /.card-header -->
         <div class="card-body">
             <div class="row">
             	<div class="col-md-6">
-            		
             		<div class="form-group">
                    		<label>
                    			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('start_date_label')?>
-							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('start_date_label')?>">
-								<span class='glyphicon glyphicon-info-sign menu-icon'>
-							</a>
+							<?php echo get_msg('Id')?>
 						</label>
 
 						<?php echo form_input( array(
-							'name' => 'start_date',
-							'value' => set_value( 'start_date', show_data( @$orders->start_date ), false ),
+							'name' => 'order_id',
+							'value' => set_value( 'order_id', show_data( @$order->order_id ), false ),
 							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'start_date_label' ),
-							'id' => 'start_date',
+							'placeholder' => get_msg( 'order_id' ),
+							'id' => 'order_id',
 							'readonly' => 'true'
 						)); ?>
               		</div>
-
-              		<div class="form-group">
-                   		<label>
-                   			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('amount_label')?>
-							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('amount_label')?>">
-								<span class='glyphicon glyphicon-info-sign menu-icon'>
-							</a>
-						</label>
-
-						<?php echo form_input( array(
-							'name' => 'amount',
-							'value' => set_value( 'amount', show_data( @$orders->amount ), false ),
-							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'amount_label' ),
-							'id' => 'amount',
-							'readonly' => 'true'
-						)); ?>
-              		</div>
-
             	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Item')?>
+                        </label>
 
+                        <?php echo form_input( array(
+                            'name' => 'items',
+                            'value' => set_value( 'items', show_data( @$order->item_name ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'item' ),
+                            'id' => 'items',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
             	<div class="col-md-6">
-
             		<div class="form-group">
                    		<label>
                    			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('end_date_label')?>
-							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('end_date_label')?>">
-								<span class='glyphicon glyphicon-info-sign menu-icon'>
-							</a>
+							<?php echo get_msg('Delivery Method')?>
 						</label>
 
-						<?php echo form_input( array(
-							'name' => 'end_date',
-							'value' => set_value( 'end_date', show_data( @$orders->end_date ), false ),
+						<?php
+                        $print_str = 'Pickup and Delivery';
+                        if($order->delivery_method == DELIVERY_ONLY) {
+                            $print_str = 'Delivery Only';
+                        } else if($order->delivery_method == PICKUP_ONLY) {
+                            $print_str = 'Pickup Only';
+                        }
+                        echo form_input( array(
+							'name' => 'delivery_method',
+							'value' => set_value( 'delivery_method', show_data( $print_str ), false ),
 							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'end_date_label' ),
-							'id' => 'end_date',
-							'readonly' => 'true'
-						)); ?>
-              		</div>
-
-              		<div class="form-group">
-                   		<label>
-                   			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('payment_method_label')?>
-							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('payment_method_label')?>">
-								<span class='glyphicon glyphicon-info-sign menu-icon'>
-							</a>
-						</label>
-
-						<?php echo form_input( array(
-							'name' => 'payment_method',
-							'value' => set_value( 'payment_method', show_data( @$orders->payment_method ), false ),
-							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'payment_method_label' ),
-							'id' => 'payment_method',
+							'placeholder' => get_msg( 'Delivery Method' ),
+							'id' => 'delivery_method',
 							'readonly' => 'true'
 						)); ?>
               		</div>
             	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Payment Method')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'payment_method',
+                            'value' => set_value( 'payment_method', show_data( @$order->payment_method ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'payment_method' ),
+                            'id' => 'payment_method',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
             </div>
-        </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Amount')?>
+						</label>
 
-        <hr>
-        <div class="card-header">
-	    	<h3 class="card-title"><?php echo get_msg('prd_info')?></h3>
-	  	</div>
+						<?php echo form_input( array(
+							'name' => 'total_amount',
+							'value' => set_value( 'total_amount', show_data( @$order->total_amount ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'Amount' ),
+							'id' => 'total_amount',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Order Status')?>
+                        </label>
 
-	  	<div class="card-body">
-	      	<div class="row">
-	      		<div class="col-md-6">
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_title_label')?>
-	              </label>
-
-	              <?php echo form_input( array(
-	                'name' => 'title',
-	                'value' => set_value( 'title', show_data( @$item->title), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => get_msg('itm_title_label'),
-	                'id' => 'title',
-	                'readonly' => 'true'
-	              )); ?>
-
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('Prd_search_cat')?>
-	              </label>
-
-	              <?php
-	                $options=array();
-	                $conds['status'] = 1;
-	                $options[0]=get_msg('Prd_search_cat');
-	                $categories = $this->Category->get_all_by($conds);
-	                foreach($categories->result() as $cat) {
-	                    $options[$cat->cat_id]=$cat->cat_name;
-	                }
-
-	                echo form_dropdown(
-	                  'cat_id',
-	                  $options,
-	                  set_value( 'cat_id', show_data( @$item->cat_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="cat_id"',
-	                );
-	              ?>
-	            </div>
-	           
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_select_type')?>
-	              </label>
-
-	              <?php
-	              
-	                $options=array();
-	                $options[0]=get_msg('itm_select_type');
-	                $types = $this->Itemtype->get_all();
-	                foreach($types->result() as $typ) {
-	                    $options[$typ->id]=$typ->name;
-	                }
-
-	                echo form_dropdown(
-	                  'item_type_id',
-	                  $options,
-	                  set_value( 'item_type_id', show_data( @$item->item_type_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_type_id"',
-	                );
-	              ?>
-	            </div>
-	            <div class="form-group">
-	              	<label> <span style="font-size: 17px; color: red;">*</span>
-						<?php echo get_msg('itm_select_location')?>
-	              	</label>
-	              	<?php
-						$options=array();
-						$options[0]=get_msg('itm_select_location');
-						$locations = $this->Itemlocation->get_all();
-						foreach($locations->result() as $location) {
-							$options[$location->id]=$location->name;
-						}
-						echo form_dropdown(
-							'item_location_id',
-							$options,
-							set_value( 'item_location_id', show_data( @$item->item_location_id), false ),
-							'class="form-control form-control-sm mr-3" disabled="disabled" id="item_location_id"',
-						);
-	              	?>
-	            </div>
-	            <div class="form-group">
-	                <label> <span style="font-size: 17px; color: red;">*</span>
-	                  <?php echo get_msg('itm_select_deal_option')?>
-	                </label>
-
-	                <?php
-	                  $options=array();
-	                  $conds['status'] = 1;
-	                  $options[0]=get_msg('deal_option_id_label');
-	                  $deals = $this->Option->get_all_by($conds);
-	                  foreach($deals->result() as $deal) {
-	                      $options[$deal->id]=$deal->name;
-	                  }
-
-	                  echo form_dropdown(
-	                    'deal_option_id',
-	                    $options,
-	                    set_value( 'deal_option_id', show_data( @$item->deal_option_id), false ),
-	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="deal_option_id"',
-	                  );
-	                ?>
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('item_description_label')?>
-	              </label>
-
-	              <?php echo form_textarea( array(
-	                'name' => 'description',
-	                'value' => set_value( 'description', show_data( @$item->description), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => get_msg('item_description_label'),
-	                'id' => 'description',
-	                'rows' => "3",
-	                'readonly' => 'true'
-	              )); ?>
-
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('prd_high_info')?>
-	              </label>
-
-	              <?php echo form_textarea( array(
-	                'name' => 'highlight_info',
-	                'value' => set_value( 'info', show_data( @$item->highlight_info), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => "Please Highlight Information",
-	                'id' => 'info',
-	                'rows' => "3",
-	                'readonly' => 'true'
-	              )); ?>
-
-	            </div>
-	            <!-- form group -->
-	          </div>
-
-	          <div class="col-md-6">
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('price')?>
-	              </label>
-
-	              <?php echo form_input( array(
-	                'name' => 'price',
-	                'value' => set_value( 'price', show_data( @$item->price), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => get_msg('price'),
-	                'id' => 'price',
-	                'readonly' => 'true'
-	              )); ?>
-	            </div>
-
-	            <div class="form-group">
-	              	<label> <span style="font-size: 17px; color: red;">*</span>
-	                	<?php echo get_msg('Prd_search_subcat')?>
-	              	</label>
-	              	<?php
-						if(isset($item)) {
-							$options=array();
-							$options[0]=get_msg('Prd_search_subcat');
-							$conds['cat_id'] = $item->cat_id;
-							$sub_cat = $this->Subcategory->get_all_by($conds);
-							foreach($sub_cat->result() as $subcat) {
-								$options[$subcat->id]=$subcat->name;
-							}
-							echo form_dropdown(
-								'sub_cat_id',
-								$options,
-								set_value( 'sub_cat_id', show_data( @$item->sub_cat_id), false ),
-								'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"',
-							);
-						} else {
-							$conds['cat_id'] = $selected_cat_id;
-							$options=array();
-							$options[0]=get_msg('Prd_search_subcat');
-							echo form_dropdown(
-								'sub_cat_id',
-								$options,
-								set_value( 'sub_cat_id', show_data( @$item->sub_cat_id), false ),
-								'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"',
-							);
-						}	
-	              	?>
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_select_price')?>
-	              </label>
-	              <?php
-	                $options=array();
-	                $conds['status'] = 1;
-	                $options[0]=get_msg('itm_select_price');
-	                $pricetypes = $this->Pricetype->get_all_by($conds);
-	                foreach($pricetypes->result() as $price) {
-	                    $options[$price->id]=$price->name;
-	                }
-
-	                echo form_dropdown(
-	                  'item_price_type_id',
-	                  $options,
-	                  set_value( 'item_price_type_id', show_data( @$item->item_price_type_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_price_type_id"',
-	                );
-	              ?>
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_select_currency')?>
-	              </label>
-
-	              <?php
-	                $options=array();
-	                $conds['status'] = 1;
-	                $options[0]=get_msg('itm_select_currency');
-	                $currency = $this->Currency->get_all_by($conds);
-	                foreach($currency->result() as $curr) {
-	                    $options[$curr->id]=$curr->currency_short_form;
-	                }
-
-	                echo form_dropdown(
-	                  'item_currency_id',
-	                  $options,
-	                  set_value( 'item_currency_id', show_data( @$item->item_currency_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_currency_id"',
-	                );
-	              ?>
-	            </div>
-
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_select_condition_of_item')?>
-	              </label>
-
-	              <?php
-	                $options=array();
-	                $conds['status'] = 1;
-	                $options[0]=get_msg('condition_of_item');
-	                $conditions = $this->Condition->get_all_by($conds);
-	                foreach($conditions->result() as $cond) {
-	                    $options[$cond->id]=$cond->name;
-	                }
-
-	                echo form_dropdown(
-	                  'condition_of_item_id',
-	                  $options,
-	                  set_value( 'condition_of_item_id', show_data( @$item->condition_of_item_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="condition_of_item_id"',
-	                );
-	              ?>
-	            </div>
-
-	          </div>
-	          
-	          <div class="col-md-6">
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('brand_label')?>
-	              </label>
-
-	              <?php echo form_input( array(
-	                'name' => 'brand',
-	                'value' => set_value( 'brand', show_data( @$item->brand), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => get_msg('brand_label'),
-	                'id' => 'brand',
-	                'readonly' => 'true'
-	              )); ?>
-
-	            </div>
-
-	          </div>
-
-	          <div class="col-md-6">
-	            <div class="form-group">
-	              <div class="form-check">
-	                <label>
-	                
-	                <?php echo form_checkbox( array(
-	                  'name' => 'business_mode',
-	                  'id' => 'business_mode',
-	                  'value' => 'accept',
-	                  'checked' => set_checkbox('business_mode', 1, ( @$item->business_mode == 1 )? true: false ),
-	                  'class' => 'form-check-input',
-	                  'disabled' => 'disabled'
-	                )); ?>
-
-	                <?php echo get_msg( 'itm_business_mode' ); ?>
-	                <br><?php echo get_msg( 'itm_show_shop' ) ?>
-	                </label>
-	              </div>
-	            </div>
-
-	            <div class="form-group">
-	              <div class="form-check">
-	                <label>
-	                
-	                <?php echo form_checkbox( array(
-	                  'name' => 'is_sold_out',
-	                  'id' => 'is_sold_out',
-	                  'value' => 'accept',
-	                  'checked' => set_checkbox('is_sold_out', 1, ( @$item->is_sold_out == 1 )? true: false ),
-	                  'class' => 'form-check-input',
-	                  'disabled' => 'disabled'
-	                )); ?>
-
-	                <?php echo get_msg( 'itm_is_sold_out' ); ?>
-
-	                </label>
-	              </div>
-	            </div>
-	            <!-- form group -->
-	          </div>
-	          <div class="col-md-6">
-	             <br><br>
-	            <legend><?php echo get_msg('location_info_label'); ?></legend>
-	            <div class="form-group">
-	              <label> <span style="font-size: 17px; color: red;">*</span>
-	                <?php echo get_msg('itm_address_label')?>
-	              </label>
-
-	              <?php echo form_textarea( array(
-	                'name' => 'address',
-	                'value' => set_value( 'address', show_data( @$item->address), false ),
-	                'class' => 'form-control form-control-sm',
-	                'placeholder' => get_msg('itm_address_label'),
-	                'id' => 'address',
-	                'rows' => "5",
-	                'readonly' => 'true'
-	              )); ?>
-
-	            </div>
-	          </div>
-	          <?php if (  @$item->lat !='0' && @$item->lng !='0' ):?>
-	          <div class="col-md-6">
-	            <div id="itm_location" style="width: 700px; height: 400px;"></div>
-	            <div class="clearfix">&nbsp;</div>
-	            <div class="form-group">
-	              <label><?php echo get_msg('itm_lat_label') ?>
-	                <a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('city_lat_label')?>">
-	                  <span class='glyphicon glyphicon-info-sign menu-icon'>
-	                </a>
-	              </label>
-
-	              <br>
-
-	              <?php 
-	                echo form_input( array(
-	                  'type' => 'text',
-	                  'name' => 'lat',
-	                  'id' => 'lat',
-	                  'class' => 'form-control',
-	                  'placeholder' => '',
-	                  'value' => set_value( 'lat', show_data( @$item->lng ), false ),
-	                  'readonly' => 'true'
-	                ));
-	              ?>
-	            </div>
-	            <div class="form-group">
-	              <label><?php echo get_msg('itm_lng_label') ?>
-	                <a href="#" class="tooltip-ps" data-toggle="tooltip" 
-	                  title="<?php echo get_msg('city_lng_tooltips')?>">
-	                  <span class='glyphicon glyphicon-info-sign menu-icon'>
-	                </a>
-	              </label>
-
-	              <br>
-
-	              <?php 
-	                echo form_input( array(
-	                  'type' => 'text',
-	                  'name' => 'lng',
-	                  'id' => 'lng',
-	                  'class' => 'form-control',
-	                  'placeholder' => '',
-	                  'value' =>  set_value( 'lat', show_data( @$item->lng ), false ),
-	                  'readonly' => 'true'
-	                ));
-	              ?>
-	            </div>
-	            <!-- form group -->
-	          </div>
-
-	          <?php endif ?>
-	          
-	        </div>
-	        <!-- row -->
-	    </div>
-
-	    <!-- Grid row -->
-        <div class="gallery" id="gallery" style="margin-left: 15px; margin-bottom: 15px;">
-          <?php
-              $conds = array( 'img_type' => 'item', 'img_parent_id' => $item->id );
-              $images = $this->Image->get_all_by( $conds )->result();
-          ?>
-          <?php $i = 0; foreach ( $images as $img ) :?>
-            <!-- Grid column -->
-            <div class="mb-3 pics animation all 2">
-              <a href="#<?php echo $i;?>"><img class="img-fluid" src="<?php echo img_url('/' . $img->img_path); ?>" alt="Card image cap"></a>
+                        <?php
+                        echo form_input( array(
+                            'name' => 'status',
+                            'value' => set_value( 'status', show_data( @$order->status ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'status' ),
+                            'id' => 'status',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
             </div>
-            <!-- Grid column -->
-          <?php $i++; endforeach; ?>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Operation Type')?>
+						</label>
 
-          <?php $i = 0; foreach ( $images as $img ) :?>
-            <a href="#_1" class="lightbox trans" id="<?php echo $i?>"><img src="<?php echo img_url('/' . $img->img_path); ?>"></a>
-          <?php $i++; endforeach; ?>
+						<?php
+                        $print_str = 'Direct Buy';
+                        if($order->operation_type == REQUEST_ITEM) {
+                            $print_str = 'Request Item';
+                        } else if($order->operation_type == SELLING) {
+                            $print_str = 'Selling';
+                        } else if($order->operation_type == EXCHANGE) {
+                            $print_str = 'Exchange';
+                        }
+                        echo form_input( array(
+							'name' => 'operation_type',
+							'value' => set_value( 'operation_type', show_data( $print_str ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'operation_type' ),
+							'id' => 'operation_type',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Delivery Status')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'delivery_status',
+                            'value' => set_value( 'delivery_status', show_data( @$order->delivery_status ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'delivery_status' ),
+                            'id' => 'delivery_status',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('QRcode')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'qrcode',
+							'value' => set_value( 'qrcode', show_data( @$order->qrcode ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'qrcode' ),
+							'id' => 'qrcode',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Delivery Address')?>
+                        </label>
+
+                        <?php 
+                        $addresses = $this->db->from('bs_addresses')->where('id', $order->address_id)->get()->row();
+                        $print_Str = $addresses->address1.','.$addresses->address2.','.$addresses->city.','.$addresses->state.','.$addresses->zipcode.','.$addresses->country;
+                        echo form_input( array(
+                            'name' => 'address_id',
+                            'value' => set_value( 'address_id', show_data( $print_Str ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'address_id' ),
+                            'id' => 'address_id',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Place Date')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'created_at',
+							'value' => set_value( 'created_at', show_data( @$order->created_at ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'created_at' ),
+							'id' => 'created_at',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Processed Date')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'processed_date',
+                            'value' => set_value( 'processed_date', show_data( @$order->processed_date ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'processed_date' ),
+                            'id' => 'processed_date',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Pickup Date')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'pickup_date',
+							'value' => set_value( 'pickup_date', show_data( @$order->pickup_date ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'pickup_date' ),
+							'id' => 'pickup_date',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('QRscan Date')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'scanqr_date',
+                            'value' => set_value( 'scanqr_date', show_data( @$order->scanqr_date ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'scanqr_date' ),
+                            'id' => 'scanqr_date',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Rate Date')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'rate_date',
+							'value' => set_value( 'rate_date', show_data( @$order->rate_date ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'rate_date' ),
+							'id' => 'rate_date',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Complete Date')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'completed_date',
+                            'value' => set_value( 'completed_date', show_data( @$order->completed_date ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'completed_date' ),
+                            'id' => 'completed_date',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('QR Generate Date')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'generate_qr_date',
+							'value' => set_value( 'generate_qr_date', show_data( @$order->generate_qr_date ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'generate_qr_date' ),
+							'id' => 'generate_qr_date',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Seller Charge')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'seller_charge',
+                            'value' => set_value( 'seller_charge', show_data( @$order->seller_charge ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'seller_charge' ),
+                            'id' => 'seller_charge',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+             <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Buyer Detail')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'user_id',
+							'value' => set_value( 'user_id', show_data( @$order->buyer_name ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'user_id' ),
+							'id' => 'user_id',
+							'readonly' => 'true'
+						)); ?>
+                        <br>
+                        <?php echo form_input( array(
+                            'name' => 'user_email',
+                            'value' => set_value( 'user_email', show_data( @$order->buyer_email ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'user_email' ),
+                            'id' => 'user_email',
+                            'readonly' => 'true'
+                        )); ?>
+                        <br>
+                        <?php echo form_input( array(
+                            'name' => 'user_phone',
+                            'value' => set_value( 'user_phone', show_data( @$order->buyer_phone ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'user_phone' ),
+                            'id' => 'user_phone',
+                            'readonly' => 'true'
+                        )); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Seller Detail')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'selleruser_id',
+                            'value' => set_value( 'selleruser_id', show_data( @$order->seller_name ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'selleruser_id' ),
+                            'id' => 'selleruser_id',
+                            'readonly' => 'true'
+                        )); ?>
+                        <br>
+                        <?php echo form_input( array(
+                            'name' => 'selleruser_email',
+                            'value' => set_value( 'selleruser_email', show_data( @$order->seller_email ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'selleruser_email' ),
+                            'id' => 'selleruser_email',
+                            'readonly' => 'true'
+                        )); ?>
+                        <br>
+                        <?php echo form_input( array(
+                            'name' => 'selleruser_phone',
+                            'value' => set_value( 'selleruser_phone', show_data( @$order->seller_phone ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'selleruser_phone' ),
+                            'id' => 'selleruser_phone',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('Tracking Status')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'tracking_status',
+							'value' => set_value( 'tracking_status', show_data( @$order->tracking_status ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'tracking_status' ),
+							'id' => 'tracking_status',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Tracking URL')?>
+                        </label>
+
+                        <?php echo form_input( array(
+                            'name' => 'tracking_url',
+                            'value' => set_value( 'tracking_url', show_data( @$order->tracking_url ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'tracking_url' ),
+                            'id' => 'tracking_url',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
+            </div>
+            
         </div>
-        <!-- Grid row -->
-
     </div>
     <!-- card info -->
 </section>

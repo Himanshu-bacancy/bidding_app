@@ -1428,7 +1428,18 @@ class Users extends API_Controller
 		$count_object->buyer_unread_count      = $buyer_unread_count; 
 		$count_object->seller_unread_count     = $seller_unread_count; 
 		
-
+        $count_object->unread_chat_counts = $this->db->from('bs_chat_history')
+                ->group_start()
+                ->where('buyer_user_id', $this->post('user_id'))
+                ->where('buyer_unread_count > 0')
+                    ->or_group_start()
+                            ->where('seller_user_id', $this->post('user_id'))
+                            ->where('seller_unread_count > 0')
+                    ->group_end()
+                ->group_end()
+                ->get()->num_rows();
+        
+        
 		$final_data = $this->ps_security->clean_output( $count_object );
 
 

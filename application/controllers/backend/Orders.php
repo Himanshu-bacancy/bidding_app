@@ -78,7 +78,7 @@ class Orders extends BE_Controller {
 		$this->data['action_title'] = get_msg( 'order_detail' );
         // load order
         //$order = $this->db->query("SELECT * FROM `bs_order` WHERE id = '".$id."'")->result();
-        $order = $this->db->from('bs_order')
+        $order = $this->db->select('bs_order.*, bs_items.title as item_name, order_user.user_name as buyer_name, order_user.user_email as buyer_email, order_user.user_phone as buyer_phone, seller.user_name as seller_name, seller.user_email as seller_email, seller.user_phone as seller_phone,bs_track_order.status as tracking_status, bs_track_order.tracking_url')->from('bs_order')
                 ->where('bs_order.id', $id)
                 ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
@@ -86,9 +86,10 @@ class Orders extends BE_Controller {
 		        ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')->get()->result();
         // print_r($this->db->last_query());die;
         //$this->data['orders'] = $order[0];
-        $item_id = $order[0]->items;;
+//        $item_id = $order[0]->items;
 
-		$this->data['item'] = $this->Item->get_one( $item_id );
+//		$this->data['item'] = $this->Item->get_one( $item_id );
+		$this->data['order'] = $order[0];
         //echo '<pre>'; print_r($order); die;
 		// call the parent edit logic
 		parent::edit( $id );
