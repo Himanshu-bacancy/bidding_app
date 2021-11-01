@@ -620,7 +620,7 @@ class Chats extends API_Controller
 
         }
         $chat_data = array(
-        	"chat_id" => $this->post('chat_id'), 
+        	"id" => $this->post('chat_id'), 
         );
         $chat_history_data = $this->Chat->get_one_by($chat_data);
         if( !$this->Chat->Save( $chat_data_update,$chat_history_data->id )) {
