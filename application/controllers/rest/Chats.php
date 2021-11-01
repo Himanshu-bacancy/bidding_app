@@ -604,17 +604,17 @@ class Chats extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
-        $get_chat_detail = $this->db->from('bs_chat_history')->where('chat_id', $this->post('chat_id'))->get()->row();
+        $get_chat_detail = $this->db->from('bs_chat_history')->where('id', $this->post('chat_id'))->get()->row();
         if($get_chat_detail->seller_user_id == $this->post('user_id')) {
             
             $chat_data_update = array(
-                "chat_id" => $this->post('chat_id'), 
+                "id" => $this->post('chat_id'), 
                 "seller_unread_count" => 0
             );
 
         } else {
             $chat_data_update = array(
-                "chat_id" => $this->post('chat_id'), 
+                "id" => $this->post('chat_id'), 
                 "buyer_unread_count" => 0
             );
 
@@ -628,6 +628,12 @@ class Chats extends API_Controller
         } else {
             $obj = $this->Chat->get_one_by($chat_data);
             $this->ps_adapter->convert_chathistory( $obj );
+            if(empty($obj->buyer_unread_count)) {
+                $obj->buyer_unread_count = "0";
+            }
+            if(empty($obj->seller_unread_count)) {
+                $obj->seller_unread_count = "0";
+            }
             $this->custom_response( $obj );
         }
         
