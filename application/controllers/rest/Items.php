@@ -682,6 +682,11 @@ class Items extends API_Controller
 		
 		if ($conds['item_search']==1) {
 
+			if(isset($conds['added_user_id']) && !empty($conds['added_user_id'])){
+				unset($conds['status']);
+			}
+
+
 			/* For User Block */
 			//user block check with login_user_id
 			$conds_login_block['user_id'] = $this->get_login_user_id();
@@ -1490,6 +1495,49 @@ class Items extends API_Controller
 			} else {
 				$this->error_response( get_msg( 'record_not_found' ) );
 			}
+		} else {
+			$this->error_response( get_msg( 'record_not_found' ) );
+		}
+	}
+
+
+	/**
+	 * Himanshu Sharma
+	 * Function to get item active
+	 */
+	public function reactive_item_post(){
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'added_user_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'item_id',
+	        	'rules' => 'required'
+	        )
+        );
+		$addedUserId = $this->post('added_user_id');
+		$itemId = $this->post('item_id');
+		if ( !$this->is_valid( $rules )) exit;
+
+		$this->db->where('added_user_id', $addedUserId);
+		$this->db->where('id', $itemId);
+    	$itemData = $this->db->get('bs_items');
+        $items = $itemData->result_array();
+		if(!empty($items)){
+			$id = ($items && $items[0]['id']) ? $items[0]['id'] : 0;
+			$itm_data['status'] = 1;
+			if ( !$this->Item->save( $itm_data, $id )) {
+				return false;
+			}
+			$this->success_response( get_msg( 'success_reactivated' ));
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}

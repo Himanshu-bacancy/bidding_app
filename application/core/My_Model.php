@@ -789,7 +789,6 @@ class PS_Model extends CI_Model {
 			 return $this->get_empty_object( $this->table_name );
 			
 		}
-
 	}
 
 

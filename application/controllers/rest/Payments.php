@@ -1259,4 +1259,32 @@ class Payments extends API_Controller {
         $this->ps_adapter->convert_order($orderData);
         $this->custom_response($orderData);
     }
+
+
+
+
+    /**
+     * Himanshu Sharma
+     * Function to get the card details
+     */
+    public function get_default_card_post(){
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $user_id = $this->post('user_id');
+        $cards = $this->db->query("SELECT * FROM `bs_card` WHERE user_id = '".$user_id."' LIMIT 1")->result();
+        $cardData = $cards && $cards[0] ? $cards[0] : []; 
+        //$this->ps_adapter->convert_card($cardData);
+        $this->custom_response($cardData);
+    }
+
+
 }
