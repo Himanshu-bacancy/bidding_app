@@ -240,15 +240,15 @@ class Notis extends API_Controller
 			$chat_data = array(
 //				"offered_item_id" => $get_chat_detail->offered_item_id, 
 				"id" => $chat_id, 
-				"buyer_user_id" => $get_chat_detail->buyer_user_id, 
-				"seller_user_id" => $get_chat_detail->seller_user_id	
+				"seller_user_id" => $get_chat_detail->buyer_user_id, 
+				"buyer_user_id" => $get_chat_detail->seller_user_id	
 			);
 		}
 		
 
 		if($get_chat_detail->seller_user_id == $this->post('user_id')) {
 
-			$user_ids[] = $get_chat_detail->seller_user_id;
+			$user_ids[] = $get_chat_detail->buyer_user_id;
 
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
 
@@ -279,7 +279,7 @@ class Notis extends API_Controller
 
 	    } else if ($get_chat_detail->buyer_user_id == $this->post('user_id')){
 
-	    	$user_ids[] = $get_chat_detail->buyer_user_id;
+	    	$user_ids[] = $get_chat_detail->seller_user_id;
 
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
 
@@ -318,8 +318,9 @@ class Notis extends API_Controller
 	    	$data['buyer_user_id'] = $buyer_user_id;
 	    	$data['seller_user_id'] = $seller_user_id;
 	    	$data['sender_name'] = $user_name;
-	    	$data['item_id'] = $this->post('item_id');
+	    	$data['item_id'] = "";
 	    	$data['sender_profle_photo'] = $user_profile_photo;
+            $data['chat_id'] = $this->post('chat_id');
 			$status = send_android_fcm_chat( $device_ids, $data );
 			if($status) {				
 				$this->success_response( get_msg('success_noti_send'));

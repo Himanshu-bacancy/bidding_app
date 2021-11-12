@@ -394,6 +394,7 @@ if ( ! function_exists( 'send_android_fcm_chat' ))
 		$sender_name = $data['sender_name'];
 		$item_id = $data['item_id'];
 		$sender_profle_photo = $data['sender_profle_photo'];
+		$chat_id = $data['chat_id'];
     	//Google cloud messaging GCM-API url
     	$url = 'https://fcm.googleapis.com/fcm/send';
     	
@@ -421,6 +422,7 @@ if ( ! function_exists( 'send_android_fcm_chat' ))
 	    	'buyer_id' => $buyer_id,
 	    	'seller_id' => $seller_id,
 	    	'item_id' => $item_id,
+	    	'chat_id' => $chat_id,
 	    	'sender_name' => $sender_name,
 	    	'sender_profle_photo' => $sender_profle_photo,
 	    	'action' => "abc",
