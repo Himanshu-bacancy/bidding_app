@@ -68,6 +68,7 @@ $route['track-order'] = "crons/update_order_status";
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";
 $route['admin/(.*)'] = "backend/$1";
+$route['rest/card/(.*)'] = "rest/cards/$1";
 $route['rest/(.*)'] = "rest/$1";
 $route['guestajax/(.*)'] = "frontend/guestajax/$1";
 $route['userajax/(.*)'] = "frontend/userajax/$1";

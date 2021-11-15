@@ -5,7 +5,7 @@ require_once( APPPATH . 'libraries/REST_Controller.php' );
 /**
  * REST API for Notification
  */
-class Card extends API_Controller {
+class Cards extends API_Controller {
 
     /**
      * Constructs Parent Constructor
