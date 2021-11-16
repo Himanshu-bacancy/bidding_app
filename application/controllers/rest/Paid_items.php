@@ -449,6 +449,51 @@ class Paid_items extends API_Controller
 			$this->error_response(get_msg('stripe_transaction_failed'));
 		}
 	}
+    
+    function update_promoteditems_post() {
+
+		// API Configuration [Return Array: User Token Data]
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+
+		// validation rules for add promoted item
+		$rules = array(
+			array(
+	        	'field' => 'item_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'intent_id',
+	        	'rules' => 'required'
+	        ),
+	        array(
+	        	'field' => 'status',
+	        	'rules' => 'required'
+	        ),
+        );
+
+		// exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        $item_id = $this->post('item_id');
+        $intent_id = $this->post('intent_id');
+        $status = $this->post('status');
+        if($status == 'succeeded') {
+            $this->response(['status' => 'success', 'message' => 'Item promoted successfully']);
+        } else {
+            $item_data = array(
+                "is_paid" => "0"
+            );
+            $this->Item->save($item_data,$item_id);
+            $paydata['payment_status'] = 'fail';
+            $this->db->where('payment_id', $intent_id);
+            $this->db->where('item_id', $item_id);
+            $this->db->update('bs_paid_items_history', $paydata);
+                
+            $this->response(['status' => 'success', 'message' => 'Item promoted failed']);
+        }
+    }
 
 	/**
 	 * Convert Object

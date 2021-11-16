@@ -441,6 +441,7 @@ if ( ! function_exists( 'send_android_fcm_chat' ))
     	    	'buyer_id' => $buyer_id,
     	    	'seller_id' => $seller_id,
     	    	'item_id' => $item_id,
+                'chat_id' => $chat_id,
     	    	'sender_name' => $sender_name,
     	    	'sender_profle_photo' => $sender_profle_photo,
     	    	'action' => "abc",
