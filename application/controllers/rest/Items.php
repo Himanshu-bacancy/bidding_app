@@ -1342,8 +1342,14 @@ class Items extends API_Controller
 			$this->db->where('added_user_id', $userId);
 			$this->db->where_in('cat_id', $catIds);	
 			$exchangeItems = $this->db->get('bs_items');
-			$exchangeData = $exchangeItems->result_array();
-			$this->custom_response($exchangeData);
+//			$exchangeData = $exchangeItems->result_array();
+			$exchangeData = $exchangeItems->result();
+            $row_item_details = [] ;
+            foreach ($exchangeData as $key => $value) {
+                $row_item_details[$key] = $value;
+                $this->ps_adapter->convert_item($row_item_details[$key]);
+            }
+			$this->custom_response($row_item_details);
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}	
