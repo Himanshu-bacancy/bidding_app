@@ -408,12 +408,15 @@ class PS_Adapter {
 			//$chatHistory = $this->db->`query`("SELECT * FROM `bs_chat_history` WHERE ".$conditionChatHistory)->result();
 			$obj->big_count = count($chatHistory);
 			$lowestBid = 0;
+			//echo '<pre>'; print_r($chatHistory); die;
 			foreach($chatHistory as $history){
-				if($lowestBid > $history->nego_price){
-					$lowestBid = $history->nego_price;
+				// echo gettype($history->nego_price);
+				// echo gettype($lowestBid); die;
+				$lowestBid = (int)$history->nego_price;
+				if($lowestBid > (int)$history->nego_price){
+					$lowestBid = (int)$history->nego_price;
 				}
 			}
-			//echo $lowestBid; die(' hello testing');
 			$obj->bid_count = count($chatHistory);
 			$obj->lowest_bid_amount = $lowestBid;
 		}
