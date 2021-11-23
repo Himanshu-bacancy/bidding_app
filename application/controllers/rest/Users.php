@@ -296,8 +296,8 @@ class Users extends API_Controller
 				);
 
 				$noti_count = $this->Noti->count_all_by($noti_token);
-
 				if ($noti_count == 1) {
+                
 					if ( $this->Noti->exists( $noti_token )) {
 	        			$noti_id = $this->Noti->get_one_by($noti_token);
 	        			$push_noti_token_id = $noti_id->push_noti_token_id;
@@ -307,6 +307,7 @@ class Users extends API_Controller
 							
 						);
 			        	$this->Noti->save( $noti_data, $push_noti_token_id );
+                        
 			        } else {
 			            $noti_data = array(
 
@@ -328,13 +329,17 @@ class Users extends API_Controller
 				}
 				// you user authentication code will go here, you can compare the user with the database or whatever
 				//echo '<pre>'; print_r($user); die;
+                if($user->device_token != $this->post( 'device_token' )) {
+                    $this->db->where('user_id', $user->user_id)->update('core_users', ["device_token" => $this->post( 'device_token' )]);
+                    
+                    $user->device_token = $this->post( 'device_token' );
+                }
 				$payload = [
 					'user_id' => $user->user_id ? $user->user_id : 0,
 					'user_email' => $user->user_email ? $user->user_email : '',
 					'user_phone' => $user->user_phone ? $user->user_phone : '',
 					'device_token' => $user->device_token ? $user->device_token : '',
 				];
-				//echo '<pre>'; print_r($payload); die;
 				$token = $this->authorization_token->generateToken($payload);
 
 				$check_data = array(

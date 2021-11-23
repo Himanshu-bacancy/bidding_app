@@ -223,6 +223,17 @@ class Chats extends API_Controller
 		
 		$obj = $this->save_chat($this->post('offered_item_id'));
 		$this->ps_adapter->convert_chathistory( $obj );
+        /*Notify seller :start*/
+        $get_user = $this->db->select('device_token')->from('core_users')->where('user_id', $this->post('seller_user_id'))->get()->row();
+        if(isset($this->post('quantity')) && $this->post('quantity') > 1) {
+            send_push( $get_user->device_token, ["message" => "Requied cofirmation for the offer", "flag" => "confirmation_required"] );
+        }
+        $get_item = $this->db->select('is_confirm_with_seller')->from('bs_items')->where('id', $requestedItemId)->get()->row();
+        if($get_item->is_confirm_with_seller) {
+             send_push( $get_user->device_token, ["message" => "Requied cofirmation for the offer", "flag" => "confirmation_required"] );
+        }
+        /*Notify seller :end*/
+        
 		$this->custom_response( $obj );
 	}
 
@@ -1676,5 +1687,48 @@ class Chats extends API_Controller
 			$this->error_response(get_msg( 'offer_not_found'));
 		}
 	}
+    
+    public function save_shipping_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+		$rules = array(
+			array(
+	        	'field' => 'chat_id',
+	        	'rules' => 'required'
+	        ),
+            array(
+	        	'field' => 'prepaidlabel',
+	        	'rules' => 'required'
+	        )
+        );
+		if ( !$this->is_valid( $rules )) exit;
+		$posts_var = $this->post();
+        
+        if(!$posts_var('prepaidlabel') && (!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount']))) {
+            $this->error_response("Please provide shipping amount");
+        } else {
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
+        }
+        if($posts_var('prepaidlabel')) {
+            if(!isset($posts_var['packagesize_id']) || empty($posts_var['packagesize_id']) || is_null($posts_var['packagesize_id'])){
+                $this->error_response("Please provide packagesize id");
+            }   
+            if(!isset($posts_var['shippingcarrier_id']) || empty($posts_var['shippingcarrier_id']) || is_null($posts_var['shippingcarrier_id'])) {
+                $this->error_response("Please provide shippingcarrier id");
+            }   
+
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['packagesize_id' => $posts_var['packagesize_id'],'shippingcarrier_id' => $posts_var['shippingcarrier_id']]);
+        }
+        
+        $get_user = $this->db->select('buyer_user_id')->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
+        $buyer = $this->db->select('device_token')->from('core_users')
+                            ->where('user_id', $get_user->buyer_user_id)->get()->row();
+        send_push( $buyer->device_token, ["message" => "Shipment confirmed by Seller ", "flag" => "shipment_confirm",'chat_id' => $posts_var['chat_id']] );
+        
+        $this->response(['status' => 'success', 'message' => 'Shipment confimed']);
+        
+    }
 
 }
