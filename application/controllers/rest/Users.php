@@ -1436,10 +1436,12 @@ class Users extends API_Controller
                             ->where('seller_user_id', $this->post('user_id'))
                             ->where('seller_unread_count > 0')
                     ->group_end()
-                ->group_end()
+				->group_end()
+				->group_start()
+					->where('requested_item_id is NOT NULL', NULL, FALSE)
+					->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+				->group_end()
                 ->get()->num_rows();
-        
-        
 		$final_data = $this->ps_security->clean_output( $count_object );
 
 
