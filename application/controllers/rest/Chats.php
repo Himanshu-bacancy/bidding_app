@@ -225,7 +225,8 @@ class Chats extends API_Controller
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
         $get_user = $this->db->select('device_token')->from('core_users')->where('user_id', $this->post('seller_user_id'))->get()->row();
-        if(isset($this->post('quantity')) && $this->post('quantity') > 1) {
+        $post = $this->post();
+        if(isset($post['quantity']) && $post['quantity'] > 1) {
             send_push( $get_user->device_token, ["message" => "Requied cofirmation for the offer", "flag" => "confirmation_required"] );
         }
         $get_item = $this->db->select('is_confirm_with_seller')->from('bs_items')->where('id', $requestedItemId)->get()->row();
@@ -1679,6 +1680,20 @@ class Chats extends API_Controller
         // check user id
 
         $offer_data = $this->Chat->get_one_by($conds);
+        if(!empty($offer_data->packagesize_id)) {
+            $package_details = $this->Packagesizes->get_one( $offer_data->packagesize_id );
+            $this->ps_adapter->convert_packagesize( $package_details );
+            $offer_data->package_details = $package_details;
+        } else {
+            $offer_data->package_details = (object)[];
+        }
+        if(!empty($offer_data->shippingcarrier_id)) {
+            $shipping_details = $this->Shippingcarriers->get_one( $offer_data->shippingcarrier_id );
+            $this->ps_adapter->convert_shippingcarrier( $shipping_details );
+            $offer_data->shipping_details = $shipping_details;
+        } else {
+            $offer_data->shipping_details = (object)[];
+        }
 		$this->ps_adapter->convert_chathistory( $offer_data );
 		// echo '<pre>'; print_r($offer_data); die('rukooo');
 		if($offer_data){
@@ -1706,12 +1721,15 @@ class Chats extends API_Controller
 		if ( !$this->is_valid( $rules )) exit;
 		$posts_var = $this->post();
         
-        if(!$posts_var('prepaidlabel') && (!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount']))) {
-            $this->error_response("Please provide shipping amount");
+        if(!$posts_var['prepaidlabel']){
+            if(!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount'])) {
+                $this->error_response("Please provide shipping amount");
+            }
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
         } else {
             $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
         }
-        if($posts_var('prepaidlabel')) {
+        if($posts_var['prepaidlabel']) {
             if(!isset($posts_var['packagesize_id']) || empty($posts_var['packagesize_id']) || is_null($posts_var['packagesize_id'])){
                 $this->error_response("Please provide packagesize id");
             }   
@@ -1727,7 +1745,7 @@ class Chats extends API_Controller
                             ->where('user_id', $get_user->buyer_user_id)->get()->row();
         send_push( $buyer->device_token, ["message" => "Shipment confirmed by Seller ", "flag" => "shipment_confirm",'chat_id' => $posts_var['chat_id']] );
         
-        $this->response(['status' => 'success', 'message' => 'Shipment confimed']);
+        $this->response(['status' => 'success', 'message' => 'Shipping details saved']);
         
     }
 
