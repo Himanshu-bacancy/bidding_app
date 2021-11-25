@@ -1122,13 +1122,23 @@ class Payments extends API_Controller {
                 $item_price = $posts_var['price'];
                 
                 if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
-                    $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
+                    $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
                     if($get_item->pay_shipping_by == '1') {
-                        if($get_item->shipping_type == '1') {
+                        if($get_item->is_confirm_with_seller) {
+                            
+                            $applied_shipping_price = $offer_details->shipping_amount;
+                            if(!is_null($offer_details->shippingcarrier_id)) {
+                                $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $offer_details->shippingcarrier_id)->get()->row();
+                                $applied_shipping_price = $get_shiping_detail->price;
+                            }
+                            $item_price = $item_price + (float)$applied_shipping_price;
+                            
+                        } else if($get_item->shipping_type == '1') {
                             $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
                             $item_price = $item_price + (float)$get_shiping_detail->price;
+                            
                         } else if($get_item->shipping_type == '2'){
                             $item_price = $item_price + $get_item->shipping_cost_by_seller;   
                         }
@@ -1185,6 +1195,7 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
+                    echo 'else';die();
                     $date = date('Y-m-d H:i:s');
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
