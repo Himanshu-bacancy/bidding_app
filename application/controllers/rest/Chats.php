@@ -224,14 +224,35 @@ class Chats extends API_Controller
 		$obj = $this->save_chat($this->post('offered_item_id'));
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
-        $get_user = $this->db->select('device_token')->from('core_users')->where('user_id', $this->post('seller_user_id'))->get()->row();
         $post = $this->post();
-        if(isset($post['quantity']) && $post['quantity'] > 1) {
-            send_push( $get_user->device_token, ["message" => "Requied cofirmation for the offer", "flag" => "confirmation_required"] );
+        $title = '';
+        $token = '';
+        $item_img = '';
+        if($post['operation_type'] == DIRECT_BUY || $post['operation_type'] == EXCHANGE) {
+            $get_user = $this->db->select('device_token')->from('core_users')->where('user_id', $post['seller_user_id'])->get()->row();
+            $token = $get_user->device_token;
+            
+            $get_item = $this->db->select('is_confirm_with_seller,title')->from('bs_items')->where('id', $requestedItemId)->get()->row();
+            $title = $get_item->title;
+            
+            $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $requestedItemId)->get()->row();
+            $item_img = $item_images->img_path;
+            
+        } else if ($post['operation_type'] == REQUEST_ITEM) {
+            $get_user = $this->db->select('device_token')->from('core_users')->where('user_id', $post['buyer_user_id'])->get()->row();
+            $token = $get_user->device_token;
+            
+            $get_item = $this->db->select('is_confirm_with_seller,title')->from('bs_items')->where('id', $post['offered_item_id'])->get()->row();
+            $title = $get_item->title;
+            
+            $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $post['offered_item_id'])->get()->row();
+            $item_img = $item_images->img_path;
         }
-        $get_item = $this->db->select('is_confirm_with_seller')->from('bs_items')->where('id', $requestedItemId)->get()->row();
+        if(isset($post['quantity']) && $post['quantity'] > 1) {
+            send_push( $token, ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
+        }
         if($get_item->is_confirm_with_seller) {
-             send_push( $get_user->device_token, ["message" => "Requied cofirmation for the offer", "flag" => "confirmation_required"] );
+             send_push( $token, ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
         }
         /*Notify seller :end*/
         
@@ -1680,6 +1701,10 @@ class Chats extends API_Controller
         // check user id
 
         $offer_data = $this->Chat->get_one_by($conds);
+        if(!$offer_data->shipping_amount) {
+            $this->db->where('id', $offerId)->update('bs_chat_history', ['shipping_amount' => NULL]);
+            $offer_data->shipping_amount = '';
+        }
         if(!empty($offer_data->packagesize_id)) {
             $package_details = $this->Packagesizes->get_one( $offer_data->packagesize_id );
             $this->ps_adapter->convert_packagesize( $package_details );
@@ -1724,8 +1749,9 @@ class Chats extends API_Controller
         if(!$posts_var['prepaidlabel']){
             if(!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount'])) {
                 $this->error_response("Please provide shipping amount");
+            } else {
+                $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
             }
-            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
         } else {
             $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
         }
@@ -1743,10 +1769,80 @@ class Chats extends API_Controller
         $get_user = $this->db->select('buyer_user_id')->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_user_id)->get()->row();
-        send_push( $buyer->device_token, ["message" => "Shipment confirmed by Seller ", "flag" => "shipment_confirm",'chat_id' => $posts_var['chat_id']] );
+        send_push( $buyer->device_token, ["message" => "Shipment confirmed by Seller ", "flag" => "chat",'chat_id' => $posts_var['chat_id']] );
         
         $this->response(['status' => 'success', 'message' => 'Shipping details saved']);
         
+    }
+    
+    public function unread_count_bytype_post() {
+         $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        ),
+        );
+
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        $count_object = new stdClass; 
+        $count_object->request_unread_counts = $this->db->from('bs_chat_history')
+            ->where('operation_type', REQUEST_ITEM)
+            ->where('buyer_user_id', $this->post('user_id'))
+            ->where('buyer_unread_count > 0')
+            ->group_start()
+                ->where('requested_item_id is NOT NULL', NULL, FALSE)
+                ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+            ->group_end()
+            ->get()->num_rows();
+        
+        $count_object->directbuy_unread_counts = $this->db->from('bs_chat_history')
+            ->where('operation_type', DIRECT_BUY)
+            ->where('buyer_user_id', $this->post('user_id'))
+            ->where('buyer_unread_count > 0')
+            ->group_start()
+                ->where('requested_item_id is NOT NULL', NULL, FALSE)
+                ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+            ->group_end()
+            ->get()->num_rows();
+        
+        $count_object->selling_unread_counts = $this->db->from('bs_chat_history')
+            ->where('operation_type', DIRECT_BUY)
+            ->where('seller_user_id', $this->post('user_id'))
+            ->where('seller_unread_count > 0')
+            ->group_start()
+                ->where('requested_item_id is NOT NULL', NULL, FALSE)
+                ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+            ->group_end()
+            ->get()->num_rows();
+        
+        $exchange_selling_unread_counts = $this->db->from('bs_chat_history')
+            ->where('operation_type', EXCHANGE)
+            ->where('seller_user_id', $this->post('user_id'))
+            ->where('seller_unread_count > 0')
+            ->group_start()
+                ->where('requested_item_id is NOT NULL', NULL, FALSE)
+                ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+            ->group_end()
+            ->get()->num_rows();
+        
+        $exchange_buying_unread_counts = $this->db->from('bs_chat_history')
+            ->where('operation_type', EXCHANGE)
+            ->where('buyer_user_id', $this->post('user_id'))
+            ->where('buyer_unread_count > 0')
+            ->group_start()
+                ->where('requested_item_id is NOT NULL', NULL, FALSE)
+                ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
+            ->group_end()
+            ->get()->num_rows();
+        
+        $count_object->exchange_unread_counts = $exchange_selling_unread_counts + $exchange_buying_unread_counts;
+        $final_data = $this->ps_security->clean_output( $count_object );
+		$this->response( $final_data );
     }
 
 }

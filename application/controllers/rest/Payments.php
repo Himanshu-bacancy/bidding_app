@@ -119,11 +119,18 @@ class Payments extends API_Controller {
                     $this->db->where_in('id', $records)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
                     
                     $item_ids = array_column($items,'item_id');
-                    $seller = $this->db->select('device_token')->from('bs_items')
+                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
                             ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                             ->where_in('bs_items.id', $item_ids)->get()->result_array();
                     $tokens = array_column($seller, 'device_token');
-                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
+                    
+                    foreach ($seller as $key => $value) {
+                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+                        
+                        send_push( $value->device_token, ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                    }
+                    
+//                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
                     $response = $this->ps_security->clean_output( $response );
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card']);
                 } else {
@@ -1178,10 +1185,13 @@ class Payments extends API_Controller {
                         if (isset($response->id)) { 
                             $this->db->where('id', $record)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
 
-                            $seller = $this->db->select('device_token')->from('bs_items')
+                            $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                                     ->where('bs_items.id', $posts_var['item_id'])->get()->row();
-                            send_push( $seller->device_token, ["message" => "New order arrived", "flag" => "order",'order_id' => $record] );
+                            
+                            $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $posts_var['item_id'])->get()->row();
+                            
+                            send_push( $seller->device_token, ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
                             $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $record]);
                             $response = $this->ps_security->clean_output( $response );
                             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
@@ -1195,7 +1205,7 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-                    echo 'else';die();
+                    
                     $date = date('Y-m-d H:i:s');
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();

@@ -535,7 +535,7 @@ if ( ! function_exists( 'location_check' ))
 
 if ( ! function_exists( 'send_push' ))
 {
-	function send_push( $registatoin_ids, $data ) 
+	function send_push( $registatoin_ids, $data, $extra_data = [] ) 
     {
     	// get ci instance
 		$CI =& get_instance();
@@ -547,12 +547,13 @@ if ( ! function_exists( 'send_push' ))
     	$url = 'https://fcm.googleapis.com/fcm/send';
 
     	$noti_arr = array(
-    		'title' => get_msg('site_name'),
+    		'title' => ($data['title']) ?? get_msg('site_name'),
     		'body' => $message,
     		'sound' => 'default',
     		'message' => $message,
     		'flag' => $flag,
-	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            $extra_data
     	);
 
     	$fields = array(
@@ -562,7 +563,8 @@ if ( ! function_exists( 'send_push' ))
     	    'data' => array(
     	    	'message' => $message,
     	    	'flag' => $flag,
-    	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+    	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                $extra_data
     	    )
 
     	);
