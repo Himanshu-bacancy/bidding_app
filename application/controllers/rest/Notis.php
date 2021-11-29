@@ -248,7 +248,7 @@ class Notis extends API_Controller
 				}
 			}
 
-	        $chat_old_count = $this->Chat->get_one_by($chat_data)->seller_unread_count;
+	        $chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
 
  	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
@@ -262,14 +262,14 @@ class Notis extends API_Controller
 	        	"id" => $chat_id, 
 	        	"buyer_user_id" => $buyer_user_id, 
 	        	"seller_user_id" => $seller_user_id,
-	        	"seller_unread_count" => $chat_old_count+1
+	        	"buyer_unread_count" => $chat_old_count+1
 
 	        );
 
 	    } else if ($get_chat_detail->buyer_user_id == $this->post('user_id')){
 
 	    	$user_ids[] = $seller_user_id;
-
+            
 	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
 
 			$device_ids = array();
@@ -279,7 +279,7 @@ class Notis extends API_Controller
 				}
 			}
 
-			$chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
+			$chat_old_count = $this->Chat->get_one_by($chat_data)->seller_unread_count;
 
 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
@@ -293,7 +293,7 @@ class Notis extends API_Controller
                 "id" => $chat_id,
 	        	"buyer_user_id" => $buyer_user_id, 
 	        	"seller_user_id" => $seller_user_id,
-	        	"buyer_unread_count" => $chat_old_count+1   
+	        	"seller_unread_count" => $chat_old_count+1   
 
 	        );
 
