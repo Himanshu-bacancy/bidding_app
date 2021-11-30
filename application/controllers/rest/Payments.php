@@ -127,7 +127,7 @@ class Payments extends API_Controller {
                     foreach ($seller as $key => $value) {
                         $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
                         
-                        send_push( $value->device_token, ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                        send_push( [$value->device_token], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
                     }
                     
 //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
@@ -989,7 +989,7 @@ class Payments extends API_Controller {
         $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_id)->get()->row();
-        send_push( $buyer->device_token, ["message" => "Shipment confirm for the order", "flag" => "order",'order_id'=>$posts['order_id']] );
+        send_push( [$buyer->device_token], ["message" => "Shipment confirm for the order", "flag" => "order",'order_id'=>$posts['order_id']] );
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'pickup','pickup_date' => date('Y-m-d H:i:s')]);
     
@@ -1191,7 +1191,7 @@ class Payments extends API_Controller {
                             
                             $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $posts_var['item_id'])->get()->row();
                             
-                            send_push( $seller->device_token, ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                            send_push( [$seller->device_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
                             $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $record]);
                             $response = $this->ps_security->clean_output( $response );
                             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
@@ -1228,7 +1228,7 @@ class Payments extends API_Controller {
                 if($posts_var['operation_type'] != EXCHANGE) {
                     $buyer = $this->db->select('device_token')->from('core_users')
                         ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
-                    send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
+                    send_push( [$buyer->device_token], ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
                     $this->response(['status' => "success", 'message' => 'Notification sent successfully']);
                 } else {
                     $date = date('Y-m-d H:i:s');
@@ -1266,7 +1266,7 @@ class Payments extends API_Controller {
 
                     $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
-                    send_push( $buyer->device_token, ["message" => "Offer confirmed", "flag" => "order",'order_id' => $new_odr_id] );
+                    send_push( [$buyer->device_token], ["message" => "Offer confirmed", "flag" => "order",'order_id' => $new_odr_id] );
                     
                     $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id, 'message' => 'Notification sent successfully']);
                 }

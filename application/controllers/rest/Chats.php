@@ -249,10 +249,10 @@ class Chats extends API_Controller
             $item_img = $item_images->img_path;
         }
         if(isset($post['quantity']) && $post['quantity'] > 1) {
-            send_push( $token, ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
+            send_push( [$token], ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
         }
         if($get_item->is_confirm_with_seller) {
-             send_push( $token, ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
+             send_push( [$token], ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img]);
         }
         /*Notify seller :end*/
         

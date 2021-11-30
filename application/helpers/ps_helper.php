@@ -537,6 +537,7 @@ if ( ! function_exists( 'send_push' ))
 {
 	function send_push( $registatoin_ids, $data, $extra_data = [] ) 
     {
+       
     	// get ci instance
 		$CI =& get_instance();
 
@@ -553,23 +554,24 @@ if ( ! function_exists( 'send_push' ))
     		'message' => $message,
     		'flag' => $flag,
 	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-            $extra_data
     	);
+        $noti_arr = array_merge($noti_arr, $extra_data);
+        
+        $data_arr = [
+            'message' => $message,
+            'flag' => $flag,
+            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        ];
+        $data_arr = array_merge($data_arr, $extra_data);
 
     	$fields = array(
     		'sound' => 'default',
     		'notification' => $noti_arr,
     	    'registration_ids' => $registatoin_ids,
-    	    'data' => array(
-    	    	'message' => $message,
-    	    	'flag' => $flag,
-    	    	'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                $extra_data
-    	    )
-
+    	    'data' => $data_arr
     	);
 
-
+//        echo '<pre>';print_r($fields);die();
     	// Update your Google Cloud Messaging API Key
     	//define("GOOGLE_API_KEY", "AIzaSyCCwa8O4IeMG-r_M9EJI_ZqyybIawbufgg");
     	$fcm_api_key = $CI->Backend_config->get_one('be1')->fcm_api_key;
