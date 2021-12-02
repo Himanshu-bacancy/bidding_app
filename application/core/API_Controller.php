@@ -347,7 +347,29 @@ class API_Controller extends REST_Controller
 				$this->convert_object( $data );
 			}
 		}
-
+        if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'get') {
+            
+            if($data->item_type_id == REQUEST_ITEM) {
+                $where = 'requested_item_id = "'.$data->id.'"';
+            } else if($data->item_type_id == SELLING) {
+                $where = 'offered_item_id = "'.$data->id.'"';
+            } else {
+                $where = 'requested_item_id = "'.$data->id.'" OR offered_item_id = "'.$data->id.'"';
+            }
+            $get_offer_record = $this->db->select('id')->from('bs_chat_history')->where('is_offer_complete', 0)->where($where)->get()->num_rows();
+            $get_order_record = $this->db->select('id')->from('bs_order')->where('items', $data->id)->where('status', 'succeeded')->get()->num_rows();
+            
+            if(!$get_offer_record) {
+                $editable = 0;
+            } else {
+                if(!$get_order_record) {
+                    $editable = 1;
+                } else {
+                    $editable = 2;
+                }
+            }
+            $data->editable = $editable;
+        }
 		$data = $this->ps_security->clean_output( $data );
 		
 		$this->response( $data );
@@ -456,7 +478,6 @@ class API_Controller extends REST_Controller
             'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
-		
 		// add flag for default query
 		$this->is_get = true;
 

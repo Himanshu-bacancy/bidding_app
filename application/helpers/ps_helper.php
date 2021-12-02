@@ -414,7 +414,7 @@ if ( ! function_exists( 'send_android_fcm_chat' ))
 
     	// - Testing Start
 		$noti_arr = array(
-    		'title' => get_msg('site_name'),
+    		'title' => ($data['title']) ?? get_msg('site_name'),
     		'body' => $message,
     		'sound' => 'default',
     		'message' => $message,

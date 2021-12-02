@@ -306,6 +306,7 @@ class Notis extends API_Controller
 
     		//$this->success_response( get_msg( 'count_update_success' ));
     		$data['message'] = $this->post('message');
+    		$data['title'] = 'Message from '.$user_name;
 	    	$data['buyer_user_id'] = $buyer_user_id;
 	    	$data['seller_user_id'] = $seller_user_id;
 	    	$data['sender_name'] = $user_name;
