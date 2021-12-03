@@ -1769,7 +1769,7 @@ class Chats extends API_Controller
         $get_user = $this->db->select('buyer_user_id')->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_user_id)->get()->row();
-        send_push( $buyer->device_token, ["message" => "Shipment confirmed by Seller ", "flag" => "chat",'chat_id' => $posts_var['chat_id']] );
+        send_push( [$buyer->device_token], ["message" => "Shipment confirmed by Seller ", "flag" => "chat",'chat_id' => $posts_var['chat_id']] );
         
         $this->response(['status' => 'success', 'message' => 'Shipping details saved']);
         

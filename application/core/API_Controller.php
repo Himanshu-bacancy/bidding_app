@@ -361,12 +361,12 @@ class API_Controller extends REST_Controller
             
             if(!$get_offer_record) {
                 $editable = 0;
-            } else {
-                if(!$get_order_record) {
-                    $editable = 1;
-                } else {
-                    $editable = 2;
-                }
+            } 
+            if($get_offer_record && !$get_order_record) {
+                $editable = 1;
+            } 
+            if($get_order_record) {
+                $editable = 2;
             }
             $data->editable = $editable;
         }

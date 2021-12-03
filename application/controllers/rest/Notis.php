@@ -252,7 +252,7 @@ class Notis extends API_Controller
 
  	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
-	        $user_id = $buyer_user_id;
+	        $user_id = $seller_user_id;
 	        $user_name = $this->User->get_one($user_id)->user_name;
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 
@@ -283,7 +283,7 @@ class Notis extends API_Controller
 
 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
 
-	        $user_id = $seller_user_id;
+	        $user_id = $buyer_user_id;
 	        $user_name = $this->User->get_one($user_id)->user_name;
 	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
 	        

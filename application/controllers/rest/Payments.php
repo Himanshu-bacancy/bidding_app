@@ -263,7 +263,7 @@ class Payments extends API_Controller {
                     $items = $this->db->from('bs_items')->where_in('id', $item_ids)->get()->result_array();
                     foreach ($items as $key => $value) {
                         $seller_device_token = $this->db->select('device_token')->from('core_users')->where('user_id', $value['added_user_id'])->get()->row();
-                        send_push( $seller_device_token->device_token, ["message" => "New order arrived", "flag" => "order",'order_id' => $record_id] );
+                        send_push( [$seller_device_token->device_token], ["message" => "New order arrived", "flag" => "order",'order_id' => $record_id] );
                     }
                 } else {
                     $this->db->where('id', $record_id)->update('bs_order',['status' => 'fail']);
@@ -986,10 +986,11 @@ class Payments extends API_Controller {
         
         $posts = $this->post();
         
-        $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        $get_user = $this->db->select('bs_order.user_id,bs_items.title')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
         $buyer = $this->db->select('device_token')->from('core_users')
-                            ->where('user_id', $get_user->buyer_id)->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Shipment confirm for the order", "flag" => "order",'order_id'=>$posts['order_id']] );
+                            ->where('user_id', $get_user->user_id)->get()->row();
+        
+        send_push( [$buyer->device_token], ["message" => "Item has been shipped by seller", "flag" => "order",'order_id'=>$posts['order_id'], 'title' => $get_user->title." order update"] );
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'pickup','pickup_date' => date('Y-m-d H:i:s')]);
     
@@ -1010,6 +1011,12 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $posts = $this->post();
+        
+        $get_user = $this->db->select('bs_items.title,bs_items.added_user_id')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
+        $seller = $this->db->select('device_token')->from('core_users')
+                            ->where('user_id', $get_user->added_user_id)->get()->row();
+        
+        send_push( [$seller->device_token], ["message" => "Item has been received by buyer", "flag" => "order",'order_id'=>$posts['order_id'], 'title' => $get_user->title." order update"] );
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'delivered','completed_date' => date('Y-m-d H:i:s')]);
     
