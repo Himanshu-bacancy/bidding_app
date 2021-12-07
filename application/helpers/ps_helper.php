@@ -564,14 +564,57 @@ if ( ! function_exists( 'send_push' ))
         ];
         $data_arr = array_merge($data_arr, $extra_data);
 
-    	$fields = array(
-    		'sound' => 'default',
-    		'notification' => $noti_arr,
-    	    'registration_ids' => $registatoin_ids,
-    	    'data' => $data_arr
-    	);
-
-//        echo '<pre>';print_r($fields);die();
+        $fields = array(
+            'sound' => 'default',
+            'notification' => $noti_arr,
+            'registration_ids' => $registatoin_ids,
+            'data' => $data_arr
+        );
+         
+        if(array_key_exists('image', $extra_data)) {
+            $data_arr = [
+                'message' => $message,
+                'flag' => $flag,
+                'chat_id' => $extra_data['chat_id']
+            ];
+            $notification = [
+                'body' => $message,
+                'title' => ($data['title']) ?? get_msg('site_name'),
+            ];
+//            $noti_arr = array_merge($notification, $extra_data);
+            $fields = array(
+                'registration_ids' => $registatoin_ids,
+                'data' => $data_arr,
+                'notification' => $notification
+            );
+            $img_fields = array(
+                'android' => [
+                    "notification" => [
+                        'body' => $message,
+                        'title' => ($data['title']) ?? get_msg('site_name'),
+                        'image' => $extra_data['image'],
+                        'sound' => 'default',
+                        'notification_count' => 0
+                    ]
+                ],
+                
+                'apns' => [
+                    'payload' => [
+                        'aps' => [
+                            'mutable-content' => 1,
+                            'sound' => 'default',
+                            'badge' => 0
+                        ]
+                    ],
+                    "fcm_options" => [
+                        'image' => $extra_data['image']
+                    ]
+                ]
+            );
+            $fields = array_merge($fields, $img_fields);
+            
+        } 
+//        echo '<pre>';print_r(json_encode($fields));die();
     	// Update your Google Cloud Messaging API Key
     	//define("GOOGLE_API_KEY", "AIzaSyCCwa8O4IeMG-r_M9EJI_ZqyybIawbufgg");
     	$fcm_api_key = $CI->Backend_config->get_one('be1')->fcm_api_key;

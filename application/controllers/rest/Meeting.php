@@ -49,9 +49,11 @@ class Meeting extends API_Controller {
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['share_meeting_list_date' => $date]);
         
         $this->db->insert('bs_meeting', ['sender_id' => $posts['user_id'], 'receiver_id' => $posts['buyer_id'], 'order_id' => $posts['order_id'], 'location_list' => json_encode($posts['location_list']), 'created_at' => $date]);
+        $get_item = $this->db->select('bs_items.title')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
+        
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $posts['buyer_id'])->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Meeting request arrived from seller", "flag" => "order", 'order_id' => $posts['order_id']] );
+        send_push( [$buyer->device_token], ["message" => "Meeting request arrived from seller", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_item->title." order update"] );
     
         $this->response(['status' => 'success', 'message' => 'Locations sent']);
     }
@@ -80,6 +82,12 @@ class Meeting extends API_Controller {
         $this->db->where('receiver_id',$posts['user_id'])->where('order_id',$posts['order_id'])->update('bs_meeting',['confirm_location' => json_encode($posts['location_id']), 'updated_at' => $date]);
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['confirm_meeting_date' => $date]);
+        
+        $get_item = $this->db->select('bs_items.title')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
+        
+        $buyer = $this->db->select('device_token')->from('core_users')
+                            ->where('user_id', $posts['user_id'])->get()->row();
+        send_push( [$buyer->device_token], ["message" => "Meeting location confirmed by buyer", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_item->title." order update"] );
         
         $this->response(['status' => 'success', 'message' => 'Locations confirmed']);
     }
@@ -110,11 +118,15 @@ class Meeting extends API_Controller {
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['qrcode' => $return_file_path2,'generate_qr_date' => date('Y-m-d H:i:s')]);
         
-        $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+//        $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        
+        $get_user = $this->db->select('bs_order.user_id,bs_items.title')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->where('bs_order.order_id', $posts['order_id'])->get()->row();
         
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_id)->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Qr code received for order", "flag" => "order", 'order_id' => $posts['order_id']] );
+        send_push( [$buyer->device_token], ["message" => "Qr code received for order", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_user->title." order update"] );
         
         $this->response(['status' => 'success', 'message' => 'Qr code generated', 'file_path' => $return_file_path2]);
     }
