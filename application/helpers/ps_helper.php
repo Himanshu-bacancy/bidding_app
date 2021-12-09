@@ -532,7 +532,66 @@ if ( ! function_exists( 'location_check' ))
 		return true;
 	}
 }
+if ( ! function_exists( 'send_push_static' ))
+{
+	function send_push_static( ) 
+    {
+       
+    	// get ci instance
+		$CI =& get_instance();
 
+    	$fields = [
+            'registration_ids' => ['clv35T_GSlObY0SautSdHb:APA91bFisXpPpNhxHghCmyL29Z76JVHEs3LToyWvMnRzG1QqXR6PaOX83MmzAk1rObxKVcrrJbNTOFr-h6RUxv2xi47haOtJf94OlFN7zGNeURkRLxMidQ7xABBUCfGgvof1hjx0ySsc'],
+//            "message" => [
+                "notification" => [
+                    "title" => "Sparky says hello!"
+                ],
+                "android" => [
+                    'notification' => [
+                        "image" => "http://bacancy.com/biddingapp/uploads/4f8bef78-efb5-40fb-9818-a3ec6fb6a9eb2582876370562147653.jpg"
+                    ]
+                ],
+                'apns' => [
+                    'payload' => [
+                        'aps' => [
+                            'mutable-content' => 1,
+                        ]
+                    ],
+                    "fcm_options" => [
+                        'image' => 'http://bacancy.com/biddingapp/uploads/4f8bef78-efb5-40fb-9818-a3ec6fb6a9eb2582876370562147653.jpg'
+                    ]
+                ]
+//            ]
+        ];
+//        echo '<pre>';print_r($fields);die();
+    	//Google cloud messaging GCM-API url
+        $url = 'https://fcm.googleapis.com/fcm/send';
+        
+        $fcm_api_key = $CI->Backend_config->get_one('be1')->fcm_api_key;
+    	define("GOOGLE_API_KEY", $fcm_api_key);  	
+    		
+    	$headers = array(
+    	    'Authorization: key=' . GOOGLE_API_KEY,
+    	    'Content-Type: application/json'
+    	);
+    	$ch = curl_init();
+    	curl_setopt($ch, CURLOPT_URL, $url);
+    	curl_setopt($ch, CURLOPT_POST, true);
+    	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);	
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+    	$result = curl_exec($ch);	
+        echo '<pre>';print_r($result);die();
+    	if ($result === FALSE) {
+    	    die('Curl failed: ' . curl_error($ch));
+    	}
+    	curl_close($ch);
+    	return $result;
+    
+    }
+}
 if ( ! function_exists( 'send_push' ))
 {
 	function send_push( $registatoin_ids, $data, $extra_data = [] ) 
@@ -578,8 +637,7 @@ if ( ! function_exists( 'send_push' ))
                 'chat_id' => $extra_data['chat_id']
             ];
             $notification = [
-                'body' => $message,
-                'title' => ($data['title']) ?? get_msg('site_name'),
+                'image' => $extra_data['image']
             ];
 //            $noti_arr = array_merge($notification, $extra_data);
             $fields = array(
@@ -593,6 +651,7 @@ if ( ! function_exists( 'send_push' ))
                         'body' => $message,
                         'title' => ($data['title']) ?? get_msg('site_name'),
                         'image' => $extra_data['image'],
+//                        'image' => 'https://picsum.photos/200/300.jpg',
                         'sound' => 'default',
                         'notification_count' => 0
                     ]
@@ -608,13 +667,19 @@ if ( ! function_exists( 'send_push' ))
                     ],
                     "fcm_options" => [
                         'image' => $extra_data['image']
+//                        'image' => 'https://picsum.photos/200/300.jpg'
                     ]
                 ]
             );
-            $fields = array_merge($fields, $img_fields);
+//            $fields = array_merge($fields, $img_fields);
+//            $fields = [
+//                'registration_ids' => $registatoin_ids,
+//                'message' => $fields
+//            ];
             
         } 
-//        echo '<pre>';print_r(json_encode($fields));die();
+//        echo '<pre>';print_r($fields);
+        
     	// Update your Google Cloud Messaging API Key
     	//define("GOOGLE_API_KEY", "AIzaSyCCwa8O4IeMG-r_M9EJI_ZqyybIawbufgg");
     	$fcm_api_key = $CI->Backend_config->get_one('be1')->fcm_api_key;
@@ -632,7 +697,8 @@ if ( ! function_exists( 'send_push' ))
     	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);	
     	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
-    	$result = curl_exec($ch);				
+    	$result = curl_exec($ch);	
+//        echo '<pre>';print_r($result);die();
     	if ($result === FALSE) {
     	    die('Curl failed: ' . curl_error($ch));
     	}

@@ -155,7 +155,11 @@ class Chats extends API_Controller
 
 
 	}
-
+    
+    function send_push_static_post(){
+        send_push_static();
+        die();
+    }
 
 	/**
 	 * Update Price 
