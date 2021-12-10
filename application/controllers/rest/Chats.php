@@ -215,6 +215,20 @@ class Chats extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
 		$requestedItemId = $this->post('requested_item_id');
+        $get_item_detail = $this->db->from('bs_items')->where('id',$requestedItemId)->get()->row();
+        if($get_item_detail->is_negotiable) {
+            $min_requied_price = $get_item_detail->price + ($get_item_detail->price * $get_item_detail->negotiable_percentage) / 100;
+           
+            if($get_item_detail->item_type_id == '1') {
+                if($this->post('nego_price') > $min_requied_price) {
+                    $this->error_response('Offer cant be made to buyer since price differcence is more than > percentage');
+                }
+            } else if($get_item_detail->item_type_id == '2' || $get_item_detail->item_type_id == '3') {
+                if($this->post('nego_price') <= $min_requied_price) {
+                    $this->error_response('Offer cant be madeto seller since price differcence is more than > percentage');
+                }
+            }
+        }
 		if(is_array($this->post('offered_item_id'))){
 			foreach($this->post('offered_item_id') as $offeredItemId){
 				$this->validation_chat_item_categories($requestedItemId, $offeredItemId,'exchange');
