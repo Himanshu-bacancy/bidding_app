@@ -215,6 +215,7 @@ class Chats extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
 		$requestedItemId = $this->post('requested_item_id');
+        /* seller form : start 
         $get_item_detail = $this->db->from('bs_items')->where('id',$requestedItemId)->get()->row();
         if($get_item_detail->is_negotiable) {
             $min_requied_price = $get_item_detail->price + ($get_item_detail->price * $get_item_detail->negotiable_percentage) / 100;
@@ -229,6 +230,7 @@ class Chats extends API_Controller
                 }
             }
         }
+         seller form : end */
 		if(is_array($this->post('offered_item_id'))){
 			foreach($this->post('offered_item_id') as $offeredItemId){
 				$this->validation_chat_item_categories($requestedItemId, $offeredItemId,'exchange');
