@@ -521,7 +521,9 @@ class PS_Model extends CI_Model {
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
 				}
 			}			
-		}
+        } else {
+            $this->db->where( 'bs_items.status', 1);	
+        }
         
         // remove added_user_id
 		if ( isset( $conds['excpet_login_user'] ) && $conds['excpet_login_user']) {
