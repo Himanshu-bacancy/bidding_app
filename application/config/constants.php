@@ -115,3 +115,6 @@ define('SHIPPO_AUTH_TOKEN', 'shippo_test_74fbe972f439460ea46efaaa264d8cfb97cf4cf
 define('PICKUP_ONLY', '1');
 define('DELIVERY_ONLY', '2');
 define('PICKUP_AND_DELIVERY', '3');
+
+define('PAYCASH', '0');
+define('PAYCARD', '1');

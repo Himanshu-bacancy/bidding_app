@@ -58,6 +58,7 @@ class Payments extends API_Controller {
         if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
             $this->error_response("Please pass cvc");
         }
+        
         $card_id = $posts_var['card_id'];
         $cvc     = $posts_var['cvc'];
         $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -67,6 +68,7 @@ class Payments extends API_Controller {
         $records = [];
         
         foreach ($items as $key => $value) {
+            
             $item_price = $value['price'];
             $new_odr_id = 'odr_'.time().$user_id;
             
@@ -91,6 +93,10 @@ class Payments extends API_Controller {
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
                 $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
 
+                if($value['payin'] == PAYCARD) {
+                    $records[$key] = $this->db->insert_id();
+                    $card_total_amount += $item_price;
+                }
             }
         }
         
@@ -127,7 +133,7 @@ class Payments extends API_Controller {
                     foreach ($seller as $key => $value) {
                         $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
                         
-                        send_push( [$value->device_token], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
                     }
                     
 //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
@@ -142,6 +148,18 @@ class Payments extends API_Controller {
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
         } else {
+            $item_ids = array_column($items,'item_id');
+            $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                    ->where_in('bs_items.id', $item_ids)->get()->result_array();
+            $tokens = array_column($seller, 'device_token');
+
+            foreach ($seller as $key => $value) {
+                $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+
+                send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+            }
+                    
             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
         }
     }
@@ -742,12 +760,16 @@ class Payments extends API_Controller {
             )
         );
         if (!$this->is_valid($rules)) exit;
-        
+//        echo 'hrer';die();
         $record_id = $this->post('record_id');
         $status = $this->post('status');
-        $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $status]);
+        $str = 'failed';
+        if($status) {
+            $str = 'succeeded';
+        }
+        $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $str]);
         
-        if($status == 'succeeded') {
+        if($status) {
             $get_records = $this->db->from('bs_order')->where('transaction_id', $record_id)->get()->result();
             foreach ($get_records as $key => $value) {
                 $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
@@ -768,7 +790,7 @@ class Payments extends API_Controller {
             }
             
         }
-         
+        
         $this->response(['status' => 'success', 'message' => 'Record save successfully']);
     }
     

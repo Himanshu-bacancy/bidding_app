@@ -617,6 +617,9 @@ if ( ! function_exists( 'send_push' ))
         $noti_arr = array_merge($noti_arr, $extra_data);
         
         $data_arr = [
+            'title' => ($data['title']) ?? get_msg('site_name'),
+            'body' => $message,
+            'sound' => 'default',
             'message' => $message,
             'flag' => $flag,
             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
@@ -629,7 +632,7 @@ if ( ! function_exists( 'send_push' ))
             'registration_ids' => $registatoin_ids,
             'data' => $data_arr
         );
-         
+        /* testig start 
         if(array_key_exists('image', $extra_data)) {
             $data_arr = [
                 'message' => $message,
@@ -637,6 +640,8 @@ if ( ! function_exists( 'send_push' ))
                 'chat_id' => $extra_data['chat_id']
             ];
             $notification = [
+                'body' => $message,
+                'title' => ($data['title']) ?? get_msg('site_name'),
                 'image' => $extra_data['image']
             ];
 //            $noti_arr = array_merge($notification, $extra_data);
@@ -678,7 +683,9 @@ if ( ! function_exists( 'send_push' ))
 //            ];
             
         } 
-//        echo '<pre>';print_r($fields);
+         end */ 
+         
+//        echo '<pre>';print_r($fields);die();
         
     	// Update your Google Cloud Messaging API Key
     	//define("GOOGLE_API_KEY", "AIzaSyCCwa8O4IeMG-r_M9EJI_ZqyybIawbufgg");
