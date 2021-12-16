@@ -83,11 +83,17 @@ class Meeting extends API_Controller {
         
         $this->db->where('order_id',$posts['order_id'])->update('bs_order',['confirm_meeting_date' => $date]);
         
-        $get_item = $this->db->select('bs_items.title')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
+        $get_item = $this->db->select('bs_items.title,bs_order.offer_id,bs_items.added_user_id')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
         
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $posts['user_id'])->get()->row();
         send_push( [$buyer->device_token], ["message" => "Meeting location confirmed by buyer", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_item->title." order update"] );
+        
+        send_push( [$buyer->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE SELLER", "flag" => "chat", 'chat_id' => $get_item->offer_id, 'title' => $get_item->title." order update"] );
+        $seller = $this->db->select('device_token')->from('core_users')
+                            ->where('user_id', $get_item->added_user_id)->get()->row();
+        
+        send_push( [$seller->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE BUYER", "flag" => "chat", 'chat_id' => $get_item->offer_id, 'title' => $get_item->title." order update"] );
         
         $this->response(['status' => 'success', 'message' => 'Locations confirmed']);
     }

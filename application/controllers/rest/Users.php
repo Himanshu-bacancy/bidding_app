@@ -458,15 +458,15 @@ class Users extends API_Controller
 	        	'field' => 'user_email',
 	        	'rules' => 'required|valid_email'
 	        ),
-	        array(
-	        	'field' => 'user_phone',
-	        	'rules' => 'required'
-	        ),
-	       
-	        array(
-	        	'field' => 'user_about_me',
-	        	'rules' => 'required'
-	        ),
+//	        array(
+//	        	'field' => 'user_phone',
+//	        	'rules' => 'required'
+//	        ),
+//	       
+//	        array(
+//	        	'field' => 'user_about_me',
+//	        	'rules' => 'required'
+//	        ),
 
 	        array(
 	        	'field' => 'is_show_email',
@@ -497,33 +497,40 @@ class Users extends API_Controller
 		    	$this->error_response( get_msg( 'err_user_email_exist' ));
 		    }		 
         }
-
-        // user phone checking
-        $user_phone = $this->User->get_one($user_id)->user_phone;
-        if ($user_phone == $this->post('user_phone')) {
-        	$phone = $this->post('user_phone');
-        } else {
-        	$conds['user_phone'] = $this->post('user_phone');
-        	$conds['status'] = 1;
-       		$user_infos = $this->User->get_one_user_phone($conds)->result();
-        	if (empty($user_infos)) {
-        		$phone = $this->post( 'user_phone' );
-        	} else {	
-		    	$this->error_response( get_msg( 'err_user_phone_exist' ));
-		    }		 
+        if(!empty($this->post('user_phone'))) {
+            // user phone checking
+            $user_phone = $this->User->get_one($user_id)->user_phone;
+            if ($user_phone == $this->post('user_phone')) {
+                $phone = $this->post('user_phone');
+            } else {
+                $conds['user_phone'] = $this->post('user_phone');
+                $conds['status'] = 1;
+                $user_infos = $this->User->get_one_user_phone($conds)->result();
+                if (empty($user_infos)) {
+                    $phone = $this->post( 'user_phone' );
+                } else {	
+                    $this->error_response( get_msg( 'err_user_phone_exist' ));
+                }		 
+            }
         }
 
         $user_data = array(
         	"user_name"     => $this->post('user_name'), 
         	"user_email"    => $this->post('user_email'), 
-        	"user_phone"    => $this->post('user_phone'),
+//        	"user_phone"    => $this->post('user_phone'),
         	"user_address"  => $this->post('user_address'),
         	"city"			=> $this->post('city'),
-        	"user_about_me" => $this->post('user_about_me'),
+//        	"user_about_me" => $this->post('user_about_me'),
         	"device_token" => $this->post('device_token'),
         	"is_show_email" => $this->post('is_show_email'),
         	"is_show_phone" => $this->post('is_show_phone')
         );
+        if(!empty($this->post('user_phone'))) {
+            $user_data['user_phone'] = $this->post('user_phone');
+        }
+        if(!empty($this->post('user_about_me'))) {
+            $user_data['user_about_me'] = $this->post('user_about_me');
+        }
         // print_r($user_data);die;
 
         if ( !$this->User->save($user_data, $this->post('user_id'))) {

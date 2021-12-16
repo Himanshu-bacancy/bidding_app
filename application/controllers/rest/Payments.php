@@ -66,12 +66,13 @@ class Payments extends API_Controller {
         $paid_config = $this->Paid_config->get_one('pconfig1');
         $card_total_amount = 0;
         $records = [];
+        $orderids= [];
         
         foreach ($items as $key => $value) {
             
             $item_price = $value['price'];
             $new_odr_id = 'odr_'.time().$user_id;
-            
+            $orderids[$value['item_id']] = $new_odr_id;
             if($value['delivery_method_id'] == DELIVERY_ONLY) {
                 $card_total_amount += $item_price;
                 $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $value['item_id'])->get()->row();
@@ -125,16 +126,26 @@ class Payments extends API_Controller {
                     $this->db->where_in('id', $records)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
                     
                     $item_ids = array_column($items,'item_id');
-                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
-                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
-                    $tokens = array_column($seller, 'device_token');
                     
-                    foreach ($seller as $key => $value) {
-                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+                    foreach ($item_ids as $key => $value) {
+                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
                         
-                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                        $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                            ->where('bs_items.id', $value)->get()->row_array();
+                        
+                        send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
                     }
+                    
+//                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+//                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+//                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
+//                    $tokens = array_column($seller, 'device_token');
+//                    foreach ($seller as $key => $value) {
+//                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+//                        
+//                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+//                    }
                     
 //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
                     $response = $this->ps_security->clean_output( $response );
@@ -149,16 +160,27 @@ class Payments extends API_Controller {
             }
         } else {
             $item_ids = array_column($items,'item_id');
-            $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+//            $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+//                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+//                    ->where_in('bs_items.id', $item_ids)->get()->result_array();
+//            $tokens = array_column($seller, 'device_token');
+//
+//            foreach ($seller as $key => $value) {
+//                $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+//
+//                send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+//            }
+            
+            foreach ($item_ids as $key => $value) {
+                $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
+
+                $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                    ->where_in('bs_items.id', $item_ids)->get()->result_array();
-            $tokens = array_column($seller, 'device_token');
+                    ->where('bs_items.id', $value)->get()->row_array();
 
-            foreach ($seller as $key => $value) {
-                $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
-
-                send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+                send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
             }
+            
                     
             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'record_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
         }
@@ -430,7 +452,7 @@ class Payments extends API_Controller {
 
             $address_from = array(
                 "name"=> $seller_detail->user_name,
-                "street1"=> $seller_detail->address1.','.$seller_detail->address2,
+                "street1"=> $seller_detail->address2,
                 "city"=> $seller_detail->city,
                 "state"=> $seller_detail->state,
                 "zip" => $seller_detail->zipcode,
@@ -441,7 +463,7 @@ class Payments extends API_Controller {
 
             $address_to = array(
                 "name"=> $buyer_detail->user_name,
-                "street1"=> $buyer_detail->address1.','.$buyer_detail->address2,
+                "street1"=> $buyer_detail->address2,
                 "city"=> $buyer_detail->city,
                 "state"=> $buyer_detail->state,
                 "zip" => $buyer_detail->zipcode,
@@ -472,7 +494,7 @@ class Payments extends API_Controller {
                     "carrier_account"=> $shippingcarriers_details->shippo_object_id,
                     "servicelevel_token"=> "usps_priority"
                             );                   
-
+//                echo '<pre>';print_r($shipmentdata);die();
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -486,7 +508,7 @@ class Payments extends API_Controller {
 //                $response = json_decode($response);
 //                echo '<pre>';
 //                echo $response->object_id.'<br>';
-//                print_r($response);
+//                print_r($response);die();
                 $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                 $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
             /*Shippo integration End*/
