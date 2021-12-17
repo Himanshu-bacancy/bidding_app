@@ -250,11 +250,13 @@ class PS_Adapter {
 
 		if ( isset( $obj->shippingcarrier_id )) {
 			$tmp_shippingCarrier = $this->CI->Shippingcarriers->get_one( $obj->shippingcarrier_id );
+            $this->convert_shippingcarrier( $tmp_shippingCarrier );
 			$obj->shipping_carrier = $tmp_shippingCarrier;
 		}
 
 		if ( isset( $obj->packagesize_id )) {
 			$tmp_packageSize = $this->CI->Packagesizes->get_one( $obj->packagesize_id );
+            $this->convert_packagesize( $tmp_packageSize );
 			$obj->package_size = $tmp_packageSize;
 		}
 
@@ -327,19 +329,19 @@ class PS_Adapter {
 			$obj->item_brand = $tmp_brand;
 		}
 
-		// Packagesize object
-		if ( isset( $obj->packagesize_id ) && $obj->packagesize_id !='') {
+//		// Packagesize object
+//		if ( isset( $obj->packagesize_id ) && $obj->packagesize_id !='') {
+//
+//			$tmp_packagesize = $this->CI->Packagesizes->get_one( $obj->packagesize_id );
+//			$obj->item_packagesize = $tmp_packagesize;
+//		}
 
-			$tmp_packagesize = $this->CI->Packagesizes->get_one( $obj->packagesize_id );
-			$obj->item_packagesize = $tmp_packagesize;
-		}
-
-		// Shippingcarrier object
-		if ( isset( $obj->shippingcarrier_id ) && $obj->shippingcarrier_id !='') {
-
-			$tmp_shippingcarrier = $this->CI->Shippingcarriers->get_one( $obj->shippingcarrier_id );
-			$obj->item_shippingcarrier = $tmp_shippingcarrier;
-		}
+//		// Shippingcarrier object
+//		if ( isset( $obj->shippingcarrier_id ) && $obj->shippingcarrier_id !='') {
+//
+//			$tmp_shippingcarrier = $this->CI->Shippingcarriers->get_one( $obj->shippingcarrier_id );
+//			$obj->item_shippingcarrier = $tmp_shippingcarrier;
+//		}
 
 		//print_r($obj->added_user_id . "$$");die;
 		// User Object
@@ -1121,6 +1123,15 @@ class PS_Adapter {
 	
 					$obj[$i]->requested_item_detail = $tmp_req_item;
 				}
+                
+                // Delivery method object
+                if ($obj[$i]->delivery_method_id) {
+
+                    $tmp_deliverymethod = $this->CI->Deliverymethods->get_one( $obj[$i]->delivery_method_id );
+                    $obj[$i]->chat_deliverymethod = $tmp_deliverymethod;
+                } else {
+                    $obj[$i]->chat_deliverymethod = (object)[];
+                }
 			}
 		} else {
 
@@ -1203,6 +1214,14 @@ class PS_Adapter {
 				$obj->remaining_exchange_amount = '0';
 			}
 			
+            // Delivery method object
+            if ($obj->delivery_method_id) {
+
+                $tmp_deliverymethod = $this->CI->Deliverymethods->get_one( $obj->delivery_method_id );
+                $obj->chat_deliverymethod = $tmp_deliverymethod;
+            } else {
+                $obj->chat_deliverymethod = (object)[];
+            }
 		}	
 	}
 

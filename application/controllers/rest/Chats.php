@@ -211,6 +211,13 @@ class Chats extends API_Controller
 	        	'rules' => 'required'
 	        ));
 		}
+        
+        if($this->post('operation_type') == DIRECT_BUY){
+			array_push($rules, array(
+	        	'field' => 'delivery_method_id',
+	        	'rules' => 'required'
+	        ));
+		}
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
@@ -242,6 +249,10 @@ class Chats extends API_Controller
 		}
 		
 		$obj = $this->save_chat($this->post('offered_item_id'));
+        
+        if($this->post('operation_type') == DIRECT_BUY){
+            $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id')]);
+        }
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
         $post = $this->post();

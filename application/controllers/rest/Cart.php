@@ -135,6 +135,12 @@ class Cart extends API_Controller {
             $row[$key] = $this->Item->get_one( $value->item_id );
             $this->ps_adapter->convert_item($row[$key]);
             $row[$key]->cart_id = $value->cart_id;
+            
+            $num_rows = $this->db->select('id')->from('bs_cart')->where('item_id',$value->item_id)->get()->num_rows();
+            $row[$key]->in_multiple_carts = '0';
+            if($num_rows > 1) {
+                $row[$key]->in_multiple_carts = '1';
+            }
         }
         $row = $this->ps_security->clean_output( $row );
 //        print_r($tmp_req_item);
@@ -144,7 +150,7 @@ class Cart extends API_Controller {
 //            die();
 ////            $row[$key]['default_photo'] = $this->ps_adapter->get_default_photo( $value['item_id'], 'item' );
 //        }
-        $this->response( ['status' => "success", 'items' => $row, 'sum' => ($sum_of_cart->sum) ?? 0]);
+        $this->response( ['status' => "success", 'items' => $row, 'sum' => ($sum_of_cart->sum) ?? "0"]);
     }
 
 }

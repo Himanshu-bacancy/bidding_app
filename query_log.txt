@@ -313,3 +313,6 @@ ALTER TABLE `bs_addresses` ADD `address_title` VARCHAR(255) NULL AFTER `id`;
 
 // RB: ADDED ON 23/11/2021
 ALTER TABLE `bs_chat_history` ADD `packagesize_id` VARCHAR(255) NULL AFTER `order_id`, ADD `shippingcarrier_id` VARCHAR(255) NULL AFTER `packagesize_id`, ADD `shipping_amount` FLOAT NULL AFTER `shippingcarrier_id`;
+
+// RB: ADDED ON 17/12/2021
+ALTER TABLE `bs_chat_history` ADD `delivery_method_id` INT(11) NOT NULL DEFAULT '0' AFTER `shipping_amount`;
