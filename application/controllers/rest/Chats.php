@@ -211,7 +211,7 @@ class Chats extends API_Controller
 	        	'rules' => 'required'
 	        ));
 		}
-        
+
         if($this->post('operation_type') == DIRECT_BUY){
 			array_push($rules, array(
 	        	'field' => 'delivery_method_id',
