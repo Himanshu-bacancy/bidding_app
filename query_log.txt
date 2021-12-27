@@ -316,3 +316,6 @@ ALTER TABLE `bs_chat_history` ADD `packagesize_id` VARCHAR(255) NULL AFTER `orde
 
 // RB: ADDED ON 17/12/2021
 ALTER TABLE `bs_chat_history` ADD `delivery_method_id` INT(11) NOT NULL DEFAULT '0' AFTER `shipping_amount`;
+
+// RB: ADDED ON 27/12/2021
+ALTER TABLE `bs_order` ADD `item_offered_price` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `address_id`;

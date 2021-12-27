@@ -1432,7 +1432,7 @@ class Chats extends API_Controller
 			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != ''";		
 		}
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
-		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition)->result();
+		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition." order by added_date desc")->result();
 		$obj = [];
 		//  SEND USER COUNT AND Lowest Price
 		foreach($records as $key => $data){
