@@ -1432,7 +1432,7 @@ class Chats extends API_Controller
 			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != ''";		
 		}
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
-		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition." order by added_date desc")->result();
+		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition." order by updated_date desc, added_date desc")->result();
 		$obj = [];
 		//  SEND USER COUNT AND Lowest Price
 		foreach($records as $key => $data){
@@ -1807,7 +1807,7 @@ class Chats extends API_Controller
     }
     
     public function unread_count_bytype_post() {
-         $user_data = $this->_apiConfig([
+        $user_data = $this->_apiConfig([
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
@@ -1875,5 +1875,39 @@ class Chats extends API_Controller
         $final_data = $this->ps_security->clean_output( $count_object );
 		$this->response( $final_data );
     }
+    
+    public function save_chat_msg_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+			array(
+	        	'field' => 'chat_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        ),
+            array(
+	        	'field' => 'msg',
+	        	'rules' => 'required'
+	        ),
+        );
 
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        $posts_var = $this->post();
+        
+        $chat_detail = $this->db->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
+        
+        if($chat_detail->buyer_user_id == $posts_var['user_id']) {
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['buyer_last_msg' => $posts_var['msg'], 'updated_date' => date('Y-m-d H:i:s')]);
+        } else {
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['seller_last_msg' => $posts_var['msg'], 'updated_date' => date('Y-m-d H:i:s')]);
+        }
+        
+        $this->response(['status' => 'success', 'message' => 'Message save successfully']);
+    }
 }

@@ -91,6 +91,22 @@ class Payments extends API_Controller {
                 $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
                 $records[$key] = $this->db->insert_id();
                 
+                if(!$item_price) {
+                     /*manage qty: start*/
+                    $item_detail = $this->db->from('bs_items')->where('id', $value['item_id'])->get()->row();
+
+                    $stock_update = $item_detail->pieces - 1;
+                    $update_array['pieces'] = $stock_update;
+                    if(!$stock_update) {
+                        $update_array['is_sold_out'] = 1;
+                    }
+
+                    $this->db->where('id', $value['item_id'])->update('bs_items', $update_array);
+                    $this->db->where('user_id', $user_id)->where('item_id', $value['item_id'])->delete('bs_cart');
+                    /*manage qty: end*/
+                    
+                }
+                
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
                 $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
 
@@ -98,6 +114,20 @@ class Payments extends API_Controller {
                     $records[$key] = $this->db->insert_id();
                     $card_total_amount += $item_price;
                 }
+                
+                /*manage qty: start*/
+                $item_detail = $this->db->from('bs_items')->where('id', $value['item_id'])->get()->row();
+                
+                $stock_update = $item_detail->pieces - 1;
+                $update_array['pieces'] = $stock_update;
+                if(!$stock_update) {
+                    $update_array['is_sold_out'] = 1;
+                }
+                
+                $this->db->where('id', $value['item_id'])->update('bs_items', $update_array);
+                $this->db->where('user_id', $user_id)->where('item_id', $value['item_id'])->delete('bs_cart');
+                /*manage qty: end*/
+                
             }
         }
         
@@ -515,7 +545,7 @@ class Payments extends API_Controller {
         }
         if(is_null($track_number) || empty($track_number)) {
 //            $this->error_response("Something wrong with shipping provided detail");
-            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => json_decode($response,true)]);
+            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
         }
         
         $card_id = $this->post('card_id');
@@ -875,7 +905,9 @@ class Payments extends API_Controller {
 //                ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left');
                 if($operation_type == SELLING) {
                     
-                    $obj = $obj->where(['bs_items.added_user_id'=> $user_id, 'bs_items.item_type_id'=> $operation_type]);
+//                    $obj = $obj->where(['bs_items.added_user_id'=> $user_id, 'bs_items.item_type_id'=> $operation_type]);
+                    $obj = $obj->where('bs_items.added_user_id', $user_id)
+                             ->where('bs_order.operation_type !=', EXCHANGE);
                 } else if($operation_type == EXCHANGE){
                     $obj = $obj->group_start()->where('bs_items.added_user_id', $user_id)
                             ->or_where('bs_order.user_id', $user_id)->group_end()
@@ -887,6 +919,7 @@ class Payments extends API_Controller {
 //                ->where('bs_order.status', "succeeded")
 //                ->where('bs_order.delivery_status', "pending")->get()->result();
 //                echo $this->db->last_query();die();
+//        echo '<pre>';print_r($obj);die();
         if(!empty($obj)) {
             $row = [];
             foreach ($obj as $key => $value) {

@@ -319,3 +319,8 @@ ALTER TABLE `bs_chat_history` ADD `delivery_method_id` INT(11) NOT NULL DEFAULT 
 
 // RB: ADDED ON 27/12/2021
 ALTER TABLE `bs_order` ADD `item_offered_price` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `address_id`;
+
+// RB: ADDED ON 28/12/2021
+ALTER TABLE `bs_chat_history` ADD `updated_date` DATETIME NULL AFTER `delivery_method_id`, ADD `buyer_last_msg` TEXT NULL AFTER `updated_date`, ADD `seller_last_msg` TEXT NULL AFTER `buyer_last_msg`;
+
+ALTER TABLE `bs_order_confirm` CHANGE `order_id` `order_id` TEXT NOT NULL;
