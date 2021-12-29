@@ -1910,4 +1910,41 @@ class Chats extends API_Controller
         
         $this->response(['status' => 'success', 'message' => 'Message save successfully']);
     }
+    
+    public function retrive_chat_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+			array(
+	        	'field' => 'item_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'seller_id',
+	        	'rules' => 'required'
+	        ),
+            array(
+	        	'field' => 'buyer_id',
+	        	'rules' => 'required'
+	        ),
+        );
+
+        // exit if there is an error in validation,
+        if ( !$this->is_valid( $rules )) exit;
+        $posts_var = $this->post();
+        
+        $chat_detail = $this->db->from('bs_chat_history')
+                ->where('seller_user_id', $posts_var['seller_id'])
+                ->where('buyer_user_id', $posts_var['buyer_id'])
+                ->where('requested_item_id', $posts_var['item_id'])
+                ->order_by('added_date','desc')
+                ->get()->row();
+        if(empty($chat_detail)) {
+            $this->response(['status' => 'error', 'message' => 'Record not found'],404);
+        } 
+        $this->ps_adapter->convert_chathistory( $chat_detail );
+        $this->custom_response( $chat_detail );
+    }
 }

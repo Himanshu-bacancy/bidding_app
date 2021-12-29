@@ -73,22 +73,24 @@ class Payments extends API_Controller {
             $item_price = $value['price'];
             $new_odr_id = 'odr_'.time().$user_id;
             $orderids[$value['item_id']] = $new_odr_id;
+            $shipping_amount = 0;
             if($value['delivery_method_id'] == DELIVERY_ONLY) {
                 $card_total_amount += $item_price;
                 $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $value['item_id'])->get()->row();
-                
                 if($get_item->pay_shipping_by == '1') {
                     if($get_item->shipping_type == '1') {
                         $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
                         $item_price = $item_price + (float)$get_shiping_detail->price;
+                        $shipping_amount = $get_shiping_detail->price;
                         $card_total_amount += (float)$get_shiping_detail->price;
                     } else if($get_item->shipping_type == '2'){
                         $item_price = $item_price + $get_item->shipping_cost_by_seller;   
+                        $shipping_amount = $get_item->shipping_cost_by_seller;
                         $card_total_amount += $get_item->shipping_cost_by_seller;
                     }
                 }
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
                 $records[$key] = $this->db->insert_id();
                 
                 if(!$item_price) {
@@ -108,7 +110,7 @@ class Payments extends API_Controller {
                 }
                 
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
 
                 if($value['payin'] == PAYCARD) {
                     $records[$key] = $this->db->insert_id();
@@ -279,6 +281,7 @@ class Payments extends API_Controller {
                 $item_ids = $posts_var['item_ids'];
             }
         }
+        $shipping_amount = 0;
         if($payment_method == 'card') {
             if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
                 $this->error_response("Please pass card id");
@@ -299,8 +302,10 @@ class Payments extends API_Controller {
                     $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
                     
                     $item_price = $item_price + (float)$get_shiping_detail->price;
+                    $shipping_amount = $get_shiping_detail->price;
                 } else if($get_item->shipping_type == '2'){
                     $item_price = $item_price + $get_item->shipping_cost_by_seller;   
+                    $shipping_amount = $get_item->shipping_cost_by_seller;
                 }
             }
             
@@ -324,7 +329,7 @@ class Payments extends API_Controller {
                     'payment_method_types' => ['card']
                 ]);
                 $new_odr_id = 'odr_'.time().$user_id;
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $address_id, 'item_offered_price' => $this->post('total_amount'), 'shipping_amount' => $shipping_amount, 'total_amount' => $total_amount, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => $response,'created_at' => date('Y-m-d H:i:s')]);
                 $record_id = $this->db->insert_id();
                 if (isset($response->id)) { 
                     $this->db->where('id', $record_id)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
@@ -344,7 +349,7 @@ class Payments extends API_Controller {
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
         } else if($payment_method == 'cash') {
-            $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $address_id, 'item_offered_price' => $total_amount, 'total_amount' => $total_amount, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s')]);
+            $this->db->insert('bs_order', ['user_id' => $user_id, 'items' => $item_ids, 'delivery_method' => $delivery_method, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $address_id, 'item_offered_price' => $total_amount, 'shipping_amount' => $shipping_amount, 'total_amount' => $total_amount, 'status' => 'success', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s')]);
             
             $this->response(['status' => "success", 'order_status' => 'success']);
         }
@@ -539,7 +544,7 @@ class Payments extends API_Controller {
 //                echo '<pre>';
 //                echo $response->object_id.'<br>';
 //                print_r($response);die();
-                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                 $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
             /*Shippo integration End*/
         }
@@ -814,9 +819,95 @@ class Payments extends API_Controller {
             )
         );
         if (!$this->is_valid($rules)) exit;
-//        echo 'hrer';die();
         $record_id = $this->post('record_id');
         $status = $this->post('status');
+        $get_records = $this->db->from('bs_order')->where('transaction_id', $record_id)->get()->result();
+        foreach ($get_records as $key => $value) {
+            $track_exist = $this->db->from('bs_track_order')->where('order_id', $value->order_id)->order_by('id','desc')->get()->row();
+            if(empty($track_exist) || $track_exist->status == 'ERROR') {
+                $get_item = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+                if($get_item->pay_shipping_by == '1') {
+                    if($get_item->shipping_type == '1') { 
+                        $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+                        $package_details = $this->db->from('bs_packagesizes')->where('id', $get_item->packagesize_id)->get()->row();
+                        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                            ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                            ->where('order_id', $value->order_id)->get()->row();
+                        
+                        $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                        ->join('bs_items', 'bs_order.items = bs_items.id')
+                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                        ->where('order_id', $value->order_id)->get()->row();
+                        
+                        $headers = array(
+                            "Content-Type: application/json",
+                            "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+                                              );
+                        $url = 'https://api.goshippo.com/transactions/';
+                        $address_from = array(
+                            "name"=> $seller_detail->user_name,
+                            "street1"=> $seller_detail->address2,
+                            "city"=> $seller_detail->city,
+                            "state"=> $seller_detail->state,
+                            "zip" => $seller_detail->zipcode,
+                            "country" => $seller_detail->country,
+                            "phone" => $seller_detail->user_phone,
+                            "email" => $seller_detail->user_email
+                                      );
+                        $address_to = array(
+                            "name"=> $buyer_detail->user_name,
+                            "street1"=> $buyer_detail->address2,
+                            "city"=> $buyer_detail->city,
+                            "state"=> $buyer_detail->state,
+                            "zip" => $buyer_detail->zipcode,
+                            "country" => $buyer_detail->country,
+                            "phone" => $buyer_detail->user_phone,
+                            "email" => $buyer_detail->user_email
+                                      );
+                        $parcel = array(
+                            "length"=> $package_details->length,
+                            "width"=> $package_details->width,
+                            "height"=> $package_details->height,
+                            "distance_unit"=> "in",
+                            "weight"=> $package_details->weight,
+                            "mass_unit" => "lb"
+                                      ); 
+                        $shipment = 
+                            array(
+                                "address_to" =>$address_to,
+                                "address_from" =>$address_from,
+                                "parcels"=> $parcel
+                                     );
+                         $shipmentdata = 
+                            array(
+                                "shipment"=> $shipment,
+                                "carrier_account"=> $shippingcarriers_details->shippo_object_id,
+                                "servicelevel_token"=> "usps_priority"
+                                        );
+                         $ch = curl_init();
+                            curl_setopt($ch, CURLOPT_URL, $url);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($shipmentdata));
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+                            $response = json_decode(curl_exec($ch)); 
+                            curl_close($ch);
+                        $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                        $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
+                        
+                        if(is_null($track_number) || empty($track_number)) {
+                //            $this->error_response("Something wrong with shipping provided detail");
+                            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
+                        }
+                    }
+                }
+            }
+        }
+        
         $str = 'failed';
         if($status) {
             $str = 'succeeded';
@@ -824,7 +915,6 @@ class Payments extends API_Controller {
         $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $str]);
         
         if($status) {
-            $get_records = $this->db->from('bs_order')->where('transaction_id', $record_id)->get()->result();
             foreach ($get_records as $key => $value) {
                 $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
                 if($value->operation_type == DIRECT_BUY) {
@@ -1213,7 +1303,7 @@ class Payments extends API_Controller {
                 $expiry_date = explode('/',$card_details->expiry_date);
                 $paid_config = $this->Paid_config->get_one('pconfig1');
                 $item_price = $posts_var['price'];
-                
+                $shipping_amount = 0;
                 if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
                     $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
@@ -1226,17 +1316,20 @@ class Payments extends API_Controller {
                                 $applied_shipping_price = $get_shiping_detail->price;
                             }
                             $item_price = $item_price + (float)$applied_shipping_price;
+                            $shipping_amount = $applied_shipping_price;
                             
                         } else if($get_item->shipping_type == '1') {
                             $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
                             $item_price = $item_price + (float)$get_shiping_detail->price;
+                            $shipping_amount = $get_shiping_detail->price;
                             
                         } else if($get_item->shipping_type == '2'){
                             $item_price = $item_price + $get_item->shipping_cost_by_seller;   
+                            $shipping_amount = $get_item->shipping_cost_by_seller;
                         }
                     }
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'qty' => ($posts_var['qty'] ?? ''), 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $posts_var['price'], 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'qty' => ($posts_var['qty'] ?? ''), 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $posts_var['price'], 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
@@ -1295,7 +1388,7 @@ class Payments extends API_Controller {
                         $this->error_response("Please pass payin");
                     }
                     $date = date('Y-m-d H:i:s');
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
@@ -1382,7 +1475,7 @@ class Payments extends API_Controller {
 //                        $requested_item_id = $posts_var['item_id'];
 //                    }
                     $item_price = $posts_var['price'];
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id, 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id, 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
 
                     /*manage stock :start*/
