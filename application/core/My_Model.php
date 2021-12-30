@@ -1565,8 +1565,12 @@ class PS_Model extends CI_Model {
 		$this->db->select('bs_items.*'); 
 		
 		$this->db->from('bs_items');
-		$this->db->where('bs_items.status',(int)$conds['status']);
-		$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
+		if($conds['status']){
+			$this->db->where('bs_items.status',(int)$conds['status']);
+		}
+		if($conds['is_draft']){
+			$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
+		}
         $this->db->join('bs_paid_items_history', 'bs_items.id = bs_paid_items_history.item_id', 'left');
 		// $today_date = date('Y-m-d H:i:s');
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
@@ -1815,8 +1819,12 @@ class PS_Model extends CI_Model {
 		$this->db->from('bs_items');
         $this->db->join('bs_paid_items_history', 'bs_items.id = bs_paid_items_history.item_id', 'left');
 		// $today_date = date('Y-m-d H:i:s');
-		$this->db->where( 'bs_items.status',(int)$conds['status']);
-		$this->db->where( 'bs_items.is_draft',(int)$conds['is_draft']);
+		if($conds['status']){
+			$this->db->where('bs_items.status',(int)$conds['status']);
+		}
+		if($conds['is_draft']){
+			$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
+		}
 		//$this->db->where( 'bs_items.is_paid', (int)$conds['is_paid']);
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
    		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );

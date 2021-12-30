@@ -679,7 +679,6 @@ class Items extends API_Controller
 		$conds = $final_conds;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
-		
 		if ($conds['item_search']==1) {
 
 			if(isset($conds['added_user_id']) && !empty($conds['added_user_id'])){
@@ -902,15 +901,13 @@ class Items extends API_Controller
 				$brand_item = rtrim($brand_itemids,',');
 				$brand_items_id = explode(",", $brand_item);	
 			}
-			
 			//  lat long condition 
 			if ( isset( $conds['miles'] ) && $conds['miles'] != '' ) {
 				$this->db->select('*');
 				$this->db->from('bs_addresses');
 				$this->db->where( 'user_id', $user_data['token_data']['user_id'] );
-				$this->db->where( 'is_default_address', '1');
+				$this->db->where( 'is_default_address', 1);
 				$addrfilter = $this->db->get();
-				
 				if(count($addrfilter->row())>0){
 					$this->db->select('*,( 3959
 					* acos( cos( radians('. $addrfilter->row()->latitude .') )
@@ -945,7 +942,6 @@ class Items extends API_Controller
 					}
 				}
 			}
-
 			if(isset($addressitemids) && $addressitemids !=''){
 				$address_items = rtrim($addressitemids,',');
 				$address_item_id = explode(",", $address_items);	

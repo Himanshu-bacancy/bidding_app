@@ -259,7 +259,6 @@ class Reason extends API_Controller
                     $this->error_response(get_msg( 'no_item_reported'));
                 }
             } else {
-                die('hello himanshu');
                 $this->error_response(get_msg( 'item_already_reported'));
             }
         } else {
