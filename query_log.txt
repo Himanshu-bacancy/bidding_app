@@ -327,3 +327,8 @@ ALTER TABLE `bs_order_confirm` CHANGE `order_id` `order_id` TEXT NOT NULL;
 
 // RB: ADDED ON 29/12/2021
 ALTER TABLE `bs_order` ADD `shipping_amount` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `item_offered_price`;
+
+// RB: ADDED ON 30/12/2021
+ALTER TABLE `core_backend_config` ADD `processing_fees` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `selling_fees`;
+
+ALTER TABLE `bs_order` ADD `service_fee` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `shipping_amount`, ADD `processing_fee` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `service_fee`, ADD `seller_earn` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `processing_fee`;
