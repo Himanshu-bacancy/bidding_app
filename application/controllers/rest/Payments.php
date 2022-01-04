@@ -487,13 +487,15 @@ class Payments extends API_Controller {
             
             $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
-                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+//                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                    ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                     ->where('order_id', $posts_var['order_id'])->get()->row();
             
             $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+//                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                    ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                     ->where('order_id', $posts_var['order_id'])->get()->row();
             
            
@@ -783,9 +785,9 @@ class Payments extends API_Controller {
             } else {
                 $orders['confirm_location'] = "";
             }
-            $orders['service_fee'] = "0";
-            $orders['processing_fee'] = "0";
-            $orders['you_earn'] = "0";
+//            $orders['service_fee'] = "0";
+//            $orders['processing_fee'] = "0";
+//            $orders['you_earn'] = "0";
             $orders['tax_charged_to_buyer'] = "0";
             
             if($orders['operation_type'] == EXCHANGE) {
@@ -852,13 +854,15 @@ class Payments extends API_Controller {
                         $package_details = $this->db->from('bs_packagesizes')->where('id', $get_item->packagesize_id)->get()->row();
                         $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
                             ->join('core_users', 'bs_order.user_id = core_users.user_id')
-                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+//                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                            ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                             ->where('order_id', $value->order_id)->get()->row();
                         
                         $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+//                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                        ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                         ->where('order_id', $value->order_id)->get()->row();
                         
                         $headers = array(
