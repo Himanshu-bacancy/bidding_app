@@ -332,3 +332,6 @@ ALTER TABLE `bs_order` ADD `shipping_amount` VARCHAR(255) NOT NULL DEFAULT '0' A
 ALTER TABLE `core_backend_config` ADD `processing_fees` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `selling_fees`;
 
 ALTER TABLE `bs_order` ADD `service_fee` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `shipping_amount`, ADD `processing_fee` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `service_fee`, ADD `seller_earn` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `processing_fee`;
+
+// RB: ADDED ON 05/01/2021
+CREATE TABLE `bidding_app3`.`bs_item_chats` ( `id` VARCHAR(255) NOT NULL , `buyer_id` VARCHAR(255) NOT NULL , `seller_id` VARCHAR(255) NOT NULL , `item_id` VARCHAR(255) NOT NULL , `buyer_last_msg` TEXT NULL , `seller_last_msg` TEXT NULL , `created_at` DATETIME NOT NULL , `updated_at` DATETIME NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

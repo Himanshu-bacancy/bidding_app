@@ -196,6 +196,10 @@ class Notis extends API_Controller
 	        	'field' => 'message',
 	        	'rules' => 'required'
 	        ),
+			array(
+	        	'field' => 'is_item_chat',
+	        	'rules' => 'required'
+	        ),
 //	        array(
 //	        	'field' => 'type',
 //	        	'rules' => 'required'
@@ -217,109 +221,143 @@ class Notis extends API_Controller
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
+        if($this->post('is_item_chat')) {
+            $itm_chat_id = $this->post('chat_id');
+            $get_chat_detail = $this->db->from('bs_item_chats')->where('id', $itm_chat_id)->get()->row();
+            if(empty($get_chat_detail)){ 
+                $this->error_response( 'Record not found');
+            } else {
+                if($get_chat_detail->seller_id == $this->post('user_id')) {
+                    $seller_user_id = $this->post('user_id');
+                    $buyer_user_id = $get_chat_detail->buyer_id;
+                    $receiver_user_id = $buyer_user_id;
+                } else {
+                    $buyer_user_id = $this->post('user_id');
+                    $seller_user_id = $get_chat_detail->seller_id;
+                    $receiver_user_id = $seller_user_id;
+                }
+                $user_detail = $this->User->get_one($this->post('user_id'));
+                $receiver_user_detail = $this->User->get_one($receiver_user_id);
 
-        //Get Device Tokens
-        $chat_id = $this->post('chat_id');
-        $get_chat_detail = $this->db->from('bs_chat_history')->where('id', $this->post('chat_id'))->get()->row();
-        if($get_chat_detail->seller_user_id == $this->post('user_id')) {
-            $seller_user_id = $this->post('user_id');
-            $buyer_user_id = $get_chat_detail->buyer_user_id;
+                $data['message'] = $this->post('message');
+                $data['title'] = 'Message from '.$user_detail->user_name;
+                $data['buyer_user_id'] = $buyer_user_id;
+                $data['seller_user_id'] = $seller_user_id;
+                $data['sender_name'] = $user_detail->user_name;
+                $data['item_id'] = "";
+                $data['sender_profle_photo'] = $user_detail->user_profile_photo;
+                $data['chat_id'] = $this->post('chat_id');
+                
+                $status = send_android_fcm_chat( [$receiver_user_detail->device_token], $data );
+                if($status) {				
+                    $this->success_response( get_msg('success_noti_send'));
+                } else {
+                    $this->error_response( get_msg('error_noti_send'));
+                }
+            }
         } else {
-            $buyer_user_id = $this->post('user_id');
-            $seller_user_id = $get_chat_detail->seller_user_id;
-        }
-        $chat_data = array(
-            "id" => $chat_id,
-            "buyer_user_id" => $buyer_user_id, 
-            "seller_user_id" => $seller_user_id
-        );
-
-
-		if($get_chat_detail->seller_user_id == $this->post('user_id')) {
-
-			$user_ids[] = $buyer_user_id;
-
-	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
-
-			$device_ids = array();
-			if ( count( $devices ) > 0 ) {
-				foreach ( $devices as $device ) {
-					$device_ids[] = $device->device_token;
-				}
-			}
-
-	        $chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
-
- 	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
-
-	        $user_id = $seller_user_id;
-	        $user_name = $this->User->get_one($user_id)->user_name;
-	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
-
-	        $update_chat_data = array(
-				//"requested_item_id" => $this->post('item_id'), 
-	        	// "item_id" => $this->post('item_id'), 
-	        	"id" => $chat_id, 
-	        	"buyer_user_id" => $buyer_user_id, 
-	        	"seller_user_id" => $seller_user_id,
-	        	"buyer_unread_count" => $chat_old_count+1
-
-	        );
-
-	    } else if ($get_chat_detail->buyer_user_id == $this->post('user_id')){
-
-	    	$user_ids[] = $seller_user_id;
             
-	        $devices = $this->Noti->get_all_device_in($user_ids)->result();
-
-			$device_ids = array();
-			if ( count( $devices ) > 0 ) {
-				foreach ( $devices as $device ) {
-					$device_ids[] = $device->device_token;
-				}
-			}
-
-			$chat_old_count = $this->Chat->get_one_by($chat_data)->seller_unread_count;
-
-	        $chat_id = $this->Chat->get_one_by($chat_data)->id;
-
-	        $user_id = $buyer_user_id;
-	        $user_name = $this->User->get_one($user_id)->user_name;
-	        $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
-	        
-	        $update_chat_data = array(
-				//"offered_item_id" => $this->post('item_id'), 
-	        	// "item_id" => $this->post('item_id'), 
+            //Get Device Tokens
+            $chat_id = $this->post('chat_id');
+            $get_chat_detail = $this->db->from('bs_chat_history')->where('id', $this->post('chat_id'))->get()->row();
+            if($get_chat_detail->seller_user_id == $this->post('user_id')) {
+                $seller_user_id = $this->post('user_id');
+                $buyer_user_id = $get_chat_detail->buyer_user_id;
+            } else {
+                $buyer_user_id = $this->post('user_id');
+                $seller_user_id = $get_chat_detail->seller_user_id;
+            }
+            $chat_data = array(
                 "id" => $chat_id,
-	        	"buyer_user_id" => $buyer_user_id, 
-	        	"seller_user_id" => $seller_user_id,
-	        	"seller_unread_count" => $chat_old_count+1   
+                "buyer_user_id" => $buyer_user_id, 
+                "seller_user_id" => $seller_user_id
+            );
+            if($get_chat_detail->seller_user_id == $this->post('user_id')) {
 
-	        );
+                $user_ids[] = $buyer_user_id;
 
-	    }
-//        print_r($update_chat_data);
-//        die();
-		if( !$this->Chat->Save( $update_chat_data,$chat_id )) {
-    		$this->error_response( get_msg( 'err_count_update' ));    	
-    	} else {
+                $devices = $this->Noti->get_all_device_in($user_ids)->result();
 
-    		//$this->success_response( get_msg( 'count_update_success' ));
-    		$data['message'] = $this->post('message');
-    		$data['title'] = 'Message from '.$user_name;
-	    	$data['buyer_user_id'] = $buyer_user_id;
-	    	$data['seller_user_id'] = $seller_user_id;
-	    	$data['sender_name'] = $user_name;
-	    	$data['item_id'] = "";
-	    	$data['sender_profle_photo'] = $user_profile_photo;
-            $data['chat_id'] = $this->post('chat_id');
-			$status = send_android_fcm_chat( $device_ids, $data );
-			if($status) {				
-				$this->success_response( get_msg('success_noti_send'));
-			} else {
-				$this->error_response( get_msg('error_noti_send'));
-			}
-    	}
+                $device_ids = array();
+                if ( count( $devices ) > 0 ) {
+                    foreach ( $devices as $device ) {
+                        $device_ids[] = $device->device_token;
+                    }
+                }
+
+                $chat_old_count = $this->Chat->get_one_by($chat_data)->buyer_unread_count;
+
+                $chat_id = $this->Chat->get_one_by($chat_data)->id;
+
+                $user_id = $seller_user_id;
+                $user_name = $this->User->get_one($user_id)->user_name;
+                $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
+
+                $update_chat_data = array(
+                    //"requested_item_id" => $this->post('item_id'), 
+                    // "item_id" => $this->post('item_id'), 
+                    "id" => $chat_id, 
+                    "buyer_user_id" => $buyer_user_id, 
+                    "seller_user_id" => $seller_user_id,
+                    "buyer_unread_count" => $chat_old_count+1
+
+                );
+
+            } else if ($get_chat_detail->buyer_user_id == $this->post('user_id')){
+
+                $user_ids[] = $seller_user_id;
+
+                $devices = $this->Noti->get_all_device_in($user_ids)->result();
+
+                $device_ids = array();
+                if ( count( $devices ) > 0 ) {
+                    foreach ( $devices as $device ) {
+                        $device_ids[] = $device->device_token;
+                    }
+                }
+
+                $chat_old_count = $this->Chat->get_one_by($chat_data)->seller_unread_count;
+
+                $chat_id = $this->Chat->get_one_by($chat_data)->id;
+
+                $user_id = $buyer_user_id;
+                $user_name = $this->User->get_one($user_id)->user_name;
+                $user_profile_photo = $this->User->get_one($user_id)->user_profile_photo;
+
+                $update_chat_data = array(
+                    //"offered_item_id" => $this->post('item_id'), 
+                    // "item_id" => $this->post('item_id'), 
+                    "id" => $chat_id,
+                    "buyer_user_id" => $buyer_user_id, 
+                    "seller_user_id" => $seller_user_id,
+                    "seller_unread_count" => $chat_old_count+1   
+
+                );
+
+            }
+    //        print_r($update_chat_data);
+    //        die();
+            if( !$this->Chat->Save( $update_chat_data,$chat_id )) {
+                $this->error_response( get_msg( 'err_count_update' ));    	
+            } else {
+
+                //$this->success_response( get_msg( 'count_update_success' ));
+                $data['message'] = $this->post('message');
+                $data['title'] = 'Message from '.$user_name;
+                $data['buyer_user_id'] = $buyer_user_id;
+                $data['seller_user_id'] = $seller_user_id;
+                $data['sender_name'] = $user_name;
+                $data['item_id'] = "";
+                $data['sender_profle_photo'] = $user_profile_photo;
+                $data['chat_id'] = $this->post('chat_id');
+                $status = send_android_fcm_chat( $device_ids, $data );
+                if($status) {				
+                    $this->success_response( get_msg('success_noti_send'));
+                } else {
+                    $this->error_response( get_msg('error_noti_send'));
+                }
+            }
+        }
 	}
 
 

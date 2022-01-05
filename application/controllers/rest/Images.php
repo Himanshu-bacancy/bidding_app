@@ -314,7 +314,7 @@ class Images extends API_Controller
 
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+//		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
@@ -351,7 +351,7 @@ class Images extends API_Controller
 
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+//		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,
@@ -454,7 +454,7 @@ class Images extends API_Controller
 
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+//		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"buyer_unread_count" => $buyer_unread_count + 1,
@@ -491,7 +491,7 @@ class Images extends API_Controller
 
 		    	$chat_data = array(
 
-		        	"item_id" => $this->post('item_id'), 
+//		        	"item_id" => $this->post('item_id'), 
 		        	"buyer_user_id" => $this->post('buyer_user_id'), 
 		        	"seller_user_id" => $this->post('seller_user_id'),
 		        	"seller_unread_count" => $seller_unread_count + 1,
