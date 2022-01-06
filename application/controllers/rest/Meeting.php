@@ -160,10 +160,10 @@ class Meeting extends API_Controller {
             $date = date('Y-m-d H:i:s');
             $update_order['delivery_status'] = 'qr-verified';
             $update_order['scanqr_date'] = $date;
-            if($get_user->delivery_method_id == PICKUP_ONLY) {
-                $update_order['pickup_date'] = $date;
-                $update_order['completed_date'] = $date;
-            }
+//            if($get_user->delivery_method_id == PICKUP_ONLY) {
+            $update_order['pickup_date'] = $date;
+            $update_order['completed_date'] = $date;
+//            }
             $this->db->where('order_id',$posts['order_id'])->update('bs_order',$update_order);
             $this->response(['status' => 'success', 'message' => 'Qr code verified']);
         } else {

@@ -153,7 +153,7 @@ class Address extends API_Controller
 				"longitude" => $this->post('longitude'),
 				"user_id" => $this->post('user_id'),
 				"is_home_address" => (($this->post('is_home_address')=='1'))?'1':'0', 
-				"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
+//				"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
 				"id" => $this->post('id')
 			);
 

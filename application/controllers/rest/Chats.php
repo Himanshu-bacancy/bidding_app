@@ -1421,7 +1421,7 @@ class Chats extends API_Controller
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
 			$condition .=  $condition != '' ? 
 			" AND buyer_user_id = '".$user_id."' AND requested_item_id != ''" : 
-			"buyer_user_id = '".$user_id."' AND (operation_type = '1' OR operation_type = '4') AND requested_item_id != ''"; 
+			"buyer_user_id = '".$user_id."' AND (operation_type = '1' OR operation_type = '4') AND requested_item_id != '' AND is_cart_offer = 0"; 
 		} else if($type == EXCHANGE){
 			$condition .= $condition != '' ? 
 			" AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' AND requested_item_id != ''" : 
@@ -1429,7 +1429,7 @@ class Chats extends API_Controller
 		} else {
 			$condition .= $condition != '' ? 
 			" AND seller_user_id = '".$user_id."' AND requested_item_id != ''" : 
-			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != ''";		
+			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != '' AND is_cart_offer = 0";		
 		}
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
 		$records = $this->db->query("SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition." order by updated_date desc, added_date desc")->result();
@@ -1839,6 +1839,7 @@ class Chats extends API_Controller
                 ->where('requested_item_id is NOT NULL', NULL, FALSE)
                 ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
             ->group_end()
+            ->where('is_cart_offer', 0)
             ->get()->num_rows();
         
         $count_object->selling_unread_counts = $this->db->from('bs_chat_history')
@@ -1849,6 +1850,7 @@ class Chats extends API_Controller
                 ->where('requested_item_id is NOT NULL', NULL, FALSE)
                 ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
             ->group_end()
+            ->where('is_cart_offer', 0)
             ->get()->num_rows();
         
         $exchange_selling_unread_counts = $this->db->from('bs_chat_history')
@@ -1950,7 +1952,7 @@ class Chats extends API_Controller
         $chat_detail['seller_user_id'] = $chat_record_detail['seller_id'];
         $chat_detail['buyer_user_id'] = $chat_record_detail['buyer_id'];
         $chat_detail['created_at'] = $chat_record_detail['created_at'];
-        $chat_detail['item_detail'] = $this->Item->get_one( $chat_record_detail['item_id'] );
+        $chat_detail['requested_item_detail'] = $this->Item->get_one( $chat_record_detail['item_id'] );
         
         $seller = $this->User->get_one( $chat_detail['seller_user_id'] );
         $this->ps_adapter->convert_user( $seller );
@@ -1960,7 +1962,7 @@ class Chats extends API_Controller
         $this->ps_adapter->convert_user( $buyer );
         $chat_detail['buyer'] = $buyer;
             
-        $this->ps_adapter->convert_item( $chat_detail['item_detail'] );
+        $this->ps_adapter->convert_item( $chat_detail['requested_item_detail'] );
         $this->custom_response( $chat_detail );
     }
 }

@@ -509,7 +509,7 @@ class Payments extends API_Controller {
 
             $address_from = array(
                 "name"=> $seller_detail->user_name,
-                "street1"=> $seller_detail->address2,
+                "street1"=> $seller_detail->address1,
                 "city"=> $seller_detail->city,
                 "state"=> $seller_detail->state,
                 "zip" => $seller_detail->zipcode,
@@ -520,7 +520,7 @@ class Payments extends API_Controller {
 
             $address_to = array(
                 "name"=> $buyer_detail->user_name,
-                "street1"=> $buyer_detail->address2,
+                "street1"=> $buyer_detail->address1,
                 "city"=> $buyer_detail->city,
                 "state"=> $buyer_detail->state,
                 "zip" => $buyer_detail->zipcode,
@@ -709,9 +709,14 @@ class Payments extends API_Controller {
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
                 ->join('bs_chat_history', 'bs_order.items = bs_chat_history.requested_item_id', 'left')
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
-                ->where('bs_chat_history.operation_type', $operation_type)->where('bs_order.user_id', $user_id)->get()->result_array();   
+                ->where('bs_chat_history.operation_type', $operation_type)
+                ->where('bs_order.user_id', $user_id);
+                if($operation_type == DIRECT_BUY) {
+                    $orders = $orders->where('bs_chat_history.is_cart_offer', 0);
+                }
+                $orders = $orders->get()->result_array();   
                 
-        if(count($orders)) {
+        if(!empty($orders) && count($orders)) {
             $this->response($orders);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
@@ -872,7 +877,7 @@ class Payments extends API_Controller {
                         $url = 'https://api.goshippo.com/transactions/';
                         $address_from = array(
                             "name"=> $seller_detail->user_name,
-                            "street1"=> $seller_detail->address2,
+                            "street1"=> $seller_detail->address1,
                             "city"=> $seller_detail->city,
                             "state"=> $seller_detail->state,
                             "zip" => $seller_detail->zipcode,
@@ -882,7 +887,7 @@ class Payments extends API_Controller {
                                       );
                         $address_to = array(
                             "name"=> $buyer_detail->user_name,
-                            "street1"=> $buyer_detail->address2,
+                            "street1"=> $buyer_detail->address1,
                             "city"=> $buyer_detail->city,
                             "state"=> $buyer_detail->state,
                             "zip" => $buyer_detail->zipcode,
@@ -923,10 +928,10 @@ class Payments extends API_Controller {
                         $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                         $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
                         
-                        if(is_null($track_number) || empty($track_number)) {
-                //            $this->error_response("Something wrong with shipping provided detail");
-                            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
-                        }
+//                        if(is_null($track_number) || empty($track_number)) {
+//                //            $this->error_response("Something wrong with shipping provided detail");
+//                            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
+//                        }
                     }
                 }
             }
@@ -934,6 +939,25 @@ class Payments extends API_Controller {
         
         $str = 'failed';
         if($status) {
+            foreach ($get_records as $key => $value) {
+                $create_offer['requested_item_id'] = $value->items;
+                $create_offer['buyer_user_id'] = $value->user_id;
+                
+                $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+                $create_offer['seller_user_id'] = $item_detail->added_user_id;
+                
+                $create_offer['type'] = 'to_seller';
+                $create_offer['operation_type'] = DIRECT_BUY;
+                $create_offer['quantity'] = $value->qty;
+                $create_offer['added_date'] = date("Y-m-d H:i:s");
+                $create_offer['is_offer_complete'] = 1;
+                $create_offer['order_id'] = $value->order_id;
+                $create_offer['is_cart_offer'] = 1;
+                $this->Chat->save($create_offer);	
+                $obj = $this->Chat->get_one_by($create_offer);
+                
+                $this->db->where('order_id', $value->order_id)->update('bs_order',['offer_id' => $obj->id]);
+            }
             $str = 'succeeded';
         }
         $this->db->where('transaction_id', $record_id)->update('bs_order',['status' => $str]);
@@ -1074,7 +1098,7 @@ class Payments extends API_Controller {
                         $row[$key]->order_state = is_null($value->completed_date) ? 'in_process' : 'complete';
 
                         if(!is_null($value->share_meeting_list_date)) {
-                            $row[$key]->meeting_location = $this->db->from('bs_meeting')->where('order_id', $value->order_id)->get()->row()->location_list;
+                            $row[$key]->meeting_location = json_decode($this->db->from('bs_meeting')->where('order_id', $value->order_id)->get()->row()->location_list, true);
                         } else {
                             $row[$key]->meeting_location = "";
                         }
@@ -1290,6 +1314,7 @@ class Payments extends API_Controller {
         $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['offer_id'])->get()->row();
         if(!$offer_details->is_offer_complete) {
             $new_odr_id = 'odr_'.time().$posts_var['user_id'];
+            $shipping_amount = 0;
             if($offer_details->seller_user_id != $posts_var['user_id']) {
                 if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
                     $this->error_response("Please pass card id");
@@ -1327,7 +1352,6 @@ class Payments extends API_Controller {
                 $expiry_date = explode('/',$card_details->expiry_date);
                 $paid_config = $this->Paid_config->get_one('pconfig1');
                 $item_price = $posts_var['price'];
-                $shipping_amount = 0;
                 
                 $backend_config = $this->Backend_config->get_one('be1');
                 $service_fee = ((float)$item_price * (float)$backend_config->selling_fees)/100;
@@ -1335,6 +1359,7 @@ class Payments extends API_Controller {
                 $seller_earn = (float)$item_price - $service_fee - $processing_fees;
                 
                 if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
+                    
                     $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
                     if($get_item->pay_shipping_by == '1') {
@@ -1414,11 +1439,13 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
+                    
                     if(!isset($posts_var['payin']) || empty($posts_var['payin']) || is_null($posts_var['payin'])) {
                         $this->error_response("Please pass payin");
                     }
                     $date = date('Y-m-d H:i:s');
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
+                    
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
