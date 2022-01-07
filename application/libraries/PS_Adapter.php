@@ -429,6 +429,10 @@ class PS_Adapter {
 		$obj->is_owner = $obj->is_owner;
 		$obj->gallery_images = $img = $this->CI->Image->get_all_by( array( 'img_parent_id' => $obj->id, 'img_type' => 'item' ))->result();
 
+        $removed_elements = ['item_price_type_id','item_currency_id','item_location_id','deal_option_remark','deal_option_id','business_mode','lat','lng','payment_type','item_price_type','item_currency','item_location','highlight_info'];
+        foreach ($removed_elements as $key => $value) {
+            unset($obj->$value);
+        }
 	}
 
 	/**

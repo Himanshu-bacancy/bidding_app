@@ -279,7 +279,7 @@ class Images extends API_Controller
 		$type = $this->post('type');
 		 $chat_data = array(
 
-        	"item_id" => $this->post('item_id'), 
+        	"requested_item_id" => $this->post('item_id'), 
         	"buyer_user_id" => $this->post('buyer_user_id'), 
         	"seller_user_id" => $this->post('seller_user_id')
 
