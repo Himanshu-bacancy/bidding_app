@@ -26,6 +26,13 @@
 			    }
 			}
 		});
+        jQuery.validator.addMethod("indexCheck",function( value, element ) {
+			   if(value == 0) {
+			    	return false;
+			   } else {
+			    	return true;
+			   };
+		});
 		// custom validation
 		jQuery.validator.addMethod("blankCheck",function( value, element ) {
 			
@@ -34,7 +41,7 @@
 			   } else {
 			    	return true;
 			   }
-		})
+		});
 	}
 
 	<?php endif; ?>

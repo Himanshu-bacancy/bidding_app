@@ -371,7 +371,9 @@ class API_Controller extends REST_Controller
             $data->editable = $editable;
         }
 		$data = $this->ps_security->clean_output( $data );
-		
+        if(@$data->sizegroup->is_empty_object) {
+            $data->sizegroup = null;
+        }
 		$this->response( $data );
 	}
 

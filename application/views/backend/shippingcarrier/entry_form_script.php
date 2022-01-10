@@ -30,7 +30,7 @@
 		      	},
 				shippo_object_id:{
 					required: true
-				}
+				},
 				shippo_servicelevel_token:{
 					required: true
 				}
