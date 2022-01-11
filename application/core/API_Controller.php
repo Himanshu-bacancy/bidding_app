@@ -374,6 +374,36 @@ class API_Controller extends REST_Controller
         if(@$data->sizegroup->is_empty_object) {
             $data->sizegroup = null;
         }
+        if(@$data->item_type->is_empty_object) {
+            $data->item_type = null;
+        }
+        if(@$data->item_brand->is_empty_object) {
+            $data->item_brand = null;
+        }
+        if(empty(@$data->item_colors)) {
+            $data->item_colors = null;
+        }
+        if(@$data->deal_option) {
+            unset($data->deal_option);
+        }
+        if(empty(@$data->sizegroup_options)) {
+            $data->sizegroup_options = null;
+        }
+        if(@$data->shipping_carrier->is_empty_object) {
+            $data->shipping_carrier = null;
+        }
+        if(@$data->package_size->is_empty_object) {
+            $data->package_size = null;
+        }
+        if(@$data->item_address->is_empty_object) {
+            $data->item_address = null;
+        }
+        if(@$data->user->is_empty_object) {
+            $data->user = null;
+        }
+        if(@$data->condition_of_item->is_empty_object) {
+            $data->condition_of_item = null;
+        }
 		$this->response( $data );
 	}
 
