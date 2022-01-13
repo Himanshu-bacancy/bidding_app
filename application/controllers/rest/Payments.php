@@ -825,7 +825,7 @@ class Payments extends API_Controller {
             $seller_transaction = str_replace('Stripe\\PaymentIntent JSON: ', '', $orders['seller_transaction']);
             $orders['seller_transaction'] = json_decode($seller_transaction);
             $orders = $this->ps_security->clean_output( $orders );
-            $this->response($orders);
+            $this->custom_response($orders);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
@@ -1179,7 +1179,7 @@ class Payments extends API_Controller {
             if(!empty($row)) {
                 $row = array_values($row);
             $row = $this->ps_security->clean_output( $row );
-            $this->response($row);
+            $this->custom_response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }

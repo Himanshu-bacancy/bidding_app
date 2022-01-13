@@ -371,38 +371,146 @@ class API_Controller extends REST_Controller
             $data->editable = $editable;
         }
 		$data = $this->ps_security->clean_output( $data );
-        if(@$data->sizegroup->is_empty_object) {
-            $data->sizegroup = null;
-        }
-        if(@$data->item_type->is_empty_object) {
-            $data->item_type = null;
-        }
-        if(@$data->item_brand->is_empty_object) {
-            $data->item_brand = null;
-        }
-        if(empty(@$data->item_colors)) {
-            $data->item_colors = null;
-        }
-        if(@$data->deal_option) {
-            unset($data->deal_option);
-        }
-        if(empty(@$data->sizegroup_options)) {
-            $data->sizegroup_options = null;
-        }
-        if(@$data->shipping_carrier->is_empty_object) {
-            $data->shipping_carrier = null;
-        }
-        if(@$data->package_size->is_empty_object) {
-            $data->package_size = null;
-        }
-        if(@$data->item_address->is_empty_object) {
-            $data->item_address = null;
-        }
-        if(@$data->user->is_empty_object) {
-            $data->user = null;
-        }
-        if(@$data->condition_of_item->is_empty_object) {
-            $data->condition_of_item = null;
+        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item'];
+        $is_empty = ['item_colors', 'sizegroup_options'];
+        if(is_array($data)) {
+            foreach ($data as $key => $value) {
+                if(isset($value->requested_item_detail)) {
+                    foreach ($is_empty_object as $key2 => $value2) {
+                        if(@$value->requested_item_detail->$value2->is_empty_object) {
+                            $value->requested_item_detail->$value2 = null;
+                        }
+                    }
+                    foreach ($is_empty as $key3 => $value3) {
+                        if(empty(@$value->requested_item_detail->$value3)) {
+                            $value->requested_item_detail->$value3 = null;
+                        }
+                    }
+                }
+                if(isset($value->offered_item_detail)) {
+                    if($value->offered_item_detail->is_empty_object) {
+                        $value->offered_item_detail = null;
+                    } else {
+                        foreach ($is_empty_object as $key2 => $value2) {
+                            if(@$value->offered_item_detail->$value2->is_empty_object) {
+                                $value->offered_item_detail->$value2 = null;
+                            }
+                        }
+                        foreach ($is_empty as $key3 => $value3) {
+                            if(empty(@$value->offered_item_detail->$value3)) {
+                                $value->offered_item_detail->$value3 = null;
+                            }
+                        }
+                    }
+                }
+                if(isset($value->item_details)) {
+                    if($value->item_details->is_empty_object) {
+                        $value->item_details = null;
+                    } else {
+                        foreach ($is_empty_object as $key2 => $value2) {
+                            if(@$value->item_details->$value2->is_empty_object) {
+                                $value->item_details->$value2 = null;
+                            }
+                        }
+                        foreach ($is_empty as $key3 => $value3) {
+                            if(empty(@$value->item_details->$value3)) {
+                                $value->item_details->$value3 = null;
+                            }
+                        }
+                    }
+                }
+                if(isset($value->exchange_item_detail)){
+                    foreach ($value->exchange_item_detail as $key => $value) {
+                        foreach ($is_empty_object as $key2 => $value2) {
+                            if(@$value->$value2->is_empty_object) {
+                                $value->$value2 = null;
+                            }
+                        }
+                        foreach ($is_empty as $key3 => $value3) {
+                            if(empty(@$value->$value3)) {
+                                $value->$value3 = null;
+                            }
+                        }
+                    }
+                }
+                if(!isset($value->exchange_item_detail) && !isset($value->requested_item_detail)){
+                    foreach ($is_empty_object as $key2 => $value2) {
+                        if(@$value->$value2->is_empty_object) {
+                            $value->$value2 = null;
+                        }
+                    }
+                    foreach ($is_empty as $key3 => $value3) {
+                        if(empty(@$value->$value3)) {
+                            $value->$value3 = null;
+                        }
+                    }
+                }
+            }
+        } else {
+            if(isset($data->requested_item_detail)) {
+                foreach ($is_empty_object as $key2 => $value2) {
+                    if(@$data->requested_item_detail->$value2->is_empty_object) {
+                        $data->requested_item_detail->$value2 = null;
+                    }
+                }
+                foreach ($is_empty as $key3 => $value3) {
+                    if(empty(@$data->requested_item_detail->$value3)) {
+                        $data->requested_item_detail->$value3 = null;
+                    }
+                }
+            }
+            if(isset($data->offered_item_detail)) {
+                if($data->offered_item_detail->is_empty_object) {
+                    $data->offered_item_detail = null;
+                } else {
+                    foreach ($is_empty_object as $key2 => $value2) {
+                        if(@$data->offered_item_detail->$value2->is_empty_object) {
+                            $data->offered_item_detail->$value2 = null;
+                        }
+                    }
+                    foreach ($is_empty as $key3 => $value3) {
+                        if(empty(@$data->offered_item_detail->$value3)) {
+                            $data->offered_item_detail->$value3 = null;
+                        }
+                    }
+                }
+            }
+            if(isset($data->item_details)) {
+                foreach ($is_empty_object as $key2 => $value2) {
+                    if(@$data->item_details->$value2->is_empty_object) {
+                        $data->item_details->$value2 = null;
+                    }
+                }
+                foreach ($is_empty as $key3 => $value3) {
+                    if(empty(@$data->item_details->$value3)) {
+                        $data->item_details->$value3 = null;
+                    }
+                }
+            }
+            if(isset($data->exchange_item_detail)){
+                foreach ($data->exchange_item_detail as $key => $value) {
+                    foreach ($is_empty_object as $key2 => $value2) {
+                        if(@$value->$value2->is_empty_object) {
+                            $value->$value2 = null;
+                        }
+                    }
+                    foreach ($is_empty as $key3 => $value3) {
+                        if(empty(@$value->$value3)) {
+                            $value->$value3 = null;
+                        }
+                    }
+                }
+            }
+            foreach ($is_empty_object as $key2 => $value2) {
+                if(@$data->$value2->is_empty_object) {
+                    $data->$value2 = null;
+                }
+            }
+            foreach ($is_empty as $key3 => $value3) {
+                if(empty(@$data->$value3)) {
+                    $data->$value3 = null;
+                }
+            }
         }
 		$this->response( $data );
 	}
