@@ -1336,6 +1336,7 @@ class Items extends API_Controller
 			}
 			$this->db->where('item_type_id', $itemTypeId);
 			$this->db->where('added_user_id', $userId);
+			$this->db->where('is_sold_out', 0);
 			$this->db->where_in('cat_id', $catIds);	
 			$exchangeItems = $this->db->get('bs_items');
 //			$exchangeData = $exchangeItems->result_array();

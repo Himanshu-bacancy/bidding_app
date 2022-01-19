@@ -945,6 +945,7 @@ class Payments extends API_Controller {
                 
                 $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
                 $create_offer['seller_user_id'] = $item_detail->added_user_id;
+                $create_offer['nego_price'] = $value->item_offered_price;
                 
                 $create_offer['type'] = 'to_seller';
                 $create_offer['operation_type'] = DIRECT_BUY;

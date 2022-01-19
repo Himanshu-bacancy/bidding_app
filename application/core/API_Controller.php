@@ -370,9 +370,32 @@ class API_Controller extends REST_Controller
             }
             $data->editable = $editable;
         }
+        
+        
 		$data = $this->ps_security->clean_output( $data );
-        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item'];
-        $is_empty = ['item_colors', 'sizegroup_options'];
+        if($this->router->fetch_class() == 'chats' && ($this->router->fetch_method() == 'get_offer_details' || $this->router->fetch_method() == "offer_list" || $this->router->fetch_method() == "offer_by_items")) {
+            if(is_array($data)) { 
+                foreach ($data as $key => $value) {
+                    if(isset($value->buyer_unread_count) && empty($value->buyer_unread_count)) {
+                        $value->buyer_unread_count = "0";
+                    } 
+                    if(isset($value->seller_unread_count) && empty($value->seller_unread_count)) {
+                        $value->seller_unread_count = "0";
+                    } 
+                }
+            } else {
+                if(empty($data->buyer_unread_count)) {
+                    $data->buyer_unread_count = "0";
+                }
+                if(empty($data->seller_unread_count)) {
+                    $data->seller_unread_count = "0";
+                }
+            }
+        }
+        
+        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item', 'default_deliverymethod'];
+        $is_empty = ['item_colors', 'sizegroup_options', 'default_address', 'meeting_location','confirm_location'];
+        
         if(is_array($data)) {
             foreach ($data as $key => $value) {
                 if(isset($value->requested_item_detail)) {
@@ -440,9 +463,9 @@ class API_Controller extends REST_Controller
                         }
                     }
                     foreach ($is_empty as $key3 => $value3) {
-                        if(empty(@$value->$value3)) {
+                        if(isset($value->$value3) && empty($value->$value3)) {
                             $value->$value3 = null;
-                        }
+                        } 
                     }
                 }
             }
@@ -507,7 +530,7 @@ class API_Controller extends REST_Controller
                 }
             }
             foreach ($is_empty as $key3 => $value3) {
-                if(empty(@$data->$value3)) {
+                if(isset($data->$value3) && empty($data->$value3)) {
                     $data->$value3 = null;
                 }
             }

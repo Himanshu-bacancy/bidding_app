@@ -774,19 +774,20 @@ class PS_Adapter {
 
 
 		$obj->rating_details = $rating_std;
-
-		$this->CI->db->where('user_id', $obj->user_id);
-		$this->CI->db->where('is_default_address', 1);
-    	$default_address = $this->CI->db->get('bs_addresses')->row();
-		$obj->default_address = $default_address;
-
-		if(!empty($obj->accept_delivery_id))
-		{
-			$this->CI->db->where('id', $obj->accept_delivery_id);
-			$default_deliverymethod = $this->CI->db->get('bs_deliverymethod')->row();
-			$obj->default_deliverymethod = $default_deliverymethod;
-			$obj->default_deliverymethod->pickup_search_distance = $obj->pickup_search_distance;
-		}
+        $current_url =& get_instance();
+        if( ($current_url->router->fetch_class() == 'users' && ( $current_url->router->fetch_method() == 'add' || $current_url->router->fetch_method() == 'login' || $current_url->router->fetch_method() == 'facebook_register' || $current_url->router->fetch_method() == 'google_register' || $current_url->router->fetch_method() == 'apple_register' || $current_url->router->fetch_method() == 'profile_update' || $current_url->router->fetch_method() == 'phone_register' || $current_url->router->fetch_method() == 'get') ) || ($current_url->router->fetch_class() == 'userfollows' && $current_url->router->fetch_method() == 'searcht') || ($current_url->router->fetch_class() == 'images' && $current_url->router->fetch_method() == 'upload') ) {
+            $this->CI->db->where('user_id', $obj->user_id);
+            $this->CI->db->where('is_default_address', 1);
+            $default_address = $this->CI->db->get('bs_addresses')->row();
+            $obj->default_address = $default_address;
+            if(!empty($obj->accept_delivery_id))
+            {
+                $this->CI->db->where('id', $obj->accept_delivery_id);
+                $default_deliverymethod = $this->CI->db->get('bs_deliverymethod')->row();
+                $obj->default_deliverymethod = $default_deliverymethod;
+                $obj->default_deliverymethod->pickup_search_distance = $obj->pickup_search_distance;
+            }
+        } 
 
 		if($need_return)
 		{
