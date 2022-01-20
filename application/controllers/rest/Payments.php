@@ -824,8 +824,8 @@ class Payments extends API_Controller {
             }
             $seller_transaction = str_replace('Stripe\\PaymentIntent JSON: ', '', $orders['seller_transaction']);
             $orders['seller_transaction'] = json_decode($seller_transaction);
-            $orders = $this->ps_security->clean_output( $orders );
-            $this->custom_response($orders);
+//            $orders = $this->ps_security->clean_output( $orders );
+            $this->custom_response((object) $orders);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
@@ -1179,7 +1179,7 @@ class Payments extends API_Controller {
             }
             if(!empty($row)) {
                 $row = array_values($row);
-            $row = $this->ps_security->clean_output( $row );
+//            $row = $this->ps_security->clean_output( $row );
             $this->custom_response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
@@ -1229,6 +1229,31 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $posts = $this->post();
+        $current_date = date('Y-m-d H:i:s');
+        $get_order = $this->db->select('*')->from('bs_order')->where('bs_order.order_id', $posts['order_id'])->get()->row();
+        $udpate_order_array['delivery_status'] = 'delivered';
+        $udpate_order_array['completed_date'] = $current_date;
+        if(is_null($get_order->processed_date)) {
+            $udpate_order_array['processed_date'] = $current_date;
+        }
+        if(is_null($get_order->pickup_date)) {
+            $udpate_order_array['pickup_date'] = $current_date;
+        }
+        if(is_null($get_order->scanqr_date)) {
+            $udpate_order_array['scanqr_date'] = $current_date;
+        }
+        if(is_null($get_order->rate_date)) {
+            $udpate_order_array['rate_date'] = $current_date;
+        }
+        if(is_null($get_order->generate_qr_date)) {
+            $udpate_order_array['generate_qr_date'] = $current_date;
+        }
+        if(is_null($get_order->share_meeting_list_date)) {
+            $udpate_order_array['share_meeting_list_date'] = $current_date;
+        }
+        if(is_null($get_order->confirm_meeting_date)) {
+            $udpate_order_array['confirm_meeting_date'] = $current_date;
+        }
         
         $get_user = $this->db->select('bs_items.title,bs_items.added_user_id')->from('bs_order')->join('bs_items', 'bs_order.items = bs_items.id')->where('bs_order.order_id', $posts['order_id'])->get()->row();
         $seller = $this->db->select('device_token')->from('core_users')
@@ -1236,7 +1261,7 @@ class Payments extends API_Controller {
         
         send_push( [$seller->device_token], ["message" => "Item has been received by buyer", "flag" => "order",'order_id'=>$posts['order_id'], 'title' => $get_user->title." order update"] );
         
-        $this->db->where('order_id',$posts['order_id'])->update('bs_order',['delivery_status' => 'delivered','completed_date' => date('Y-m-d H:i:s')]);
+        $this->db->where('order_id',$posts['order_id'])->update('bs_order',$udpate_order_array);
     
         $this->response(['status' => 'success', 'message' => 'Order delivered']);
     }

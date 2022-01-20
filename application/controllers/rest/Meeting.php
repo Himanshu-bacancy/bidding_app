@@ -155,7 +155,7 @@ class Meeting extends API_Controller {
         if ( !$this->is_valid( $rules )) exit;
         $posts = $this->post();
 
-        $get_user = $this->db->select('user_id')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        $get_user = $this->db->select('*')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
         if($get_user->user_id == $posts['user_id']) {
             $date = date('Y-m-d H:i:s');
             $update_order['delivery_status'] = 'qr-verified';
@@ -164,6 +164,21 @@ class Meeting extends API_Controller {
             $update_order['pickup_date'] = $date;
             $update_order['completed_date'] = $date;
 //            }
+            if(is_null($get_user->processed_date)) {
+                $update_order['processed_date'] = $date;
+            }
+            if(is_null($get_user->rate_date)) {
+                $update_order['rate_date'] = $date;
+            }
+            if(is_null($get_user->generate_qr_date)) {
+                $update_order['generate_qr_date'] = $date;
+            }
+            if(is_null($get_user->share_meeting_list_date)) {
+                $update_order['share_meeting_list_date'] = $date;
+            }
+            if(is_null($get_user->confirm_meeting_date)) {
+                $update_order['confirm_meeting_date'] = $date;
+            }
             $this->db->where('order_id',$posts['order_id'])->update('bs_order',$update_order);
             $this->response(['status' => 'success', 'message' => 'Qr code verified']);
         } else {
