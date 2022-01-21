@@ -1158,6 +1158,7 @@ class Items extends API_Controller
 
 				return false;
 			}
+            $this->db->delete('bs_cart', ['item_id' => $id]);
 
         	// $conds_id['id'] = $id;
          	// $conds_item['item_id'] = $id;

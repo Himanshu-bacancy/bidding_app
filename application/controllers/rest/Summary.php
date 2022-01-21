@@ -49,7 +49,7 @@ class Summary extends API_Controller {
         $request_arr['savings'] = 0;
                 
         $direct_buy_arr = [];
-        $direct_buy_arr['items_in_cart'] = $this->db->select('id')->from('bs_cart')->where('type_id',DIRECT_BUY)->where('user_id', $posts['user_id'])->get()->num_rows();
+        $direct_buy_arr['items_in_cart'] = $this->db->select('bs_cart.id')->from('bs_cart')->join('bs_items', 'bs_cart.item_id = bs_items.id')->where('type_id',DIRECT_BUY)->where('user_id', $posts['user_id'])->get()->num_rows();
         
         $direct_buy_arr['favourites'] = $this->db->select('id')->from('bs_favourite')->where('user_id', $posts['user_id'])->get()->num_rows();
         
@@ -64,7 +64,13 @@ class Summary extends API_Controller {
         
         $direct_buy_arr['in_process_orders'] = $this->db->select('id')->from('bs_order')->where('operation_type',DIRECT_BUY)->where('user_id', $posts['user_id'])->where('completed_date is NULL')->get()->num_rows();
         
-        $direct_buy_arr['discounts'] = $this->db->select('SUM(bs_items.price - bs_chat_history.nego_price) as discount')->from('bs_chat_history')->join('bs_items', 'bs_chat_history.requested_item_id = bs_items.id')->where('bs_chat_history.operation_type',DIRECT_BUY)->where('bs_chat_history.buyer_user_id', $posts['user_id'])->where('bs_chat_history.is_offer_complete', 1)->where('bs_chat_history.is_cart_offer', 0)->get()->row()->discount;
+        $direct_buy_discount = $this->db->select('SUM(bs_items.price - bs_chat_history.nego_price) as discount')->from('bs_chat_history')
+                ->join('bs_items', 'bs_chat_history.requested_item_id = bs_items.id')
+                ->where('bs_chat_history.operation_type',DIRECT_BUY)
+                ->where('bs_chat_history.buyer_user_id', $posts['user_id'])
+                ->where('bs_chat_history.is_offer_complete', 1)
+                ->where('bs_chat_history.is_cart_offer', 0)->get()->row()->discount;
+        $direct_buy_arr['discounts'] = ($direct_buy_discount) ?? '0' ;
         
         $selling_arr = [];
         $selling_arr['posted_items'] = $this->db->select('id')->from('bs_items')->where('item_type_id',SELLING)->where('added_user_id', $posts['user_id'])->where('is_draft', 0)->get()->num_rows();

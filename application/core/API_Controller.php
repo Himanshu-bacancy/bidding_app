@@ -1262,10 +1262,11 @@ class API_Controller extends REST_Controller
 				$total_follow_count = $this->Userfollow->count_all_by($conds_followed);
 				$total_following_count = $this->Userfollow->count_all_by($conds_following);
 
-				$user_data['follower_count'] = $total_follow_count;
-				$user_data['following_count'] = $total_following_count;
+				$update_user_data['follower_count'] = $total_follow_count;
+				$update_user_data['following_count'] = $total_following_count;
 				$user_id = $this->post('user_id');
-				$this->User->save($user_data, $user_id);
+				
+				$this->User->save($update_user_data, $user_id);
 				
 				//for followed user_id
 				$following_user['follower_count'] = $this->Userfollow->count_all_by($conds_followed1);
@@ -1274,7 +1275,6 @@ class API_Controller extends REST_Controller
 			}
 
 		} else {
-
 			if ( !$this->Userfollow->save( $data )) {
 				$this->error_response( get_msg( 'err_model' ));
 			} else {
@@ -1286,10 +1286,10 @@ class API_Controller extends REST_Controller
 				$total_follow_count = $this->Userfollow->count_all_by($conds_followed);
 				$total_following_count = $this->Userfollow->count_all_by($conds_following);
 
-				$user_data['follower_count'] = $total_follow_count;
-				$user_data['following_count'] = $total_following_count;
+				$update_user_data['follower_count'] = $total_follow_count;
+				$update_user_data['following_count'] = $total_following_count;
 				$user_id = $this->post('user_id');
-				$this->User->save($user_data, $user_id);
+				$this->User->save($update_user_data, $user_id);
 
 				//for followed user_id
 				$following_user['follower_count'] = $this->Userfollow->count_all_by($conds_followed1);
