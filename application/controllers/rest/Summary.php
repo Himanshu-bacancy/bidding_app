@@ -51,7 +51,9 @@ class Summary extends API_Controller {
         $direct_buy_arr = [];
         $direct_buy_arr['items_in_cart'] = $this->db->select('bs_cart.id')->from('bs_cart')->join('bs_items', 'bs_cart.item_id = bs_items.id')->where('type_id',DIRECT_BUY)->where('user_id', $posts['user_id'])->get()->num_rows();
         
-        $direct_buy_arr['favourites'] = $this->db->select('id')->from('bs_favourite')->where('user_id', $posts['user_id'])->get()->num_rows();
+        $direct_buy_arr['favourites'] = $this->db->select('bs_favourite.id')->from('bs_favourite')
+                ->join('bs_items', 'bs_favourite.item_id = bs_items.id')
+                ->where('bs_favourite.user_id', $posts['user_id'])->get()->num_rows();
         
         $direct_buy_arr['offer_sent'] = $this->db->select('id')->from('bs_chat_history')->where('operation_type',DIRECT_BUY)->where('buyer_user_id', $posts['user_id'])->where('is_cart_offer', 0)->get()->num_rows();
         
@@ -62,7 +64,11 @@ class Summary extends API_Controller {
                 ->where('bs_order.user_id', $posts['user_id'])
                 ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
         
-        $direct_buy_arr['in_process_orders'] = $this->db->select('id')->from('bs_order')->where('operation_type',DIRECT_BUY)->where('user_id', $posts['user_id'])->where('completed_date is NULL')->get()->num_rows();
+        $direct_buy_arr['in_process_orders'] = $this->db->select('bs_order.id')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->where('bs_order.operation_type',DIRECT_BUY)
+                ->where('bs_order.user_id', $posts['user_id'])
+                ->where('bs_order.completed_date is NULL')->get()->num_rows();
         
         $direct_buy_discount = $this->db->select('SUM(bs_items.price - bs_chat_history.nego_price) as discount')->from('bs_chat_history')
                 ->join('bs_items', 'bs_chat_history.requested_item_id = bs_items.id')
