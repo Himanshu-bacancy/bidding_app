@@ -30,8 +30,10 @@ class Subcategories extends API_Controller
 			//$setting = $this->Api->get_one_by( array( 'api_constant' => GET_ALL_CATEGORIES ));
 
 			$conds['order_by'] = 1;
-			$conds['order_by_field'] = $setting->order_by_field;
-			$conds['order_by_type'] = $setting->order_by_type;
+//			$conds['order_by_field'] = $setting->order_by_field;
+//			$conds['order_by_type'] = $setting->order_by_type;
+			$conds['order_by_field'] = 'name';
+			$conds['order_by_type'] = 'asc';
 		}
 
 		return $conds;

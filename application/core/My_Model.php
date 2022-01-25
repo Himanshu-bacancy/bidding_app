@@ -476,6 +476,20 @@ class PS_Model extends CI_Model {
 			$this->db->where( 'bs_items.is_draft', 0);
 		}
 
+        if ( isset( $conds['cat_id'] )) {
+			if ($conds['cat_id'] != "") {
+				if($conds['cat_id'] != '0'){
+					$this->db->where( 'cat_id', $conds['cat_id'] );	
+				}
+			}			
+		}
+        
+        if(isset($conds['sub_cat_id'])) {
+			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
+			}
+		}
+
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
 			if ($conds['item_id'] != "") {
@@ -1576,6 +1590,18 @@ class PS_Model extends CI_Model {
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
    		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
 
+        if ( isset( $conds['cat_id'] )) {
+			if ($conds['cat_id'] != "") {
+				if($conds['cat_id'] != '0'){
+					$this->db->where( 'bs_items.cat_id', $conds['cat_id'] );	
+				}
+			}			
+		}
+        if(isset($conds['sub_cat_id'])) {
+			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+				$this->db->where( 'bs_items.sub_cat_id', $conds['sub_cat_id'] );	
+			}
+		}
    		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
 			if ($conds['item_id'] != "") {

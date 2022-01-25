@@ -68,9 +68,16 @@ class Childsubcategory extends PS_Model {
 			}
 			
 			}
+        if ( isset( $conds['order_by'] )) {
 
-		$this->db->order_by( 'added_date', 'desc' );
+			$order_by_field = $conds['order_by_field'];
+			$order_by_type = $conds['order_by_type'];
 
+			$this->db->order_by( 'bs_childsubcategories.'.$order_by_field, $order_by_type );
+		} else {
+
+			$this->db->order_by( 'added_date' );
+        }
 	}
 
 

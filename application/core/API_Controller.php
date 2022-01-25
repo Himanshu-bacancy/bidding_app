@@ -677,7 +677,6 @@ class API_Controller extends REST_Controller
 			unset( $conds['offset']);
 		}
 
-
 		if ( count( $conds ) == 0 ) {
 		// if 'id' is not existed, get all	
 		
@@ -706,6 +705,7 @@ class API_Controller extends REST_Controller
 			// if limit is not empty
 
 				$data = $this->model->get_all_by( $conds, $limit )->result();
+//                print_r($this->db->last_query());die;
 			} else {
 			// if both are empty
 
