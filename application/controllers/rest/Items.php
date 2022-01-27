@@ -143,13 +143,14 @@ class Items extends API_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
-
-		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
-		if ($approval_enable == 1) {
-			$status = 0;
-		} else {
-			$status = 1;
-		}
+        /*admin verifation for item*/
+//		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
+//		if ($approval_enable == 1) {
+//			$status = 0;
+//		} else {
+//			$status = 1;
+//		}
+        $status = 0;
 		// validation rules for user register
 		$rules = array(
 			array(
@@ -326,12 +327,14 @@ class Items extends API_Controller
 
 		$todate = date('Y-m-d');
 		
-		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
-		if ($approval_enable == 1) {
-			$status = 0;
-		} else {
-			$status = 1;
-		}
+        /*admin verifation for item*/
+//		$approval_enable = $this->App_setting->get_one('app1')->is_approval_enabled;
+//		if ($approval_enable == 1) {
+//			$status = 0;
+//		} else {
+//			$status = 1;
+//		}
+        $status = 0;
 
 		// validation rules for add item
 		if(!empty($this->post('is_draft')) && $this->post('is_draft')=='1')
@@ -1288,12 +1291,20 @@ class Items extends API_Controller
 	/**
 	* Get drafted items from item database table
 	*/
-	function deactivate_item_get(){
+	function toggle_active_get(){
 		// API Configuration [Return Array: User Token Data]
         $user_data = $this->_apiConfig([
             'methods' => ['GET'],
             'requireAuthorization' => true,
         ]);
+        $rules = array(
+			array(
+	        	'field' => 'id',
+	        	'rules' => 'required'
+	        )
+        );
+		if ( !$this->is_valid( $rules )) exit;
+        
 		$userId = !empty($user_data['token_data']) && !empty($user_data['token_data']['user_id']) ? $user_data['token_data']['user_id'] : '';
 		$itemId = $this->get('id');
 
@@ -1303,11 +1314,14 @@ class Items extends API_Controller
         $items = $itemData->result_array();
 		if(!empty($items)){
 			$id = ($items && $items[0]['id']) ? $items[0]['id'] : 0;
-			$itm_data['status'] = 0 ;
+            $itm_data['status'] = 1 ;
+            if($items[0]['status']) {
+                $itm_data['status'] = 0 ;
+            }
 			if ( !$this->Item->save( $itm_data,$id )) {
 				return false;
 			}
-			$this->success_response( get_msg( 'success_deactivated' ));
+			$this->success_response( get_msg( 'status_updated' ));
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}	

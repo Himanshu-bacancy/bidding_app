@@ -113,7 +113,7 @@ class PS_Model extends CI_Model {
 	 * @param      boolean  $offset  The offset
 	 */
 	function get_all( $limit = false, $offset = false ) {
-
+        
 		// where clause
 		$this->custom_conds();
 
@@ -470,12 +470,12 @@ class PS_Model extends CI_Model {
 	}
 
 	function get_all_by_itemnew( $conds = array(), $limit = false, $offset = false ) {
-		//echo '<pre>'; print_r($conds);die;
+//		echo '<pre>'; print_r($conds);die;
 		
 		if ( empty( $conds['is_draft'] )) {
 			$this->db->where( 'bs_items.is_draft', 0);
 		}
-
+        
         if ( isset( $conds['cat_id'] )) {
 			if ($conds['cat_id'] != "") {
 				if($conds['cat_id'] != '0'){
@@ -533,6 +533,7 @@ class PS_Model extends CI_Model {
 			if ($conds['added_user_id'] != "") {
 				if($conds['added_user_id'] != '0'){
 					$this->db->where( 'bs_items.added_user_id', $conds['added_user_id'] );	
+                    $this->db->where('bs_items.status > ',-1);
 				}
 			}			
         } else {
@@ -1581,7 +1582,9 @@ class PS_Model extends CI_Model {
 		$this->db->from('bs_items');
 		if($conds['status']){
 			$this->db->where('bs_items.status',(int)$conds['status']);
-		}
+		} else {
+			$this->db->where('bs_items.status > ',-1);
+        }
 		if($conds['is_draft']){
 			$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
 		}
@@ -1589,7 +1592,7 @@ class PS_Model extends CI_Model {
 		// $today_date = date('Y-m-d H:i:s');
 		// $this->db->where( 'bs_paid_items_history.start_date <= ', $today_date );
    		// $this->db->where( 'bs_paid_items_history.end_date >= ', $today_date );
-
+        
         if ( isset( $conds['cat_id'] )) {
 			if ($conds['cat_id'] != "") {
 				if($conds['cat_id'] != '0'){
@@ -1847,7 +1850,9 @@ class PS_Model extends CI_Model {
 		// $today_date = date('Y-m-d H:i:s');
 		if($conds['status']){
 			$this->db->where('bs_items.status',(int)$conds['status']);
-		}
+		} else {
+			$this->db->where('bs_items.status > ',-1);
+        }
 		if($conds['is_draft']){
 			$this->db->where('bs_items.is_draft',(int)$conds['is_draft']);
 		}
