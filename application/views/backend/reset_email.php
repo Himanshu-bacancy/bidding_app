@@ -36,7 +36,7 @@
 					'name' => 'conf_password',
 					'value' => set_value( 'conf_password' ),
 					'class' => 'form-control form-control-sm',
-					'placeholder' => 'Conf Password',
+					'placeholder' => 'Confirm Password',
 					'id' => 'conf_password'
 				)); ?>
 			</div>
