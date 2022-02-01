@@ -268,8 +268,11 @@ class Address extends API_Controller
 						$this->db->where('user_id', $this->post('user_id'));
 						$this->db->update('bs_addresses'); 
 					}
-
-					$address_data['added_date'] =  date("Y-m-d H:i:s");
+                    $get_addresses = $this->Addresses->get_all_by( ['user_id' => $this->post('user_id')] );
+                    if(!$get_addresses->num_rows()) {
+                        $address_data['is_default_address'] = '1';
+                    }
+                    $address_data['added_date'] =  date("Y-m-d H:i:s");
 					$this->Addresses->save($address_data);
 
 					$id = $address_data['id'];
