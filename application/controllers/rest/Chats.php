@@ -1937,32 +1937,53 @@ class Chats extends API_Controller
         if ( !$this->is_valid( $rules )) exit;
         $posts = $this->post();
         
-        $chat_record_detail = $this->db->from('bs_item_chats')
-                ->where('seller_id', $posts['seller_id'])
-                ->where('buyer_id', $posts['buyer_id'])
-                ->where('item_id', $posts['item_id'])
-                ->get()->row_array();
+//        $chat_record_detail = $this->db->from('bs_item_chats')
+//                ->where('seller_id', $posts['seller_id'])
+//                ->where('buyer_id', $posts['buyer_id'])
+//                ->where('item_id', $posts['item_id'])
+//                ->get()->row_array();
+        $chat_record_detail = $this->db->from('bs_chat_history')
+                ->where('seller_user_id', $posts['seller_id'])
+                ->where('buyer_user_id', $posts['buyer_id'])
+                ->where('requested_item_id', $posts['item_id'])
+                ->get()->row();
+        
         if(empty($chat_record_detail)) {
-            $record_id = 'itm_cht_'.time();
-            $this->db->insert('bs_item_chats', ['id' => $record_id,'seller_id' => $posts['seller_id'], 'buyer_id' => $posts['buyer_id'], 'item_id' => $posts['item_id'], 'created_at' => date('Y-m-d H:i:s')]);
-            $chat_record_detail = $this->db->from('bs_item_chats')->where('bs_item_chats.id',$record_id)->get()->row_array();
+//            $record_id = 'itm_cht_'.time();
+//            $this->db->insert('bs_item_chats', ['id' => $record_id,'seller_id' => $posts['seller_id'], 'buyer_id' => $posts['buyer_id'], 'item_id' => $posts['item_id'], 'created_at' => date('Y-m-d H:i:s')]);
+//            $chat_record_detail = $this->db->from('bs_item_chats')->where('bs_item_chats.id',$record_id)->get()->row_array();
+             $item_record_detail = $this->db->select('item_type_id')->from('bs_items')
+                ->where('id', $posts['item_id'])
+                ->get()->row_array();
+            $operation_type = REQUEST_ITEM;
+            if($item_record_detail['item_type_id'] == '2' || $item_record_detail['item_type_id'] == '3') {
+                $operation_type = DIRECT_BUY;
+            }
+            $create_offer['requested_item_id'] = $posts['item_id'];
+            $create_offer['buyer_user_id'] = $posts['buyer_id'];
+            $create_offer['seller_user_id'] = $posts['seller_id'];
+            $create_offer['operation_type'] = $operation_type;
+            $create_offer['added_date'] = date("Y-m-d H:i:s");
+            $create_offer['is_offer'] = 0;
+            $this->Chat->save($create_offer);	
+            $chat_record_detail = $this->Chat->get_one_by($create_offer);
         } 
-        
-        $chat_detail['id'] = $chat_record_detail['id'];
-        $chat_detail['seller_user_id'] = $chat_record_detail['seller_id'];
-        $chat_detail['buyer_user_id'] = $chat_record_detail['buyer_id'];
-        $chat_detail['created_at'] = $chat_record_detail['created_at'];
-        $chat_detail['requested_item_detail'] = $this->Item->get_one( $chat_record_detail['item_id'] );
-        
-        $seller = $this->User->get_one( $chat_detail['seller_user_id'] );
-        $this->ps_adapter->convert_user( $seller );
-        $chat_detail['seller'] = $seller;
-            
-        $buyer = $this->User->get_one(  $chat_detail['buyer_user_id'] );
-        $this->ps_adapter->convert_user( $buyer );
-        $chat_detail['buyer'] = $buyer;
-            
-        $this->ps_adapter->convert_item( $chat_detail['requested_item_detail'] );
-        $this->custom_response( $chat_detail );
+        $this->ps_adapter->convert_chathistory( $chat_record_detail );
+//        $chat_detail['id'] = $chat_record_detail['id'];
+//        $chat_detail['seller_user_id'] = $chat_record_detail['seller_id'];
+//        $chat_detail['buyer_user_id'] = $chat_record_detail['buyer_id'];
+//        $chat_detail['created_at'] = $chat_record_detail['created_at'];
+//        $chat_detail['requested_item_detail'] = $this->Item->get_one( $chat_record_detail['item_id'] );
+//        
+//        $seller = $this->User->get_one( $chat_detail['seller_user_id'] );
+//        $this->ps_adapter->convert_user( $seller );
+//        $chat_detail['seller'] = $seller;
+//            
+//        $buyer = $this->User->get_one(  $chat_detail['buyer_user_id'] );
+//        $this->ps_adapter->convert_user( $buyer );
+//        $chat_detail['buyer'] = $buyer;
+//            
+//        $this->ps_adapter->convert_item( $chat_detail['requested_item_detail'] );
+        $this->custom_response( $chat_record_detail );
     }
 }

@@ -27,6 +27,16 @@ if ( !function_exists( 'read_more' ))
 	}
 }
 
+if ( !function_exists( 'dd' )) 
+{
+	function dd( $obj )
+	{
+		echo '<pre>';
+        print_r($obj);
+		die();
+	}
+}
+
 /**
  * transform 'added date' display
  *

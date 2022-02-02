@@ -1465,10 +1465,10 @@ class Payments extends API_Controller {
                     }
 
                 } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-                    
-                    if(!isset($posts_var['payin']) || empty($posts_var['payin']) || is_null($posts_var['payin'])) {
+                    if(!isset($posts_var['payin']) || $posts_var['payin'] == '' || is_null($posts_var['payin'])) {
                         $this->error_response("Please pass payin");
                     }
+                   
                     $date = date('Y-m-d H:i:s');
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     

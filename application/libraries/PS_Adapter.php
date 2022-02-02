@@ -1065,11 +1065,11 @@ class PS_Adapter {
 				}
 
 				if ( $obj[$i]->nego_price == '0') {
-					$obj[$i]->is_offer = 0;
+//					$obj[$i]->is_offer = 0;
 					$obj[$i]->offer_amount = 0;
 					
 				} else {
-					$obj[$i]->is_offer = 1;
+//					$obj[$i]->is_offer = 1;
 					$obj[$i]->offer_amount = $obj[$i]->nego_price;
 
 				}
@@ -1145,10 +1145,10 @@ class PS_Adapter {
 				$obj->quantity = 1;
 			}
 			if ( $obj->nego_price == '0') {
-				$obj->is_offer = 0;
+//				$obj->is_offer = 0;
 				$obj->offer_amount = 0;	
 			} else {
-				$obj->is_offer = 1;
+//				$obj->is_offer = 1;
 				$obj->offer_amount = $obj->nego_price;
 			}
 

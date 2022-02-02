@@ -343,3 +343,6 @@ ALTER TABLE `bs_chat_history` ADD `is_cart_offer` TINYINT NOT NULL AFTER `seller
 // RB: ADDED ON 19/01/2022
 ALTER TABLE `bs_chat_history` CHANGE `buyer_unread_count` `buyer_unread_count` INT(11) NULL DEFAULT '0';
 ALTER TABLE `bs_chat_history` CHANGE `seller_unread_count` `seller_unread_count` INT(11) NULL DEFAULT '0';
+
+// RB: ADDED ON 2/02/2022
+ALTER TABLE `bs_chat_history` ADD `is_offer` TINYINT NOT NULL DEFAULT '1' AFTER `is_cart_offer`;
