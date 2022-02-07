@@ -939,6 +939,7 @@ class Payments extends API_Controller {
         
         $str = 'failed';
         if($status) {
+            $current_date = date("Y-m-d H:i:s");
             foreach ($get_records as $key => $value) {
                 $create_offer['requested_item_id'] = $value->items;
                 $create_offer['buyer_user_id'] = $value->user_id;
@@ -950,14 +951,18 @@ class Payments extends API_Controller {
                 $create_offer['type'] = 'to_seller';
                 $create_offer['operation_type'] = DIRECT_BUY;
                 $create_offer['quantity'] = $value->qty;
-                $create_offer['added_date'] = date("Y-m-d H:i:s");
+                $create_offer['added_date'] = $current_date;
                 $create_offer['is_offer_complete'] = 1;
                 $create_offer['order_id'] = $value->order_id;
                 $create_offer['is_cart_offer'] = 1;
                 $this->Chat->save($create_offer);	
                 $obj = $this->Chat->get_one_by($create_offer);
                 
-                $this->db->where('order_id', $value->order_id)->update('bs_order',['offer_id' => $obj->id]);
+                $update_order['offer_id'] = $obj->id;
+                if(!is_null($track_number) && !empty($track_number)) {
+                    $update_order['processed_date'] = $current_date;
+                }
+                $this->db->where('order_id', $value->order_id)->update('bs_order',$update_order);
             }
             $str = 'succeeded';
         }
