@@ -87,13 +87,14 @@ class Meeting extends API_Controller {
         
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $posts['user_id'])->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Meeting location confirmed by buyer", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_item->title." order update"] );
+        send_push( [$buyer->device_token], ["message" => "Meeting location confirmed by buyer", "flag" => "order", 'title' => $get_item->title." order update"],['order_id' => $posts['order_id'], 'chat_id' => $get_item->offer_id] );
         
-        send_push( [$buyer->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE SELLER", "flag" => "chat", 'chat_id' => $get_item->offer_id, 'title' => $get_item->title." order update"] );
         $seller = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_item->added_user_id)->get()->row();
         
-        send_push( [$seller->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE BUYER", "flag" => "chat", 'chat_id' => $get_item->offer_id, 'title' => $get_item->title." order update"] );
+        send_push( [$seller->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE BUYER", "flag" => "chat", 'title' => $get_item->title." order update"],['chat_id' => $get_item->offer_id] );
+        
+        send_push( [$buyer->device_token], ["message" => "SET DAY AND TIME TO PICK UP YOUR ITEM- SEND A MESSAGE TO THE SELLER", "flag" => "chat", 'chat_id' => $get_item->offer_id, 'title' => $get_item->title." order update"] ,['chat_id' => $get_item->offer_id]);
         
         $this->response(['status' => 'success', 'message' => 'Locations confirmed']);
     }

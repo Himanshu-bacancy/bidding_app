@@ -1341,9 +1341,13 @@ class Chats extends API_Controller
         if ( !$this->is_valid( $rules )) exit;
         
         $item_id = $this->post('item_id');
-        $condition = 'requested_item_id = "'.$item_id.'"';
+        $get_item_type = $this->db->select('item_type_id')->from('bs_items')->where('id', $item_id)->get()->row();
+        $condition = 'requested_item_id = "'.$item_id.'" OR offered_item_id = "'.$item_id.'"';
+        if($get_item_type->item_type_id == '1') {
+            $condition = 'requested_item_id = "'.$item_id.'"';
+        }
         $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
-        
+//        echo $this->db->last_query();die();
         $this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
     }
@@ -1421,7 +1425,7 @@ class Chats extends API_Controller
 		if($type == DIRECT_BUY || $type == REQUEST_ITEM) {
 			$condition .=  $condition != '' ? 
 			" AND buyer_user_id = '".$user_id."' AND requested_item_id != ''" : 
-			"buyer_user_id = '".$user_id."' AND (operation_type = '1' OR operation_type = '4') AND requested_item_id != '' AND is_cart_offer = 0"; 
+			"buyer_user_id = '".$user_id."' AND (operation_type = '1' OR operation_type = '4') AND requested_item_id != '' "; 
 		} else if($type == EXCHANGE){
 			$condition .= $condition != '' ? 
 			" AND (buyer_user_id = '".$user_id."' OR seller_user_id = '".$user_id."') AND operation_type = '3' AND requested_item_id != ''" : 
@@ -1429,38 +1433,60 @@ class Chats extends API_Controller
 		} else {
 			$condition .= $condition != '' ? 
 			" AND seller_user_id = '".$user_id."' AND requested_item_id != ''" : 
-			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != '' AND is_cart_offer = 0";		
+			"seller_user_id = '".$user_id."' AND operation_type != '3' AND requested_item_id != ''";		
 		}
-        $unique_record = '';
+        $unique_record = 'requested_item_id as retreive_item_id';
         if($type == REQUEST_ITEM) {
-            $unique_record = 'DISTINCT';
-        }
+            $unique_record = 'DISTINCT requested_item_id as retreive_item_id';
+        } else if($type == SELLING) {
+            $unique_record = 'DISTINCT requested_item_id as retreive_item_id,offered_item_id';
+        } 
 		//echo "SELECT DISTINCT requested_item_id FROM `bs_chat_history` WHERE ".$condition; die(' dieee');
-		$records = $this->db->query("SELECT ".$unique_record." requested_item_id FROM `bs_chat_history` WHERE ".$condition." order by updated_date desc, added_date desc")->result();
+		$records = $this->db->query("SELECT ".$unique_record."  FROM `bs_chat_history` WHERE ".$condition." order by updated_date desc, added_date desc")->result();
 //        echo $this->db->last_query();die();
+//        dd($records);
+        if($type == SELLING) {
+            $filter_record = [];
+            foreach ($records as $key => $value) {
+                $retreive_item_id = array_column($filter_record, 'retreive_item_id');
+                $offered_item_id = array_column($filter_record, 'offered_item_id');
+                $combine_items = array_unique(array_filter(array_merge($retreive_item_id,$offered_item_id)));
+                if(!in_array($value->retreive_item_id, $combine_items) && !in_array($value->offered_item_id, $combine_items)) {
+                    $filter_record[$key] = $value;
+                }
+            }
+            $records = array_values($filter_record);
+        }
+//        dd($records);
+
 		$obj = [];
 		//  SEND USER COUNT AND Lowest Price
         $verify_ids = [];
-        if($type == REQUEST_ITEM) { 
-		foreach($records as $key => $data){
-                $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->requested_item_id."'")->row();
+        if($type == REQUEST_ITEM || $type == SELLING) { 
+            foreach($records as $key => $data){
+                $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."'")->row();
                 $obj[] = isset($details) && !empty($details) ? $details : [];
             }
         } else {
             foreach($records as $key => $data){
-			$details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->requested_item_id."'")->result();
+                $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."'")->result();
 
-            foreach ($details as $k => $v) {
-                if(!in_array($v->id, $verify_ids)) {
-                    $obj[] = isset($v) && !empty($v) ? $v : [];
-                    $verify_ids[] = $v->id;
-		}
+                foreach ($details as $k => $v) {
+                    if(!in_array($v->id, $verify_ids)) {
+                        $obj[] = isset($v) && !empty($v) ? $v : [];
+                        $verify_ids[] = $v->id;
+                    }
+                }
             }
-		}
         }
+//        dd($obj);
 		foreach($obj as $key => $data){
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
-				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' AND requested_item_id = "'.$obj[$key]->requested_item_id.'"')->row();
+                $item_condition = 'requested_item_id = "'.$obj[$key]->requested_item_id.'"';
+                if($type == SELLING && $obj[$key]->operation_type == REQUEST_ITEM) {
+                    $item_condition = '(requested_item_id = "'.$obj[$key]->offered_item_id.'" OR offered_item_id = "'.$obj[$key]->offered_item_id.'")';
+                }
+				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' AND '.$item_condition)->row();
 				$obj[$key]->bid_count = $total->total_user;
 
 				$result_price = $this->db->query('SELECT MIN(nego_price) AS lowest_price FROM `bs_chat_history` WHERE '.$condition.' AND requested_item_id = "'.$obj[$key]->requested_item_id.'"')->row();
@@ -1474,6 +1500,8 @@ class Chats extends API_Controller
 			}
 			$obj[$key]->quantity = $obj[$key]->quantity != 0 ? $obj[$key]->quantity : 1;	 		
 		}
+//        die();
+        
 		$this->ps_adapter->convert_chathistory( $obj );
 		$this->custom_response( $obj );
 		// end of code
