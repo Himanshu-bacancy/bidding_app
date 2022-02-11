@@ -279,12 +279,12 @@ class Chats extends API_Controller
             $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $post['offered_item_id'])->get()->row();
             $item_img = $item_images->img_path;
         }
-        if(isset($post['quantity']) && $post['quantity'] > 1) {
+//        if(isset($post['quantity']) && $post['quantity'] > 1) {
             send_push( [$token], ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img,'chat_id' => $obj->id]);
-        }
-        if($get_item->is_confirm_with_seller) {
-             send_push( [$token], ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img,'chat_id' => $obj->id]);
-        }
+//        }
+//        if($get_item->is_confirm_with_seller) {
+//             send_push( [$token], ["message" => "Offer received $".$post['nego_price'], "flag" => "chat",'title' => $title], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_img,'chat_id' => $obj->id]);
+//        }
         /*Notify seller :end*/
         
 		$this->custom_response( $obj );
@@ -401,6 +401,7 @@ class Chats extends API_Controller
 					"seller_user_id" => $sellerUserId,
 					"buyer_unread_count" => $buyer_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
+					"updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
 					"size_id" => $this->post('size_id'),
 					"color_id" => $this->post('color_id'),
@@ -453,6 +454,7 @@ class Chats extends API_Controller
 					"seller_user_id" => $sellerUserId,
 					"seller_unread_count" => $seller_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
+                    "updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
 					"size_id" => $this->post('size_id'),
 					"color_id" => $this->post('color_id'),
@@ -533,6 +535,7 @@ class Chats extends API_Controller
 					"seller_user_id" => $sellerUserId,
 					"buyer_unread_count" => $buyer_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
+                    "updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
 					"size_id" => $this->post('size_id'),
 					"color_id" => $this->post('color_id'),
@@ -582,6 +585,7 @@ class Chats extends API_Controller
 					"seller_user_id" => $sellerUserId,
 					"seller_unread_count" => $seller_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
+                    "updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
 					"size_id" => $this->post('size_id'),
 					"color_id" => $this->post('color_id'),
@@ -1334,18 +1338,36 @@ class Chats extends API_Controller
         array(
 	        	'field' => 'item_id',
 	        	'rules' => 'required'
+	        ),
+            array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        ),
+            array(
+	        	'field' => 'return_type',
+	        	'rules' => 'required'
 	        )
+            
         );
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
         $item_id = $this->post('item_id');
-        $get_item_type = $this->db->select('item_type_id')->from('bs_items')->where('id', $item_id)->get()->row();
-        $condition = 'requested_item_id = "'.$item_id.'" OR offered_item_id = "'.$item_id.'"';
-        if($get_item_type->item_type_id == '1') {
-            $condition = 'requested_item_id = "'.$item_id.'"';
+        $return_type = $this->post('return_type');
+        $user_id = $this->post('user_id');
+        
+//        $get_item_type = $this->db->select('item_type_id')->from('bs_items')->where('id', $item_id)->get()->row();
+//        $condition = 'requested_item_id = "'.$item_id.'" OR offered_item_id = "'.$item_id.'"';
+//        if($get_item_type->item_type_id == '1') {
+//            $condition = 'requested_item_id = "'.$item_id.'"';
+//        }
+        
+        $condition = 'buyer_user_id = "'.$user_id.'" AND requested_item_id = "'.$item_id.'"';
+        if($return_type == 'to_seller') {
+            $condition = 'seller_user_id = "'.$user_id.'" AND (requested_item_id = "'.$item_id.'" OR offered_item_id = "'.$item_id.'") ';
         }
+        
         $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
 //        echo $this->db->last_query();die();
         $this->ps_adapter->convert_chathistory( $obj );
@@ -1465,8 +1487,10 @@ class Chats extends API_Controller
         if($type == REQUEST_ITEM || $type == SELLING) { 
             foreach($records as $key => $data){
                 $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."'")->row();
+//                echo $this->db->last_query();echo '<br>';
                 $obj[] = isset($details) && !empty($details) ? $details : [];
             }
+//            die();
         } else {
             foreach($records as $key => $data){
                 $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."'")->result();
@@ -1483,12 +1507,13 @@ class Chats extends API_Controller
 		foreach($obj as $key => $data){
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
                 $item_condition = 'requested_item_id = "'.$obj[$key]->requested_item_id.'"';
-                if($type == SELLING && $obj[$key]->operation_type == REQUEST_ITEM) {
+                if($type == SELLING && $obj[$key]->operation_type == REQUEST_ITEM ) {
                     $item_condition = '(requested_item_id = "'.$obj[$key]->offered_item_id.'" OR offered_item_id = "'.$obj[$key]->offered_item_id.'")';
                 }
 				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' AND '.$item_condition)->row();
+//                echo $this->db->last_query();echo '<br>';
 				$obj[$key]->bid_count = $total->total_user;
-
+//                die();
 				$result_price = $this->db->query('SELECT MIN(nego_price) AS lowest_price FROM `bs_chat_history` WHERE '.$condition.' AND requested_item_id = "'.$obj[$key]->requested_item_id.'"')->row();
 				$obj[$key]->lowest_price = $result_price->lowest_price ? $result_price->lowest_price : $obj[$key]->nego_price;
 				// if($obj[$key]->operation_type==3){
@@ -1498,7 +1523,13 @@ class Chats extends API_Controller
 			} else {
 				$obj[$key]->lowest_price = $obj[$key]->nego_price;
 			}
-			$obj[$key]->quantity = $obj[$key]->quantity != 0 ? $obj[$key]->quantity : 1;	 		
+			$obj[$key]->quantity = $obj[$key]->quantity != 0 ? $obj[$key]->quantity : 1;	
+            $unread_col_sum = 'buyer_unread_count';
+            if($type == SELLING) {
+                $unread_col_sum = 'seller_unread_count';
+            }
+            $total = $this->db->query('SELECT sum('.$unread_col_sum.') AS unread_sum FROM `bs_chat_history` WHERE '.$condition.' AND '.$item_condition)->row();
+            $obj[$key]->$unread_col_sum = $total->unread_sum;            
 		}
 //        die();
         
@@ -1739,6 +1770,7 @@ class Chats extends API_Controller
 		} else {
 			$chat_data_update = array(
 				"nego_price" => $this->post('price'), 
+                "updated_date" => date("Y-m-d H:i:s"),
 			);
 			if(!$this->Chat->Save($chat_data_update, $chat_history_id)) {
 				$this->error_response(get_msg( 'err_count_update'));
@@ -1886,18 +1918,18 @@ class Chats extends API_Controller
                 ->where('requested_item_id is NOT NULL', NULL, FALSE)
                 ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
             ->group_end()
-            ->where('is_cart_offer', 0)
+//            ->where('is_cart_offer', 0)
             ->get()->num_rows();
         
         $count_object->selling_unread_counts = $this->db->from('bs_chat_history')
-            ->where('operation_type', DIRECT_BUY)
+            ->where('operation_type !=', EXCHANGE)
             ->where('seller_user_id', $this->post('user_id'))
             ->where('seller_unread_count > 0')
             ->group_start()
                 ->where('requested_item_id is NOT NULL', NULL, FALSE)
                 ->or_where('offered_item_id is NOT NULL', NULL, FALSE)
             ->group_end()
-            ->where('is_cart_offer', 0)
+//            ->where('is_cart_offer', 0)
             ->get()->num_rows();
         
         $exchange_selling_unread_counts = $this->db->from('bs_chat_history')

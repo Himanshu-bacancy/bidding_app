@@ -72,7 +72,7 @@ class Reason extends API_Controller
         if($this->Chat->exists( $operationData )){
             $offersData = $this->db->select('id')->from('bs_chat_history')->where('id', $chatId)->where('is_cancel', 0)->get()->row();
             if(!empty($offersData)){
-                $chatHistoryData = array('is_cancel'=>1);
+                $chatHistoryData = array('is_cancel'=>1, "updated_date" => date("Y-m-d H:i:s"));
                 if(!$this->Chat->save( $chatHistoryData, $chatId )) {
                     $this->error_response( get_msg( 'err_cancel_offer' ));
                 } else {
