@@ -354,7 +354,7 @@ class Chats extends API_Controller
 		}
 		$type = $this->post('type');
 		
-		if($chat_history_data->id == "") {
+		if($chat_history_data->id == "" ) {
 			$operation_type = $this->post('operation_type');
 
 			if ( $type == "to_buyer" ) {
@@ -496,6 +496,13 @@ class Chats extends API_Controller
 			}
 			return $obj;
 		} else {
+            if($chat_history_data->nego_price == $this->post('nego_price') && !$chat_history_data->is_cancel) {
+                if($this->post('operation_type') != DIRECT_BUY) {
+                    $this->error_response( get_msg( 'Active offer already exist with same price' ));
+                } else if($this->post('operation_type') == DIRECT_BUY && $chat_history_data->delivery_method_id == $this->post('delivery_method_id')) {
+                    $this->error_response( get_msg( 'Active offer already exist with same price' ));
+                }
+            }
 			if ( $type == "to_buyer" ) {
 				//prepare data for noti
 				$user_ids[] = $buyerUserId;
@@ -1486,7 +1493,7 @@ class Chats extends API_Controller
         $verify_ids = [];
         if($type == REQUEST_ITEM || $type == SELLING) { 
             foreach($records as $key => $data){
-                $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."'")->row();
+                $details = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition." AND requested_item_id = '".$records[$key]->retreive_item_id."' ORDER BY updated_date desc, added_date desc")->row();
 //                echo $this->db->last_query();echo '<br>';
                 $obj[] = isset($details) && !empty($details) ? $details : [];
             }
