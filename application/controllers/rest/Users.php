@@ -368,7 +368,7 @@ class Users extends API_Controller
 				$this->custom_response($user);
 	        }
         } else {
-			$this->error_response( get_msg( 'err_user_not_exist' ));
+			$this->error_response( get_msg( 'User or Password Invalid' ));
 
         }
 
