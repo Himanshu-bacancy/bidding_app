@@ -342,18 +342,30 @@ class Chats extends API_Controller
 				if(!empty($exchange_offer_id_data) && $exchange_offer_id_data[0]->id == ""){
 					$chat_history_data->id = "";
 				}
+                if(empty($exchange_offer_id_data)) {
+					$chat_history_data->id = "";
+                }
 			}
 		}else{
 			$chat_data = array(
 				"requested_item_id" => $requestedItemId,
-				"offered_item_id" => $offeredItemId, 
 				"buyer_user_id" => $buyerUserId, 
 				"seller_user_id" => $sellerUserId,
+                'is_offer' => 0
 			);
-			$chat_history_data = $this->Chat->get_one_by($chat_data);
+            $offer_chat_history_data = $this->Chat->get_one_by($chat_data);
+            if(!empty($offer_chat_history_data)) {
+                $chat_history_data = $offer_chat_history_data;
+            } else {
+                unset($chat_data['is_offer']);
+                $chat_data["offered_item_id"] = $offeredItemId;
+                $chat_history_data = $this->Chat->get_one_by($chat_data);
+            }
 		}
 		$type = $this->post('type');
-		
+        if($chat_history_data->is_offer_complete) {
+            $chat_history_data->id = "";
+        }
 		if($chat_history_data->id == "" ) {
 			$operation_type = $this->post('operation_type');
 
@@ -503,6 +515,7 @@ class Chats extends API_Controller
                     $this->error_response( get_msg( 'Active offer already exist with same price' ));
                 }
             }
+            
 			if ( $type == "to_buyer" ) {
 				//prepare data for noti
 				$user_ids[] = $buyerUserId;
@@ -605,6 +618,9 @@ class Chats extends API_Controller
 					"payment_method_id" => $this->post('payment_method_id'),
 				);
 			}
+            if(!$chat_history_data->is_offer) {
+                $chat_data['is_offer'] = 1;
+            }
 			if(!$this->Chat->Save( $chat_data, $chat_history_data->id )) {
 				$this->error_response( get_msg( 'err_price_update' ));
 			} else {

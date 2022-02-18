@@ -1426,6 +1426,16 @@ class Payments extends API_Controller {
                     }
                     $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
                     $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+                    
+                    if($offer_details->operation_type == REQUEST_ITEM) {
+                        $requested_item_stock = $this->db->from('bs_items')->where('id', $offer_details->requested_item_id)->get()->row();
+                        $requested_item_stock_update = $requested_item_stock->pieces - 1;
+                        $requested_item_stock_array['pieces'] = $requested_item_stock_update;
+                        if(!$requested_item_stock_update) {
+                            $requested_item_stock_array['is_sold_out'] = 1;
+                        }
+                        $this->db->where('id', $offer_details->requested_item_id)->update('bs_items', $requested_item_stock_array);
+                    }
                     /*manage stock :end*/
                     
                     # set stripe test key
