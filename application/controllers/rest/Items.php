@@ -404,6 +404,16 @@ class Items extends API_Controller
         // exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
         
+        $expiration_date = '';
+        if(!empty($this->post('expiration_date_days'))) {
+            $default_address_data = $this->db->from('bs_addresses')->where(array('is_default_address' => 1 ,'user_id' => $this->post('added_user_id')))->get()->row();
+            if(!empty($default_address_data->timezone) && !is_null($default_address_data->timezone)) {
+                $todate = new DateTime("now", new DateTimeZone($default_address_data->timezone) );
+                $todate = $todate->format('Y-m-d');
+            } 
+            $expiration_date = date('Y-m-d', strtotime($todate. ' + '.$this->post('expiration_date_days').' days'));
+        }
+        
 	  	$item_data = array(
 
         	"cat_id" => $this->post('cat_id'), 
@@ -426,7 +436,7 @@ class Items extends API_Controller
 			"is_negotiable" => $this->post('is_negotiable'),
 			"negotiable_percentage" => $this->post('negotiable_percentage'),
 			"expiration_date_days" => $this->post('expiration_date_days'),
-			"expiration_date" => !empty($this->post('expiration_date_days')) ? date('Y-m-d', strtotime($todate. ' + '.$this->post('expiration_date_days').' days')) : '',
+			"expiration_date" => $expiration_date,
 			"pickup_distance" => $this->post('pickup_distance'),
 			"observation" => $this->post('observation'),
 			"is_draft" => $this->post('is_draft'),

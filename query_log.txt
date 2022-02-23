@@ -346,3 +346,6 @@ ALTER TABLE `bs_chat_history` CHANGE `seller_unread_count` `seller_unread_count`
 
 // RB: ADDED ON 2/02/2022
 ALTER TABLE `bs_chat_history` ADD `is_offer` TINYINT NOT NULL DEFAULT '1' AFTER `is_cart_offer`;
+
+// RB: ADDED ON 22/02/2022
+ALTER TABLE `bs_addresses` ADD `timezone` TEXT NULL AFTER `updated_date`;

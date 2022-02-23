@@ -139,7 +139,9 @@ class Address extends API_Controller
 
 			// exit if there is an error in validation,
 			if ( !$this->is_valid( $rules )) exit;
-			
+			$this->load->library('TimezoneMapper');
+            
+            $timezone = TimezoneMapper::latLngToTimezoneString($this->post('latitude'), $this->post('longitude'));
 			$address_data = array(
 
 				"address_title" => $this->post('address_title'),
@@ -154,7 +156,8 @@ class Address extends API_Controller
 				"user_id" => $this->post('user_id'),
 				"is_home_address" => (($this->post('is_home_address')=='1'))?'1':'0', 
 //				"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
-				"id" => $this->post('id')
+				"id" => $this->post('id'),
+                "timezone" => $timezone
 			);
 
 			$id = $address_data['id'];
@@ -540,7 +543,12 @@ class Address extends API_Controller
 			
 //			$this->Addresses->delete( $this->post('address_id') );
             $this->db->where('id', $this->post('address_id'))->update('bs_addresses', ['status' => 0]);
-			
+			$get_addresses = $this->Addresses->get_one_by( ['user_id' => $address_data->user_id, 'status' => 1] );
+            if($get_addresses->id != "") {
+                $address_data1['is_default_address'] = '1';
+                
+                $this->Addresses->save($address_data1,$get_addresses->id);
+            }
 			$this->success_response( get_msg( 'success_delete' ));
 
         }
