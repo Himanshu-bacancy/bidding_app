@@ -892,6 +892,9 @@ class PS_Adapter {
 			{
 				$condscstm = array();
 				$condscstm['no_publish_filter'] = 1;
+                $condscstm['order_by'] = 1;
+                $condscstm['order_by_field'] = 'name';
+                $condscstm['order_by_type'] = 'asc';
 
 				$brandarray = $this->CI->Brands->get_all_by( $condscstm);
 				
