@@ -295,6 +295,7 @@ class Chats extends API_Controller
 		$requestedItemDetails = $this->Item->get_one( $requestedItemId );
 		$this->ps_adapter->convert_item($requestedItemDetails);
 		$offeredItemDetails = $this->Item->get_one( $offeredItemId );
+		$this->ps_adapter->convert_item($offeredItemDetails);
 		if(isset($operation_type) && $operation_type=='exchange'){
 			$exchangeCategoriesFlag = false;
 			foreach($requestedItemDetails->exchange_category as $exchangeCat){
@@ -316,83 +317,92 @@ class Chats extends API_Controller
 			if($requestedItemDetails->childsubcat_id != $offeredItemDetails->childsubcat_id){
 				$this->error_response( get_msg( 'err_make_offer_category_validation_error' ));
 			}
-            if($requestedItemDetails->is_accept_similar) {
-                if(!is_null($requestedItemDetails->similar_items)) {
-                    $ignored_creterias = array_column($requestedItemDetails->similar_items, 'similarcreteria_id');
-                    $all_criterias = $this->db->select('id,title')->from('bs_similar_criterias')->get()->result_array();
-                    foreach ($all_criterias as $key => $value) {
-                        if(!in_array($value['id'],$ignored_creterias)) {
-                            /*brand*/
-                            if(strtolower($value['title']) == 'brand') {
-                                if(!empty($requestedItemDetails->brand) && !empty($offeredItemDetails->brand)) {
-                                    if($requestedItemDetails->brand != $offeredItemDetails->brand) {
-                                        $this->error_response( get_msg( 'Brand doesnt match with buyer requirement' ));
+            // commented as implmented new api for the same items/useroffereditems
+//            if($requestedItemDetails->is_accept_similar) {
+//                if(!is_null($requestedItemDetails->similar_items)) {
+//                    $ignored_creterias = array_column($requestedItemDetails->similar_items, 'similarcreteria_id');
+//                    $all_criterias = $this->db->select('id,title')->from('bs_similar_criterias')->get()->result_array();
+//                    foreach ($all_criterias as $key => $value) {
+//                        if(!in_array($value['id'],$ignored_creterias)) {
+//                            
+//                            /*brand*/
+//                            if(strtolower($value['title']) == 'brand') {
+//                                if(!empty($requestedItemDetails->brand) && !empty($offeredItemDetails->brand))                               {
+//                                    if($requestedItemDetails->brand != $offeredItemDetails->brand) {
+//                                        $this->error_response( get_msg( 'Brand doesnt match with buyer requirement' ));
+//                                    }
+//                                    
+//                                }
+//                            }
+//                            
+//                            /*color*/
+//                            if(strtolower($value['title']) == 'color') {
+//                                
+//                                if(!is_null($requestedItemDetails->item_colors) && !is_null($offeredItemDetails->item_colors)) {
+//                                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
+//                                    $offeredItem_color = $offeredItemDetails->item_colors[0]->color_id;
+//
+//                                    if(!in_array($offeredItem_color, $requestedItem_colors)) {
+//                                        $this->error_response( get_msg( 'Color doesnt match with buyer requirement' ));
+//                                    }
+//                                }
+//                            }
+//                            if(strtolower($value['title']) == 'condition') { 
+//                                /*condition*/
+//                                if($requestedItemDetails->condition_of_item_id != $offeredItemDetails->condition_of_item_id)                 {
+//                                    $this->error_response( get_msg( 'Condition doesnt match with buyer requirement' ));
+//                                }
+//                            }
+//                            if(strtolower($value['title']) == 'size') { 
+//                                
+//                                /*size*/
+//                                if($requestedItemDetails->sizegroup_id && $offeredItemDetails->sizegroup_id && $requestedItemDetails->sizegroup_id  != $offeredItemDetails->sizegroup_id) {
+//                                    $this->error_response( get_msg( 'Size doesnt match with buyer requirement' ));
+//                                }
+//                                if(!is_null($requestedItemDetails->sizegroup_options) && !is_null($offeredItemDetails->sizegroup_options)) {
+//                                    $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
+//                                    $offeredItem_sizegroup_option = $offeredItemDetails->sizegroup_options[0]->sizegroup_option_id;
+//
+//                                    if(!in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
+//                                        $this->error_response( get_msg( 'Sizegroup option doesnt match with buyer requirement' ));
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+//                if($requestedItemDetails->condition_of_item_id != $offeredItemDetails->condition_of_item_id)                 {
+//                    $this->error_response( get_msg( 'Condition doesnt match with buyer requirement' ));
+//                }
+//                if(!empty($requestedItemDetails->brand) && !empty($offeredItemDetails->brand)) {
+//                    if($requestedItemDetails->brand != $offeredItemDetails->brand) {
+//                        $this->error_response( get_msg( 'Brand doesnt match with buyer requirement' ));
+//                    }
+//                }
+//                if(!is_null($requestedItemDetails->item_colors) && !empty($requestedItemDetails->item_colors) && !is_null($offeredItemDetails->item_colors) && !empty($offeredItemDetails->item_colors)) {
+//                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
+//                    $offeredItem_color = $offeredItemDetails->item_colors[0]->color_id;
+//                    
+//                    if(!in_array($offeredItem_color, $requestedItem_colors)) {
+//                        $this->error_response( get_msg( 'Color doesnt match with buyer requirement' ));
+//                    }
+//                }
+//                if($requestedItemDetails->sizegroup_id && $offeredItemDetails->sizegroup_id && $requestedItemDetails->sizegroup_id  != $offeredItemDetails->sizegroup_id) {
+//                    $this->error_response( get_msg( 'Size doesnt match with buyer requirement' ));
+//                }
+//                if(!is_null($requestedItemDetails->sizegroup_options) && !empty($requestedItemDetails->sizegroup_options) && !is_null($offeredItemDetails->sizegroup_options) && !empty($offeredItemDetails->sizegroup_options)) {
+//                    $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
+//                    $offeredItem_sizegroup_option = $offeredItemDetails->sizegroup_options[0]->sizegroup_option_id;
+//                    
+//                    if(!in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
+//                        $this->error_response( get_msg( 'Sizegroup option doesnt match with buyer requirement' ));
+//                    }
+//                }
+//            }
                                     }
-                                    
                                 }
-                            }
-                            /*color*/
-                            if(strtolower($value['title']) == 'color') {
-                                if(!is_null($requestedItemDetails->item_colors) && !is_null($offeredItemDetails->item_colors)) {
-                                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
-                                    $offeredItem_color = $offeredItemDetails->item_colors[0]->color_id;
-
-                                    if(!in_array($offeredItem_color, $requestedItem_colors)) {
-                                        $this->error_response( get_msg( 'Color doesnt match with buyer requirement' ));
-                                    }
-                                }
-                            }
-                            /*condition*/
-                            if($requestedItemDetails->condition_of_item_id != $offeredItemDetails->condition_of_item_id)                 {
-                                $this->error_response( get_msg( 'Condition doesnt match with buyer requirement' ));
-                            }
-                            /*size*/
-                            if($requestedItemDetails->sizegroup_id && $offeredItemDetails->sizegroup_id && $requestedItemDetails->sizegroup_id  != $offeredItemDetails->sizegroup_id) {
-                                $this->error_response( get_msg( 'Size doesnt match with buyer requirement' ));
-                            }
-                            if(!is_null($requestedItemDetails->sizegroup_options) && !is_null($offeredItemDetails->sizegroup_options)) {
-                                $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
-                                $offeredItem_sizegroup_option = $offeredItemDetails->sizegroup_options[0]->sizegroup_option_id;
-
-                                if(!in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
-                                    $this->error_response( get_msg( 'Sizegroup option doesnt match with buyer requirement' ));
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if($requestedItemDetails->condition_of_item_id != $offeredItemDetails->condition_of_item_id)                 {
-                    $this->error_response( get_msg( 'Condition doesnt match with buyer requirement' ));
-                }
-                if(!empty($requestedItemDetails->brand) && !empty($offeredItemDetails->brand)) {
-                    if($requestedItemDetails->brand != $offeredItemDetails->brand) {
-                        $this->error_response( get_msg( 'Brand doesnt match with buyer requirement' ));
-                    }
-                }
-                if(!is_null($requestedItemDetails->item_colors) && !is_null($offeredItemDetails->item_colors)) {
-                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
-                    $offeredItem_color = $offeredItemDetails->item_colors[0]->color_id;
-                    
-                    if(!in_array($offeredItem_color, $requestedItem_colors)) {
-                        $this->error_response( get_msg( 'Color doesnt match with buyer requirement' ));
-                    }
-                }
-                if($requestedItemDetails->sizegroup_id && $offeredItemDetails->sizegroup_id && $requestedItemDetails->sizegroup_id  != $offeredItemDetails->sizegroup_id) {
-                    $this->error_response( get_msg( 'Size doesnt match with buyer requirement' ));
-                }
-                if(!is_null($requestedItemDetails->sizegroup_options) && !is_null($offeredItemDetails->sizegroup_options)) {
-                    $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
-                    $offeredItem_sizegroup_option = $offeredItemDetails->sizegroup_options[0]->sizegroup_option_id;
-                    
-                    if(!in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
-                        $this->error_response( get_msg( 'Sizegroup option doesnt match with buyer requirement' ));
-                    }
-                }
-            }
-		}
-	}
-
+                            
 	// ADD CHAT FOR REQUEST SELLER AND EXCHANGE    -- Operation type = 3 means exchange, 1 = Request, 4 = Direct Buy
 	function save_chat($offeredItemId){
 		$requestedItemId = $this->post('requested_item_id');

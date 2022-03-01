@@ -715,9 +715,30 @@ class Payments extends API_Controller {
                     $orders = $orders->where('bs_chat_history.is_cart_offer', 0);
                 }
                 $orders = $orders->get()->result_array();   
-                
+        
         if(!empty($orders) && count($orders)) {
-            $this->response($orders);
+            $rowdetails = [];
+            $row = [];
+            foreach ($orders as $key => $value) {
+                $row[$key] = $value;
+                $item_details = $this->Item->get_one( $value['items'] );
+                $this->ps_adapter->convert_item($item_details);
+                $row[$key]['requested_item_detail'] = retreive_custom_data($item_details,['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
+                if($operation_type == EXCHANGE) {
+                    if(!is_null($value[offer_id])) {
+                        $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $value['offer_id'])->get()->result();
+                        foreach ($offered_item_details as $k => $v) { 
+                            $rowdetails[$k] = $this->Item->get_one( $v->offered_item_id );
+                            $this->ps_adapter->convert_item($rowdetails[$k]);
+                            $who_pay = $v->who_pay;
+                            $rowdetails[$k] = retreive_custom_data($rowdetails[$k],['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
+                        }
+                    }
+                    $row[$key]['who_pay'] = $who_pay;
+                    $row[$key]['exchange_item_detail'] = $rowdetails;
+                } 
+            }
+            $this->response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
@@ -768,6 +789,7 @@ class Payments extends API_Controller {
             }
                 
             $orders['item_details'] = $item_details;
+            $orders['requested_item_detail'] = retreive_custom_data($item_details,['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
             
             $buyer = $this->User->get_one( $orders['user_id'] );
             $this->ps_adapter->convert_user( $buyer );
@@ -796,7 +818,7 @@ class Payments extends API_Controller {
             $orders['tax_charged_to_buyer'] = "0";
             
             if($orders['operation_type'] == EXCHANGE) {
-                $offered_item_details = $this->db->select('offered_item_id')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $orders['offer_id'])->get()->result();
+                $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $orders['offer_id'])->get()->result();
                 
                 foreach ($offered_item_details as $key => $value) {
                     $row_item_details[$key] = $this->Item->get_one( $value->offered_item_id );
@@ -817,10 +839,15 @@ class Payments extends API_Controller {
                     } else {
                         $row_item_details[$key]->shipping_details = (object)[];
                     }
+                    $who_pay = $value->who_pay;
+                    $exchange_item_detail[$key] = retreive_custom_data($row_item_details[$key],['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
                 }
-                $orders['offered_item_details'] = $row_item_details;
+                $orders['offered_item_detail'] = $row_item_details;
+                $orders['who_pay'] = $who_pay;
+                $orders['exchange_item_detail'] = $exchange_item_detail;
+                
             } else {
-                $orders['offered_item_details'] = (object)[];
+                $orders['offered_item_detail'] = (object)[];
             }
             $seller_transaction = str_replace('Stripe\\PaymentIntent JSON: ', '', $orders['seller_transaction']);
             $orders['seller_transaction'] = json_decode($seller_transaction);
@@ -1092,6 +1119,7 @@ class Payments extends API_Controller {
                             $item_details->shipping_details = (object)[];
                         }
                         $row[$key]->item_details = $item_details;
+                        $row[$key]->requested_item_detail = retreive_custom_data($item_details,['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
                 
                         $buyer = $this->User->get_one( $value->user_id );
                         $this->ps_adapter->convert_user( $buyer );
@@ -1122,6 +1150,20 @@ class Payments extends API_Controller {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
                         }
+                        
+                        if($operation_type == EXCHANGE) {
+                            if(!is_null($value->offer_id)) {
+                                $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $value->offer_id)->get()->result();
+                                foreach ($offered_item_details as $k => $v) { 
+                                    $rowdetails[$k] = $this->Item->get_one( $v->offered_item_id );
+                                    $this->ps_adapter->convert_item($rowdetails[$k]);
+                                    $who_pay = $v->who_pay;
+                                    $rowdetails[$k] = retreive_custom_data($rowdetails[$k],['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
+                                }
+                            }
+                            $row[$key]->who_pay = $who_pay;
+                            $row[$key]->exchange_item_detail = $rowdetails;
+                        }
                     }
                 } else {
                     if(is_null($value->completed_date)) {
@@ -1148,6 +1190,7 @@ class Payments extends API_Controller {
                             $item_details->shipping_details = (object)[];
                         }
                         $row[$key]->item_details = $item_details;
+                        $row[$key]->requested_item_detail = retreive_custom_data($item_details,['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
 
                         $buyer = $this->User->get_one( $value->user_id );
                         $this->ps_adapter->convert_user( $buyer );
@@ -1179,19 +1222,33 @@ class Payments extends API_Controller {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
                         }
+                        
+                        if($operation_type == EXCHANGE) {
+                            if(!is_null($value->offer_id)) {
+                                $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $value->offer_id)->get()->result();
+                                foreach ($offered_item_details as $k => $v) { 
+                                    $rowdetails[$k] = $this->Item->get_one( $v->offered_item_id );
+                                    $this->ps_adapter->convert_item($rowdetails[$k]);
+                                    $who_pay = $v->who_pay;
+                                    $rowdetails[$k] = retreive_custom_data($rowdetails[$k],['id', 'cat_id', 'sub_cat_id', 'item_type_id', 'condition_of_item_id', 'description', 'price', 'title', 'status', 'added_date', 'added_user_id', 'default_photo']);
+                                }
+                            }
+                            $row[$key]->who_pay = $who_pay;
+                            $row[$key]->exchange_item_detail = $rowdetails;
+                        } 
                     }
                 }
             }
             if(!empty($row)) {
                 $row = array_values($row);
 //            $row = $this->ps_security->clean_output( $row );
-            $this->custom_response($row);
+                $this->custom_response($row);
+            } else {
+                $this->error_response($this->config->item( 'record_not_found'));
+            }
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
-        } else {
-            $this->error_response($this->config->item( 'record_not_found'));
-    }
     }
     
     public function confirm_shipment_post() {

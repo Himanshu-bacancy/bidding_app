@@ -79,7 +79,11 @@ class Summary extends API_Controller {
         $direct_buy_arr['discounts'] = ($direct_buy_discount) ?? '0' ;
         
         $selling_arr = [];
-        $selling_arr['posted_items'] = $this->db->select('id')->from('bs_items')->where('item_type_id',SELLING)->where('added_user_id', $posts['user_id'])->where('is_draft', 0)->where('status > ', -1)->get()->num_rows();
+        $selling_arr['posted_items'] = $this->db->select('id')->from('bs_items')
+                ->group_start()
+                ->where('item_type_id',SELLING)->or_where('item_type_id',EXCHANGE)
+                ->group_end()
+                ->where('added_user_id', $posts['user_id'])->where('is_draft', 0)->where('status > ', -1)->get()->num_rows();
         
         $selling_arr['in_process_orders'] = $this->db->select('bs_order.id')->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')

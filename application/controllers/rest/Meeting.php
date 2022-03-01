@@ -156,7 +156,9 @@ class Meeting extends API_Controller {
         if ( !$this->is_valid( $rules )) exit;
         $posts = $this->post();
 
-        $get_user = $this->db->select('*')->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        $get_user = $this->db->select('bs_items.title,bs_items.added_user_id,bs_order.*')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->where('bs_order.order_id', $posts['order_id'])->get()->row();
         if($get_user->user_id == $posts['user_id']) {
             $date = date('Y-m-d H:i:s');
             $update_order['delivery_status'] = 'qr-verified';
@@ -181,6 +183,11 @@ class Meeting extends API_Controller {
                 $update_order['confirm_meeting_date'] = $date;
             }
             $this->db->where('order_id',$posts['order_id'])->update('bs_order',$update_order);
+            
+            $seller = $this->db->select('device_token')->from('core_users')->where('user_id', $get_user->added_user_id)->get()->row();
+            
+            send_push( [$seller->device_token], ["message" => "Barcode has been scanned and payment successfully", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_user->title." order update"] );
+                    
             $this->response(['status' => 'success', 'message' => 'Qr code verified']);
         } else {
             $this->response(['status' => 'error', 'message' => 'Invalid']);

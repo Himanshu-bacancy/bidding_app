@@ -870,3 +870,22 @@ if ( ! function_exists( 'deep_linking_shorten_url' ))
 
 	}
 }
+
+if ( ! function_exists( 'retreive_custom_data' )) 
+{
+	function retreive_custom_data( $main_arr, $filter_colums_arr )
+	{
+        
+        $arr = [];
+        if(is_array($main_arr)) {
+            foreach ($filter_colums_arr as $key => $value) {
+                $arr[$value] = $main_arr[$value];
+            }
+        } else {
+            foreach ($filter_colums_arr as $key => $value) {
+                $arr[$value] = $main_arr->$value;
+            }
+        }
+        return $arr;
+	}
+}

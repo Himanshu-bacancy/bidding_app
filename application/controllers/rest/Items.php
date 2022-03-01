@@ -969,8 +969,8 @@ class Items extends API_Controller
 			$conds['itemcondition_item_id'] = $itemcondition_item_id;
 			$conds['brand_items_id'] = $brand_items_id;
 			if ($conds['is_paid'] == "only_paid_item") {
-				//$conds['item_id'] = $item_id;
-				//$conds['reported_item_id'] = $reported_item_id;
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1 ;
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
@@ -985,8 +985,8 @@ class Items extends API_Controller
 			} elseif ($conds['is_paid'] == "paid_item_first") {
 				$result = "";
 
-				//$conds['item_id'] = $item_id;
-				//$conds['reported_item_id'] = $reported_item_id;
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
 				$conds['is_paid'] = 1;
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
@@ -999,8 +999,8 @@ class Items extends API_Controller
 					$data_paid = $this->model->get_all_item_by_paid_date( $conds )->result();
 				}
 			} else {
-				//$conds['item_id'] = $item_id;
-				//$conds['reported_item_id'] = $reported_item_id;
+				$conds['item_id'] = $item_id;
+				$conds['reported_item_id'] = $reported_item_id;
 				if ( !empty( $limit ) && !empty( $offset )) {
 					// if limit & offset is not empty
 					$data = $this->model->get_all_by_itemnew( $conds, $limit, $offset )->result();
@@ -1571,5 +1571,215 @@ class Items extends API_Controller
 			$this->error_response( get_msg( 'record_not_found' ) );
 		}
 	}
+    
+    public function useroffereditems_post(){
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
 
+		// validation rules for police station
+		$rules = array(
+			array(
+	        	'field' => 'requested_item_id',
+	        	'rules' => 'required'
+	        ),
+			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        )
+        );
+		if ( !$this->is_valid( $rules )) exit;
+		$requested_item_id = $this->post('requested_item_id');
+		$user_id = $this->post('user_id');
+        
+        $requestedItemDetails = $this->Item->get_one( $requested_item_id );
+//        dd($requestedItemDetails);
+		$this->ps_adapter->convert_item($requestedItemDetails);
+        
+        $conds_user['added_user_id'] = $user_id;
+        $conds_user['is_sold_out'] = 0;
+        $conds_user['status'] = 1;
+        $conds_user['cat_id'] = $requestedItemDetails->cat_id;
+        $conds_user['sub_cat_id'] = $requestedItemDetails->sub_cat_id;
+        $conds_user['childsubcat_id'] = $requestedItemDetails->childsubcat_id;
+        
+        $where = "delivery_method_id = ".PICKUP_AND_DELIVERY;
+        if($requestedItemDetails->delivery_method_id == PICKUP_ONLY) {
+            $where = "delivery_method_id IN (".PICKUP_ONLY.",".PICKUP_AND_DELIVERY.")";
+        } else if($requestedItemDetails->delivery_method_id == DELIVERY_ONLY) {
+            $where = "delivery_method_id IN (".DELIVERY_ONLY.",".PICKUP_AND_DELIVERY.")";
+        }
+        $item_users = $this->db->from('bs_items')->where( $conds_user )
+                ->group_start()
+                    ->where('item_type_id', SELLING)->or_where('item_type_id', EXCHANGE)
+                ->group_end()
+                ->where($where)
+                ->get()->result();
+        $row = [];
+        foreach ($item_users as $key => $value) {
+            $row[$key] = $value;
+    		$this->ps_adapter->convert_item($row[$key]);
+        }
+        if($requestedItemDetails->is_accept_similar) {
+            if(!is_null($requestedItemDetails->similar_items)) {
+                $ignored_creterias = array_column($requestedItemDetails->similar_items, 'similarcreteria_id');
+                $all_criterias = $this->db->select('id,title')->from('bs_similar_criterias')->get()->result_array();
+                $skip_criteria = 0;
+                foreach ($all_criterias as $k => $v) {
+                    if(!in_array($v['id'],$ignored_creterias)) { 
+                        /*brand*/
+                        if(strtolower($v['title']) == 'brand') {
+                            foreach ($row as $key => $value) {
+                                if(!empty($requestedItemDetails->brand) && !empty($value->brand)){
+                                    if($requestedItemDetails->brand == $value->brand) {
+                                        $brand_filter_arr[] = $value;
+                                    }
+                                } else {
+                                    $brand_filter_arr[] = $value;
+                                }
+                            }
+                            $op = $brand_filter_arr;
+                        }
+                        
+                        /*color*/
+                        if(strtolower($v['title']) == 'color') {
+                            $arr = $brand_filter_arr;
+                            if($skip_criteria) {
+                                $arr = $row;
+                                $skip_criteria = 0;
+                            }
+                            foreach ($arr as $key => $value) {
+                                if(!is_null($requestedItemDetails->item_colors) && !empty($requestedItemDetails->item_colors) && !is_null($value->item_colors) && !empty($value->item_colors)) {
+                                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
+                                    $offeredItem_color = $value->item_colors[0]->color_id;
+
+                                    if(in_array($offeredItem_color, $requestedItem_colors)) {
+                                        $color_filter_arr[] = $value;
+                                    }
+                                } else {
+                                    $color_filter_arr[] = $value;
+                                }
+                            }
+                            $op = $color_filter_arr;
+                        }
+                        
+                        /*condition*/
+                        if(strtolower($v['title']) == 'condition') { 
+                            $arr = $color_filter_arr;
+                            if($skip_criteria == 2) {
+                                $arr = $row;
+                                $skip_criteria = 0;
+                            } elseif ($skip_criteria == 1) {
+                                $arr = $brand_filter_arr;
+                                $skip_criteria = 0;
+                            }
+                            foreach ($arr as $key => $value) {
+                                if($requestedItemDetails->condition_of_item_id == $value->condition_of_item_id){
+                                    $condition_filter_arr[] = $value;
+                                }
+                            }
+                            $op = $condition_filter_arr;
+                        }
+                        
+                        /*size*/
+                        if(strtolower($v['title']) == 'size') { 
+                            $arr = $condition_filter_arr;
+                            if($skip_criteria == 3){
+                                $arr = $row;
+                                $skip_criteria = 0;
+                            } elseif($skip_criteria == 2) {
+                                $arr = $brand_filter_arr;
+                                $skip_criteria = 0;
+                            } elseif ($skip_criteria == 1) {
+                                $arr = $color_filter_arr;
+                                $skip_criteria = 0;
+                            }
+                           
+                            foreach ($arr as $key => $value) {    
+                                if($requestedItemDetails->sizegroup_id && $value->sizegroup_id) {
+                                    if($requestedItemDetails->sizegroup_id  == $value->sizegroup_id) {
+                                        $sizegroup_filter_arr[] = $value;
+                                    }
+                                } else {
+                                    $sizegroup_filter_arr[] = $value;
+                                }
+                            }
+                            
+                            foreach ($sizegroup_filter_arr as $key => $value) {    
+                                if(!is_null($requestedItemDetails->sizegroup_options) && !empty($requestedItemDetails->sizegroup_options) && !is_null($value->sizegroup_options) && !empty($value->sizegroup_options)) {
+                                        $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
+                                        $offeredItem_sizegroup_option = $value->sizegroup_options[0]->sizegroup_option_id;
+
+                                        if(in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
+                                            $sizegroup_options_filter_arr[] = $value;
+                                        }
+                                } else {
+                                    $sizegroup_options_filter_arr[] = $value;
+                                }
+                            }
+                            $op = $sizegroup_options_filter_arr;
+                        }           
+                    } else {
+                        $skip_criteria += 1;
+                    }
+                }
+            }
+        } else {
+            /*brand*/
+            foreach ($row as $key => $value) {
+                if(!empty($requestedItemDetails->brand) && !empty($value->brand)){
+                    if($requestedItemDetails->brand == $value->brand) {
+                        $brand_filter_arr[] = $value;
+                    }
+                } else {
+                    $brand_filter_arr[] = $value;
+                }
+            }
+            /*color*/
+            foreach ($brand_filter_arr as $key => $value) {
+                if(!is_null($requestedItemDetails->item_colors) && !empty($requestedItemDetails->item_colors) && !is_null($value->item_colors) && !empty($value->item_colors)) {
+                    $requestedItem_colors = array_column($requestedItemDetails->item_colors, 'color_id');
+                    $offeredItem_color = $value->item_colors[0]->color_id;
+
+                    if(in_array($offeredItem_color, $requestedItem_colors)) {
+                        $color_filter_arr[] = $value;
+                    }
+                } else {
+                    $color_filter_arr[] = $value;
+                }
+            }
+            /*condition*/
+            foreach ($color_filter_arr as $key => $value) {
+                if($requestedItemDetails->condition_of_item_id == $value->condition_of_item_id){
+                    $condition_filter_arr[] = $value;
+                }
+            }
+            
+            /*size*/
+            foreach ($condition_filter_arr as $key => $value) {    
+                if($requestedItemDetails->sizegroup_id && $value->sizegroup_id) {
+                    if($requestedItemDetails->sizegroup_id  == $value->sizegroup_id) {
+                        $sizegroup_filter_arr[] = $value;
+                    }
+                } else {
+                    $sizegroup_filter_arr[] = $value;
+                }
+            }
+            foreach ($sizegroup_filter_arr as $key => $value) {    
+                if(!is_null($requestedItemDetails->sizegroup_options) && !empty($requestedItemDetails->sizegroup_options) && !is_null($value->sizegroup_options) && !empty($value->sizegroup_options)) {
+                        $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
+                        $offeredItem_sizegroup_option = $value->sizegroup_options[0]->sizegroup_option_id;
+
+                        if(in_array($offeredItem_sizegroup_option, $requestedItem_sizegroup_options)) {
+                            $sizegroup_options_filter_arr[] = $value;
+                        }
+                } else {
+                    $sizegroup_options_filter_arr[] = $value;
+                }
+            }
+        }
+        
+        $this->custom_response($op);
+    }
 }
