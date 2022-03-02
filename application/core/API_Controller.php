@@ -393,7 +393,7 @@ class API_Controller extends REST_Controller
             }
         }
         
-        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item', 'default_deliverymethod'];
+        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item', 'default_deliverymethod','category','sub_category','childsub_category','item_deliverymethod'];
         $is_empty = ['item_colors', 'sizegroup_options', 'default_address', 'meeting_location','confirm_location'];
         
         if(is_array($data)) {
