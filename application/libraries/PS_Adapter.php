@@ -169,6 +169,24 @@ class PS_Adapter {
 		// set default photo
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'item' );
 
+		$obj->price = $obj->price ? $obj->price : '';
+		$obj->is_sold_out = $obj->is_sold_out ? $obj->is_sold_out : '';
+		$obj->updated_flag = $obj->updated_flag ? $obj->updated_flag : '';
+		$obj->touch_count = $obj->touch_count ? $obj->touch_count : '';
+		$obj->favourite_count = $obj->favourite_count ? $obj->favourite_count : '';
+		$obj->is_paid = $obj->is_paid ? $obj->is_paid : '';
+		$obj->is_all_colors = $obj->is_all_colors ? $obj->is_all_colors : ''; 
+		$obj->delivery_method_id = $obj->delivery_method_id ? $obj->delivery_method_id : '';
+		$obj->pieces = $obj->pieces ? $obj->pieces : '';
+		$obj->is_negotiable = $obj->is_negotiable ? $obj->is_negotiable : '';
+		$obj->is_draft = $obj->is_draft ? $obj->is_draft : '';
+		$obj->is_confirm_with_seller = $obj->is_confirm_with_seller ? $obj->is_confirm_with_seller : '';
+		$obj->is_exchange = $obj->is_exchange ? $obj->is_exchange : '';	
+		$obj->is_accept_similar = $obj->is_accept_similar ? $obj->is_accept_similar : '';	
+		$obj->is_confirm = $obj->is_confirm ? $obj->is_confirm : '';	
+		$obj->photo_count = $obj->photo_count ? $obj->photo_count : '';	
+
+
 		// category object
 		if ( isset( $obj->cat_id )) {
 
