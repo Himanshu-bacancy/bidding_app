@@ -170,21 +170,21 @@ class PS_Adapter {
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'item' );
 
 		$obj->price = $obj->price ? $obj->price : '';
-		$obj->is_sold_out = $obj->is_sold_out ? $obj->is_sold_out : '';
-		$obj->updated_flag = $obj->updated_flag ? $obj->updated_flag : '';
-		$obj->touch_count = $obj->touch_count ? $obj->touch_count : '';
-		$obj->favourite_count = $obj->favourite_count ? $obj->favourite_count : '';
-		$obj->is_paid = $obj->is_paid ? $obj->is_paid : '';
-		$obj->is_all_colors = $obj->is_all_colors ? $obj->is_all_colors : ''; 
-		$obj->delivery_method_id = $obj->delivery_method_id ? $obj->delivery_method_id : '';
-		$obj->pieces = $obj->pieces ? $obj->pieces : '';
-		$obj->is_negotiable = $obj->is_negotiable ? $obj->is_negotiable : '';
-		$obj->is_draft = $obj->is_draft ? $obj->is_draft : '';
-		$obj->is_confirm_with_seller = $obj->is_confirm_with_seller ? $obj->is_confirm_with_seller : '';
-		$obj->is_exchange = $obj->is_exchange ? $obj->is_exchange : '';	
-		$obj->is_accept_similar = $obj->is_accept_similar ? $obj->is_accept_similar : '';	
-		$obj->is_confirm = $obj->is_confirm ? $obj->is_confirm : '';	
-		$obj->photo_count = $obj->photo_count ? $obj->photo_count : '';	
+		$obj->is_sold_out = $obj->is_sold_out ? $obj->is_sold_out : 0;
+		$obj->updated_flag = $obj->updated_flag ? $obj->updated_flag : 0;
+		$obj->touch_count = $obj->touch_count ? $obj->touch_count : 0;
+		$obj->favourite_count = $obj->favourite_count ? $obj->favourite_count : 0;
+		$obj->is_paid = $obj->is_paid ? $obj->is_paid : 0;
+		$obj->is_all_colors = $obj->is_all_colors ? $obj->is_all_colors : 0; 
+		$obj->delivery_method_id = $obj->delivery_method_id ? $obj->delivery_method_id : 0;
+		$obj->pieces = $obj->pieces ? $obj->pieces : 0;
+		$obj->is_negotiable = $obj->is_negotiable ? $obj->is_negotiable : 0;
+		$obj->is_draft = $obj->is_draft ? $obj->is_draft : 0;
+		$obj->is_confirm_with_seller = $obj->is_confirm_with_seller ? $obj->is_confirm_with_seller : 0;
+		$obj->is_exchange = $obj->is_exchange ? $obj->is_exchange : 0;	
+		$obj->is_accept_similar = $obj->is_accept_similar ? $obj->is_accept_similar : 0;	
+		$obj->is_confirm = $obj->is_confirm ? $obj->is_confirm : 0;	
+		$obj->photo_count = $obj->photo_count ? $obj->photo_count : 0;	
 
 
 		// category object
