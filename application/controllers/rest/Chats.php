@@ -1613,11 +1613,15 @@ class Chats extends API_Controller
 //        dd($obj);
 		foreach($obj as $key => $data){
 			if(isset($obj[$key]->requested_item_id) && isset($obj[$key]->operation_type)){
-                $item_condition = 'requested_item_id = "'.$obj[$key]->requested_item_id.'"';
-                if($type == SELLING && $obj[$key]->operation_type == REQUEST_ITEM ) {
-                    $item_condition = '(requested_item_id = "'.$obj[$key]->offered_item_id.'" OR offered_item_id = "'.$obj[$key]->offered_item_id.'")';
+                $item_condition = "";
+                if($type == SELLING && $obj[$key]->operation_type == REQUEST_ITEM) {
+                    if(!empty($obj[$key]->offered_item_id)) {
+                        $item_condition = 'AND (requested_item_id = "'.$obj[$key]->offered_item_id.'" OR offered_item_id = "'.$obj[$key]->offered_item_id.'")';
                 }
-				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' AND '.$item_condition)->row();
+                } else {
+                    $item_condition = 'AND requested_item_id = "'.$obj[$key]->requested_item_id.'"';
+                }
+				$total = $this->db->query('SELECT COUNT(*) AS total_user FROM `bs_chat_history` WHERE '.$condition.' '.$item_condition)->row();
 //                echo $this->db->last_query();echo '<br>';
 				$obj[$key]->bid_count = $total->total_user;
 //                die();
@@ -1635,7 +1639,7 @@ class Chats extends API_Controller
             if($type == SELLING) {
                 $unread_col_sum = 'seller_unread_count';
             }
-            $total = $this->db->query('SELECT sum('.$unread_col_sum.') AS unread_sum FROM `bs_chat_history` WHERE '.$condition.' AND '.$item_condition)->row();
+            $total = $this->db->query('SELECT sum('.$unread_col_sum.') AS unread_sum FROM `bs_chat_history` WHERE '.$condition.' '.$item_condition)->row();
             $obj[$key]->$unread_col_sum = $total->unread_sum;            
 		}
 //        die();

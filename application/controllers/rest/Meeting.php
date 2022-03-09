@@ -133,7 +133,7 @@ class Meeting extends API_Controller {
         
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_id)->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Qr code received for order", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_user->title." order update"] );
+        send_push( [$buyer->device_token], ["message" => "Qr code received for order", "flag" => "order", 'title' => $get_user->title." order update"],['order_id' => $posts['order_id']] );
         
         $this->response(['status' => 'success', 'message' => 'Qr code generated', 'file_path' => $return_file_path2]);
     }

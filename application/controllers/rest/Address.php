@@ -1,5 +1,6 @@
 <?php
 require_once( APPPATH .'libraries/REST_Controller.php' );
+require_once( APPPATH .'libraries/TimezoneMapper.php' );
 
 /**
  * REST API for Addresses
@@ -139,7 +140,7 @@ class Address extends API_Controller
 
 			// exit if there is an error in validation,
 			if ( !$this->is_valid( $rules )) exit;
-			$this->load->library('TimezoneMapper');
+//			$this->load->library('TimezoneMapper');
             
             $timezone = TimezoneMapper::latLngToTimezoneString($this->post('latitude'), $this->post('longitude'));
 			$address_data = array(
