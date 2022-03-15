@@ -1400,31 +1400,72 @@ class Payments extends API_Controller {
         $posts_var = $this->post();
         
         $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['offer_id'])->get()->row();
+        $card_id = $offer_details->card_id;
+        $cvc = $offer_details->cvc;
+        $delivery_address_id = $offer_details->delivery_address_id;
+        $stripe_payment_method_id = $offer_details->stripe_payment_method_id;
+        $delivery_method_id = $offer_details->delivery_method_id;
+        
+        $paid_config = $this->Paid_config->get_one('pconfig1');
         if(!$offer_details->is_offer_complete) {
             $new_odr_id = 'odr_'.time().$posts_var['user_id'];
             $shipping_amount = 0;
             if($offer_details->seller_user_id != $posts_var['user_id']) {
-                if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
-                    $this->error_response("Please pass card id");
+                if($offer_details->operation_type == REQUEST_ITEM && is_null($stripe_payment_method_id)) {
+                    if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
+                        $this->error_response("Please pass card id");
+                    }
+                    if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
+                        $this->error_response("Please pass cvc");
+                    }
+                    if(!isset($posts_var['delivery_address_id']) || empty($posts_var['delivery_address_id']) || is_null($posts_var['delivery_address_id'])) {
+                        $this->error_response("Please pass delivery address id");
+                    }
+                    
+                    $delivery_address_id = $posts_var['delivery_address_id'];
+                    $card_id = $posts_var['card_id'];
+                    $cvc = $posts_var['cvc'];
+                    
+                    $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+                    $expiry_date = explode('/',$card_details->expiry_date);
+                    # set stripe test key
+                    \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                    try {
+                        $response = \Stripe\PaymentMethod::create([
+                            'type' => 'card',
+                            'card' => [
+                                'number' => $card_details->card_number,
+                                'exp_month' => $expiry_date[0],
+                                'exp_year' => $expiry_date[1],
+                                'cvc' => $cvc
+                            ]
+                        ]);
+                        $stripe_payment_method_id = $response->id;
+                        
+                        $chat_data_update['card_id'] = $card_id;
+                        $chat_data_update['delivery_address_id'] = $delivery_address_id;
+                        $chat_data_update['stripe_payment_method_id'] = $stripe_payment_method_id;
+                        $chat_data_update['stripe_payment_method'] = $response;
+                        
+                        $this->db->where('id', $posts_var['offer_id'])->update('bs_chat_history', $chat_data_update);
+                    } catch (exception $e) {
+                        $this->db->insert('bs_stripe_error', ['chat_id' => $posts_var['offer_id'], 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->error_response(get_msg('stripe_transaction_failed'));
+                    }
                 }
-                if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
-                    $this->error_response("Please pass cvc");
+                if($offer_details->operation_type != DIRECT_BUY) {
+                    if(!isset($posts_var['delivery_method_id']) || empty($posts_var['delivery_method_id']) || is_null($posts_var['delivery_method_id'])) {
+                        $this->error_response("Please pass delivery method id");
+                    }
+                    $delivery_method_id = $posts_var['delivery_method_id'];
                 }
-                if(!isset($posts_var['delivery_method_id']) || empty($posts_var['delivery_method_id']) || is_null($posts_var['delivery_method_id'])) {
-                    $this->error_response("Please pass delivery_method_id");
-                }
-                if(!isset($posts_var['price']) || empty($posts_var['price']) || is_null($posts_var['price'])) {
-                    $this->error_response("Please pass price");
-                }
+
                 if($posts_var['operation_type'] != EXCHANGE) {
                     if(!isset($posts_var['item_id']) || empty($posts_var['item_id']) || is_null($posts_var['item_id'])) {
                         $this->error_response("Please pass item_id");
                     }
                 } else {
                     $requested_item_id = $this->db->from('bs_chat_history')->where('id',$posts_var['offer_id'])->get()->row()->requested_item_id;
-                }
-                if(!isset($posts_var['delivery_address']) || empty($posts_var['delivery_address']) || is_null($posts_var['delivery_address'])) {
-                    $this->error_response("Please pass delivery_address");
                 }
                 if(!isset($posts_var['operation_type']) || empty($posts_var['operation_type']) || is_null($posts_var['operation_type'])) {
                     $this->error_response("Please pass operation_type");
@@ -1434,19 +1475,14 @@ class Payments extends API_Controller {
                         $this->error_response("Please pass qty");
                     }
                 }
-                $card_id = $posts_var['card_id'];
-                $cvc     = $posts_var['cvc'];
-                $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
-                $expiry_date = explode('/',$card_details->expiry_date);
-                $paid_config = $this->Paid_config->get_one('pconfig1');
-                $item_price = $posts_var['price'];
+                $item_price = $offer_details->nego_price;
                 
                 $backend_config = $this->Backend_config->get_one('be1');
                 $service_fee = ((float)$item_price * (float)$backend_config->selling_fees)/100;
                 $processing_fees = ((float)$item_price * (float)$backend_config->processing_fees)/100;
                 $seller_earn = (float)$item_price - $service_fee - $processing_fees;
-                
-                if($posts_var['delivery_method_id'] == DELIVERY_ONLY) {
+               
+                if($delivery_method_id == DELIVERY_ONLY) {
                     
                     $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
@@ -1472,7 +1508,7 @@ class Payments extends API_Controller {
                             $shipping_amount = $get_item->shipping_cost_by_seller;
                         }
                     }
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'qty' => ($posts_var['qty'] ?? ''), 'delivery_method' => $posts_var['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $posts_var['price'], 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => $posts_var['item_id'], 'qty' => ($posts_var['qty'] ?? ''), 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
@@ -1498,24 +1534,19 @@ class Payments extends API_Controller {
                     # set stripe test key
                     \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
                     try {
-                        $response = \Stripe\PaymentMethod::create([
-                            'type' => 'card',
-                            'card' => [
-                                'number' => $card_details->card_number,
-                                'exp_month' => $expiry_date[0],
-                                'exp_year' => $expiry_date[1],
-                                'cvc' => $cvc
-                            ]
-                        ]);
                         $response = \Stripe\PaymentIntent::create([
                             'amount' => $item_price * 100,
                             "currency" => trim($paid_config->currency_short_form),
-                            'payment_method' => $response->id,
-                            'payment_method_types' => ['card']
+                            'payment_method' => $stripe_payment_method_id,
+                            'payment_method_types' => ['card'],
+                            'confirm' => true
                         ]);
 
                         if (isset($response->id)) { 
-                            $this->db->where('id', $record)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
+                            if($response->status == 'requires_action') {
+                                $this->error_response('Transaction requires authorization');
+                            }
+                            $this->db->where('id', $record)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
 
                             $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
@@ -1529,20 +1560,18 @@ class Payments extends API_Controller {
                             $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
                         } else {
                             $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
+                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
                             $this->error_response(get_msg('stripe_transaction_failed'));
                         }
                     } catch (exception $e) {
                         $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
+                        $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
 
-                } else if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
-                    if(!isset($posts_var['payin']) || $posts_var['payin'] == '' || is_null($posts_var['payin'])) {
-                        $this->error_response("Please pass payin");
-                    }
-                   
+                } else if($delivery_method_id == PICKUP_ONLY) {
                     $date = date('Y-m-d H:i:s');
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $posts_var['user_id'], 'items' => ($posts_var['item_id'] ?? $requested_item_id), 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
@@ -1555,34 +1584,22 @@ class Payments extends API_Controller {
                     $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
                     $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
                     /*manage stock :end*/
-                    if($posts_var['payin'] == PAYCARD) {
-                        $card_id = $posts_var['card_id'];
-                        $cvc     = $posts_var['cvc'];
-                        $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
-                        $expiry_date = explode('/',$card_details->expiry_date);
-                        $paid_config = $this->Paid_config->get_one('pconfig1');
-                        $item_price = $posts_var['price']; 
-                        
+                    if($offer_details->payin == PAYCARD) {
                         # set stripe test key
                         \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
                         try {
-                            $response = \Stripe\PaymentMethod::create([
-                                'type' => 'card',
-                                'card' => [
-                                    'number' => $card_details->card_number,
-                                    'exp_month' => $expiry_date[0],
-                                    'exp_year' => $expiry_date[1],
-                                    'cvc' => $cvc
-                                ]
-                            ]);
                             $response = \Stripe\PaymentIntent::create([
                                 'amount' => $item_price * 100,
                                 "currency" => trim($paid_config->currency_short_form),
-                                'payment_method' => $response->id,
-                                'payment_method_types' => ['card']
+                                'payment_method' => $stripe_payment_method_id,
+                                'payment_method_types' => ['card'],
+                                'confirm' => true
                             ]);
                             if (isset($response->id)) { 
-                                $this->db->where('id', $record)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id,'payment_method' => 'card', 'card_id' => $card_id]);
+                                if($response->status == 'requires_action') {
+                                   $this->error_response('Transaction requires authorization');
+                                }
+                                $this->db->where('id', $record)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id,'payment_method' => 'card', 'card_id' => $card_id]);
 
                                 $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
@@ -1600,6 +1617,7 @@ class Payments extends API_Controller {
                             }
                         } catch (exception $e) {
                             $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
+                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                             $this->error_response(get_msg('stripe_transaction_failed'));
                         } 
                     } else {
@@ -1629,7 +1647,7 @@ class Payments extends API_Controller {
 //                    } else {
 //                        $requested_item_id = $posts_var['item_id'];
 //                    }
-                    $item_price = $posts_var['price'];
+                    $item_price = $offer_details->nego_price;
                     
                     $backend_config = $this->Backend_config->get_one('be1');
                     $service_fee = ((float)$item_price * (float)$backend_config->selling_fees)/100;
@@ -1638,7 +1656,7 @@ class Payments extends API_Controller {
 
                     $seller_earn = (float)$item_price - $service_fee - $processing_fees;
                     
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id, 'delivery_method' => $posts_var['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $posts_var['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'success', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $posts_var['operation_type']]);
                     $record = $this->db->insert_id();
 
                     /*manage stock :start*/

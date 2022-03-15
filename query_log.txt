@@ -349,3 +349,17 @@ ALTER TABLE `bs_chat_history` ADD `is_offer` TINYINT NOT NULL DEFAULT '1' AFTER 
 
 // RB: ADDED ON 22/02/2022
 ALTER TABLE `bs_addresses` ADD `timezone` TEXT NULL AFTER `updated_date`;
+
+// RB: ADDED ON 15/03/2022
+ALTER TABLE `bs_chat_history` ADD `card_id` INT NULL AFTER `is_offer`, ADD `cvv` INT NULL AFTER `card_id`, ADD `delivery_address_id` VARCHAR(255) NULL AFTER `cvv`;
+
+ALTER TABLE `bs_chat_history` CHANGE `cvv` `stripe_payment_method` TEXT NULL DEFAULT NULL;
+
+ALTER TABLE `bs_chat_history` ADD `stripe_payment_method_id` VARCHAR(255) NULL AFTER `card_id`;
+
+
+CREATE TABLE `bidding_app6`.`bs_stripe_error` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `order_id` VARCHAR(255) NOT NULL , `response` LONGTEXT NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_stripe_error` ADD `chat_id` VARCHAR(255) NULL AFTER `order_id`;
+
+ALTER TABLE `bs_chat_history` ADD `payin` TINYINT NULL AFTER `delivery_address_id`;

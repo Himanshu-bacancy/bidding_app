@@ -1159,6 +1159,13 @@ class PS_Adapter {
                 } else {
                     $obj[$i]->chat_deliverymethod = (object)[];
                 }
+                
+                if(!is_null($obj[$i]->stripe_payment_method)) {
+                    $stripe_payment_method = str_replace('Stripe\\StripeObject JSON: ', '', $obj[$i]->stripe_payment_method);
+                    $obj[$i]->stripe_payment_method = json_decode($stripe_payment_method);
+                } else {
+                    $obj[$i]->stripe_payment_method = (object)[];
+                }
 			}
 		} else {
 
@@ -1249,7 +1256,14 @@ class PS_Adapter {
             } else {
                 $obj->chat_deliverymethod = (object)[];
             }
+            
+            if(!is_null($obj->stripe_payment_method)) {
+                $stripe_payment_method = str_replace('Stripe\\StripeObject JSON: ', '', $obj->stripe_payment_method);
+                $obj->stripe_payment_method = json_decode($stripe_payment_method);
+            } else {
+                $obj->stripe_payment_method = (object)[];
 		}	
+        }
 	}
 
 

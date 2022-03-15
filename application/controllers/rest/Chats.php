@@ -1,5 +1,6 @@
 <?php
 require_once( APPPATH .'libraries/REST_Controller.php' );
+require_once( APPPATH .'libraries/stripe_lib/autoload.php' );
 
 
 /**
@@ -217,11 +218,30 @@ class Chats extends API_Controller
 	        	'field' => 'delivery_method_id',
 	        	'rules' => 'required'
 	        ));
+			array_push($rules, array(
+	        	'field' => 'card_id',
+	        	'rules' => 'required'
+	        ));
+			array_push($rules, array(
+	        	'field' => 'cvc',
+	        	'rules' => 'required'
+	        ));
+			array_push($rules, array(
+	        	'field' => 'delivery_address_id',
+	        	'rules' => 'required'
+	        ));
 		}
 
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
 		$requestedItemId = $this->post('requested_item_id');
+        
+        if($this->post('operation_type') == DIRECT_BUY && $this->post('operation_type') == PICKUP_ONLY){
+            $payin = $this->post('payin');
+            if(!isset($payin)) {
+                $this->error_response("Please pass payin");
+            }
+        }
         /* seller form : start 
         $get_item_detail = $this->db->from('bs_items')->where('id',$requestedItemId)->get()->row();
         if($get_item_detail->is_negotiable) {
@@ -251,7 +271,30 @@ class Chats extends API_Controller
 		$obj = $this->save_chat($this->post('offered_item_id'));
         
         if($this->post('operation_type') == DIRECT_BUY){
-            $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id')]);
+            
+            $card_id = $this->post('card_id');
+            $cvc     = $this->post('cvc');
+            $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+            $expiry_date = explode('/',$card_details->expiry_date);
+            $paid_config = $this->Paid_config->get_one('pconfig1');
+                        
+            # set stripe test key
+            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+            try {
+                $response = \Stripe\PaymentMethod::create([
+                    'type' => 'card',
+                    'card' => [
+                        'number' => $card_details->card_number,
+                        'exp_month' => $expiry_date[0],
+                        'exp_year' => $expiry_date[1],
+                        'cvc' => $cvc
+                    ]
+                ]);
+                $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id'),'card_id' => $this->post('card_id'),'stripe_payment_method_id' => $response->id,'stripe_payment_method' => $response,'delivery_address_id' => $this->post('delivery_address_id'),'payin' => $this->post('payin')]);
+            } catch (exception $e) {
+                $this->db->insert('bs_stripe_error', ['chat_id' => $obj->id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                $this->error_response(get_msg('stripe_transaction_failed'));
+            } 
         }
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
@@ -495,7 +538,7 @@ class Chats extends API_Controller
 					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
-					"buyer_unread_count" => $buyer_unread_count + 1,
+					"buyer_unread_count" => empty($buyer_unread_count) ? 1 : $buyer_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
 					"updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
@@ -543,12 +586,13 @@ class Chats extends API_Controller
 				$data['operation_type'] = $operation_type; */
 
 				$seller_unread_count = $chat_history_data->seller_unread_count;
+                
 				$chat_data = array(
 					"requested_item_id" => $requestedItemId,
 					"offered_item_id" => ($this->post('operation_type') != EXCHANGE) ? $offeredItemId : NULL,
 					"buyer_user_id" => $buyerUserId, 
 					"seller_user_id" => $sellerUserId,
-					"seller_unread_count" => $seller_unread_count + 1,
+					"seller_unread_count" => (empty($seller_unread_count)) ? 1 : $seller_unread_count + 1,
 					"added_date" => date("Y-m-d H:i:s"),
                     "updated_date" => date("Y-m-d H:i:s"),
 					"nego_price" => $this->post('nego_price'),
@@ -1863,6 +1907,10 @@ class Chats extends API_Controller
 		// validation rules for chat history
 		$rules = array(
 			array(
+	        	'field' => 'user_id',
+	        	'rules' => 'required'
+	        ),
+			array(
 	        	'field' => 'id',
 	        	'rules' => 'required'
 	        ),
@@ -1872,7 +1920,7 @@ class Chats extends API_Controller
 	        ),
         );
 		if ( !$this->is_valid( $rules )) exit;
-
+        $posts_var = $this->post();
 		$chat_history_id = $this->post('id');
 		$chat_history_data = $this->Chat->get_one_by(array('id' => $chat_history_id));
 
@@ -1883,6 +1931,44 @@ class Chats extends API_Controller
 				"nego_price" => $this->post('price'), 
                 "updated_date" => date("Y-m-d H:i:s"),
 			);
+            if($chat_history_data->buyer_user_id == $posts_var['user_id'] && $chat_history_data->operation_type == REQUEST_ITEM) {
+                if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
+                    $this->error_response("Please pass cvc");
+                }
+                if(!isset($posts_var['card_id']) || empty($posts_var['card_id']) || is_null($posts_var['card_id'])) {
+                    $this->error_response("Please pass card_id");
+                }
+                if(!isset($posts_var['delivery_address_id']) || empty($posts_var['delivery_address_id']) || is_null($posts_var['delivery_address_id'])) {
+                    $this->error_response("Please pass delivery address id");
+                }
+                $card_id = $posts_var['card_id'];
+                $cvc     = $posts_var['cvc'];
+                $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+                $expiry_date = explode('/',$card_details->expiry_date);
+                $paid_config = $this->Paid_config->get_one('pconfig1');
+
+                # set stripe test key
+                \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                try {
+                    $response = \Stripe\PaymentMethod::create([
+                        'type' => 'card',
+                        'card' => [
+                            'number' => $card_details->card_number,
+                            'exp_month' => $expiry_date[0],
+                            'exp_year' => $expiry_date[1],
+                            'cvc' => $cvc
+                        ]
+                    ]);
+                } catch (exception $e) {
+                    $this->db->insert('bs_stripe_error', ['chat_id' => $chat_history_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->error_response(get_msg('stripe_transaction_failed'));
+                }
+
+                $chat_data_update['card_id'] = $posts_var['card_id'];
+                $chat_data_update['delivery_address_id'] = $posts_var['delivery_address_id'];
+                $chat_data_update['stripe_payment_method_id'] = $response->id;
+                $chat_data_update['stripe_payment_method'] = $response;
+            }
 			if(!$this->Chat->Save($chat_data_update, $chat_history_id)) {
 				$this->error_response(get_msg( 'err_count_update'));
 			} else {
