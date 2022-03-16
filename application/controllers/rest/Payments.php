@@ -1449,7 +1449,7 @@ class Payments extends API_Controller {
                         
                         $this->db->where('id', $posts_var['offer_id'])->update('bs_chat_history', $chat_data_update);
                     } catch (exception $e) {
-                        $this->db->insert('bs_stripe_error', ['chat_id' => $posts_var['offer_id'], 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->db->insert('bs_stripe_error', ['chat_id' => $posts_var['offer_id'], 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
                 }
@@ -1738,7 +1738,7 @@ class Payments extends API_Controller {
         );
         if (!$this->is_valid($rules)) exit; 
         $user_id = $this->post('user_id');
-        $cards = $this->db->query("SELECT * FROM `bs_card` WHERE user_id = '".$user_id."' LIMIT 1")->result();
+        $cards = $this->db->query("SELECT * FROM `bs_card` WHERE user_id = '".$user_id."' and status = 1 LIMIT 1")->result();
         $cardData = $cards && $cards[0] ? $cards[0] : []; 
         //$this->ps_adapter->convert_card($cardData);
         $this->custom_response($cardData);

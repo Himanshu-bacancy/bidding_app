@@ -22,7 +22,7 @@ class Crons extends CI_Controller {
                 "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
                                   );
 
-                $url = 'https://api.goshippo.com/tracks/shippo/'.$track_number;
+                $url = 'https://api.goshippo.com/tracks/shippo/'.$value['tracking_number'];
 
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
@@ -44,4 +44,15 @@ class Crons extends CI_Controller {
         }
         echo 'cron run successfully';
     }
+    
+//    public function expire_offer() {
+//        $past_record = $this->db->select('id, added_date,NOW() - INTERVAL 10 MINUTE as datetr')->from('bs_chat_history')
+//                ->where('is_cancel', 0)
+//                ->where('is_offer_complete', 0)
+//                ->where('DATE(added_date) < DATE(NOW() - INTERVAL 10 MINUTE)')
+//                ->get()->result_array();
+//        dd($past_record);
+//        $past_record_ids = array_column($past_record, 'id');
+//        echo 'cron run successfully';
+//    }
 }

@@ -267,11 +267,8 @@ class Chats extends API_Controller
 				$this->validation_chat_item_categories($requestedItemId, $this->post('offered_item_id'));
 			}
 		}
-		
-		$obj = $this->save_chat($this->post('offered_item_id'));
-        
+       
         if($this->post('operation_type') == DIRECT_BUY){
-            
             $card_id = $this->post('card_id');
             $cvc     = $this->post('cvc');
             $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -290,11 +287,15 @@ class Chats extends API_Controller
                         'cvc' => $cvc
                     ]
                 ]);
-                $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id'),'card_id' => $this->post('card_id'),'stripe_payment_method_id' => $response->id,'stripe_payment_method' => $response,'delivery_address_id' => $this->post('delivery_address_id'),'payin' => $this->post('payin')]);
             } catch (exception $e) {
-                $this->db->insert('bs_stripe_error', ['chat_id' => $obj->id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_stripe_error', ['card_id' => $this->post('card_id'),'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             } 
+        }
+		
+		$obj = $this->save_chat($this->post('offered_item_id'));
+        if($this->post('operation_type') == DIRECT_BUY){
+            $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id'),'card_id' => $this->post('card_id'),'stripe_payment_method_id' => $response->id,'stripe_payment_method' => $response,'delivery_address_id' => $this->post('delivery_address_id'),'payin' => $this->post('payin')]);
         }
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
@@ -1960,7 +1961,7 @@ class Chats extends API_Controller
                         ]
                     ]);
                 } catch (exception $e) {
-                    $this->db->insert('bs_stripe_error', ['chat_id' => $chat_history_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->db->insert('bs_stripe_error', ['chat_id' => $chat_history_id, 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
 

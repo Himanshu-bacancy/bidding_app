@@ -363,3 +363,9 @@ CREATE TABLE `bidding_app6`.`bs_stripe_error` ( `id` INT(11) NOT NULL AUTO_INCRE
 ALTER TABLE `bs_stripe_error` ADD `chat_id` VARCHAR(255) NULL AFTER `order_id`;
 
 ALTER TABLE `bs_chat_history` ADD `payin` TINYINT NULL AFTER `delivery_address_id`;
+
+// RB: ADDED ON 16/03/2022
+ALTER TABLE `bs_stripe_error` ADD `card_id` INT(11) NULL AFTER `chat_id`;
+
+ALTER TABLE `bs_stripe_error` CHANGE `order_id` `order_id` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL;
+
