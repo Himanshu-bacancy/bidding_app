@@ -76,7 +76,8 @@ class Summary extends API_Controller {
                 ->where('bs_chat_history.buyer_user_id', $posts['user_id'])
                 ->where('bs_chat_history.is_offer_complete', 1)
                 ->where('bs_chat_history.is_cart_offer', 0)->get()->row()->discount;
-        $direct_buy_arr['discounts'] = ($direct_buy_discount) ?? '0' ;
+        
+        $direct_buy_arr['discounts'] = ($direct_buy_discount < 0) ? '0' : round($direct_buy_discount, 2);
         
         $selling_arr = [];
         $selling_arr['posted_items'] = $this->db->select('id')->from('bs_items')

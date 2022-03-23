@@ -2053,15 +2053,15 @@ class Chats extends API_Controller
         );
 		if ( !$this->is_valid( $rules )) exit;
 		$posts_var = $this->post();
-        
+        $date = date('Y-m-d H:i:s');
         if(!$posts_var['prepaidlabel']){
             if(!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount'])) {
                 $this->error_response("Please provide shipping amount");
             } else {
-                $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
+                $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount'], 'updated_date' => $date]);
             }
         } else {
-            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount']]);
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount'], 'updated_date' => $date]);
         }
         if($posts_var['prepaidlabel']) {
             if(!isset($posts_var['packagesize_id']) || empty($posts_var['packagesize_id']) || is_null($posts_var['packagesize_id'])){
@@ -2071,13 +2071,13 @@ class Chats extends API_Controller
                 $this->error_response("Please provide shippingcarrier id");
             }   
 
-            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['packagesize_id' => $posts_var['packagesize_id'],'shippingcarrier_id' => $posts_var['shippingcarrier_id']]);
+            $this->db->where('id', $posts_var['chat_id'])->update('bs_chat_history', ['packagesize_id' => $posts_var['packagesize_id'],'shippingcarrier_id' => $posts_var['shippingcarrier_id'], 'updated_date' => $date]);
         }
         
-        $get_user = $this->db->select('buyer_user_id')->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
+        $get_user = $this->db->select('nego_price,buyer_user_id')->from('bs_chat_history')->where('id', $posts_var['chat_id'])->get()->row();
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $get_user->buyer_user_id)->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Shipment confirmed by Seller ", "flag" => "chat",'chat_id' => $posts_var['chat_id']] );
+        send_push( [$buyer->device_token], ["message" => "Shipment confirmed by Seller ", "flag" => "chat"],['chat_id' => $posts_var['chat_id'], 'price' => $get_user->nego_price] );
         
         $this->response(['status' => 'success', 'message' => 'Shipping details saved']);
         

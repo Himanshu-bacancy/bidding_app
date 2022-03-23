@@ -369,3 +369,6 @@ ALTER TABLE `bs_stripe_error` ADD `card_id` INT(11) NULL AFTER `chat_id`;
 
 ALTER TABLE `bs_stripe_error` CHANGE `order_id` `order_id` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL;
 
+
+// RB: ADDED ON 23/03/2022
+ALTER TABLE `bs_stripe_error` ADD `item_id` VARCHAR(255) NULL AFTER `chat_id`;

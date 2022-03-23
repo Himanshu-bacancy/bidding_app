@@ -388,7 +388,8 @@ class Paid_items extends API_Controller
 				'amount' => $plancheck->price * 100,
 				"currency" => trim($paid_config->currency_short_form),
 				'payment_method' => $response->id,
-				'payment_method_types' => ['card']
+				'payment_method_types' => ['card'],
+                'confirm' => true
 			]);
 			
 			$item_id = $this->post('item_id');
@@ -430,22 +431,25 @@ class Paid_items extends API_Controller
 			$this->Paid_item->save($paid_data);
 			$id = $paid_data['id'];
 			
-			if (isset($response->id)) {
-				$paydata['payment_status'] = 'initiate';
+			if (isset($response->id) && $response->status == 'succeeded') {
+				$paydata['payment_status'] = 'succeeded';
 				$this->db->where('id', $id);
         		$this->db->update('bs_paid_items_history', $paydata);
 				
-				$this->response(['status' => "success", 'payment_status' => 'success', 'intent_id' => $response->id, 'record_id' => $id, 'client_secret' => $response->client_secret, 'response' => ['payment_method' => $response->payment_method]]);
+				$this->response(['status' => "success", 'payment_status' => 'success', 'record_id' => $id, 'response' => ['payment_method' => $response->payment_method]]);
 			} else {
 				$paydata['payment_status'] = 'fail';
 				$this->db->where('id', $id);
         		$this->db->update('bs_paid_items_history', $paydata);
+                $this->db->insert('bs_stripe_error', ['item_id' => $item_id, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
 				$this->error_response(get_msg('stripe_transaction_failed'));
 			}
 		} catch (exception $e) {
 			$paydata['payment_status'] = 'fail';
 			$this->db->where('id', $id);
 			$this->db->update('bs_paid_items_history', $paydata);
+            
+            $this->db->insert('bs_stripe_error', ['item_id' => $item_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
 			$this->error_response(get_msg('stripe_transaction_failed'));
 		}
 	}
