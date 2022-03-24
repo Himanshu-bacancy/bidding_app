@@ -1617,6 +1617,7 @@ class Items extends API_Controller
                 ->where($where)
                 ->get()->result();
         $row = [];
+        
         foreach ($item_users as $key => $value) {
             $row[$key] = $value;
     		$this->ps_adapter->convert_item($row[$key]);
@@ -1736,6 +1737,7 @@ class Items extends API_Controller
                     $brand_filter_arr[] = $value;
                 }
             }
+            
             /*color*/
             foreach ($brand_filter_arr as $key => $value) {
                 if(!is_null($requestedItemDetails->item_colors) && !empty($requestedItemDetails->item_colors) && !is_null($value->item_colors) && !empty($value->item_colors)) {
@@ -1749,6 +1751,7 @@ class Items extends API_Controller
                     $color_filter_arr[] = $value;
                 }
             }
+            
             /*condition*/
             foreach ($color_filter_arr as $key => $value) {
                 if($requestedItemDetails->condition_of_item_id == $value->condition_of_item_id){
@@ -1766,6 +1769,7 @@ class Items extends API_Controller
                     $sizegroup_filter_arr[] = $value;
                 }
             }
+            
             foreach ($sizegroup_filter_arr as $key => $value) {    
                 if(!is_null($requestedItemDetails->sizegroup_options) && !empty($requestedItemDetails->sizegroup_options) && !is_null($value->sizegroup_options) && !empty($value->sizegroup_options)) {
                         $requestedItem_sizegroup_options = array_column($requestedItemDetails->sizegroup_options, 'sizegroup_option_id');
@@ -1778,6 +1782,7 @@ class Items extends API_Controller
                     $sizegroup_options_filter_arr[] = $value;
                 }
             }
+            $op = $sizegroup_options_filter_arr;
         }
         
         $this->custom_response($op);

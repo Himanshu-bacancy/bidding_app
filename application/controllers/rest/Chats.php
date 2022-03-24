@@ -1912,7 +1912,7 @@ class Chats extends API_Controller
 	        	'rules' => 'required'
 	        ),
 			array(
-	        	'field' => 'id',
+	        	'field' => 'offer_id',
 	        	'rules' => 'required'
 	        ),
 			array(
@@ -1922,7 +1922,7 @@ class Chats extends API_Controller
         );
 		if ( !$this->is_valid( $rules )) exit;
         $posts_var = $this->post();
-		$chat_history_id = $this->post('id');
+		$chat_history_id = $this->post('offer_id');
 		$chat_history_data = $this->Chat->get_one_by(array('id' => $chat_history_id));
 
 		if($chat_history_data->id == ""){
@@ -1932,7 +1932,16 @@ class Chats extends API_Controller
 				"nego_price" => $this->post('price'), 
                 "updated_date" => date("Y-m-d H:i:s"),
 			);
-            if($chat_history_data->buyer_user_id == $posts_var['user_id'] && $chat_history_data->operation_type == REQUEST_ITEM) {
+            if(is_null($chat_history_data->stripe_payment_method_id) && $chat_history_data->buyer_user_id == $posts_var['user_id'] && $chat_history_data->operation_type == REQUEST_ITEM) {
+                if(!isset($posts_var['delivery_method_id']) || empty($posts_var['delivery_method_id']) || is_null($posts_var['delivery_method_id'])) {
+                    $this->error_response("Please pass delivery_method_id");
+                } else {
+                    if($posts_var['delivery_method_id'] == PICKUP_ONLY) {
+                        if(!isset($posts_var['payin']) || empty($posts_var['payin']) || is_null($posts_var['payin'])) {
+                            $this->error_response("Please pass payin");
+                        }
+                    }
+                }
                 if(!isset($posts_var['cvc']) || empty($posts_var['cvc']) || is_null($posts_var['cvc'])) {
                     $this->error_response("Please pass cvc");
                 }
@@ -1969,6 +1978,8 @@ class Chats extends API_Controller
                 $chat_data_update['delivery_address_id'] = $posts_var['delivery_address_id'];
                 $chat_data_update['stripe_payment_method_id'] = $response->id;
                 $chat_data_update['stripe_payment_method'] = $response;
+                $chat_data_update['delivery_method_id'] = $posts_var['delivery_method_id'];
+                $chat_data_update['payin'] = $posts_var['payin'];
             }
 			if(!$this->Chat->Save($chat_data_update, $chat_history_id)) {
 				$this->error_response(get_msg( 'err_count_update'));
