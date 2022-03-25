@@ -80,6 +80,14 @@ class Chat extends PS_Model {
 		if ( isset( $conds['operation_type'] )) {
 			$this->db->where( 'operation_type', $conds['operation_type'] );
 		}
+		// operation type condition
+		if ( isset( $conds['is_offer'] )) {
+			$this->db->where( 'is_offer', $conds['is_offer'] );
+		}
+		// operation type condition
+		if ( isset( $conds['is_expired'] )) {
+			$this->db->where( 'is_expired', $conds['is_expired'] );
+		}
 		
 	}
 }

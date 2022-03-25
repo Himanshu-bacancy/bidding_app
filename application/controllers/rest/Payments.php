@@ -163,12 +163,16 @@ class Payments extends API_Controller {
                     'amount' => $card_total_amount * 100,
                     "currency" => trim($paid_config->currency_short_form),
                     'payment_method' => $response->id,
-                    'payment_method_types' => ['card']
+                    'payment_method_types' => ['card'],
+                    'confirm' => true
                 ]);
                 
                 if (isset($response->id)) { 
-                    $this->db->where_in('id', $records)->update('bs_order',['status' => 'initiate', 'transaction_id' => $response->id]);
-                    
+                    if($response->status == 'requires_action') {
+                        $this->error_response('Transaction requires authorization');
+                    }
+                    $this->db->where_in('id', $records)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
+                    $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
                     $item_ids = array_column($items,'item_id');
                     
                     foreach ($item_ids as $key => $value) {
@@ -193,7 +197,7 @@ class Payments extends API_Controller {
                     
 //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
                     $response = $this->ps_security->clean_output( $response );
-                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card']);
+                    $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
                 } else {
                     $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
@@ -224,9 +228,8 @@ class Payments extends API_Controller {
 
                 send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
             }
-            
                     
-            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash']);
+            $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'cash']);
         }
     }
 
@@ -598,18 +601,24 @@ class Payments extends API_Controller {
                 'amount' => $amount * 100,
                 "currency" => trim($paid_config->currency_short_form),
                 'payment_method' => $response->id,
-                'payment_method_types' => ['card']
+                'payment_method_types' => ['card'],
+                'confirm' => true
             ]);
             $this->db->where('order_id', $posts_var['order_id'])->update('bs_order', ['seller_charge' => $amount,'seller_transaction' => $response]);
             if (isset($response->id)) { 
-                $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => 'initiate', 'seller_transaction_id' => $response->id, 'processed_date' => date("Y-m-d H:i:s")]);
-                $this->response(['status' => "success",'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'track_number' => $track_number]);
+                if($response->status == 'requires_action') {
+                    $this->error_response('Transaction requires authorization');
+                }
+                $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => $response->status, 'seller_transaction_id' => $response->id, 'processed_date' => date("Y-m-d H:i:s")]);
+                $this->response(['status' => "success", 'track_number' => $track_number]);
             } else {
                 $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
+                $this->db->insert('bs_stripe_error', ['order_id' => $record_id, 'card_id' => $card_id, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             }
         } catch (exception $e) {
             $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
+            $this->db->insert('bs_stripe_error', ['order_id' => $record_id, 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
             $this->error_response(get_msg('stripe_transaction_failed'));
         }
     }
@@ -1458,7 +1467,7 @@ class Payments extends API_Controller {
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
                 }
-                if($offer_details->operation_type != DIRECT_BUY) {
+                if($offer_details->operation_type != DIRECT_BUY && !$offer_details->delivery_method_id) {
                     if(!isset($posts_var['delivery_method_id']) || empty($posts_var['delivery_method_id']) || is_null($posts_var['delivery_method_id'])) {
                         $this->error_response("Please pass delivery method id");
                     }
@@ -1552,17 +1561,23 @@ class Payments extends API_Controller {
                                 $this->error_response('Transaction requires authorization');
                             }
                             $this->db->where('id', $record)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
-
+                            $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 0]);
                             $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                                     ->where('bs_items.id', $posts_var['item_id'])->get()->row();
                             
                             $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $posts_var['item_id'])->get()->row();
                             
-                            send_push( [$seller->device_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' =>$new_odr_id] );
+                            $buyer = $this->db->select('device_token')->from('core_users')
+                                    ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+                            $send_noti_user_token = $buyer->device_token;
+                            if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                                $send_noti_user_token = $seller->device_token;
+                            }
+                            send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' =>$new_odr_id] );
                             $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $new_odr_id]);
                             $response = $this->ps_security->clean_output( $response );
-                            $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
+                            $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card', 'order_id' => $new_odr_id]);
                         } else {
                             $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
                             $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
@@ -1605,17 +1620,24 @@ class Payments extends API_Controller {
                                    $this->error_response('Transaction requires authorization');
                                 }
                                 $this->db->where('id', $record)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id,'payment_method' => 'card', 'card_id' => $card_id]);
-
+                                
+                                $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 0]);
                                 $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                                         ->where('bs_items.id', $posts_var['item_id'])->get()->row();
 
                                 $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $posts_var['item_id'])->get()->row();
 
-                                send_push( [$seller->device_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
+                                $buyer = $this->db->select('device_token')->from('core_users')
+                                    ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+                                $send_noti_user_token = $buyer->device_token;
+                                if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                                    $send_noti_user_token = $seller->device_token;
+                                }
+                                send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
                                $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $new_odr_id]);
                                 $response = $this->ps_security->clean_output( $response );
-                                $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => $response->id, 'client_secret' => $response->client_secret, 'response' => $response, 'order_type' => 'card', 'order_id' => $new_odr_id]);
+                                $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card', 'order_id' => $new_odr_id]);
                             } else {
                                 $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
                                 $this->error_response(get_msg('stripe_transaction_failed'));
@@ -1634,9 +1656,15 @@ class Payments extends API_Controller {
 
                         $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $posts_var['item_id'])->get()->row();
 
-                        send_push( [$seller->device_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
+                        $buyer = $this->db->select('device_token')->from('core_users')
+                          ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
+                        $send_noti_user_token = $buyer->device_token;
+                        if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                            $send_noti_user_token = $seller->device_token;
+                        }
+                        send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
 
-                        $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id]);
+                        $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'cash', 'order_id' => $new_odr_id]);
                     }
                 }
             } else {
@@ -1691,7 +1719,7 @@ class Payments extends API_Controller {
                             ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
                     send_push( [$buyer->device_token], ["message" => "Offer confirmed", "flag" => "order"],['order_id' => $new_odr_id] );
                     
-                    $this->response(['status' => "success", 'order_status' => 'success', 'intent_id' => '', 'client_secret' => '', 'response' => (object)[], 'order_type' => 'cash', 'order_id' => $new_odr_id, 'message' => 'Notification sent successfully']);
+                    $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'cash', 'order_id' => $new_odr_id, 'message' => 'Notification sent successfully']);
                 }
             }
         } else {
@@ -1749,5 +1777,125 @@ class Payments extends API_Controller {
         $this->custom_response($cardData);
     }
 
+    public function tracking_order($param) {
+        $get_records = $this->db->from('bs_order')->where('transaction_id', $param['transaction_id'])->get()->result();
+        
+        $current_date = date("Y-m-d H:i:s");
+        foreach ($get_records as $key => $value) {
+            $track_exist = $this->db->from('bs_track_order')->where('order_id', $value->order_id)->order_by('id','desc')->get()->row();
+            if(empty($track_exist) || $track_exist->status == 'ERROR') {
+                $get_item = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+                if($get_item->pay_shipping_by == '1') {
+                    if($get_item->shipping_type == '1') { 
+                        $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+                        $package_details = $this->db->from('bs_packagesizes')->where('id', $get_item->packagesize_id)->get()->row();
+                        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                            ->join('core_users', 'bs_order.user_id = core_users.user_id')
+//                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                            ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                            ->where('order_id', $value->order_id)->get()->row();
+                        
+                        $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                        ->join('bs_items', 'bs_order.items = bs_items.id')
+                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+//                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                        ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                        ->where('order_id', $value->order_id)->get()->row();
+                        
+                        $headers = array(
+                            "Content-Type: application/json",
+                            "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+                                              );
+                        $url = 'https://api.goshippo.com/transactions/';
+                        $address_from = array(
+                            "name"=> $seller_detail->user_name,
+                            "street1"=> $seller_detail->address1,
+                            "city"=> $seller_detail->city,
+                            "state"=> $seller_detail->state,
+                            "zip" => $seller_detail->zipcode,
+                            "country" => $seller_detail->country,
+                            "phone" => $seller_detail->user_phone,
+                            "email" => $seller_detail->user_email
+                                      );
+                        $address_to = array(
+                            "name"=> $buyer_detail->user_name,
+                            "street1"=> $buyer_detail->address1,
+                            "city"=> $buyer_detail->city,
+                            "state"=> $buyer_detail->state,
+                            "zip" => $buyer_detail->zipcode,
+                            "country" => $buyer_detail->country,
+                            "phone" => $buyer_detail->user_phone,
+                            "email" => $buyer_detail->user_email
+                                      );
+                        $parcel = array(
+                            "length"=> $package_details->length,
+                            "width"=> $package_details->width,
+                            "height"=> $package_details->height,
+                            "distance_unit"=> "in",
+                            "weight"=> $package_details->weight,
+                            "mass_unit" => "lb"
+                                      ); 
+                        $shipment = 
+                            array(
+                                "address_to" =>$address_to,
+                                "address_from" =>$address_from,
+                                "parcels"=> $parcel
+                                     );
+                         $shipmentdata = 
+                            array(
+                                "shipment"=> $shipment,
+                                "carrier_account"=> $shippingcarriers_details->shippo_object_id,
+                                "servicelevel_token"=> "usps_priority"
+                                        );
+                         $ch = curl_init();
+                            curl_setopt($ch, CURLOPT_URL, $url);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($shipmentdata));
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
+                            $response = json_decode(curl_exec($ch)); 
+                            curl_close($ch);
+                        $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                        $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
+                        
+//                        if(is_null($track_number) || empty($track_number)) {
+//                //            $this->error_response("Something wrong with shipping provided detail");
+//                            $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
+//                        }
+                    }
+                }
+            }
+        }
+        if($param['create_offer']) {
+            $current_date = date("Y-m-d H:i:s");
+            foreach ($get_records as $key => $value) {
+                $create_offer['requested_item_id'] = $value->items;
+                $create_offer['buyer_user_id'] = $value->user_id;
+
+                $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+                $create_offer['seller_user_id'] = $item_detail->added_user_id;
+                $create_offer['nego_price'] = $value->item_offered_price;
+
+                $create_offer['type'] = 'to_seller';
+                $create_offer['operation_type'] = DIRECT_BUY;
+                $create_offer['quantity'] = $value->qty;
+                $create_offer['added_date'] = $current_date;
+                $create_offer['is_offer_complete'] = 1;
+                $create_offer['order_id'] = $value->order_id;
+                $create_offer['is_cart_offer'] = 1;
+                $this->Chat->save($create_offer);	
+                $obj = $this->Chat->get_one_by($create_offer);
+
+                $update_order['offer_id'] = $obj->id;
+                if(!is_null($track_number) && !empty($track_number)) {
+                    $update_order['processed_date'] = $current_date;
+                }
+                $this->db->where('order_id', $value->order_id)->update('bs_order',$update_order);
+            }
+        }
+        
+    }
+    
 }

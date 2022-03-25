@@ -459,7 +459,8 @@ class Chats extends API_Controller
 				"requested_item_id" => $requestedItemId,
 				"buyer_user_id" => $buyerUserId, 
 				"seller_user_id" => $sellerUserId,
-				"operation_type" => EXCHANGE
+				"operation_type" => EXCHANGE,
+                'is_expired' => 0
 			);
 
 			// GET ALL DATA 
@@ -479,9 +480,12 @@ class Chats extends API_Controller
 				"requested_item_id" => $requestedItemId,
 				"buyer_user_id" => $buyerUserId, 
 				"seller_user_id" => $sellerUserId,
-                'is_offer' => 0
+                "is_offer" => 1,
+                "is_expired" => 0
 			);
             $offer_chat_history_data = $this->Chat->get_one_by($chat_data);
+//            echo $this->db->last_query();
+//            dd($offer_chat_history_data);
             if(!empty($offer_chat_history_data)) {
                 $chat_history_data = $offer_chat_history_data;
             } else {
@@ -490,6 +494,7 @@ class Chats extends API_Controller
                 $chat_history_data = $this->Chat->get_one_by($chat_data);
             }
 		}
+        
 		$type = $this->post('type');
         if($chat_history_data->is_offer_complete) {
             $chat_history_data->id = "";
@@ -552,6 +557,7 @@ class Chats extends API_Controller
 					"cancel_reason" => $this->post('cancel_reason'),
 					"delivery_to" => $this->post('delivery_to'),
 					"payment_method_id" => $this->post('payment_method_id'),
+                    "timezone" => date_default_timezone_get()
 				);
 			} elseif ( $type == "to_seller" ) {
 
@@ -606,6 +612,7 @@ class Chats extends API_Controller
 					"cancel_reason" => $this->post('cancel_reason'),
 					"delivery_to" => $this->post('delivery_to'),
 					"payment_method_id" => $this->post('payment_method_id'),
+                    "timezone" => date_default_timezone_get()
 				);
 			}
 			// $status = send_android_fcm_chat( $device_ids, $data );
@@ -695,6 +702,7 @@ class Chats extends API_Controller
 					"cancel_reason" => $this->post('cancel_reason'),
 					"delivery_to" => $this->post('delivery_to'),
 					"payment_method_id" => $this->post('payment_method_id'),
+                    "timezone" => date_default_timezone_get()
 				);
 			} elseif ( $type == "to_seller" ) {
 				$user_ids[] = $sellerUserId;
@@ -745,6 +753,7 @@ class Chats extends API_Controller
 					"cancel_reason" => $this->post('cancel_reason'),
 					"delivery_to" => $this->post('delivery_to'),
 					"payment_method_id" => $this->post('payment_method_id'),
+                    "timezone" => date_default_timezone_get()
 				);
 			}
             if(!$chat_history_data->is_offer) {

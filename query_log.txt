@@ -372,3 +372,9 @@ ALTER TABLE `bs_stripe_error` CHANGE `order_id` `order_id` VARCHAR(255) CHARACTE
 
 // RB: ADDED ON 23/03/2022
 ALTER TABLE `bs_stripe_error` ADD `item_id` VARCHAR(255) NULL AFTER `chat_id`;
+
+
+// RB: ADDED ON 25/03/2022
+ALTER TABLE `bs_chat_history` ADD `timezone` VARCHAR(255) NOT NULL DEFAULT 'Asia/Kolkata' AFTER `payin`;
+
+ALTER TABLE `bs_chat_history` ADD `is_expired` INT NOT NULL AFTER `timezone`;

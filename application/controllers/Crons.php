@@ -10,6 +10,7 @@ class Crons extends CI_Controller {
         $past_record = $this->db->select('id')->from('bs_cart')->where('DATE(created_date) < DATE(now())')->get()->result_array();
         $past_record_ids = array_column($past_record, 'id');
         $this->db->where_in('id', $past_record_ids)->delete('bs_cart');
+        $this->db->insert('bs_cron_log',['cron_name' => 'remove-item-from-cart', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
     
@@ -42,17 +43,42 @@ class Crons extends CI_Controller {
                 }
             }
         }
+        $this->db->insert('bs_cron_log',['cron_name' => 'track-order', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
     
-//    public function expire_offer() {
-//        $past_record = $this->db->select('id, added_date,NOW() - INTERVAL 10 MINUTE as datetr')->from('bs_chat_history')
-//                ->where('is_cancel', 0)
-//                ->where('is_offer_complete', 0)
-//                ->where('DATE(added_date) < DATE(NOW() - INTERVAL 10 MINUTE)')
-//                ->get()->result_array();
+    public function expire_offer() {
+        $past_record = $this->db->select('id, added_date, updated_date, timezone')->from('bs_chat_history')
+                ->where('is_cancel', 0)
+                ->where('is_offer_complete', 0)
+                ->order_by('added_date', 'desc')->get()->result_array();
 //        dd($past_record);
-//        $past_record_ids = array_column($past_record, 'id');
-//        echo 'cron run successfully';
-//    }
+        foreach ($past_record as $key => $value) {
+            if(empty($value['updated_date'])) {
+                $date1 = date_create($value['added_date']);
+            } else {
+                $date1 = date_create($value['updated_date']);
+            }
+            $date = new DateTime("now", new DateTimeZone($value['timezone']) );
+            $date2 = date_create($date->format('Y-m-d H:i:s'));
+            
+            $diff = date_diff($date1, $date2)->format("%a||%h||%i"); 
+            $split_diff = explode('||',$diff);
+            $days = $split_diff[0];
+//            $hours = $split_diff[1];
+//            $mins = $split_diff[2];
+//            dd($diff);
+            if($days > 0) {
+//                if($hours == 0) {
+//                    if($mins > 5 && $mins < 10) {
+//                        echo $value['id'].'<br>';
+//                    }
+//                }
+//                echo 'expired offer :- '.$value['id']. '<br>';
+                $this->db->where('id', $value['id'])->update('bs_chat_history',['is_expired' => 1, 'updated_date' => $date->format('Y-m-d H:i:s')]);
+            }
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'expire-offer', 'created_at' => date('Y-m-d H:i:s')]);
+        echo 'cron run successfully';
+    }
 }
