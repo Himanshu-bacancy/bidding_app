@@ -378,3 +378,10 @@ ALTER TABLE `bs_stripe_error` ADD `item_id` VARCHAR(255) NULL AFTER `chat_id`;
 ALTER TABLE `bs_chat_history` ADD `timezone` VARCHAR(255) NOT NULL DEFAULT 'Asia/Kolkata' AFTER `payin`;
 
 ALTER TABLE `bs_chat_history` ADD `is_expired` INT NOT NULL AFTER `timezone`;
+
+// RB: ADDED ON 28/03/2022
+CREATE TABLE `bidding_app6`.`bs_helpcenter_topic` ( `id` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `status` INT NOT NULL DEFAULT '1' , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `bidding_app6`.`bs_helpcenter_subtopic` ( `id` INT NOT NULL AUTO_INCREMENT ,`topic_id` INT(11) NOT NULL, `name` VARCHAR(255) NOT NULL , `status` INT NOT NULL DEFAULT '1' , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_helpcenter_subtopic` ADD `content` TEXT NOT NULL AFTER `name`;

@@ -102,6 +102,65 @@ class Abouts extends API_Controller
 			$this->custom_response( $data , $offset );
 		}
 	}
-
+    
+    public function helpcenter_topics_get() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['GET'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $topics = $this->db->select('id,name')->from('bs_helpcenter_topic')->where('status', 1)->get()->result_array();
+        if(count($topics)) {
+            $this->response($topics);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
+    public function helpcenter_subtopics_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'topic_id',
+                'rules' => 'required'
+            ),
+        );
+        if ( !$this->is_valid( $rules )) exit;
+        $posts = $this->post();
+        
+        $subtopics = $this->db->select('id,name')->from('bs_helpcenter_subtopic')->where('topic_id',$posts['topic_id'])->where('status', 1)->get()->result_array();
+        if(count($subtopics)) {
+            $this->response($subtopics);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
+    public function helpcenter_subtopic_content_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'subtopic_id',
+                'rules' => 'required'
+            ),
+        );
+        if ( !$this->is_valid( $rules )) exit;
+        $posts = $this->post();
+        
+        $subtopics_content = $this->db->select('id,name,content')->from('bs_helpcenter_subtopic')->where('id',$posts['subtopic_id'])->where('status', 1)->get()->result_array();
+        if(count($subtopics_content)) {
+            $this->response($subtopics_content);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
 
 }
