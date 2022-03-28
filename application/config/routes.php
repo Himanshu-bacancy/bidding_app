@@ -65,6 +65,7 @@ $route['success_reset_password'] = "main/success_reset_password";
 $route['remove-item-from-cart'] = "crons/remove_item_from_cart";
 $route['track-order'] = "crons/update_order_status";
 $route['expire-offer'] = "crons/expire_offer";
+$route['read-xcel'] = "crons/read_xcel";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";

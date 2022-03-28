@@ -81,4 +81,54 @@ class Crons extends CI_Controller {
         $this->db->insert('bs_cron_log',['cron_name' => 'expire-offer', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
+    
+    public function read_xcel() {
+        $file = 'D:\xampp\htdocs\short.xlsx';
+        
+        $this->load->library('excel');
+        
+        try {
+            //read file from path
+            $objPHPExcel = PHPExcel_IOFactory::load($file);
+        } catch(Exception $e) {
+            echo $e->getMessage();
+        }
+//        get sheet count
+//        $count = $objPHPExcel->getSheetCount();
+//        dd($count);
+       
+//        get sheet names
+//        $sheets = $objPHPExcel->getSheetNames();
+//        dd($sheets);
+//        
+//        get sheet by name
+        $custom_sheet = $objPHPExcel->getSheetByName("X");
+        $cell_collection = $custom_sheet->getCellCollection();
+//        dd($cell_collection);
+        //get only the Cell Collection
+//        $cell_collection = $objPHPExcel->getActiveSheet()->getCellCollection();
+        
+        $current_date = date('Y-m-d H:i:s');
+        //extract to a PHP readable array format
+        foreach ($cell_collection as $cell) {
+            $column = $custom_sheet->getCell($cell)->getColumn();
+            $row = $custom_sheet->getCell($cell)->getRow();
+            $data_value = $custom_sheet->getCell($cell)->getValue();
+
+            //The header will/should be in row 1 only. of course, this can be modified to suit your need.
+            if ($row == 1) {
+                $header[$row][$column] = $data_value;
+            } else {
+                $arr_data[$row]['name'] = $data_value;
+                $arr_data[$row]['status'] = 1;
+                $arr_data[$row]['added_date'] = $current_date;
+            }
+        }
+        
+        //send the data in an array format
+        $data['header'] = $header;
+        $data['values'] = array_values($arr_data);
+//        dd($data);
+        $this->db->insert_batch('bs_brand',$data['values']);
+    }
 }
