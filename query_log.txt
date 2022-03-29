@@ -385,3 +385,12 @@ CREATE TABLE `bidding_app6`.`bs_helpcenter_topic` ( `id` INT NOT NULL AUTO_INCRE
 CREATE TABLE `bidding_app6`.`bs_helpcenter_subtopic` ( `id` INT NOT NULL AUTO_INCREMENT ,`topic_id` INT(11) NOT NULL, `name` VARCHAR(255) NOT NULL , `status` INT NOT NULL DEFAULT '1' , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
 ALTER TABLE `bs_helpcenter_subtopic` ADD `content` TEXT NOT NULL AFTER `name`;
+
+// RB: ADDED ON 29/03/2022
+ALTER TABLE `bs_order` ADD `is_return` INT NOT NULL AFTER `confirm_meeting_date`, ADD `return_date` DATETIME NULL AFTER `is_return`;
+
+CREATE TABLE `bidding_app6`.`bs_return_order` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `order_id` VARCHAR(255) NOT NULL , `reason_id` INT(11) NOT NULL , `description` TEXT NOT NULL , `images` TEXT NOT NULL , `status` INT(11) NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_return_order` DROP `images`;
+
+ALTER TABLE `bs_return_order` CHANGE `status` `status` VARCHAR(255) NOT NULL;

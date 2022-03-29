@@ -577,6 +577,58 @@ class Images extends API_Controller
 
 		
 	}
+    
+    function returnorder_image_upload_post()
+	{
+		
+		$order_id = $this->post('order_id');
+		if ( !$order_id ) {
+            $this->custom_response( get_msg('order_id_required') ) ;
+        }		
+        $uploaddir = 'uploads/';
+
+        $path_parts = pathinfo( $_FILES['file']['name'] );
+        $filename = $path_parts['filename'] . date( 'YmdHis' ) .'.'. $path_parts['extension'];
+        //print_r($filename); die;
+
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $uploaddir . $filename)) {
+
+            $data = getimagesize($uploaddir . $filename);
+            $width = $data[0];
+            $height = $data[1];
+            //call to image reseize
+
+            $this->image_resize_calculation( FCPATH. $uploaddir . $filename );
+
+            $img_data = array( 
+
+                'img_parent_id' => $order_id, 
+                'img_type'      => "return_order",
+                'img_path'      => $filename,
+                'img_width'     => $width,
+                'img_height'    => $height 
+
+            );
+
+           //	print_r($img_data); die;
+
+           if ( $this->Image->save( $img_data ) ) {
+
+                //print_r($img_data['img_id']);
+
+                $image = $this->Image->get_one( $img_data['img_id'] );
+
+                //$this->ps_adapter->convert_image( $image );
+
+                $this->custom_response( $image );
+
+           } else {
+                $this->error_response( get_msg('file_na') );
+           }
+        } else {
+           $this->error_response( get_msg('file_na') );
+        }
+	}
 	
 	/**
 	 * Convert Object

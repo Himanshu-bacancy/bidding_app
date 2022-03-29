@@ -826,6 +826,17 @@ class Payments extends API_Controller {
 //            $orders['you_earn'] = "0";
             $orders['tax_charged_to_buyer'] = "0";
             
+            if($orders['is_return']) {
+                $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                        ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
+                        ->where('order_id', $orders['order_id'])
+                        ->get()->row();
+                $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $orders['order_id'], 'img_type' => 'return_order' ))->result();
+                $orders['return_details'] = $return_details;
+            } else {
+                $orders['return_details'] = (object)[];
+            }
+            
             if($orders['operation_type'] == EXCHANGE) {
                 $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $orders['offer_id'])->get()->result();
                 
@@ -1160,6 +1171,17 @@ class Payments extends API_Controller {
                             $row[$key]->tracking_url = "";
                         }
                         
+                        if($value->is_return) {
+                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                                    ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
+                                    ->where('order_id', $value->order_id)
+                                    ->get()->row();
+                            $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $value->order_id, 'img_type' => 'return_order' ))->result();
+                            $row[$key]->return_details = $return_details;
+                        } else {
+                            $row[$key]->return_details = (object)[];
+                        }
+                        
                         if($operation_type == EXCHANGE) {
                             if(!is_null($value->offer_id)) {
                                 $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $value->offer_id)->get()->result();
@@ -1230,6 +1252,17 @@ class Payments extends API_Controller {
                         } else {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
+                        }
+                        
+                        if($value->is_return) {
+                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                                    ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
+                                    ->where('order_id', $value->order_id)
+                                    ->get()->row();
+                            $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $value->order_id, 'img_type' => 'return_order' ))->result();
+                            $row[$key]->return_details = $return_details;
+                        } else {
+                            $row[$key]->return_details = (object)[];
                         }
                         
                         if($operation_type == EXCHANGE) {
@@ -1898,4 +1931,45 @@ class Payments extends API_Controller {
         
     }
     
+    public function return_order_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'reason_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'description',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        
+        $date = date('Y-m-d H:i:s');
+        $exist_for_return = $this->db->from('bs_order')->where('order_id',$posts['order_id'])->where('is_return', 0)->get()->row();
+        if(!empty($exist_for_return)) {
+            $this->db->where('order_id', $posts['order_id'])->update('bs_order', ['is_return' => 1, 'return_date' => $date]);
+            $this->db->insert('bs_return_order', ['order_id' => $posts['order_id'],'reason_id' => $posts['reason_id'], 'description' => $posts['description'], 'status' =>'initiate','created_at' => $date]);
+
+            $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                    ->join('bs_order', 'bs_order.items = bs_items.id')
+                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                    ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
+            if(!empty($seller)) {
+                send_push( [$seller->device_token], ["message" => "Order Returned", "flag" => "order"],['order_id' => $posts['order_id']] );
+            }
+
+            $this->response(['status' => "success", 'message' => 'Order return request initiate successfully']);
+        } else {
+            $this->error_response("Order already returned");
+        }
+    }
 }
