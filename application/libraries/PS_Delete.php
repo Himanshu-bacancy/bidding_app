@@ -886,6 +886,40 @@ class PS_Delete {
 
 		return true;
 	}
+    
+    /**
+	 * Delete the hctopic record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_hctopic( $id )
+	{		
+		if ( ! $this->CI->Hctopic->delete( $id )) {
+		// if there is an error in deleting,
+			
+			return false;
+		}
+
+
+		return true;
+	}
+    
+    /**
+	 * Delete the hcsubtopic record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_hcsubtopic( $id )
+	{		
+		if ( ! $this->CI->Hcsubtopic->delete( $id )) {
+		// if there is an error in deleting,
+			
+			return false;
+		}
+
+
+		return true;
+	}
 
 	/**
 	 * Delete the Reason record
