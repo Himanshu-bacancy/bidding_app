@@ -394,3 +394,20 @@ CREATE TABLE `bidding_app6`.`bs_return_order` ( `id` INT(11) NOT NULL AUTO_INCRE
 ALTER TABLE `bs_return_order` DROP `images`;
 
 ALTER TABLE `bs_return_order` CHANGE `status` `status` VARCHAR(255) NOT NULL;
+
+// RB: ADDED ON 31/03/2022
+
+ALTER TABLE `bs_return_order` ADD `cancel_by` VARCHAR(255) NULL AFTER `created_at`, ADD `updated_at` DATETIME NULL AFTER `cancel_by`;
+
+
+// RB: ADDED ON 1/04/2022
+
+ALTER TABLE `bs_track_order` ADD `is_return` TINYINT NOT NULL AFTER `response`;
+
+ALTER TABLE `bs_stripe_error` ADD `note` TEXT NULL AFTER `response`;
+
+ALTER TABLE `bs_return_order` ADD `payment_status` VARCHAR(255) NULL AFTER `updated_at`, ADD `transaction_id` VARCHAR(255) NULL AFTER `payment_status`, ADD `payment_response` TEXT NULL AFTER `transaction_id`;
+
+
+ALTER TABLE `bs_return_order` ADD `seller_response` TEXT NULL AFTER `status`;
+

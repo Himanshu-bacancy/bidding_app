@@ -2,6 +2,7 @@
 	<table class="table m-0 table-striped">
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
+			<th><?php echo get_msg('topic_name'); ?></th>
 			<th><?php echo get_msg('subtopic_name'); ?></th>
 			
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
@@ -33,6 +34,7 @@
 			
 			<tr>
 				<td><?php echo ++$count;?></td>
+				<td ><?php echo $this->Hctopic->get_one( $val->topic_id )->name; ?></td>
 				<td ><?php echo $val->name;?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>

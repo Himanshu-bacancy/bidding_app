@@ -16,6 +16,25 @@
 			)); ?>
 
 	  	</div>
+        <div class="form-group" style="padding-right: 3px;">
+
+			<?php
+				$options=array();
+				$options[0]=get_msg('select_topic_name');
+				$topics = $this->Hctopic->get_all();
+				foreach($topics->result() as $topic) {
+                    $options[$topic->id] = $topic->name;
+				}
+
+				echo form_dropdown(
+					'topic_id',
+					$options,
+					set_value( 'topic_id', show_data( @$hctopic->topic_id), false ),
+					'class="form-control form-control-sm mr-3" id="topic_id"'
+				);
+			?>
+
+	  	</div>
 
 		<div class="form-group">
 		  	<button type="submit" class="btn btn-sm btn-primary">

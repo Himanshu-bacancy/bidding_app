@@ -54,7 +54,7 @@ class Hcsubtopics extends BE_Controller {
 		$this->data['action_title'] = get_msg( 'subtopics_search' );
 		
 		// condition with search term
-		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )) );
+		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )), 'topic_id' => $this->searchterm_handler( $this->input->post('topic_id')) );
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
 		$conds['order_by'] = 1;

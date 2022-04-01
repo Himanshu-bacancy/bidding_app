@@ -827,11 +827,35 @@ class Payments extends API_Controller {
             $orders['tax_charged_to_buyer'] = "0";
             
             if($orders['is_return']) {
+                $created_at = date_create($orders['created_at']);
+                $date = new DateTime("now");
+                $date2 = date_create($date->format('Y-m-d H:i:s'));
+                $diff = date_diff($created_at, $date2)->format("%a");
+
+                $orders['is_return_expire'] = 0;
+                if($diff > 3) {
+                    $orders['is_return_expire'] = 1;
+                } 
                 $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
                         ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
-                        ->where('order_id', $orders['order_id'])
+                        ->where('order_id', $order_id)
                         ->get()->row();
-                $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $orders['order_id'], 'img_type' => 'return_order' ))->result();
+                $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $order_id, 'img_type' => 'return_order' ))->result();
+                if(is_null($return_details->updated_at)) {
+                    $created_at = date_create($return_details->created_at);
+                    $date = new DateTime("now");
+                    $diff = date_diff($created_at, $date2)->format("%a");
+                    if($diff > 1) { 
+                        $orders['is_return_expire'] = 1;
+                    }
+                }
+                if($return_details->status == "accept") {
+                    $return_trackin_details = $this->db->from('bs_track_order')->where('order_id',$order_id)->where('is_return', 1)->order_by('id','desc')->get()->row();
+
+                    $return_details->tracking_status = $return_trackin_details->status;
+                    $return_details->tracking_url = $return_trackin_details->tracking_url;
+                }
+                
                 $orders['return_details'] = $return_details;
             } else {
                 $orders['return_details'] = (object)[];
@@ -1172,11 +1196,35 @@ class Payments extends API_Controller {
                         }
                         
                         if($value->is_return) {
+                            $created_at = date_create($value->created_at);
+                            $date = new DateTime("now");
+                            $date2 = date_create($date->format('Y-m-d H:i:s'));
+                            $diff = date_diff($created_at, $date2)->format("%a");
+
+                            $row[$key]->is_return_expire = 0;
+                            if($diff > 3) {
+                                $row[$key]->is_return_expire = 1;
+                            } 
                             $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
                                     ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
                                     ->where('order_id', $value->order_id)
                                     ->get()->row();
                             $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $value->order_id, 'img_type' => 'return_order' ))->result();
+                            
+                            if(is_null($return_details->updated_at)) {
+                                $created_at = date_create($return_details->created_at);
+                                $date = new DateTime("now");
+                                $diff = date_diff($created_at, $date2)->format("%a");
+                                if($diff > 1) { 
+                                    $row[$key]->is_return_expire = 1;
+                                }
+                            }
+                            if($return_details->status == "accept") {
+                                $return_trackin_details = $this->db->from('bs_track_order')->where('order_id',$value->order_id)->where('is_return', 1)->order_by('id','desc')->get()->row();
+
+                                $return_details->tracking_status = $return_trackin_details->status;
+                                $return_details->tracking_url = $return_trackin_details->tracking_url;
+                            }
                             $row[$key]->return_details = $return_details;
                         } else {
                             $row[$key]->return_details = (object)[];
@@ -1255,11 +1303,34 @@ class Payments extends API_Controller {
                         }
                         
                         if($value->is_return) {
+                            $created_at = date_create($value->created_at);
+                            $date = new DateTime("now");
+                            $date2 = date_create($date->format('Y-m-d H:i:s'));
+                            $diff = date_diff($created_at, $date2)->format("%a");
+
+                            $row[$key]->is_return_expire = 0;
+                            if($diff > 3) {
+                                $row[$key]->is_return_expire = 1;
+                            } 
                             $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
                                     ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
                                     ->where('order_id', $value->order_id)
                                     ->get()->row();
                             $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $value->order_id, 'img_type' => 'return_order' ))->result();
+                            if(is_null($return_details->updated_at)) {
+                                $created_at = date_create($return_details->created_at);
+                                $date = new DateTime("now");
+                                $diff = date_diff($created_at, $date2)->format("%a");
+                                if($diff > 1) { 
+                                    $row[$key]->is_return_expire = 1;
+                                }
+                            }
+                            if($return_details->status == "accept") {
+                                $return_trackin_details = $this->db->from('bs_track_order')->where('order_id',$value->order_id)->where('is_return', 1)->order_by('id','desc')->get()->row();
+
+                                $return_details->tracking_status = $return_trackin_details->status;
+                                $return_details->tracking_url = $return_trackin_details->tracking_url;
+                            }
                             $row[$key]->return_details = $return_details;
                         } else {
                             $row[$key]->return_details = (object)[];
@@ -1971,5 +2042,227 @@ class Payments extends API_Controller {
         } else {
             $this->error_response("Order already returned");
         }
+    }
+    
+    public function cancel_return_request_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $check_for_order = $this->db->from('bs_return_order')->where('order_id', $posts['order_id'])->get()->row();
+        if($check_for_order->status == 'initiate') {
+            $this->db->where('order_id', $posts['order_id'])->update('bs_return_order', ['status' => 'cancel', 'cancel_by' => 'buyer', 'updated_at' => $date]);
+            
+            $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                        ->join('bs_order', 'bs_order.items = bs_items.id')
+                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                        ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
+            if(!empty($seller)) {
+                send_push( [$seller->device_token], ["message" => "Order return request canceled", "flag" => "order"],['order_id' => $posts['order_id']] );
+            }
+
+            $this->response(['status' => "success", 'message' => 'Order return canceled']);
+        } else {
+            $this->error_response("Order already proceed");
+        }
+    }
+    
+    public function return_request_action_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'status',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'seller_response',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+                    
+        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token')->from('bs_order')
+                ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                ->where('order_id', $posts['order_id'])->get()->row();
+        $update_order['seller_response'] = $posts['seller_response'];
+        $update_order['status'] = 'reject';
+        $message = "Order return request rejected by seller";
+        if($posts['status']) {
+            if(!isset($posts['card_id']) || empty($posts['card_id']) || is_null($posts['card_id'])) {
+                $this->error_response("Please pass card id");
+            }
+            if(!isset($posts['cvc']) || empty($posts['cvc']) || is_null($posts['cvc'])) {
+                $this->error_response("Please pass cvc");
+            }
+            
+            $check_for_order = $this->db->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+            $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $check_for_order->items)->get()->row();
+
+            if($get_item->shipping_type == '1') {
+                $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+
+                $shipping_amount = $get_shiping_detail->price;
+            } else if($get_item->shipping_type == '2'){
+                $shipping_amount = $get_item->shipping_cost_by_seller;
+            }
+            
+            $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+            
+            $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
+            
+            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                ->where('order_id', $posts['order_id'])->get()->row();
+           
+            /*Shippo integration Start*/
+            $headers = array(
+                "Content-Type: application/json",
+                "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+            );
+
+            $url = 'https://api.goshippo.com/transactions/';
+
+            $address_from = array(
+                "name"    => $buyer_detail->user_name,
+                "street1" => $buyer_detail->address1,
+                "city"    => $buyer_detail->city,
+                "state"   => $buyer_detail->state,
+                "zip"     => $buyer_detail->zipcode,
+                "country" => $buyer_detail->country,
+                "phone"   => $buyer_detail->user_phone,
+                "email"   => $buyer_detail->user_email
+            );    
+
+            $address_to = array(
+                "name"    => $seller_detail->user_name,
+                "street1" => $seller_detail->address1,
+                "city"    => $seller_detail->city,
+                "state"   => $seller_detail->state,
+                "zip"     => $seller_detail->zipcode,
+                "country" => $seller_detail->country,
+                "phone"   => $seller_detail->user_phone,
+                "email"   => $seller_detail->user_email
+            );
+
+            $parcel = array(
+                "length"    => $package_details->length,
+                "width"     => $package_details->width,
+                "height"    => $package_details->height,
+                "distance_unit" => "in",
+                "weight"    => $package_details->weight,
+                "mass_unit" => "lb"
+            ); 
+
+            $shipment = 
+                array(
+                    "address_to" => $address_to,
+                    "address_from" => $address_from,
+                    "parcels"    => $parcel
+            );
+
+            $shipmentdata = 
+            array(
+                "shipment"           => $shipment,
+                "carrier_account"    => $shippingcarriers_details->shippo_object_id,
+                "servicelevel_token" => "usps_priority"
+            );                   
+//            echo '<pre>';print_r($shipmentdata);die();
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($shipmentdata));
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+            $response = json_decode(curl_exec($ch)); 
+            curl_close($ch);
+            
+//            echo '<pre>';
+//            echo $response->object_id.'<br>';
+//            print_r($response);die();
+
+            $this->db->insert('bs_track_order', ['order_id' => $posts['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'is_return' => 1,'created_at' => date('Y-m-d H:i:s')]);
+            $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
+            /*Shippo integration End*/
+//            dd($track_number);
+            if(!empty($track_number)) {
+                $card_id = $posts['card_id'];
+                $cvc     = $posts['cvc'];
+                $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+                $expiry_date = explode('/',$card_details->expiry_date);
+                $paid_config = $this->Paid_config->get_one('pconfig1');
+
+                \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                
+                try {
+                    $response = \Stripe\PaymentMethod::create([
+                        'type' => 'card',
+                        'card' => [
+                            'number' => $card_details->card_number,
+                            'exp_month' => $expiry_date[0],
+                            'exp_year' => $expiry_date[1],
+                            'cvc' => $cvc
+                        ]
+                    ]);
+                    $response = \Stripe\PaymentIntent::create([
+                        'amount' => $shipping_amount * 100,
+                        "currency" => trim($paid_config->currency_short_form),
+                        'payment_method' => $response->id,
+                        'payment_method_types' => ['card'],
+                        'confirm' => true
+                    ]);
+
+                    if (isset($response->id)) { 
+                        if($response->status == 'requires_action') {
+                            $this->error_response('Transaction requires authorization');
+                        }
+                        $update_order['status'] = 'accept';
+                        $update_order['payment_status'] = $response->status;
+                        $update_order['transaction_id'] = $response->id;
+                        $update_order['payment_response'] = $response;
+                        $message = "Order return request accepted by seller";
+                    } else {
+                        $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response, 'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->error_response(get_msg('stripe_transaction_failed'));
+                    }
+                } catch (exception $e) {
+                    $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response,'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->error_response(get_msg('stripe_transaction_failed'));
+                }
+            }
+           
+        }
+        $update_order['updated_at'] = $date;
+        $this->db->where('order_id', $posts['order_id'])->update('bs_return_order', $update_order);
+        
+        if(!empty($buyer_detail)) {
+            send_push( [$buyer_detail->device_token], ["message" => $message, "flag" => "order"],['order_id' => $posts['order_id']] );
+        }
+
+        $this->response(['status' => "success", 'message' => $message]);
+       
     }
 }

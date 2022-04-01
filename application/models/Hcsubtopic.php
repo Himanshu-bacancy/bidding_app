@@ -36,6 +36,16 @@ class Hcsubtopic extends PS_Model {
 		if ( isset( $conds['name'] )) {
 			$this->db->where( 'name', $conds['name'] );
 		}
+        
+        // topic id condition
+		if ( isset( $conds['topic_id'] )) {
+			
+			if ($conds['topic_id'] != "" || $conds['topic_id'] != 0) {
+				
+				$this->db->where( 'topic_id', $conds['topic_id'] );	
+
+			}			
+		}
 
 		// searchterm
 		if ( isset( $conds['searchterm'] )) {
