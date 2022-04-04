@@ -411,3 +411,10 @@ ALTER TABLE `bs_return_order` ADD `payment_status` VARCHAR(255) NULL AFTER `upda
 
 ALTER TABLE `bs_return_order` ADD `seller_response` TEXT NULL AFTER `status`;
 
+// RB: ADDED ON 4/04/2022
+
+CREATE TABLE `bs_dispute` ( `id` INT NOT NULL AUTO_INCREMENT , `order_id` VARCHAR(255) NOT NULL , `name` VARCHAR(255) NOT NULL , `email` VARCHAR(255) NOT NULL , `phone` VARCHAR(255) NOT NULL , `message` TEXT NOT NULL , `status` INT NOT NULL , `created_at` DATETIME NOT NULL , `updated_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_order` ADD `is_dispute` INT NULL AFTER `return_date`, ADD `dispute_date` DATETIME NULL AFTER `is_dispute`;
+
+ALTER TABLE `bs_dispute` CHANGE `status` `status` VARCHAR(255) NOT NULL;

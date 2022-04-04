@@ -826,6 +826,12 @@ class Payments extends API_Controller {
 //            $orders['you_earn'] = "0";
             $orders['tax_charged_to_buyer'] = "0";
             
+            if($orders['is_dispute']) {
+                $dispute_details = $this->db->from('bs_dispute')->where('order_id', $order_id)->get()->row();
+                $orders['dispute_details'] = $dispute_details;
+            } else {
+                $orders['dispute_details'] = (object)[];
+            }
             if($orders['is_return']) {
                 $created_at = date_create($orders['created_at']);
                 $date = new DateTime("now");
@@ -1997,6 +2003,8 @@ class Payments extends API_Controller {
                     $update_order['processed_date'] = $current_date;
                 }
                 $this->db->where('order_id', $value->order_id)->update('bs_order',$update_order);
+                
+                $this->db->where('user_id', $value->user_id)->where('item_id', $value->items)->delete('bs_cart');
             }
         }
         
@@ -2264,5 +2272,51 @@ class Payments extends API_Controller {
 
         $this->response(['status' => "success", 'message' => $message]);
        
+    }
+    
+    public function generate_dispute_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'name',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'email',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'phone',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'message',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $check_for_dispute = $this->db->from('bs_dispute')->where('order_id', $posts['order_id'])->where('status != "close"')->get()->row();
+        $message = "Dispute already registered";
+        if(empty($check_for_dispute)) {
+            $this->db->insert('bs_dispute', ['order_id' => $posts['order_id'],'name' => $posts['name'],'email' => $posts['email'],'phone' => $posts['phone'], 'message' => $posts['message'], 'status' =>'initiate','created_at' => $date]);
+            
+            $update_order['is_dispute'] = 1;
+            $update_order['dispute_date'] = $date;
+            $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
+            
+            $message = 'Dispute generated against order';
+        }
+        
+        $this->response(['status' => "success", 'message' => $message]);
     }
 }
