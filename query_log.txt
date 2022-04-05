@@ -418,3 +418,8 @@ CREATE TABLE `bs_dispute` ( `id` INT NOT NULL AUTO_INCREMENT , `order_id` VARCHA
 ALTER TABLE `bs_order` ADD `is_dispute` INT NULL AFTER `return_date`, ADD `dispute_date` DATETIME NULL AFTER `is_dispute`;
 
 ALTER TABLE `bs_dispute` CHANGE `status` `status` VARCHAR(255) NOT NULL;
+
+
+// RB: ADDED ON 5/04/2022
+
+ALTER TABLE `bs_order` ADD `dispute_expiry_date` DATETIME NULL AFTER `dispute_date`, ADD `return_expiry_date` DATETIME NULL AFTER `dispute_expiry_date`;

@@ -99,6 +99,7 @@ define( 'EDIT', 'edit' );
 define( 'DEL', 'delete' );
 define( 'PUBLISH', 'publish' );
 define( 'BAN', 'ban' );
+define( 'VIEW', 'view' );
 
 // api constatns
 define( 'GET_ALL_CATEGORIES', 'GET_ALL_CATEGORIES' );
