@@ -16,6 +16,7 @@ class Crons extends CI_Controller {
     
     public function update_order_status() {
         $track_order = $this->db->from('bs_track_order')->where('status','!=', 'DELIVERED')->get()->result_array();
+        $date = date('Y-m-d H:i:s');
         if(count($track_order)) {
             foreach ($track_order as $key => $value) {
                 $headers = array(
@@ -38,8 +39,31 @@ class Crons extends CI_Controller {
                         
                 $this->db->where('id', $value['id'])->update('bs_track_order',['status' => $res_array['tracking_status']['status']]);
                 
+                if($res_array['tracking_status']['status'] == 'TRANSIT' && $value['status'] == 'PRE_TRANSIT') {
+                    $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                                ->join('bs_order', 'bs_order.items = bs_items.id')
+                                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                                ->where('bs_order.order_id', $value['order_id'])->get()->row_array();
+                    
+                    if(!empty($seller)) {
+                        send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order"],['order_id' => $value['order_id']] );
+                    }
+                    
+                    $this->db->where('id', $value['id'])->update('bs_order',['return_shipment_initiate_date' => $date]);
+                }
                 if($res_array['tracking_status']['status'] == 'DELIVERED') {
-                    $this->db->where('order_id', $value['order_id'])->update('bs_order',['delivery_status' => "delivered", 'completed_date' => date('Y-m-d H:i:s')]);
+                    $update_order['delivery_status'] = "delivered";
+                    if($value['is_return']) {
+                        $buyer_detail = $this->db->select('core_users.device_token')->from('bs_order')
+                            ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                            ->where('order_id', $value['order_id'])->get()->row_array();
+                        
+                        if(!empty($buyer_detail)) {
+                            send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order"],['order_id' => $value['order_id']] );
+                        }
+                        $update_order['return_shipment_delivered_date'] = $date;
+                    }
+                    $this->db->where('order_id', $value['order_id'])->update('bs_order',$update_order);
                 }
             }
         }

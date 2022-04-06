@@ -423,3 +423,7 @@ ALTER TABLE `bs_dispute` CHANGE `status` `status` VARCHAR(255) NOT NULL;
 // RB: ADDED ON 5/04/2022
 
 ALTER TABLE `bs_order` ADD `dispute_expiry_date` DATETIME NULL AFTER `dispute_date`, ADD `return_expiry_date` DATETIME NULL AFTER `dispute_expiry_date`;
+
+// RB: ADDED ON 6/04/2022
+
+ALTER TABLE `bs_order` ADD `return_shipment_initiate_date` DATETIME NULL AFTER `return_expiry_date`, ADD `return_shipment_delivered_date` DATETIME NULL AFTER `return_shipment_initiate_date`;
