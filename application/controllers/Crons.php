@@ -62,6 +62,7 @@ class Crons extends CI_Controller {
                             send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order"],['order_id' => $value['order_id']] );
                         }
                         $update_order['return_shipment_delivered_date'] = $date;
+                        $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
                     }
                     $this->db->where('order_id', $value['order_id'])->update('bs_order',$update_order);
                 }

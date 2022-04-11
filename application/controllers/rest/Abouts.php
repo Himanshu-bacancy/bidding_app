@@ -157,6 +157,7 @@ class Abouts extends API_Controller
         
         $subtopics_content = $this->db->select('id,name,content')->from('bs_helpcenter_subtopic')->where('id',$posts['subtopic_id'])->where('status', 1)->get()->result_array();
         if(count($subtopics_content)) {
+            $subtopics_content = $this->ps_security->clean_output( $subtopics_content );
             $this->response($subtopics_content);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));

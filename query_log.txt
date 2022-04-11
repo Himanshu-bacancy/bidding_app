@@ -427,3 +427,9 @@ ALTER TABLE `bs_order` ADD `dispute_expiry_date` DATETIME NULL AFTER `dispute_da
 // RB: ADDED ON 6/04/2022
 
 ALTER TABLE `bs_order` ADD `return_shipment_initiate_date` DATETIME NULL AFTER `return_expiry_date`, ADD `return_shipment_delivered_date` DATETIME NULL AFTER `return_shipment_initiate_date`;
+
+// RB: ADDED ON 11/04/2022
+
+ALTER TABLE `bs_dispute` ADD `is_seller_generate` INT NULL AFTER `status`;
+
+ALTER TABLE `bs_order` ADD `is_seller_dispute` INT NULL AFTER `return_shipment_delivered_date`, ADD `seller_dispute_expiry_date` DATETIME NULL AFTER `is_seller_dispute`;
