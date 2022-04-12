@@ -433,3 +433,16 @@ ALTER TABLE `bs_order` ADD `return_shipment_initiate_date` DATETIME NULL AFTER `
 ALTER TABLE `bs_dispute` ADD `is_seller_generate` INT NULL AFTER `status`;
 
 ALTER TABLE `bs_order` ADD `is_seller_dispute` INT NULL AFTER `return_shipment_delivered_date`, ADD `seller_dispute_expiry_date` DATETIME NULL AFTER `is_seller_dispute`;
+
+
+// RB: ADDED ON 12/04/2022
+
+CREATE TABLE `bidding_app6`.`bs_wallet` ( `id` INT NOT NULL AUTO_INCREMENT , `parent_id` VARCHAR(255) NOT NULL , `user_id` VARCHAR(255) NOT NULL , `action` VARCHAR(255) NOT NULL , `amount` FLOAT NOT NULL , `type` VARCHAR(255) NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+
+ALTER TABLE `core_users` ADD `wallet_amount` FLOAT NOT NULL AFTER `pickup_search_distance`;
+
+ALTER TABLE `bs_track_order` ADD `updated_at` DATETIME NULL AFTER `created_at`;
+
+
+ALTER TABLE `bs_track_order` ADD `tracking_status` VARCHAR(100) NULL AFTER `status`;

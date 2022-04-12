@@ -9,13 +9,21 @@ class Crons extends CI_Controller {
     public function remove_item_from_cart() {
         $past_record = $this->db->select('id')->from('bs_cart')->where('DATE(created_date) < DATE(now())')->get()->result_array();
         $past_record_ids = array_column($past_record, 'id');
-        $this->db->where_in('id', $past_record_ids)->delete('bs_cart');
+        if(!empty($past_record_ids) && count($past_record_ids)) {
+            $this->db->where_in('id', $past_record_ids)->delete('bs_cart');
+        }
         $this->db->insert('bs_cron_log',['cron_name' => 'remove-item-from-cart', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
     
     public function update_order_status() {
-        $track_order = $this->db->from('bs_track_order')->where('status','!=', 'DELIVERED')->get()->result_array();
+        $track_order = $this->db->select('bs_track_order.*')->from('bs_track_order')
+                ->join('bs_order', 'bs_track_order.order_id = bs_order.order_id')
+                ->where('bs_track_order.status != "ERROR"')
+                ->where('bs_track_order.status != ""')
+                ->where('bs_order.status !=  "delivered"')
+                ->get()->result_array();
+        
         $date = date('Y-m-d H:i:s');
         if(count($track_order)) {
             foreach ($track_order as $key => $value) {
@@ -37,9 +45,9 @@ class Crons extends CI_Controller {
                 
                 $res_array = json_decode($response,true);
                         
-                $this->db->where('id', $value['id'])->update('bs_track_order',['status' => $res_array['tracking_status']['status']]);
+                $this->db->where('id', $value['id'])->update('bs_track_order',['tracking_status' => $res_array['tracking_status']['status'], 'updated_at' => $date]);
                 
-                if($res_array['tracking_status']['status'] == 'TRANSIT' && $value['status'] == 'PRE_TRANSIT') {
+                if($res_array['tracking_status']['status'] == 'TRANSIT' && $value['tracking_status'] == 'PRE_TRANSIT') {
                     $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
                                 ->join('bs_order', 'bs_order.items = bs_items.id')
                                 ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
@@ -54,7 +62,7 @@ class Crons extends CI_Controller {
                 if($res_array['tracking_status']['status'] == 'DELIVERED') {
                     $update_order['delivery_status'] = "delivered";
                     if($value['is_return']) {
-                        $buyer_detail = $this->db->select('core_users.device_token')->from('bs_order')
+                        $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
                             ->join('core_users', 'bs_order.user_id = core_users.user_id')
                             ->where('order_id', $value['order_id'])->get()->row_array();
                         
@@ -63,6 +71,10 @@ class Crons extends CI_Controller {
                         }
                         $update_order['return_shipment_delivered_date'] = $date;
                         $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
+                        $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
+                        
+                        $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
+                        $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
                     }
                     $this->db->where('order_id', $value['order_id'])->update('bs_order',$update_order);
                 }
