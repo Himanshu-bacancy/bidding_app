@@ -2365,6 +2365,10 @@ class Payments extends API_Controller {
                 'field' => 'user_id',
                 'rules' => 'required'
             ),
+            array(
+                'field' => 'type',
+                'rules' => 'required'
+            ),
         );
         if (!$this->is_valid($rules)) exit; 
         $posts = $this->post();
@@ -2375,10 +2379,38 @@ class Payments extends API_Controller {
                 ->join('bs_wallet', 'core_users.user_id = bs_wallet.user_id')
                 ->join('bs_order', 'bs_wallet.parent_id = bs_order.order_id', 'left')
                 ->where('core_users.user_id', $posts['user_id'])
+                ->where('bs_wallet.type', $posts['type'])
                 ->get()->result_array();
+        if(!empty($get_detail) && count($get_detail)) {
+            $response['history'] = $get_detail;
+            $this->response(['status' => "success", 'response' => $response]);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+    }
+    
+    public function wallet_balance_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+//        $date = date('Y-m-d H:i:s');
+        
+        $get_detail = $this->db->select('core_users.wallet_amount')->from('core_users')
+                ->join('bs_wallet', 'core_users.user_id = bs_wallet.user_id')
+                ->where('core_users.user_id', $posts['user_id'])
+                ->get()->row_array();
         $response['wallet_amount'] = "0";
         if(!empty($get_detail) && count($get_detail)) {
-            $response['wallet_amount'] = $get_detail[0]->wallet_amount;
+            $response['wallet_amount'] = $get_detail['wallet_amount'];
         }
         $this->response(['status' => "success", 'response' => $response]);
     }
