@@ -446,3 +446,9 @@ ALTER TABLE `bs_track_order` ADD `updated_at` DATETIME NULL AFTER `created_at`;
 
 
 ALTER TABLE `bs_track_order` ADD `tracking_status` VARCHAR(100) NULL AFTER `status`;
+
+// RB: ADDED ON 19/04/2022
+
+ALTER TABLE `bs_ratings` ADD `order_id` VARCHAR(255) NULL AFTER `id`;
+
+ALTER TABLE `bs_order` ADD `is_buyer_rate` INT NOT NULL AFTER `seller_dispute_expiry_date`, ADD `is_seller_rate` INT NOT NULL AFTER `is_buyer_rate`, ADD `seller_rate_date` DATETIME NULL AFTER `is_seller_rate`;

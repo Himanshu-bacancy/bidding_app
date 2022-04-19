@@ -22,6 +22,11 @@ class Rate extends PS_Model {
 	function custom_conds( $conds = array())
 	{
 		// touch_id condition
+		if ( isset( $conds['order_id'] )) {
+			$this->db->where( 'order_id', $conds['order_id'] );
+		}
+        
+		// touch_id condition
 		if ( isset( $conds['id'] )) {
 			$this->db->where( 'id', $conds['id'] );
 		}

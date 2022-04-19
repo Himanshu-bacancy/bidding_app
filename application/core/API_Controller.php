@@ -348,7 +348,6 @@ class API_Controller extends REST_Controller
 			}
 		}
         if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'get') {
-            
             if($data->item_type_id == REQUEST_ITEM) {
                 $where = 'requested_item_id = "'.$data->id.'"';
             } else if($data->item_type_id == SELLING) {
@@ -1899,6 +1898,13 @@ class API_Controller extends REST_Controller
             'methods' => ['POST'],
             'requireAuthorization' => true,
         ]);
+        
+        $rules = array(
+			array(
+	        	'field' => 'order_id',
+ 	        	'rules' => 'required'
+	        ),
+        );
 
 		// set the add flag for custom response
 		$this->is_add = true;
@@ -1908,11 +1914,12 @@ class API_Controller extends REST_Controller
 			
 			return;
 		}
-
+        if ( !$this->is_valid( $rules )) exit;
 		// get the post data
 		$data = $this->post();
 		$from_user_id = $data['from_user_id'];
 		$to_user_id = $data['to_user_id'];
+		$order_id = $data['order_id'];
 
 		$user_id = $data['from_user_id'];
 		$users = global_user_check($user_id);
@@ -1922,11 +1929,14 @@ class API_Controller extends REST_Controller
 		
 		$conds['from_user_id'] = $from_user_id;
 		$conds['to_user_id'] = $to_user_id;
+		$conds['order_id'] = $order_id;
 		//print_r($conds);die;
 		
 		$id = $this->model->get_one_by($conds)->id;
-
-		$rating = $data['rating'];
+        $order_detail = $this->db->from('bs_order')->where('order_id', $order_id)->get()->row_array();
+		
+        $rating = $data['rating'];
+        $date = date('Y-m-d H:i:s');
 		if ( $id ) {
 
 			$this->model->save( $data, $id );
@@ -1939,7 +1949,17 @@ class API_Controller extends REST_Controller
 			// response the inserted object	
 			$obj = $this->model->get_one( $data[$this->model->primary_key] );
 		}
-
+        if($order_detail['user_id'] == $conds['from_user_id']) {
+            $seller_earn = $order_detail['seller_earn'];
+            
+            $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $conds['to_user_id'],'action' => 'plus', 'amount' => $seller_earn,'type' => 'rate_order', 'created_at' => date('Y-m-d H:i:s')]);
+            $update_order['is_buyer_rate'] = 1;
+            $update_order['rate_date'] = $date;
+        } else {
+            $update_order['is_seller_rate'] = 1;
+            $update_order['seller_rate_date'] = $date;
+        }
+        $this->db->where('order_id', $order_id)->update('bs_order', $update_order);
 		//noti send to to_user_id when reviewed
 
 		$devices = $this->Noti->get_all_device_in($to_user_id)->result();

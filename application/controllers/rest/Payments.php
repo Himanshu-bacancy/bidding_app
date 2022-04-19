@@ -873,6 +873,17 @@ class Payments extends API_Controller {
                 $orders['return_details'] = (object)[];
             }
             
+            if($orders['is_seller_rate']) {
+                $orders['seller_rate_details'] = $this->db->from('bs_ratings')->where('order_id',$order_id)->where('from_user_id != "'.$orders['user_id'].'"')->get()->row();
+            } else {
+                $orders['seller_rate_details'] = (object)[];
+            }
+            if($orders['is_buyer_rate']) {
+                $orders['buyer_rate_details'] = $this->db->from('bs_ratings')->where('order_id',$order_id)->where('from_user_id = "'.$orders['user_id'].'"')->get()->row();
+            } else {
+                $orders['buyer_rate_details'] = (object)[];
+            }
+            
             if($orders['operation_type'] == EXCHANGE) {
                 $offered_item_details = $this->db->select('offered_item_id,who_pay')->from('bs_exchange_chat_history')->where('bs_exchange_chat_history.chat_id', $orders['offer_id'])->get()->result();
                 
@@ -2412,6 +2423,6 @@ class Payments extends API_Controller {
         if(!empty($get_detail) && count($get_detail)) {
             $response['wallet_amount'] = $get_detail['wallet_amount'];
         }
-        $this->response(['status' => "success", 'response' => $response]);
+        $this->response($response);
     }
 }
