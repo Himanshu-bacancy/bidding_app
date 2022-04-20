@@ -7,7 +7,7 @@
 			<th><?php echo get_msg('user_phone'); ?></th>
 			<th><?php echo get_msg('dispute_status'); ?></th>
 			<th><?php echo get_msg('is_seller_dispute'); ?></th>
-			<th><?php echo get_msg('image'); ?></th>
+<!--			<th><?php echo get_msg('image'); ?></th>-->
 			<th><?php echo get_msg('message'); ?></th>
             <th><span class="th-title"><?php echo get_msg('action')?></span></th>
 		</tr>
@@ -26,14 +26,14 @@
 				<td ><?php echo $val->phone;?></td>
 				<td ><?php echo $val->status;?></td>
 				<td ><?php echo ($val->is_seller_generate) ? 'yes' :'no';?></td>
-				<td ><?php 
+<!--				<td ><?php 
                 $dispute_imges = $this->db->from('core_images')->where('img_parent_id', $val->order_id)->get()->result_array();
                 $path = '';
                 foreach ($dispute_imges as $key => $value) {
                     $path = $path.'<br><img src="'.base_url('uploads/'.$value['img_path']).'" alt="Girl in a jacket" width="25" height="25">
 ';
                 }
-                echo $path;?></td>
+                echo $path;?></td>-->
 				<td ><?php echo $val->message;?></td>
 
                 <td>

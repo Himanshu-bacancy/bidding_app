@@ -392,7 +392,7 @@ class API_Controller extends REST_Controller
             }
         }
         
-        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item', 'default_deliverymethod','category','sub_category','childsub_category','item_deliverymethod'];
+        $is_empty_object = ['sizegroup', 'item_type', 'item_brand', 'shipping_carrier', 'package_size', 'item_address', 'user', 'condition_of_item', 'default_deliverymethod','category','sub_category','childsub_category','item_deliverymethod','dispute_details','seller_dispute_details','return_details','seller_rate_details','buyer_rate_details'];
         $is_empty = ['item_colors', 'sizegroup_options', 'default_address', 'meeting_location','confirm_location'];
         
         if(is_array($data)) {
@@ -469,6 +469,7 @@ class API_Controller extends REST_Controller
                 }
             }
         } else {
+            
             if(isset($data->requested_item_detail)) {
                 foreach ($is_empty_object as $key2 => $value2) {
                     if(@$data->requested_item_detail->$value2->is_empty_object) {
@@ -524,9 +525,10 @@ class API_Controller extends REST_Controller
                 }
             }
             foreach ($is_empty_object as $key2 => $value2) {
-                if(@$data->$value2->is_empty_object) {
+                if(@$data->$value2->is_empty_object || !count((array)$data->$value2)) {
                     $data->$value2 = null;
                 }
+                
             }
             foreach ($is_empty as $key3 => $value3) {
                 if(isset($data->$value3) && empty($data->$value3)) {

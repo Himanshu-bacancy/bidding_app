@@ -119,3 +119,8 @@ define('PICKUP_AND_DELIVERY', '3');
 
 define('PAYCASH', '0');
 define('PAYCARD', '1');
+
+define('ALL', '1');
+define('CREDIT', '2');
+define('DEBIT', '3');
+define('DEPOSIT', '4');

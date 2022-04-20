@@ -2385,16 +2385,43 @@ class Payments extends API_Controller {
         $posts = $this->post();
 //        $date = date('Y-m-d H:i:s');
         
-        $get_detail = $this->db->select('core_users.wallet_amount')
+        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at')
                 ->from('core_users')
                 ->join('bs_wallet', 'core_users.user_id = bs_wallet.user_id')
                 ->join('bs_order', 'bs_wallet.parent_id = bs_order.order_id', 'left')
-                ->where('core_users.user_id', $posts['user_id'])
-                ->where('bs_wallet.type', $posts['type'])
-                ->get()->result_array();
+                ->where('core_users.user_id', $posts['user_id']);
+        if($posts['type'] == CREDIT) {
+           $get_detail = $get_detail->where('bs_wallet.action', 'plus');
+        } else if($posts['type'] == DEBIT){
+           $get_detail = $get_detail->where('bs_wallet.action', 'minus');
+        } else if($posts['type'] == DEPOSIT){
+           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where('bs_wallet.type', 'bank_transfer');
+        }
+        
+        $get_detail = $get_detail->get()->result_array();
+        
         if(!empty($get_detail) && count($get_detail)) {
-            $response['history'] = $get_detail;
-            $this->response(['status' => "success", 'response' => $response]);
+            $row = [];
+            foreach ($get_detail as $key => $value) {
+                $row[$key] = $value;
+                if($posts['type'] == CREDIT) {
+                    $row[$key]['type'] = 'credit';
+                } else if($posts['type'] == DEBIT && $value['type'] != 'bank_deposit'){
+                    $row[$key]['type'] = 'debit';
+                } else if($posts['type'] == DEPOSIT){
+                    $row[$key]['type'] = 'bank deposit';
+        } else {
+                    if($value['action'] == 'plus') {
+                        $row[$key]['type'] = 'credit';
+                    } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
+                        $row[$key]['type'] = 'debit';
+                    } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
+                        $row[$key]['type'] = 'bank deposit';
+                    }
+                }
+                unset($row[$key]['action']);
+            }
+            $this->response($row);
         } else {
             $this->error_response($this->config->item( 'record_not_found'));
         }
@@ -2424,5 +2451,46 @@ class Payments extends API_Controller {
             $response['wallet_amount'] = $get_detail['wallet_amount'];
         }
         $this->response($response);
+    }
+    
+    public function shiporder_deliverstatus_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $track_order = $this->db->select('bs_track_order.*')->from('bs_track_order')
+                ->join('bs_order', 'bs_track_order.order_id = bs_order.order_id')
+                ->where('bs_order.order_id',$posts['order_id'])
+                ->get()->row_array();
+        $update_order['delivery_status'] = "delivered";
+        $this->db->where('id', $track_order['id'])->update('bs_track_order',['tracking_status' => 'DELIVERED', 'updated_at' => $date]);
+        if($track_order['is_return']) {
+            $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
+                ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                ->where('order_id', $posts['order_id'])->get()->row_array();
+            
+            if(!empty($buyer_detail)) {
+                send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order"],['order_id' => $posts['order_id']] );
+            }
+            $update_order['return_shipment_delivered_date'] = $date;
+            $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
+            $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => $date]);
+
+            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
+            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
+        }
+        $this->db->where('order_id', $posts['order_id'])->update('bs_order',$update_order);
+        
+        $this->response(['message'=>'status updated successfuly']);
     }
 }
