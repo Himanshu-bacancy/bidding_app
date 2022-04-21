@@ -6,7 +6,7 @@
 		echo form_open( $module_site_url .'/search', $attributes);
 	?>
 		
-		<div class="form-group mr-3">
+<!--		<div class="form-group mr-3">
 
 			<?php echo form_input(array(
 				'name' => 'searchterm',
@@ -29,17 +29,17 @@
 					  		<?php echo get_msg( 'btn_reset' ); ?>
 				</a>
 			</div>
-		</div>
+		</div>-->
 	
 	<?php echo form_close(); ?>
 
 	</div>	
 
-	<div class='col-3'>
+<!--	<div class='col-3'>
 		<a href='<?php echo $module_site_url .'/add';?>' class='btn btn-sm btn-primary pull-right'>
 			<span class='fa fa-plus'></span> 
 			Add Topic
 		</a>
-	</div>
+	</div>-->
 
 </div>

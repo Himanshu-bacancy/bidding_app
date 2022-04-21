@@ -117,6 +117,17 @@
 							'id' => 'user_about_me'
 						)); ?>
 					</div>
+					<div class="form-group">	
+						<label><?php echo get_msg('Wallet Amount'); ?></label>
+						<?php echo form_input( array(
+							'name' => 'wallet_amount',
+							'value' => set_value( 'wallet_amount', show_data( @$user->wallet_amount ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'wallet_amount' ),
+							'id' => 'wallet_amount',
+                            'readonly' => 'true'
+						)); ?>
+					</div>
 				</div>
 			</div>
 		</div>

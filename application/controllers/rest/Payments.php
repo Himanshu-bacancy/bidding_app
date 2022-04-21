@@ -2385,10 +2385,12 @@ class Payments extends API_Controller {
         $posts = $this->post();
 //        $date = date('Y-m-d H:i:s');
         
-        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at')
+        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.parent_id as order_id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at,core_users.user_name as login_user,buyer.user_name as order_user,bs_items.title as item_name')
                 ->from('core_users')
                 ->join('bs_wallet', 'core_users.user_id = bs_wallet.user_id')
                 ->join('bs_order', 'bs_wallet.parent_id = bs_order.order_id', 'left')
+                ->join('bs_items', 'bs_order.items = bs_items.id', 'left')
+                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id', 'left')
                 ->where('core_users.user_id', $posts['user_id']);
         if($posts['type'] == CREDIT) {
            $get_detail = $get_detail->where('bs_wallet.action', 'plus');
@@ -2410,7 +2412,7 @@ class Payments extends API_Controller {
                     $row[$key]['type'] = 'debit';
                 } else if($posts['type'] == DEPOSIT){
                     $row[$key]['type'] = 'bank deposit';
-        } else {
+                } else {
                     if($value['action'] == 'plus') {
                         $row[$key]['type'] = 'credit';
                     } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
