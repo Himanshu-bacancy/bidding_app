@@ -39,6 +39,10 @@ class Payments extends API_Controller {
                 'field' => 'cvc',
                 'rules' => 'required'
             ),
+            array(
+                'field' => 'usewallet',
+                'rules' => 'required'
+            ),
         );
         if (!$this->is_valid($rules)) exit;
         $user_id = $this->post('user_id');
@@ -68,7 +72,7 @@ class Payments extends API_Controller {
         $records = [];
         $orderids= [];
         $backend_config = $this->Backend_config->get_one('be1');
-        foreach ($items as $key => $value) {
+        foreach ($items as $key => $value) {    
             
             $item_price = $value['price'];
             $new_odr_id = 'odr_'.time().$user_id;
@@ -146,65 +150,97 @@ class Payments extends API_Controller {
         }
         
         if($card_total_amount) {
-            # set stripe test key
-            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
-            $record_id = 0;
-            try {
-                $response = \Stripe\PaymentMethod::create([
-                    'type' => 'card',
-                    'card' => [
-                        'number' => $card_details->card_number,
-                        'exp_month' => $expiry_date[0],
-                        'exp_year' => $expiry_date[1],
-                        'cvc' => $cvc
-                    ]
-                ]);
-                $response = \Stripe\PaymentIntent::create([
-                    'amount' => $card_total_amount * 100,
-                    "currency" => trim($paid_config->currency_short_form),
-                    'payment_method' => $response->id,
-                    'payment_method_types' => ['card'],
-                    'confirm' => true
-                ]);
-                
-                if (isset($response->id)) { 
-                    if($response->status == 'requires_action') {
-                        $this->error_response('Transaction requires authorization');
-                    }
-                    $this->db->where_in('id', $records)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
-                    $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
-                    $item_ids = array_column($items,'item_id');
-                    
-                    foreach ($item_ids as $key => $value) {
-                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
+            $remaining_amount = $card_total_amount;
+            if($posts_var['usewallet']) {
+                $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $user_id)->get()->row();
+                $remaining_amount = $card_total_amount - $get_user_wallet->wallet_amount;
+            }
+            if($remaining_amount) {
+                # set stripe test key
+                \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                $record_id = 0;
+                try {
+                    $response = \Stripe\PaymentMethod::create([
+                        'type' => 'card',
+                        'card' => [
+                            'number' => $card_details->card_number,
+                            'exp_month' => $expiry_date[0],
+                            'exp_year' => $expiry_date[1],
+                            'cvc' => $cvc
+                        ]
+                    ]);
+                    $response = \Stripe\PaymentIntent::create([
+                        'amount' => $remaining_amount * 100,
+                        "currency" => trim($paid_config->currency_short_form),
+                        'payment_method' => $response->id,
+                        'payment_method_types' => ['card'],
+                        'confirm' => true
+                    ]);
+
+                    if (isset($response->id)) { 
+                        if($response->status == 'requires_action') {
+                            $this->error_response('Transaction requires authorization');
+                        }
+                        /* wallet management: start*/
+                        $wallet_hisotry = $card_total_amount - $remaining_amount;
+                        $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $wallet_hisotry,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $wallet_hisotry]);
+                        /* wallet management: end*/
                         
-                        $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
-                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                            ->where('bs_items.id', $value)->get()->row_array();
-                        
-                        send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
+                        $this->db->where_in('id', $records)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
+                        $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
+                        $item_ids = array_column($items,'item_id');
+
+                        foreach ($item_ids as $key => $value) {
+                            $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
+
+                            $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+                                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                                ->where('bs_items.id', $value)->get()->row_array();
+
+                            send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
+                        }
+
+    //                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+    //                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+    //                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
+    //                    $tokens = array_column($seller, 'device_token');
+    //                    foreach ($seller as $key => $value) {
+    //                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+    //                        
+    //                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+    //                    }
+
+    //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
+                        $response = $this->ps_security->clean_output( $response );
+                        $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
+                    } else {
+                        $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
+                        $this->error_response(get_msg('stripe_transaction_failed'));
                     }
-                    
-//                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
-//                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-//                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
-//                    $tokens = array_column($seller, 'device_token');
-//                    foreach ($seller as $key => $value) {
-//                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
-//                        
-//                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
-//                    }
-                    
-//                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
-                    $response = $this->ps_security->clean_output( $response );
-                    $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
-                } else {
+                } catch (exception $e) {
                     $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
-            } catch (exception $e) {
-                $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
-                $this->error_response(get_msg('stripe_transaction_failed'));
+            } else {
+                /* wallet management: start*/
+                $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $card_total_amount,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $card_total_amount]);
+                /* wallet management: end*/
+                
+                $this->db->where_in('id', $records)->update('bs_order',['status' => 'succeeded']);
+                $item_ids = array_column($items,'item_id');
+                foreach ($item_ids as $key => $value) {
+                    $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
+
+                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                        ->where('bs_items.id', $value)->get()->row_array();
+
+                    send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
+                }
+                $response = $this->ps_security->clean_output( $response );
+                $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
             }
         } else {
             $item_ids = array_column($items,'item_id');

@@ -42,8 +42,10 @@
                     } else if ($return_details->status == 'cancel') {
                         $print_status = 'Return cancel by buyer';
                     }
+                    echo '<a href="'.$module_site_url .'/returndetail/'.$order->id.'">'.$print_status.'</a>';
+                } else {
+                    echo $print_status;
                 }
-                echo $print_status;
                 ?>
                 </td>
 
