@@ -404,8 +404,14 @@ class API_Controller extends REST_Controller
                         }
                     }
                     foreach ($is_empty as $key3 => $value3) {
-                        if(empty(@$value->requested_item_detail->$value3)) {
-                            $value->requested_item_detail->$value3 = null;
+                        if(gettype($value->requested_item_detail) == 'array') {
+                            if(empty($value->requested_item_detail[$value3])) {
+                                $value->requested_item_detail[$value3] = null;
+                            }
+                        } else {
+                            if(empty($value->requested_item_detail->$value3)) {
+                                $value->requested_item_detail->$value3 = null;
+                            }
                         }
                     }
                 }
@@ -476,9 +482,16 @@ class API_Controller extends REST_Controller
                         $data->requested_item_detail->$value2 = null;
                     }
                 }
+                
                 foreach ($is_empty as $key3 => $value3) {
-                    if(empty(@$data->requested_item_detail->$value3)) {
-                        $data->requested_item_detail->$value3 = null;
+                    if(gettype($data->requested_item_detail) == 'array') {
+                        if(empty($data->requested_item_detail[$value3])) {
+                            $data->requested_item_detail[$value3] = null;
+                        }
+                    } else {
+                        if(empty($data->requested_item_detail->$value3)) {
+                            $data->requested_item_detail->$value3 = null;
+                        }
                     }
                 }
             }

@@ -116,7 +116,6 @@ class Payments extends API_Controller {
                     $this->db->where('id', $value['item_id'])->update('bs_items', $update_array);
                     $this->db->where('user_id', $user_id)->where('item_id', $value['item_id'])->delete('bs_cart');
                     /*manage qty: end*/
-                    
                 }
                 
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
@@ -181,11 +180,13 @@ class Payments extends API_Controller {
                         if($response->status == 'requires_action') {
                             $this->error_response('Transaction requires authorization');
                         }
+                    if($posts_var['usewallet']) {
                         /* wallet management: start*/
                         $wallet_hisotry = $card_total_amount - $remaining_amount;
                         $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $wallet_hisotry,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
                         $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $wallet_hisotry]);
                         /* wallet management: end*/
+                    }
                         
                         $this->db->where_in('id', $records)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
                         $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
@@ -223,10 +224,12 @@ class Payments extends API_Controller {
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
             } else {
+            if($posts_var['usewallet']) {
                 /* wallet management: start*/
                 $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $card_total_amount,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
                 $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $card_total_amount]);
                 /* wallet management: end*/
+            }
                 
                 $this->db->where_in('id', $records)->update('bs_order',['status' => 'succeeded']);
                 $item_ids = array_column($items,'item_id');
@@ -810,7 +813,7 @@ class Payments extends API_Controller {
                 ->join('bs_track_order', 'bs_order.order_id = bs_track_order.order_id', 'left')
                 ->where('bs_order.order_id', $order_id)->get()->row_array();
         
-        if(count($orders)) {
+        if(!empty($orders) && count($orders)) {
             $address_details = $this->Addresses->get_one( $orders['address_id'] );
             $orders['address_details'] = $address_details;
                 
@@ -2436,7 +2439,7 @@ class Payments extends API_Controller {
            $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where('bs_wallet.type', 'bank_transfer');
         }
         
-        $get_detail = $get_detail->get()->result_array();
+        $get_detail = $get_detail->order_by('created_at', 'desc')->get()->result_array();
         
         if(!empty($get_detail) && count($get_detail)) {
             $row = [];
