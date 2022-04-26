@@ -21,6 +21,10 @@ class Order extends PS_Model {
 	 */
 	function custom_conds( $conds = array())
 	{
+        // id condition
+		if ( isset( $conds['is_return'] )) {
+			$this->db->where( 'is_return', $conds['is_return'] );
+		}
 		
 		// order by
 		// post parameter "order_by" : "fieldname"

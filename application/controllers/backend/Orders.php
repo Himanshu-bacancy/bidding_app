@@ -48,23 +48,22 @@ class Orders extends BE_Controller {
 	 */
 	function search() {
 		// breadcrumb urls
-		$this->data['item_reports'] = get_msg( 'report_search' );
+		$this->data['action_title'] = get_msg( 'Order filter' );
 		
 		// condition with search term
-		$conds = array( 'searchterm' => $this->searchterm_handler( $this->input->post( 'searchterm' )) );
+        if($this->searchterm_handler( $this->input->post('is_return')) == 2) {
+    		$conds['is_return'] = 1;
+        }
 		// no publish filter
-		$conds['status'] = 1;
-		$conds['type'] = 'report_item';
-		$conds['order_by'] = 1;
-		$conds['order_by_field'] = "added_date";
+		$conds['order_by_field'] = "created_at";
 		$conds['order_by_type'] = "desc";
 
 
 		// pagination
-		$this->data['rows_count'] = $this->Reason_operation->count_all_by( $conds );
-
+		$this->data['rows_count'] = $this->Order->count_all_by( $conds );
+        
 		// search data
-		$this->data['reports'] = $this->Reason_operation->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['orders'] = $this->Order->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
 		
 		// load add list
 		parent::search();

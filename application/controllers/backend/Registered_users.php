@@ -424,4 +424,20 @@ class Registered_users extends BE_Controller {
 		
 		redirect( $this->module_site_url());
 	}
+    
+    public function wallethistory($id) {
+        // breadcrumb urls
+		$this->data['action_title'] = get_msg( 'user_wallet_history' );
+        // load order
+        //$order = $this->db->query("SELECT * FROM `bs_order` WHERE id = '".$id."'")->result();
+        $wallet_details = $this->db->select('*')
+                        ->from('bs_wallet')
+                        ->where('user_id', $id)
+                        ->get()->result();
+
+//		$this->data['item'] = $this->Item->get_one( $item_id );
+		$this->data['wallet_history'] = $wallet_details;
+        
+        $this->load_detail( $this->data );
+    }
 }

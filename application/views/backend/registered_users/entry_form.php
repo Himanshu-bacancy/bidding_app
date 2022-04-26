@@ -126,7 +126,14 @@
 							'placeholder' => get_msg( 'wallet_amount' ),
 							'id' => 'wallet_amount',
                             'readonly' => 'true'
-						)); ?>
+						)); 
+                        $get_history = $this->db->from('bs_wallet')->where('user_id', $user->user_id)->get()->num_rows();
+                        $label = '<br>No wallet history availible';
+                        if($get_history) {
+                            $label = '<br><a href="'.$module_site_url .'/wallethistory/'.$user->user_id.'">Show Wallet History</a>';
+                        } 
+                        echo $label;
+                        ?>
 					</div>
 				</div>
 			</div>
