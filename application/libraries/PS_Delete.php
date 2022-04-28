@@ -920,6 +920,23 @@ class PS_Delete {
 
 		return true;
 	}
+    
+    /**
+	 * Delete the hctopic record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_coupan( $id )
+	{		
+		if ( ! $this->CI->Coupan->delete( $id )) {
+		// if there is an error in deleting,
+			
+			return false;
+		}
+
+
+		return true;
+	}
 
 	/**
 	 * Delete the Reason record

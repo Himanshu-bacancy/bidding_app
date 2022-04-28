@@ -168,4 +168,14 @@ class Crons extends CI_Controller {
 //        dd($data);
         $this->db->insert_batch('bs_brand',$data['values']);
     }
+    
+    public function inactive_coupon() {
+        $past_record = $this->db->select('id')->from('bs_coupan')->where('status', 1)->where('DATE(end_at) < DATE(now())')->get()->result_array();
+        $past_record_ids = array_column($past_record, 'id');
+        if(!empty($past_record_ids) && count($past_record_ids)) {
+            $this->db->where_in('id', $past_record_ids)->update('bs_coupan', ['status' => 0]);
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'inactive-coupon', 'created_at' => date('Y-m-d H:i:s')]);
+        echo 'cron run successfully';
+    }
 }

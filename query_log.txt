@@ -452,3 +452,12 @@ ALTER TABLE `bs_track_order` ADD `tracking_status` VARCHAR(100) NULL AFTER `stat
 ALTER TABLE `bs_ratings` ADD `order_id` VARCHAR(255) NULL AFTER `id`;
 
 ALTER TABLE `bs_order` ADD `is_buyer_rate` INT NOT NULL AFTER `seller_dispute_expiry_date`, ADD `is_seller_rate` INT NOT NULL AFTER `is_buyer_rate`, ADD `seller_rate_date` DATETIME NULL AFTER `is_seller_rate`;
+
+// RB: ADDED ON 27/04/2022
+
+CREATE TABLE `bs_coupan` ( `id` INT NOT NULL AUTO_INCREMENT , `type` INT NOT NULL COMMENT '0 = Direct, 1 = Percentage' , `value` FLOAT NOT NULL , `min_purchase_amount` FLOAT NOT NULL , `created_at` DATETIME NOT NULL , `end_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_coupan` ADD `status` INT NOT NULL DEFAULT '1' AFTER `min_purchase_amount`;
+
+ALTER TABLE `bs_order` ADD `coupon_id` INT NOT NULL AFTER `seller_rate_date`;
+
