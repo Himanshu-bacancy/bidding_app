@@ -43,6 +43,10 @@ class Payments extends API_Controller {
                 'field' => 'usewallet',
                 'rules' => 'required'
             ),
+            array(
+                'field' => 'couponid',
+                'rules' => 'required'
+            )
         );
         if (!$this->is_valid($rules)) exit;
         $user_id = $this->post('user_id');
@@ -100,7 +104,7 @@ class Payments extends API_Controller {
 
                 $seller_earn = (float)$value['price'] - $service_fee - $processing_fees;
                 
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
                 $records[$key] = $this->db->insert_id();
                 
                 if(!$item_price) {
@@ -125,7 +129,7 @@ class Payments extends API_Controller {
 
                 $seller_earn = (float)$item_price - $service_fee - $processing_fees;
                 
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
 
                 if($value['payin'] == PAYCARD) {
                     $records[$key] = $this->db->insert_id();
@@ -154,6 +158,16 @@ class Payments extends API_Controller {
                 $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $user_id)->get()->row();
                 $remaining_amount = $card_total_amount - $get_user_wallet->wallet_amount;
             }
+            if($posts_var['coupon_id']) {
+                $coupondetail = $this->db->from('bs_coupan')->where('id', $posts_var['coupon_id'])->get()->row();
+                if($coupondetail->type) {
+                    $coupon_discount = ($remaining_amount*$coupondetail->value)/100;
+                    $remaining_amount = $remaining_amount - $coupon_discount;
+                } else {
+                    $coupon_discount = $coupondetail->value;
+                    $remaining_amount = $remaining_amount - $coupon_discount;
+                }
+            }
             if($remaining_amount) {
                 # set stripe test key
                 \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
@@ -180,15 +194,22 @@ class Payments extends API_Controller {
                         if($response->status == 'requires_action') {
                             $this->error_response('Transaction requires authorization');
                         }
-                    if($posts_var['usewallet']) {
-                        /* wallet management: start*/
-                        $wallet_hisotry = $card_total_amount - $remaining_amount;
-                        $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $wallet_hisotry,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
-                        $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $wallet_hisotry]);
-                        /* wallet management: end*/
-                    }
-                        
-                        $this->db->where_in('id', $records)->update('bs_order',['status' => $response->status, 'transaction_id' => $response->id]);
+                        if($posts_var['usewallet']) {
+                            /* wallet management: start*/
+                            $wallet_hisotry = $card_total_amount - $remaining_amount;
+                            $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $wallet_hisotry,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
+                            $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $wallet_hisotry]);
+                            /* wallet management: end*/
+                        }
+                        $update_order_array['status'] = $response->status;
+                        $update_order_array['transaction_id'] = $response->id;
+                        if($posts_var['coupon_id']) {
+                            $update_order_array['coupon_id'] = $posts_var['coupon_id'];
+                            $update_order_array['coupon_type'] = $coupondetail->type;
+                            $update_order_array['coupon_discount'] = $coupon_discount;
+                        }
+
+                        $this->db->where_in('id', $records)->update('bs_order',$update_order_array);
                         $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
                         $item_ids = array_column($items,'item_id');
 
@@ -202,20 +223,20 @@ class Payments extends API_Controller {
                             send_push( [$seller['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$seller['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path, 'order_id' => $orderids[$value]] );
                         }
 
-    //                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
-    //                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-    //                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
-    //                    $tokens = array_column($seller, 'device_token');
-    //                    foreach ($seller as $key => $value) {
-    //                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
-    //                        
-    //                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
-    //                    }
+        //                    $seller = $this->db->select('device_token,bs_items.id as item_id,bs_items.title as item_name')->from('bs_items')
+        //                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+        //                            ->where_in('bs_items.id', $item_ids)->get()->result_array();
+        //                    $tokens = array_column($seller, 'device_token');
+        //                    foreach ($seller as $key => $value) {
+        //                        $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value['item_id'])->get()->row();
+        //                        
+        //                        send_push( [$value['device_token']], ["message" => "New order placed", "flag" => "order",'title' =>$value['item_name']], ['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path] );
+        //                    }
 
-    //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
-                        $response = $this->ps_security->clean_output( $response );
-                        $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
-                    } else {
+        //                    send_push( [$tokens], ["message" => "New order arrived", "flag" => "order", 'order_ids' => implode(',', $records)] );
+                            $response = $this->ps_security->clean_output( $response );
+                            $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
+                        } else {
                         $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
@@ -224,14 +245,20 @@ class Payments extends API_Controller {
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
             } else {
-            if($posts_var['usewallet']) {
-                /* wallet management: start*/
-                $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $card_total_amount,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
-                $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $card_total_amount]);
-                /* wallet management: end*/
-            }
+                if($posts_var['usewallet']) {
+                    /* wallet management: start*/
+                    $this->db->insert('bs_wallet',['parent_id' => $new_odr_id,'user_id' => $user_id,'action' => 'minus', 'amount' => $card_total_amount,'type' => 'order_payment', 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->db->where('user_id', $user_id)->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount - $card_total_amount]);
+                    /* wallet management: end*/
+                }
+                $update_order_array['status'] = 'succeeded';
+                if($posts_var['coupon_id']) {
+                    $update_order_array['coupon_id'] = $posts_var['coupon_id'];
+                    $update_order_array['coupon_type'] = $coupondetail->type;
+                    $update_order_array['coupon_discount'] = $coupon_discount;
+                }
                 
-                $this->db->where_in('id', $records)->update('bs_order',['status' => 'succeeded']);
+                $this->db->where_in('id', $records)->update('bs_order',$update_order_array);
                 $item_ids = array_column($items,'item_id');
                 foreach ($item_ids as $key => $value) {
                     $item_images = $this->db->select('img_path')->from('core_images')->where('img_type', 'item')->where('img_parent_id', $value)->get()->row();
@@ -2533,5 +2560,38 @@ class Payments extends API_Controller {
         $this->db->where('order_id', $posts['order_id'])->update('bs_order',$update_order);
         
         $this->response(['message'=>'status updated successfuly']);
+    }
+    
+    public function coupans_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        
+        $used_coupons = $this->db->select('coupon_id')->from('bs_order')->where('user_id',$posts['user_id'])
+                ->where('coupon_id != 0')->get()->result_array();
+        $coupans = $this->db->select('id,type,value,min_purchase_amount,created_at,end_at')
+                ->from('bs_coupan')
+                ->where('status', 1);
+        if(!empty($used_coupons)) {
+            $usedcoupan_ids = array_column($used_coupons, 'coupon_id');
+            $coupans =  $coupans->where_not_in('id', $usedcoupan_ids);
+        }
+        $coupans = $coupans->order_by('id','desc')->get()->result_array();
+        if(!empty($coupans) && count($coupans)) {
+            $this->response($coupans);
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
+        
     }
 }

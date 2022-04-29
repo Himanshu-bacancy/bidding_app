@@ -459,5 +459,10 @@ CREATE TABLE `bs_coupan` ( `id` INT NOT NULL AUTO_INCREMENT , `type` INT NOT NUL
 
 ALTER TABLE `bs_coupan` ADD `status` INT NOT NULL DEFAULT '1' AFTER `min_purchase_amount`;
 
+// RB: ADDED ON 28/04/2022
+
 ALTER TABLE `bs_order` ADD `coupon_id` INT NOT NULL AFTER `seller_rate_date`;
 
+// RB: ADDED ON 29/04/2022
+
+ALTER TABLE `bs_order` ADD `coupon_type` INT NULL COMMENT '0 = Direct, 1 = Percentage ' AFTER `coupon_id`, ADD `coupon_discount` FLOAT NULL AFTER `coupon_type`;
