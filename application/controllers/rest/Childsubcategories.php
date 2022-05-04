@@ -272,5 +272,28 @@ class Childsubcategories extends API_Controller
 			}
 		}
 	}
+    
+    public function filterbybrand_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'childsubcatid',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $data = $this->db->select('id,name,added_date')->from('bs_brand')->where( 'status', 1 );
+        if(isset($posts['searchterm']) && !empty($posts['searchterm']) && !is_null($posts['searchterm'])) {
+            $data = $data->like( 'name', $posts['searchterm'] );
+        }
+        $data = $data->get()->result();
+        
+        $this->response( $data );
+    }
 
 }

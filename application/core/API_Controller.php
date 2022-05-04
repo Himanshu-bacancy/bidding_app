@@ -1968,6 +1968,11 @@ class API_Controller extends REST_Controller
             $seller_earn = $order_detail['seller_earn'];
             
             $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $conds['to_user_id'],'action' => 'plus', 'amount' => $seller_earn,'type' => 'rate_order', 'created_at' => date('Y-m-d H:i:s')]);
+            
+            $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $conds['to_user_id'])->get()->row();
+            
+            $this->db->where('user_id', $conds['to_user_id'])->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount + $seller_earn]);
+            
             $update_order['is_buyer_rate'] = 1;
             $update_order['rate_date'] = $date;
         } else {
