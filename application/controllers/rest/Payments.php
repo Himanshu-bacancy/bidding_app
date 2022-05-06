@@ -564,7 +564,7 @@ class Payments extends API_Controller {
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
 //                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
-                    ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                    ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                     ->where('order_id', $posts_var['order_id'])->get()->row();
             
            
@@ -1027,7 +1027,7 @@ class Payments extends API_Controller {
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
 //                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
-                        ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                        ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                         ->where('order_id', $value->order_id)->get()->row();
                         
                         $headers = array(
@@ -1993,7 +1993,7 @@ class Payments extends API_Controller {
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
 //                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
-                        ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                        ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                         ->where('order_id', $value->order_id)->get()->row();
                         
                         $headers = array(
@@ -2222,7 +2222,7 @@ class Payments extends API_Controller {
                 $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                    ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                    ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                     ->where('order_id', $posts['order_id'])->get()->row();
 
                 /*Shippo integration Start*/
@@ -2594,4 +2594,37 @@ class Payments extends API_Controller {
         }
         
     }
+    
+//    public function payout_post() {
+//        $user_data = $this->_apiConfig([
+//            'methods' => ['POST'],
+//            'requireAuthorization' => true,
+//        ]);
+//        
+//        $rules = array(
+//            array(
+//                'field' => 'user_id',
+//                'rules' => 'required'
+//            ),
+//        );
+//        if (!$this->is_valid($rules)) exit; 
+//        $posts = $this->post();
+//        $paid_config = $this->Paid_config->get_one('pconfig1');
+//        
+//        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+//        try {
+////            $payout = \Stripe\Balance::retrieve();
+////            $payout = \Stripe\Payout::create([
+////                'amount' => 1,
+////                'currency' => 'usd',
+////                'method' => 'standard',
+////              ], [
+////                'stripe_account' => 'acct_1KtUQOPAThacYQMR',
+////            ]);
+//            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
+//            dd($response);
+//        }catch (exception $e) {
+//            $this->error_response($e->getMessage());
+//        }
+//    }
 }

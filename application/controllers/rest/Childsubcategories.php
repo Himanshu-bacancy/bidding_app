@@ -292,8 +292,11 @@ class Childsubcategories extends API_Controller
             $data = $data->like( 'name', $posts['searchterm'] );
         }
         $data = $data->get()->result();
-        
-        $this->response( $data );
+        if(!empty($data)) {
+            $this->response( $data );
+        } else {
+            $this->error_response($this->config->item( 'record_not_found'));
+        }
     }
 
 }
