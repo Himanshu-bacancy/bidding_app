@@ -466,3 +466,7 @@ ALTER TABLE `bs_order` ADD `coupon_id` INT NOT NULL AFTER `seller_rate_date`;
 // RB: ADDED ON 29/04/2022
 
 ALTER TABLE `bs_order` ADD `coupon_type` INT NULL COMMENT '0 = Direct, 1 = Percentage ' AFTER `coupon_id`, ADD `coupon_discount` FLOAT NULL AFTER `coupon_type`;
+
+// RB: ADDED ON 12/05/2022
+
+ALTER TABLE `bs_track_order` ADD `ship_from` VARCHAR(255) NULL AFTER `order_id`, ADD `ship_to` VARCHAR(255) NULL AFTER `ship_from`;

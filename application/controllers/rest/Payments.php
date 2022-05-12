@@ -834,7 +834,7 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, bs_track_order.label_url, seller.user_id as seller_id')->from('bs_order')
+        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, bs_track_order.label_url, bs_track_order.ship_from, bs_track_order.ship_to, seller.user_id as seller_id')->from('bs_order')
 //                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
@@ -844,6 +844,19 @@ class Payments extends API_Controller {
         if(!empty($orders) && count($orders)) {
             $address_details = $this->Addresses->get_one( $orders['address_id'] );
             $orders['address_details'] = $address_details;
+            
+            if(!empty($orders['ship_from'])) {
+                $ship_fromaddress= $this->Addresses->get_one( $orders['ship_from'] );
+                $orders['ship_fromaddress'] = $ship_fromaddress;
+            } else {
+                 $orders['ship_fromaddress'] = "";
+            }
+            if(!empty($orders['ship_to'])) {
+                $ship_toaddress= $this->Addresses->get_one( $orders['ship_to'] );
+                $orders['ship_toaddress'] = $ship_toaddress;
+            } else {
+                 $orders['ship_toaddress'] = "";
+            }
                 
             $item_details = $this->Item->get_one( $orders['items'] );
             $this->ps_adapter->convert_item($item_details);
@@ -1280,9 +1293,23 @@ class Payments extends API_Controller {
                         if(!empty($get_tracking)) {
                             $row[$key]->tracking_status = $get_tracking->status;
                             $row[$key]->tracking_url = $get_tracking->tracking_url;
+                            if(!empty($get_tracking->ship_from)) {
+                                $ship_fromaddress= $this->Addresses->get_one( $get_tracking->ship_from );
+                                $row[$key]->ship_fromaddress = $ship_fromaddress;
+                            } else {
+                                $row[$key]->ship_fromaddress = "";
+                            }
+                            if(!empty($get_tracking->ship_to)) {
+                                $ship_toaddress= $this->Addresses->get_one( $get_tracking->ship_to );
+                                $row[$key]->ship_toaddress = $ship_toaddress;
+                            } else {
+                                $row[$key]->ship_toaddress = "";
+                            }
                         } else {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
+                            $row[$key]->ship_fromaddress = "";
+                            $row[$key]->ship_toaddress = "";
                         }
                         
                         if($value->is_return) {
@@ -2625,7 +2652,26 @@ class Payments extends API_Controller {
 ////              ], [
 ////                'stripe_account' => 'acct_1KtUQOPAThacYQMR',
 ////            ]);
-//            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
+////            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
+////            $response = \Stripe\Charge::create(array( 
+////                'customer' => 'cus_JqpKR8z1pZ3QcB', 
+////                'amount'   => 5*100, 
+////                'currency' => 'USD', 
+////            )); 
+//            
+//             $response = \Stripe\PaymentIntent::create([
+//                'amount' => 1099,
+//                'currency' => 'usd',
+//                'application_fee_amount' => 200,
+//                'payment_method' => 'pm_1KvzkQ2eZvKYlo2C9BL7g2vU',
+//                'payment_method_types' => ['card'],
+//                'on_behalf_of' => 'acct_1KtUQOPAThacYQMR',
+//                'transfer_data' => [
+//                  'destination' => 'acct_1KtUQOPAThacYQMR',
+//                ],
+//                 
+//              ]);
+//
 //            dd($response);
 //        }catch (exception $e) {
 //            $this->error_response($e->getMessage());
@@ -2669,7 +2715,8 @@ class Payments extends API_Controller {
                     $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('core_users')
                     ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                     ->where('bs_addresses.id', $posts['address_id'])->get()->row();
-
+                    $ship_from = $posts['address_id'];
+                    $ship_to = $get_records->address_id;
                     $headers = array(
                         "Content-Type: application/json",
                         "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
@@ -2726,7 +2773,7 @@ class Payments extends API_Controller {
 
                     $response = json_decode(curl_exec($ch)); 
                     curl_close($ch);
-                    $this->db->insert('bs_track_order', ['order_id' => $get_records->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => $date]);
+                    $this->db->insert('bs_track_order', ['order_id' => $get_records->order_id, 'ship_from' => $ship_from, 'ship_to' => $ship_to,'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => $date]);
                     $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
 
                     if(is_null($track_number) || empty($track_number)) {
