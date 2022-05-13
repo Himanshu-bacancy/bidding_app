@@ -470,3 +470,7 @@ ALTER TABLE `bs_order` ADD `coupon_type` INT NULL COMMENT '0 = Direct, 1 = Perce
 // RB: ADDED ON 12/05/2022
 
 ALTER TABLE `bs_track_order` ADD `ship_from` VARCHAR(255) NULL AFTER `order_id`, ADD `ship_to` VARCHAR(255) NULL AFTER `ship_from`;
+
+// RB: ADDED ON 13/05/2022
+
+ALTER TABLE `bs_item_exchange` ADD `brand` VARCHAR(255) NULL AFTER `item_id`, ADD `size` VARCHAR(255) NULL AFTER `brand`, ADD `color` VARCHAR(255) NULL AFTER `size`;

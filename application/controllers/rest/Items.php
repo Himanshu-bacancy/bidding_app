@@ -563,7 +563,7 @@ class Items extends API_Controller
 		{
 			$this->db->where('item_id', $id);
     		$this->db->delete('bs_item_exchange');
-
+            $compare_cat = $this->db->select('cat_id')->from('bs_categories')->where('cat_name','CLOTHING, SHOES &amp; ACESSORIES')->get()->row()->cat_id;
 			foreach($this->post('exchange_category') as $catid)
 			{
 				$exchange_data = array(
@@ -571,6 +571,11 @@ class Items extends API_Controller
 					"item_id" => $id,
 					"added_date" =>  date("Y-m-d H:i:s")
 				);
+                if($catid == $compare_cat) {
+                    $exchange_data['brand'] = ($this->post('exchange_category_brand')) ?? null;
+                    $exchange_data['size'] = ($this->post('exchange_category_size')) ?? null;
+                    $exchange_data['color'] = ($this->post('exchange_category_color')) ?? null;
+                }
 				$this->Itemexchangecategory->save($exchange_data);
 			}
 		}
@@ -1348,7 +1353,7 @@ class Items extends API_Controller
         ]);
 		$userId = $this->post('user_id');
 		$itemId = $this->post('item_id');
-
+        
 		$itemData = $this->Item->get_one_by(array('id' => $itemId));
 		$itemTypeId = $itemData->item_type_id ? $itemData->item_type_id : 3;
 		$this->db->where('item_id', $itemId);
@@ -1358,6 +1363,13 @@ class Items extends API_Controller
 			$catIds = [];
 			foreach($itemsInExchange as $categoryData){
 				$catIds[] = $categoryData['cat_id'];
+                if(!is_null($categoryData['brand'])) {
+                    $brand_filter = $categoryData['brand'];
+                    $size_filter  = $categoryData['size'];
+                    $color_filter = $categoryData['color'];
+                    
+                    $cateid_filter = $categoryData['cat_id'];
+                }
 			}
 			$this->db->where('item_type_id', $itemTypeId);
 			$this->db->where('added_user_id', $userId);
@@ -1368,9 +1380,30 @@ class Items extends API_Controller
 			$exchangeData = $exchangeItems->result();
             $row_item_details = [] ;
             foreach ($exchangeData as $key => $value) {
-                $row_item_details[$key] = $value;
+                    $row_item_details[$key] = $value;
                 $this->ps_adapter->convert_item($row_item_details[$key]);
+                if($row_item_details[$key]->cat_id == $cateid_filter) {
+                    /*brand filter*/
+                    if($row_item_details[$key]->brand != $brand_filter) {
+                        unset($row_item_details[$key]);
+                    }
+                    /*color filter*/
+                    foreach($row_item_details[$key]->item_colors as $colors) {
+                        $colorids[] = $colors->color_id;
+                    }
+                    if(!in_array($color_filter, $colorids)) {
+                        unset($row_item_details[$key]);
+                    }
+                    /*size filter*/
+                    foreach($row_item_details[$key]->sizegroup_options as $sizes) {
+                        $sizeids[] = $sizes->id;
+                    }
+                    if(!in_array($size_filter, $sizeids)) {
+                        unset($row_item_details[$key]);
+                    }
+                }
             }
+            $row_item_details = array_values($row_item_details);
 			$this->custom_response($row_item_details);
 		} else {
 			$this->error_response( get_msg( 'record_not_found' ) );

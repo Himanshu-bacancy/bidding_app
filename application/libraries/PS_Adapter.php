@@ -169,7 +169,7 @@ class PS_Adapter {
 		// set default photo
 		$obj->default_photo = $this->get_default_photo( $obj->id, 'item' );
 
-		$obj->price = $obj->price ? $obj->price : '';
+		$obj->price = $obj->price ? $obj->price : 0;
 		$obj->is_sold_out = $obj->is_sold_out ? $obj->is_sold_out : 0;
 		$obj->updated_flag = $obj->updated_flag ? $obj->updated_flag : 0;
 		$obj->touch_count = $obj->touch_count ? $obj->touch_count : 0;
