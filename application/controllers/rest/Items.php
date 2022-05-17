@@ -1655,11 +1655,13 @@ class Items extends API_Controller
             $row[$key] = $value;
     		$this->ps_adapter->convert_item($row[$key]);
         }
+        
         if($requestedItemDetails->is_accept_similar) {
             if(!is_null($requestedItemDetails->similar_items)) {
                 $ignored_creterias = array_column($requestedItemDetails->similar_items, 'similarcreteria_id');
                 $all_criterias = $this->db->select('id,title')->from('bs_similar_criterias')->get()->result_array();
                 $skip_criteria = 0;
+                
                 foreach ($all_criterias as $k => $v) {
                     if(!in_array($v['id'],$ignored_creterias)) { 
                         /*brand*/
@@ -1757,6 +1759,9 @@ class Items extends API_Controller
                     } else {
                         $skip_criteria += 1;
                     }
+                }
+                if($skip_criteria == 4) {
+                    $op = $row;
                 }
             }
         } else {
