@@ -474,3 +474,30 @@ ALTER TABLE `bs_track_order` ADD `ship_from` VARCHAR(255) NULL AFTER `order_id`,
 // RB: ADDED ON 13/05/2022
 
 ALTER TABLE `bs_item_exchange` ADD `brand` VARCHAR(255) NULL AFTER `item_id`, ADD `size` VARCHAR(255) NULL AFTER `brand`, ADD `color` VARCHAR(255) NULL AFTER `size`;
+
+// RB: ADDED ON 16/05/2022
+
+CREATE TABLE `bidding_app6`.`bs_bankdetails` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` VARCHAR(255) NOT NULL , `account_holder_name` VARCHAR(255) NOT NULL , `routing_number` VARCHAR(255) NOT NULL , `account_number` VARCHAR(255) NOT NULL , `is_default` INT NOT NULL , `status` INT NOT NULL DEFAULT '1' , `created_at` DATETIME NOT NULL , `updated_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+
+ALTER TABLE `bs_order` ADD `seller_address_id` VARCHAR(255) NULL AFTER `address_id`;
+
+// RB: ADDED ON 17/05/2022
+
+ALTER TABLE `bs_addresses` ADD `ssn` VARCHAR(255) NULL AFTER `timezone`;
+
+ALTER TABLE `bs_stripe_error` ADD `user_id` VARCHAR(255) NULL AFTER `created_at`;
+
+ALTER TABLE `bs_stripe_error` CHANGE `user_id` `user_id` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `card_id`
+
+ALTER TABLE `core_users` ADD `connect_id` VARCHAR(255) NULL AFTER `wallet_amount`;
+
+ALTER TABLE `bs_addresses` ADD `country_code` VARCHAR(255) NULL AFTER `country`;
+
+ALTER TABLE `bs_bankdetails` ADD `external_account_id` VARCHAR(255) NULL AFTER `account_number`;
+
+ALTER TABLE `bs_stripe_error` ADD `connect_id` VARCHAR(255) NULL AFTER `user_id`;
+
+// RB: ADDED ON 18/05/2022
+
+CREATE TABLE `bidding_app6`.`bs_payouts` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` VARCHAR(255) NOT NULL , `connect_id` VARCHAR(255) NOT NULL , `external_account_id` VARCHAR(255) NOT NULL , `amount` FLOAT NOT NULL , `response` TEXT NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

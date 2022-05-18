@@ -76,6 +76,7 @@ class Payments extends API_Controller {
         $records = [];
         $orderids= [];
         $backend_config = $this->Backend_config->get_one('be1');
+        
         foreach ($items as $key => $value) {    
             
             $item_price = $value['price'];
@@ -84,7 +85,7 @@ class Payments extends API_Controller {
             $shipping_amount = 0;
             if($value['delivery_method_id'] == DELIVERY_ONLY) {
                 $card_total_amount += $item_price;
-                $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $value['item_id'])->get()->row();
+                $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,Address_id')->from('bs_items')->where('id', $value['item_id'])->get()->row();
                 if($get_item->pay_shipping_by == '1') {
                     if($get_item->shipping_type == '1') {
                         $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
@@ -104,9 +105,8 @@ class Payments extends API_Controller {
 
                 $seller_earn = (float)$value['price'] - $service_fee - $processing_fees;
                 
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'item_offered_price' => $value['price'], 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'],'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $value['delivery_address'], 'seller_address_id' => $get_item->Address_id, 'item_offered_price' => $value['price'], 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
                 $records[$key] = $this->db->insert_id();
-                
                 if(!$item_price) {
                      /*manage qty: start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $value['item_id'])->get()->row();
@@ -123,13 +123,15 @@ class Payments extends API_Controller {
                 }
                 
             } else if($value['delivery_method_id'] == PICKUP_ONLY) {
+                $item_detail = $this->db->from('bs_items')->where('id', $value['item_id'])->get()->row();
+                
                 $service_fee = ((float)$item_price * (float)$backend_config->selling_fees)/100;
 
                 $processing_fees = ((float)$item_price * (float)$backend_config->processing_fees)/100;
 
                 $seller_earn = (float)$item_price - $service_fee - $processing_fees;
                 
-                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
+                $this->db->insert('bs_order', ['order_id' => $new_odr_id,'user_id' => $user_id, 'items' => $value['item_id'], 'delivery_method' => $value['delivery_method_id'], 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $value['delivery_address'], 'seller_address_id' => $item_detail->Address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => DIRECT_BUY, 'coupon_id' => $posts_var['couponid']]);
 
                 if($value['payin'] == PAYCARD) {
                     $records[$key] = $this->db->insert_id();
@@ -137,7 +139,6 @@ class Payments extends API_Controller {
                 }
                 
                 /*manage qty: start*/
-                $item_detail = $this->db->from('bs_items')->where('id', $value['item_id'])->get()->row();
                 
                 $stock_update = $item_detail->pieces - 1;
                 $update_array['pieces'] = $stock_update;
@@ -168,7 +169,9 @@ class Payments extends API_Controller {
                     $remaining_amount = $remaining_amount - $coupon_discount;
                 }
             }
+            
             if($remaining_amount) {
+                
                 # set stripe test key
                 \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
                 $record_id = 0;
@@ -183,7 +186,7 @@ class Payments extends API_Controller {
                         ]
                     ]);
                     $response = \Stripe\PaymentIntent::create([
-                        'amount' => $remaining_amount * 100,
+                        'amount' => round($remaining_amount * 100),
                         "currency" => trim($paid_config->currency_short_form),
                         'payment_method' => $response->id,
                         'payment_method_types' => ['card'],
@@ -210,8 +213,7 @@ class Payments extends API_Controller {
                         }
 
                         $this->db->where_in('id', $records)->update('bs_order',$update_order_array);
-//                        $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
-                        $this->tracking_order(['create_offer' => 1]);
+                        $this->tracking_order(['generate_label' => 1,'transaction_id' => $response->id, 'create_offer' => 1]);
                         $item_ids = array_column($items,'item_id');
 
                         foreach ($item_ids as $key => $value) {
@@ -239,10 +241,12 @@ class Payments extends API_Controller {
                             $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card']);
                         } else {
                         $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
+                        $this->db->insert('bs_stripe_error', ['order_id' => json_encode($records), 'card_id' => $card_id, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
                 } catch (exception $e) {
                     $this->db->where_in('id', $records)->update('bs_order',['status' => 'fail']);
+                    $this->db->insert('bs_stripe_error', ['order_id' => json_encode($records), 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
                     $this->error_response(get_msg('stripe_transaction_failed'));
                 }
             } else {
@@ -834,7 +838,7 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit;
         
         $order_id = $this->post('order_id');
-        $orders = $this->db->select('bs_order.*, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, bs_track_order.label_url, bs_track_order.ship_from, bs_track_order.ship_to, seller.user_id as seller_id')->from('bs_order')
+        $orders = $this->db->select('bs_order.*,bs_order.seller_address_id as ship_from, bs_items.title, bs_items.is_sold_out, bs_track_order.status as tracking_status, bs_track_order.tracking_url, bs_track_order.label_url, seller.user_id as seller_id')->from('bs_order')
 //                ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
@@ -850,12 +854,6 @@ class Payments extends API_Controller {
                 $orders['ship_fromaddress'] = $ship_fromaddress;
             } else {
                  $orders['ship_fromaddress'] = "";
-            }
-            if(!empty($orders['ship_to'])) {
-                $ship_toaddress= $this->Addresses->get_one( $orders['ship_to'] );
-                $orders['ship_toaddress'] = $ship_toaddress;
-            } else {
-                 $orders['ship_toaddress'] = "";
             }
                 
             $item_details = $this->Item->get_one( $orders['items'] );
@@ -1216,7 +1214,7 @@ class Payments extends API_Controller {
         $user_id = $this->post('user_id');
         $order_state = $this->post('order_state');
         $operation_type = $this->post('operation_type');
-        $obj = $this->db->select('bs_order.*,seller.user_id as seller_id')->from('bs_order')
+        $obj = $this->db->select('bs_order.*,bs_order.seller_address_id as ship_from,seller.user_id as seller_id')->from('bs_order')
                 ->join('core_users as order_user', 'bs_order.user_id = order_user.user_id')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id');
@@ -1233,8 +1231,8 @@ class Payments extends API_Controller {
                 } else {
                     $obj = $obj->where(['bs_order.user_id'=> $user_id, 'bs_order.operation_type'=> $operation_type]);
                 }
-                $obj = $obj->order_by('bs_order.id', 'desc')->get()->result();
-//                ->where('bs_order.status', "succeeded")
+                
+                $obj = $obj->where('bs_order.status !=', "fail")->order_by('bs_order.id', 'desc')->get()->result();
 //                ->where('bs_order.delivery_status', "pending")->get()->result();
 //                echo $this->db->last_query();die();
 //        echo '<pre>';print_r($obj);die();
@@ -1293,23 +1291,16 @@ class Payments extends API_Controller {
                         if(!empty($get_tracking)) {
                             $row[$key]->tracking_status = $get_tracking->status;
                             $row[$key]->tracking_url = $get_tracking->tracking_url;
-                            if(!empty($get_tracking->ship_from)) {
+                            if(!empty($value->ship_from)) {
                                 $ship_fromaddress= $this->Addresses->get_one( $get_tracking->ship_from );
                                 $row[$key]->ship_fromaddress = $ship_fromaddress;
                             } else {
                                 $row[$key]->ship_fromaddress = "";
                             }
-                            if(!empty($get_tracking->ship_to)) {
-                                $ship_toaddress= $this->Addresses->get_one( $get_tracking->ship_to );
-                                $row[$key]->ship_toaddress = $ship_toaddress;
-                            } else {
-                                $row[$key]->ship_toaddress = "";
-                            }
                         } else {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
                             $row[$key]->ship_fromaddress = "";
-                            $row[$key]->ship_toaddress = "";
                         }
                         
                         if($value->is_return) {
@@ -1414,9 +1405,16 @@ class Payments extends API_Controller {
                         if(!empty($get_tracking)) {
                             $row[$key]->tracking_status = $get_tracking->status;
                             $row[$key]->tracking_url = $get_tracking->tracking_url;
+                            if(!empty($value->ship_from)) {
+                                $ship_fromaddress= $this->Addresses->get_one( $get_tracking->ship_from );
+                                $row[$key]->ship_fromaddress = $ship_fromaddress;
+                            } else {
+                                $row[$key]->ship_fromaddress = "";
+                            }
                         } else {
                             $row[$key]->tracking_status = "";
                             $row[$key]->tracking_url = "";
+                            $row[$key]->ship_fromaddress = "";
                         }
                         
                         if($value->is_return) {
@@ -1720,7 +1718,7 @@ class Payments extends API_Controller {
                
                 if($delivery_method_id == DELIVERY_ONLY) {
                     
-                    $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
+                    $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller,Address_id')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
                     if($get_item->pay_shipping_by == '1') {
                         if($get_item->is_confirm_with_seller) {
@@ -1744,7 +1742,7 @@ class Payments extends API_Controller {
                             $shipping_amount = $get_item->shipping_cost_by_seller;
                         }
                     }
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $posts_var['item_id'], 'qty' => $qty, 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $offer_details->operation_type]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $posts_var['item_id'], 'qty' => $qty, 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id,'seller_address_id' => $get_item->Address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $offer_details->operation_type]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
@@ -1771,7 +1769,7 @@ class Payments extends API_Controller {
                     \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
                     try {
                         $response = \Stripe\PaymentIntent::create([
-                            'amount' => $item_price * 100,
+                            'amount' => round($item_price * 100),
                             "currency" => trim($paid_config->currency_short_form),
                             'payment_method' => $stripe_payment_method_id,
                             'payment_method_types' => ['card'],
@@ -1812,12 +1810,12 @@ class Payments extends API_Controller {
                     }
 
                 } else if($delivery_method_id == PICKUP_ONLY) {
+                    $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
                     $date = date('Y-m-d H:i:s');
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => ($posts_var['item_id'] ?? $requested_item_id),'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => ($posts_var['item_id'] ?? $requested_item_id),'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'seller_address_id' => $item_detail->Address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
                     
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
-                    $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
                     $stock_update = $item_detail->pieces - 1;
                     $update_array['pieces'] = $stock_update;
                     if(!$stock_update) {
@@ -1831,7 +1829,7 @@ class Payments extends API_Controller {
                         \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
                         try {
                             $response = \Stripe\PaymentIntent::create([
-                                'amount' => $item_price * 100,
+                                'amount' => round($item_price * 100),
                                 "currency" => trim($paid_config->currency_short_form),
                                 'payment_method' => $stripe_payment_method_id,
                                 'payment_method_types' => ['card'],
@@ -1896,6 +1894,7 @@ class Payments extends API_Controller {
                     send_push( [$buyer->device_token], ["message" => "Offer confirmed", "flag" => "offer_confirmed_by_seller"] );
                     $this->response(['status' => "success", 'message' => 'Notification sent successfully']);
                 } else {
+                    $item_detail = $this->db->from('bs_items')->where('id', $requested_item_id)->get()->row();
                     $date = date('Y-m-d H:i:s');
 //                    if($posts_var['operation_type'] == EXCHANGE) {
                     $requested_item_id = $this->db->from('bs_chat_history')->where('id',$posts_var['offer_id'])->get()->row()->requested_item_id;
@@ -1911,7 +1910,7 @@ class Payments extends API_Controller {
 
                     $seller_earn = (float)$item_price - $service_fee - $processing_fees;
                     
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id,'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $offer_details->buyer_user_id, 'items' => $requested_item_id,'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'seller_address_id' => $item_detail->Address_id,'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
                     $record = $this->db->insert_id();
 
                     /*manage stock :start*/
@@ -1925,7 +1924,7 @@ class Payments extends API_Controller {
                         $this->db->where('id', $value->item_id)->update('bs_items', $update_array);
                         $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $value->item_id, 'seller_id' => $value->added_user_id, 'created_at' => $date]);
                     } 
-                    $item_detail = $this->db->from('bs_items')->where('id', $requested_item_id)->get()->row();
+                    
                     $stock_update = $item_detail->pieces - 1;
                     $update_array['pieces'] = $stock_update;
                     if(!$stock_update) {
@@ -2003,7 +2002,7 @@ class Payments extends API_Controller {
         $get_records = $this->db->from('bs_order')->where('transaction_id', $param['transaction_id'])->get()->result();
         $track_number = '';
         $current_date = date("Y-m-d H:i:s");
-        if(isset($param['transaction_id'])) {
+        if(isset($param['generate_label'])) {
             foreach ($get_records as $key => $value) {
                 $track_exist = $this->db->from('bs_track_order')->where('order_id', $value->order_id)->order_by('id','desc')->get()->row();
                 if(empty($track_exist) || $track_exist->status == 'ERROR') {
@@ -2092,7 +2091,23 @@ class Payments extends API_Controller {
                 }
             }
         }
+        foreach ($get_records as $key => $value) {
+            $item_detail = $this->db->from('bs_items')->where('id', $value->items)->get()->row();
+            if($value->operation_type == DIRECT_BUY) {
+                $stock_update = $item_detail->pieces - $value->qty;
+            } else {
+                $stock_update = $item_detail->pieces - 1;
+            }
         
+            $update_array['pieces'] = $stock_update;
+            if(!$stock_update) {
+                $update_array['is_sold_out'] = 1;
+            }
+            $this->db->where('id', $value->items)->update('bs_items', $update_array);
+            $this->db->insert('bs_order_confirm', ['order_id' => $value->order_id, 'item_id' => $value->items, 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+
+            $this->db->where('user_id', $value->user_id)->where('item_id', $value->items)->delete('bs_cart');
+        }
         if($param['create_offer']) {
             $current_date = date("Y-m-d H:i:s");
             foreach ($get_records as $key => $value) {
@@ -2482,7 +2497,7 @@ class Payments extends API_Controller {
         $posts = $this->post();
 //        $date = date('Y-m-d H:i:s');
         
-        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.parent_id as order_id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at,bs_items.title as item_name,core_users.user_name as sellername,buyer.user_name as buyername')
+        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.parent_id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at,bs_items.title as item_name,core_users.user_name as sellername,buyer.user_name as buyername')
                 ->from('bs_wallet')
                 ->join('bs_order', 'bs_wallet.parent_id = bs_order.order_id', 'left')
                 ->join('bs_items', 'bs_order.items = bs_items.id', 'left')
@@ -2514,8 +2529,12 @@ class Payments extends API_Controller {
                         $row[$key]['type'] = 'credit';
                     } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
                         $row[$key]['type'] = 'debit';
-                    } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
+                    } else if($value['action'] == 'minus' && $value['type'] == 'bank_deposit') {
                         $row[$key]['type'] = 'bank deposit';
+                        
+                        $row[$key]['account_number'] = $this->db->select('account_number')->from('bs_payouts')
+                                ->join('bs_bankdetails', 'bs_payouts.external_account_id = bs_bankdetails.external_account_id')
+                                ->where('bs_payouts.id', $value['parent_id'])->get()->row()->account_number;
                     }
                 }
                 unset($row[$key]['action']);
@@ -2626,39 +2645,153 @@ class Payments extends API_Controller {
         
     }
     
-//    public function payout_post() {
-//        $user_data = $this->_apiConfig([
-//            'methods' => ['POST'],
-//            'requireAuthorization' => true,
-//        ]);
-//        
-//        $rules = array(
-//            array(
-//                'field' => 'user_id',
-//                'rules' => 'required'
-//            ),
-//        );
-//        if (!$this->is_valid($rules)) exit; 
-//        $posts = $this->post();
-//        $paid_config = $this->Paid_config->get_one('pconfig1');
-//        
-//        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
-//        try {
-////            $payout = \Stripe\Balance::retrieve();
-////            $payout = \Stripe\Payout::create([
-////                'amount' => 1,
-////                'currency' => 'usd',
-////                'method' => 'standard',
-////              ], [
-////                'stripe_account' => 'acct_1KtUQOPAThacYQMR',
-////            ]);
-////            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
-////            $response = \Stripe\Charge::create(array( 
-////                'customer' => 'cus_JqpKR8z1pZ3QcB', 
-////                'amount'   => 5*100, 
-////                'currency' => 'USD', 
-////            )); 
+    public function save_shipfrom_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'address_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        
+        $this->db->where('order_id', $posts['order_id'])->update('bs_order',['seller_address_id' => $posts['address_id']]);
+        
+        $this->response(['status' => 'success','message' => 'Address updated successfuly', 'address_id' => $posts['address_id']]);
+    }
+    
+    public function payout_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $paid_config = $this->Paid_config->get_one('pconfig1');
+        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+        try {
+//            $ch = curl_init();
+//
+//            curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/accounts/acct_1L0PWAQMJEMjFNno');
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+//
+//            curl_setopt($ch, CURLOPT_USERPWD, $paid_config->stripe_secret_key);
+//
+//            $result = curl_exec($ch);
+//            if (curl_errno($ch)) {
+//                echo 'Error:' . curl_error($ch);
+//            }
+//            curl_close($ch);
+            
+//            dd($result);
+//            $response = \Stripe\Account::deleteExternalAccount('acct_1L0PWAQMJEMjFNno','ba_1L0Pv1QMJEMjFNnocBh1h9iS');
+            $response = \Stripe\Account::retrieve('acct_1L0l7b4I13WAXEfE');
+//            echo $response->charges_enabled.'<br>';
+//            echo $response->payouts_enabled.'<br>';
+//            echo '<pre>';
+//            print_r($response->requirements);
+//            $response = \Stripe\Account::all();
+//            $response = \Stripe\Account::create([
+//                'type' => 'custom',
+//                'country' => 'US',
+//                'email' => 'brijesh.ramavat+4@bacancy.com',
+//                'capabilities' => [
+//                  'card_payments' => ['requested' => true],
+//                  'transfers' => ['requested' => true],
+//                ],
+//                'business_type' => 'individual',
+//                'business_profile' => [
+//                    "mcc" => "5045",
+//                    "support_url" => "http://laravel.com",
+//                    "url" => "http://laravel.com",
+//                ],
+//                'individual' => [
+//                    'address' => 
+//                        [
+//                          'line1' => '103 N Main St',
+//                          'postal_code' => '21713',
+//                          'state' => 'MA',
+//                          'country' => 'US',
+//                          'city' =>'Boonsboro'
+//                        ],
+//                    'dob' => 
+//                    [
+//                      'day' => 25,
+//                      'month' => 8,
+//                      'year' => 1995
+//                    ],
+//                    'email' => 'brijesh.ramavat+5@bacancy.com',
+//                    'first_name' => 'bacancy brijesh',
+//                    'last_name' => 'dev',
+//                    'phone' => '2015550124',
+//                    'ssn_last_4' => '0000'
+//                ],
+//                'external_account' => [
+//                    'object' => 'bank_account',
+//                    'country' => 'US',
+//                    'currency' => 'USD',
+//                    'account_holder_name' => 'brijesh_dev_bacancy',
+//                    'account_holder_type' => 'individual',
+//                    'routing_number' => '110000000',
+//                    'account_number' => '000222222227',
+//                ],
+//                'tos_acceptance' => ['date' => time(), 'ip' => $_SERVER['REMOTE_ADDR']],
+//            ]);
+            
+//            ----------------
+//            $response = \Stripe\Transfer::create([
+//                'amount' => 4,
+//                'currency' => 'usd',
+//                'destination' => 'acct_1KyvwaQS3y5Ei3gJ',
+//            ]);
+//            ----------------
+//            $response = \Stripe\Account::createExternalAccount('acct_1KyvwaQS3y5Ei3gJ',[
+////                'external_account' => [
+////                    'object' => 'card',
+////                    'number' => '4000056655665556',
+////                    'exp_month' => '11',
+////                    'exp_year' => '2024',
+////                    'currency' => 'USD',
+////                    'default_for_currency' => true,
+////                ],
+//                ['external_account' => 'tok_visa_debit']
+//                
+//            ]);
+//            ----------------
 //            
+//            $response = \Stripe\Balance::retrieve();
+//            $response = \Stripe\Payout::create([
+//                'amount' => 2,
+//                'currency' => 'usd',
+//                'method' => 'instant',
+//              ], [
+//                'stripe_account' => 'acct_1KyvwaQS3y5Ei3gJ',
+//            ]);
+//            ----------------
+//            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
+//            $response = \Stripe\Charge::create(array( 
+//                'customer' => 'cus_JqpKR8z1pZ3QcB', 
+//                'amount'   => 5*100, 
+//                'currency' => 'USD', 
+//            )); 
+            
 //             $response = \Stripe\PaymentIntent::create([
 //                'amount' => 1099,
 //                'currency' => 'usd',
@@ -2671,12 +2804,12 @@ class Payments extends API_Controller {
 //                ],
 //                 
 //              ]);
-//
-//            dd($response);
-//        }catch (exception $e) {
-//            $this->error_response($e->getMessage());
-//        }
-//    }
+
+            dd($response);
+        }catch (exception $e) {
+            $this->error_response($e->getMessage());
+        }
+    }
     
     public function seller_shippment_post() {
         $user_data = $this->_apiConfig([
@@ -2788,5 +2921,319 @@ class Payments extends API_Controller {
             }
         }
         $this->response(['status' => "success", 'message' => 'shipping label generated']);
+    }
+    
+    public function add_bankdetail_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'account_holder_name',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'routing_number',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'account_number',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        $is_record_exist = $this->db->from('bs_bankdetails')
+                   ->where('user_id', $posts['user_id'])
+                   ->where('routing_number', $posts['routing_number'])
+                   ->where('account_number', $posts['account_number'])
+                   ->where('status', 1)
+                   ->get()->num_rows();
+        if($is_record_exist) {
+            $this->response(['status' => 'error', 'message' => 'Account already exists'],404);
+        }
+            
+        $this->db->insert('bs_bankdetails', ['user_id' => $posts['user_id'], 'account_holder_name' => $posts['account_holder_name'], 'routing_number' => $posts['routing_number'], 'account_number' => $posts['account_number'],'created_at' => $date,'updated_at' => $date]);
+        $record_id = $this->db->insert_id();
+        
+        $check_record = $this->db->from('bs_bankdetails')->where('user_id', $posts['user_id'])->where('status', 1)->get()->num_rows();
+        $paid_config = $this->Paid_config->get_one('pconfig1');
+        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+            
+        if($check_record == 1) {
+            $this->db->where('id', $record_id)->update('bs_bankdetails',['is_default' => 1]);
+            
+            $get_user = $this->db->select('core_users.user_name, core_users.user_email, core_users.user_phone,CONCAT(bs_addresses.address1," ",bs_addresses.address2) as line1, bs_addresses.zipcode, bs_addresses.state, bs_addresses.country_code, bs_addresses.city, bs_addresses.ssn')->from('core_users')
+                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                    ->where('core_users.user_id', $posts['user_id'])
+                    ->where('bs_addresses.is_default_address', 1)
+                    ->where('bs_addresses.status', 1)->get()->row();
+            
+            $business_profile = [
+                "mcc" => "7278",
+                "support_url" => "https://www.google.com",
+                "url" => "https://www.google.com/",
+            ];
+            $dob = [
+                'day' => 1,
+                'month' => 1,
+                'year' => 1965
+            ];
+            $ssn = substr($get_user->ssn,-4);
+            $connect_id = '';
+            try{
+                $response = \Stripe\Account::create([
+                    'type' => 'custom',
+                    'country' => 'US',
+                    'email' => $get_user->user_email,
+                    'capabilities' => [
+                      'card_payments' => ['requested' => true],
+                      'transfers' => ['requested' => true],
+                    ],
+                    'business_type' => 'individual',
+                    'business_profile' => $business_profile,
+                    'individual' => [
+                        'address' => 
+                            [
+                              'line1' => $get_user->line1,
+                              'postal_code' => $get_user->zipcode,
+                              'state' => $get_user->state,
+                              'country' => $get_user->country_code,
+                              'city' => $get_user->city
+                            ],
+                        'dob' => $dob,
+                        'email' => $get_user->user_email,
+                        'first_name' => $get_user->user_name,
+                        'last_name' => 'user',
+                        'phone' => empty($get_user->user_phone) ? '2015550124' : $get_user->user_phone,
+                        'ssn_last_4' => empty($ssn) ? '0000' : $ssn
+//                        'ssn_last_4' => '0000'
+                    ],
+//                    'external_account' => [
+//                        'object' => 'bank_account',
+//                        'country' => 'US',
+//                        'currency' => 'USD',
+//                        'account_holder_name' => $posts['account_holder_name'],
+//                        'account_holder_type' => 'individual',
+//                        'routing_number' => $posts['routing_number'],
+//                        'account_number' => $posts['account_number'],
+//                    ],
+                    'tos_acceptance' => ['date' => time(), 'ip' => $_SERVER['REMOTE_ADDR']],
+                ]);
+                $connect_id = $response->id;
+                $this->db->where('user_id', $posts['user_id'])->update('core_users',['connect_id' => $connect_id]);
+                $bank_account = \Stripe\Account::createExternalAccount($connect_id, [
+                    'external_account' => [
+                        'object' => 'bank_account',
+                        'country' => 'US',
+                        'currency' => 'USD',
+                        'account_holder_name' => $posts['account_holder_name'],
+                        'account_holder_type' => 'individual',
+                        'routing_number' => $posts['routing_number'],
+                        'account_number' => $posts['account_number'],
+                        'default_for_currency' => true,
+                    ]
+                ]);
+                if(isset($bank_account->id)) {
+                    $this->db->where('id', $record_id)->update('bs_bankdetails',['external_account_id' => $bank_account->id, 'updated_at' => $date]);
+                }
+                $get_account = \Stripe\Account::retrieve($connect_id);
+                if(!$get_account->charges_enabled || !$get_account->payouts_enabled) {
+                    $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'], 'connect_id' => $connect_id, 'response' => $get_account, 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                    $this->response(['status' => "success", 'message' => 'Bank detail saved, please update account details', 'response' => $get_account->requirements]);
+                }
+            } catch (exception $e) {
+                $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                $this->db->where('id', $record_id)->delete('bs_bankdetails');
+                delete_connect_account($connect_id, trim($paid_config->stripe_secret_key));
+                $this->response(['status' => 'error', 'message' => $e->getMessage()],404);
+            }
+        } else {
+            $get_record = $this->db->select('connect_id')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
+            try{
+                $bank_account = \Stripe\Account::createExternalAccount($get_record->connect_id, [
+                    'external_account' => [
+                        'object' => 'bank_account',
+                        'country' => 'US',
+                        'currency' => 'USD',
+                        'account_holder_name' => $posts['account_holder_name'],
+                        'account_holder_type' => 'individual',
+                        'routing_number' => $posts['routing_number'],
+                        'account_number' => $posts['account_number'],
+                    ]
+                ]);
+                if(isset($bank_account->id)) {
+                    $this->db->where('id', $record_id)->update('bs_bankdetails',['external_account_id' => $bank_account->id, 'updated_at' => $date]);
+                }
+            } catch(Exception $e) {
+                $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                $this->db->where('id', $record_id)->delete('bs_bankdetails');
+                $this->response(['status' => 'error', 'message' => $e->getMessage()],404);
+            }
+        }
+        $this->response(['status' => "success", 'message' => 'Bank detail saved', 'response' => $response]);
+    }
+    
+    public function banklist_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $check_record = $this->db->select('id,user_id,account_holder_name,routing_number,account_number,external_account_id,is_default,created_at')->from('bs_bankdetails')->where('user_id', $posts['user_id'])->where('status', 1)->get()->result_array();
+        if(!empty($check_record) && count($check_record)) {
+            $this->response($check_record);
+        } else {
+            $this->error_response("Record not found");
+        }
+    }
+    
+    public function remove_bankdetail_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'record_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $check_record = $this->db->select('bs_bankdetails.is_default,bs_bankdetails.external_account_id,core_users.connect_id')->from('bs_bankdetails')
+                ->join('core_users', 'bs_bankdetails.user_id = core_users.user_id')
+                ->where('bs_bankdetails.id', $posts['record_id'])
+                ->get()->row();
+        
+        $paid_config = $this->Paid_config->get_one('pconfig1');
+        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+        if($check_record->is_default) {
+            $get_record = $this->db->select('id,external_account_id')->from('bs_bankdetails')->where('id !=', $posts['record_id'])->where('status', 1)->get()->row();
+            if(!empty($get_record)) {
+                $this->db->where('id', $get_record->id)->update('bs_bankdetails',['is_default' => 1]);
+                if(!empty($get_record->external_account_id) && !is_null($get_record->external_account_id)) {
+                    try {
+                        \Stripe\Account::updateExternalAccount(
+                                $check_record->connect_id,
+                                $get_record->external_account_id,
+                                ['default_for_currency' => true]
+                        );
+                    } catch (Exception $e) {
+                        $this->error_response($e->getMessage());
+                    }
+                }
+            }
+        }
+        $this->db->where('id', $posts['record_id'])->update('bs_bankdetails',['is_default' => 0,'status' => 0]);
+        
+        try {
+            \Stripe\Account::deleteExternalAccount($check_record->connect_id,$check_record->external_account_id);
+        } catch (Exception $e) {
+            $this->error_response($e->getMessage());
+        }
+        $this->response(['status' => "success", 'message' => 'Bank detail removed']);
+    }
+    
+    public function get_default_bankaccount_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        
+        $check_record = $this->db->select('id,user_id,account_holder_name,routing_number,account_number,external_account_id,is_default,created_at')->from('bs_bankdetails')->where('user_id', $posts['user_id'])->where('status', 1)->where('is_default', 1)->get()->row_array();
+        if(!empty($check_record) && count($check_record)) {
+            $this->response($check_record);
+        } else {
+            $this->error_response("Record not found");
+        }
+    }
+    
+    public function bank_transfer_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'connect_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'external_account_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'amount',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        $get_current_balance = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
+        
+        if($get_current_balance && $get_current_balance > $posts['amount']) {
+            $paid_config = $this->Paid_config->get_one('pconfig1');
+            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+            try {
+                \Stripe\Account::updateExternalAccount(
+                    $posts['connect_id'],
+                    $posts['external_account_id'],
+                    ['default_for_currency' => true]
+                );
+                
+                $response = \Stripe\Transfer::create([
+                    'amount' => $posts['amount']*100,
+                    'currency' => 'usd',
+                    'destination' => $posts['connect_id'],
+                ]);   
+                
+                $this->db->insert('bs_payouts',['user_id' => $posts['user_id'],'connect_id' => $posts['connect_id'], 'external_account_id' => $posts['external_account_id'], 'amount' => $posts['amount'],'response' => $response, 'created_at' => $date]);
+                $record_id = $this->db->insert_id();
+                
+                $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'bank_deposit', 'created_at' => $date]);
+                
+                $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
+                
+                $this->response(['status' => "success", 'message' => 'Amount transfered']);
+                
+            } catch (Exception $e) {
+                $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                $this->error_response($e->getMessage());
+            }
+        } else {
+            $this->error_response('Not enough balance');
+        }
     }
 }
