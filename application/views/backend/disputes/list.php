@@ -9,6 +9,7 @@
 			<th><?php echo get_msg('is_seller_dispute'); ?></th>
 <!--			<th><?php echo get_msg('image'); ?></th>-->
 			<th><?php echo get_msg('message'); ?></th>
+			<th><span class="th-title"><?php echo get_msg('btn_view')?></span></th>
             <th><span class="th-title"><?php echo get_msg('action')?></span></th>
 		</tr>
 		
@@ -35,6 +36,14 @@
                 }
                 echo $path;?></td>-->
 				<td ><?php echo $val->message;?></td>
+                <td>
+                    <?php 
+                    $record_no = $this->db->select('id')->from('bs_order')->where('order_id', $val->order_id)->get()->row()->id;
+                    ?>
+                    <a href='<?php echo base_url() .'index.php/admin/orders/returndetail/'. $record_no; ?>'>
+                        <i class="fa fa-eye" style='font-size: 18px;'></i>
+                    </a>
+                </td>
 
                 <td>
                     <?php

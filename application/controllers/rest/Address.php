@@ -160,7 +160,7 @@ class Address extends API_Controller
 //				"is_default_address" => (($this->post('is_default_address')=='1'))?'1':'0', 
 				"id" => $this->post('id'),
                 "timezone" => $timezone,
-                "ssn" => ($this->post('ssn')) ?? null
+                "ssn" => (base64_encode($this->post('ssn'))) ?? null
 			);
 
 			$id = $address_data['id'];

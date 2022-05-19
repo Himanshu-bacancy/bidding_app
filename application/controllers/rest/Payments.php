@@ -2669,23 +2669,23 @@ class Payments extends API_Controller {
         $this->response(['status' => 'success','message' => 'Address updated successfuly', 'address_id' => $posts['address_id']]);
     }
     
-    public function payout_post() {
-        $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
-            'requireAuthorization' => true,
-        ]);
-        
-        $rules = array(
-            array(
-                'field' => 'user_id',
-                'rules' => 'required'
-            ),
-        );
-        if (!$this->is_valid($rules)) exit; 
-        $posts = $this->post();
-        $paid_config = $this->Paid_config->get_one('pconfig1');
-        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
-        try {
+//    public function payout_post() {
+//        $user_data = $this->_apiConfig([
+//            'methods' => ['POST'],
+//            'requireAuthorization' => true,
+//        ]);
+//        
+//        $rules = array(
+//            array(
+//                'field' => 'user_id',
+//                'rules' => 'required'
+//            ),
+//        );
+//        if (!$this->is_valid($rules)) exit; 
+//        $posts = $this->post();
+//        $paid_config = $this->Paid_config->get_one('pconfig1');
+//        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+//        try {
 //            $ch = curl_init();
 //
 //            curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/accounts/acct_1L0PWAQMJEMjFNno');
@@ -2699,10 +2699,10 @@ class Payments extends API_Controller {
 //                echo 'Error:' . curl_error($ch);
 //            }
 //            curl_close($ch);
-            
+//            
 //            dd($result);
 //            $response = \Stripe\Account::deleteExternalAccount('acct_1L0PWAQMJEMjFNno','ba_1L0Pv1QMJEMjFNnocBh1h9iS');
-            $response = \Stripe\Account::retrieve('acct_1L0l7b4I13WAXEfE');
+//            $response = \Stripe\Account::retrieve('acct_1L0l7b4I13WAXEfE');
 //            echo $response->charges_enabled.'<br>';
 //            echo $response->payouts_enabled.'<br>';
 //            echo '<pre>';
@@ -2754,27 +2754,27 @@ class Payments extends API_Controller {
 //                ],
 //                'tos_acceptance' => ['date' => time(), 'ip' => $_SERVER['REMOTE_ADDR']],
 //            ]);
-            
-//            ----------------
+//            
+////            ----------------
 //            $response = \Stripe\Transfer::create([
 //                'amount' => 4,
 //                'currency' => 'usd',
 //                'destination' => 'acct_1KyvwaQS3y5Ei3gJ',
 //            ]);
-//            ----------------
+////            ----------------
 //            $response = \Stripe\Account::createExternalAccount('acct_1KyvwaQS3y5Ei3gJ',[
-////                'external_account' => [
-////                    'object' => 'card',
-////                    'number' => '4000056655665556',
-////                    'exp_month' => '11',
-////                    'exp_year' => '2024',
-////                    'currency' => 'USD',
-////                    'default_for_currency' => true,
-////                ],
+//                'external_account' => [
+//                    'object' => 'card',
+//                    'number' => '4000056655665556',
+//                    'exp_month' => '11',
+//                    'exp_year' => '2024',
+//                    'currency' => 'USD',
+//                    'default_for_currency' => true,
+//                ],
 //                ['external_account' => 'tok_visa_debit']
 //                
 //            ]);
-//            ----------------
+////            ----------------
 //            
 //            $response = \Stripe\Balance::retrieve();
 //            $response = \Stripe\Payout::create([
@@ -2784,14 +2784,14 @@ class Payments extends API_Controller {
 //              ], [
 //                'stripe_account' => 'acct_1KyvwaQS3y5Ei3gJ',
 //            ]);
-//            ----------------
+////            ----------------
 //            $response = \Stripe\EphemeralKey::create(['customer' => 'cus_JqpKR8z1pZ3QcB'], ['stripe_version' => '2020-08-27']);
 //            $response = \Stripe\Charge::create(array( 
 //                'customer' => 'cus_JqpKR8z1pZ3QcB', 
 //                'amount'   => 5*100, 
 //                'currency' => 'USD', 
 //            )); 
-            
+//            
 //             $response = \Stripe\PaymentIntent::create([
 //                'amount' => 1099,
 //                'currency' => 'usd',
@@ -2804,12 +2804,12 @@ class Payments extends API_Controller {
 //                ],
 //                 
 //              ]);
-
-            dd($response);
-        }catch (exception $e) {
-            $this->error_response($e->getMessage());
-        }
-    }
+//
+//            dd($response);
+//        }catch (exception $e) {
+//            $this->error_response($e->getMessage());
+//        }
+//    }
     
     public function seller_shippment_post() {
         $user_data = $this->_apiConfig([
@@ -2986,7 +2986,7 @@ class Payments extends API_Controller {
                 'month' => 1,
                 'year' => 1965
             ];
-            $ssn = substr($get_user->ssn,-4);
+            $ssn = substr(base64_decode($get_user->ssn),-4);
             $connect_id = '';
             try{
                 $response = \Stripe\Account::create([
@@ -3186,7 +3186,7 @@ class Payments extends API_Controller {
                 'rules' => 'required'
             ),
             array(
-                'field' => 'connect_id',
+                'field' => 'transfer_type',
                 'rules' => 'required'
             ),
             array(
@@ -3201,36 +3201,39 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit; 
         $posts = $this->post();
         $date = date('Y-m-d H:i:s');
-        $get_current_balance = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
+        $get_current_balance = $this->db->select('wallet_amount,connect_id')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
         
-        if($get_current_balance && $get_current_balance > $posts['amount']) {
-            $paid_config = $this->Paid_config->get_one('pconfig1');
-            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
-            try {
-                \Stripe\Account::updateExternalAccount(
-                    $posts['connect_id'],
-                    $posts['external_account_id'],
-                    ['default_for_currency' => true]
-                );
-                
-                $response = \Stripe\Transfer::create([
-                    'amount' => $posts['amount']*100,
-                    'currency' => 'usd',
-                    'destination' => $posts['connect_id'],
-                ]);   
-                
-                $this->db->insert('bs_payouts',['user_id' => $posts['user_id'],'connect_id' => $posts['connect_id'], 'external_account_id' => $posts['external_account_id'], 'amount' => $posts['amount'],'response' => $response, 'created_at' => $date]);
-                $record_id = $this->db->insert_id();
-                
-                $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'bank_deposit', 'created_at' => $date]);
-                
-                $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
-                
-                $this->response(['status' => "success", 'message' => 'Amount transfered']);
-                
-            } catch (Exception $e) {
-                $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
-                $this->error_response($e->getMessage());
+        if($get_current_balance->wallet_amount && $get_current_balance->wallet_amount > $posts['amount']) {
+            if($posts['transfer_type'] == 'bank_transfer') {
+
+                $paid_config = $this->Paid_config->get_one('pconfig1');
+                \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                try {
+                    \Stripe\Account::updateExternalAccount(
+                        $get_current_balance->connect_id,
+                        $posts['external_account_id'],
+                        ['default_for_currency' => true]
+                    );
+
+                    $response = \Stripe\Transfer::create([
+                        'amount' => $posts['amount']*100,
+                        'currency' => 'usd',
+                        'destination' => $get_current_balance->connect_id,
+                    ]);   
+
+                    $this->db->insert('bs_payouts',['user_id' => $posts['user_id'],'connect_id' => $get_current_balance->connect_id, 'external_account_id' => $posts['external_account_id'], 'amount' => $posts['amount'],'response' => $response, 'created_at' => $date]);
+                    $record_id = $this->db->insert_id();
+
+                    $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'bank_deposit', 'created_at' => $date]);
+
+                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
+
+                    $this->response(['status' => "success", 'message' => 'Amount transfered']);
+
+                } catch (Exception $e) {
+                    $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                    $this->error_response($e->getMessage());
+                }
             }
         } else {
             $this->error_response('Not enough balance');
