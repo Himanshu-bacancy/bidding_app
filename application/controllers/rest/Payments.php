@@ -2497,7 +2497,7 @@ class Payments extends API_Controller {
         $posts = $this->post();
 //        $date = date('Y-m-d H:i:s');
         
-        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.parent_id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at,bs_items.title as item_name,core_users.user_name as sellername,buyer.user_name as buyername')
+        $get_detail = $this->db->select('bs_wallet.id,bs_wallet.parent_id as order_id,bs_wallet.user_id,bs_wallet.amount,bs_wallet.action,bs_wallet.type,bs_wallet.created_at,bs_items.title as item_name,core_users.user_name as sellername,buyer.user_name as buyername')
                 ->from('bs_wallet')
                 ->join('bs_order', 'bs_wallet.parent_id = bs_order.order_id', 'left')
                 ->join('bs_items', 'bs_order.items = bs_items.id', 'left')
@@ -2527,14 +2527,24 @@ class Payments extends API_Controller {
                 } else {
                     if($value['action'] == 'plus') {
                         $row[$key]['type'] = 'credit';
-                    } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit') {
+                    } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit' && $value['type'] != 'instantpay') {
                         $row[$key]['type'] = 'debit';
-                    } else if($value['action'] == 'minus' && $value['type'] == 'bank_deposit') {
-                        $row[$key]['type'] = 'bank deposit';
+                    } else if($value['action'] == 'minus') {
+                        $row[$key]['order_id'] = '';
+                        $row[$key]['type'] = str_replace('_', ' ', $value['type']);
                         
-                        $row[$key]['account_number'] = $this->db->select('account_number')->from('bs_payouts')
-                                ->join('bs_bankdetails', 'bs_payouts.external_account_id = bs_bankdetails.external_account_id')
-                                ->where('bs_payouts.id', $value['parent_id'])->get()->row()->account_number;
+                        if($value['type'] == 'bank_deposit') {
+                            $row[$key]['account_number'] = $this->db->select('account_number')->from('bs_payouts')
+                                        ->join('bs_bankdetails', 'bs_payouts.external_account_id = bs_bankdetails.external_account_id')
+                                        ->where('bs_payouts.id', $value['order_id'])->get()->row()->account_number;
+                            $row[$key]['card_number'] = '';
+                        } else if($value['type'] == 'instantpay') {
+                            $row[$key]['account_number'] = '';
+                            $row[$key]['card_number'] = $this->db->select('bs_card.card_number')->from('bs_payouts')
+                                        ->join('bs_card', 'bs_payouts.external_account_id = bs_card.stripe_card_id')
+                                        ->where('bs_payouts.id', $value['order_id'])->get()->row()->card_number;
+                            
+                        }
                     }
                 }
                 unset($row[$key]['action']);
@@ -2686,6 +2696,20 @@ class Payments extends API_Controller {
 //        $paid_config = $this->Paid_config->get_one('pconfig1');
 //        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
 //        try {
+//            $token = \Stripe\Token::create([
+//                'card' => [
+//                    'number' => '4000056655665556',
+//                    'exp_month' => 11,
+//                    'exp_year' => 2023,
+//                    'currency' => 'USD'
+//                ]
+//            ]);
+//            $response = \Stripe\Account::createExternalAccount('acct_1L0N7KQQj1y50Q0Z', [
+//                ['external_account' => $token->id,
+//                    ['default_for_currency' =>true]
+//                ]
+//            ]);
+            
 //            $ch = curl_init();
 //
 //            curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/accounts/acct_1L0PWAQMJEMjFNno');
@@ -3189,10 +3213,10 @@ class Payments extends API_Controller {
                 'field' => 'transfer_type',
                 'rules' => 'required'
             ),
-            array(
-                'field' => 'external_account_id',
-                'rules' => 'required'
-            ),
+//            array(
+//                'field' => 'external_account_id',
+//                'rules' => 'required'
+//            ),
             array(
                 'field' => 'amount',
                 'rules' => 'required'
@@ -3204,10 +3228,12 @@ class Payments extends API_Controller {
         $get_current_balance = $this->db->select('wallet_amount,connect_id')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
         
         if($get_current_balance->wallet_amount && $get_current_balance->wallet_amount > $posts['amount']) {
+            $paid_config = $this->Paid_config->get_one('pconfig1');
+            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
             if($posts['transfer_type'] == 'bank_transfer') {
-
-                $paid_config = $this->Paid_config->get_one('pconfig1');
-                \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                if(!isset($posts['external_account_id']) || empty($posts['external_account_id']) || is_null($posts['external_account_id'])) {
+                    $this->error_response("Please pass external_account_id");
+                }
                 try {
                     \Stripe\Account::updateExternalAccount(
                         $get_current_balance->connect_id,
@@ -3231,6 +3257,59 @@ class Payments extends API_Controller {
                     $this->response(['status' => "success", 'message' => 'Amount transfered']);
 
                 } catch (Exception $e) {
+                    $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                    $this->error_response($e->getMessage());
+                }
+            } else{
+                if(!isset($posts['card_id']) || empty($posts['card_id']) || is_null($posts['card_id'])) {
+                    $this->error_response("Please pass card id");
+                }
+                $card_details = $this->db->from('bs_card')->where('id', $posts['card_id'])->get()->row();
+                $expiry_date = explode('/',$card_details->expiry_date);
+                try {
+                    if(is_null($card_details->stripe_card_id)) {
+                        $token = \Stripe\Token::create([
+                            'card' => [
+                                'number' => $card_details->card_number,
+                                'exp_month' => $expiry_date[0],
+                                'exp_year' => $expiry_date[1],
+                                'currency' => 'USD'
+                            ]
+                        ]);
+                        
+                        $response = \Stripe\Account::createExternalAccount($get_current_balance->connect_id, [
+                            ['external_account' => $token->id,
+                                ['default_for_currency' => true]
+                            ]
+                        ]);
+                        $this->db->where('id', $posts['card_id'])->update('bs_card',['stripe_card_id' => $response->id]);
+                        $stripe_card_id = $response->id;
+                    } else {
+                        \Stripe\Account::updateExternalAccount(
+                                $get_current_balance->connect_id, 
+                                $card_details->stripe_card_id, 
+                                ['default_for_currency' => true]
+                        );
+                        $stripe_card_id = $card_details->stripe_card_id;
+                    }
+
+                    $payout = \Stripe\Payout::create([
+                        'amount' => $posts['amount']*100,
+                        'currency' => 'usd',
+                        'method' => 'instant',
+                      ], [
+                        'stripe_account' => $get_current_balance->connect_id,
+                    ]);
+                    
+                    $this->db->insert('bs_payouts',['user_id' => $posts['user_id'],'connect_id' => $get_current_balance->connect_id, 'external_account_id' => $stripe_card_id, 'amount' => $posts['amount'],'response' => $payout, 'created_at' => $date]);
+                    $record_id = $this->db->insert_id();
+
+                    $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'instantpay', 'created_at' => $date]);
+
+                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
+                    
+                    $this->response(['status' => "success", 'message' => 'Amount transfered', 'payout' => $payout]);
+                }catch(Exception $e) {
                     $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
                     $this->error_response($e->getMessage());
                 }
