@@ -213,7 +213,7 @@ class Payments extends API_Controller {
                         }
 
                         $this->db->where_in('id', $records)->update('bs_order',$update_order_array);
-                        $this->tracking_order(['generate_label' => 1,'transaction_id' => $response->id, 'create_offer' => 1]);
+                        $this->tracking_order(['transaction_id' => $response->id, 'create_offer' => 1]);
                         $item_ids = array_column($items,'item_id');
 
                         foreach ($item_ids as $key => $value) {
@@ -2509,7 +2509,7 @@ class Payments extends API_Controller {
         } else if($posts['type'] == DEBIT){
            $get_detail = $get_detail->where('bs_wallet.action', 'minus');
         } else if($posts['type'] == DEPOSIT){
-           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where('bs_wallet.type', 'bank_transfer');
+           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where('bs_wallet.type', 'bank_deposit');
         }
         
         $get_detail = $get_detail->order_by('created_at', 'desc')->get()->result_array();

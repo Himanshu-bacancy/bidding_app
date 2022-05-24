@@ -572,9 +572,11 @@ class Items extends API_Controller
 					"added_date" =>  date("Y-m-d H:i:s")
 				);
                 if($catid == $compare_cat) {
-                    $exchange_data['brand'] = ($this->post('exchange_category_brand')) ?? null;
-                    $exchange_data['size'] = ($this->post('exchange_category_size')) ?? null;
-                    $exchange_data['color'] = ($this->post('exchange_category_color')) ?? null;
+                    $exchange_data['subcat_id'] = ($this->post('exchange_subcat_id')) ?? null;
+                    $exchange_data['childsubcat_id'] = ($this->post('exchange_childsubcat_id')) ?? null;
+                    $exchange_data['brand'] = (json_encode($this->post('exchange_category_brand'))) ?? null;
+                    $exchange_data['size'] = (json_encode($this->post('exchange_category_size'))) ?? null;
+                    $exchange_data['color'] = (json_encode($this->post('exchange_category_color'))) ?? null;
                 }
 				$this->Itemexchangecategory->save($exchange_data);
 			}
@@ -1364,9 +1366,11 @@ class Items extends API_Controller
 			foreach($itemsInExchange as $categoryData){
 				$catIds[] = $categoryData['cat_id'];
                 if(!is_null($categoryData['brand'])) {
-                    $brand_filter = $categoryData['brand'];
-                    $size_filter  = $categoryData['size'];
-                    $color_filter = $categoryData['color'];
+                    $subcat_id_filter = $categoryData['subcat_id'];
+                    $childsubcat_id_filter = $categoryData['childsubcat_id'];
+                    $brand_filter = json_decode($categoryData['brand'], true);
+                    $size_filter  = json_decode($categoryData['size'], true);
+                    $color_filter = json_decode($categoryData['color'], true);
                     
                     $cateid_filter = $categoryData['cat_id'];
                 }
@@ -1380,25 +1384,43 @@ class Items extends API_Controller
 			$exchangeData = $exchangeItems->result();
             $row_item_details = [] ;
             foreach ($exchangeData as $key => $value) {
-                    $row_item_details[$key] = $value;
+                $row_item_details[$key] = $value;
                 $this->ps_adapter->convert_item($row_item_details[$key]);
                 if($row_item_details[$key]->cat_id == $cateid_filter) {
-                    /*brand filter*/
-                    if($row_item_details[$key]->brand != $brand_filter) {
+                    /*$childsubcat_id filter*/
+                    if($row_item_details[$key]->childsubcat_id != $childsubcat_id_filter) {
                         unset($row_item_details[$key]);
                     }
+                    /*subcat_id filter*/
+                    if($row_item_details[$key]->subcat_id != $subcat_id_filter) {
+                        unset($row_item_details[$key]);
+                    }
+                    /*brand filter*/
+                    if(!in_array($row_item_details[$key]->brand, $brand_filter)) {
+                        unset($row_item_details[$key]);
+                    }
+//                    /*brand filter*/
+//                    if($row_item_details[$key]->brand != $brand_filter) {
+//                        unset($row_item_details[$key]);
+//                    }
                     /*color filter*/
                     foreach($row_item_details[$key]->item_colors as $colors) {
                         $colorids[] = $colors->color_id;
                     }
-                    if(!in_array($color_filter, $colorids)) {
+                    if(empty(array_diff($color_filter, $colorids))) {
                         unset($row_item_details[$key]);
                     }
+//                    if(!in_array($color_filter, $colorids)) {
+//                        unset($row_item_details[$key]);
+//                    }
                     /*size filter*/
                     foreach($row_item_details[$key]->sizegroup_options as $sizes) {
                         $sizeids[] = $sizes->id;
                     }
-                    if(!in_array($size_filter, $sizeids)) {
+//                    if(!in_array($size_filter, $sizeids)) {
+//                        unset($row_item_details[$key]);
+//                    }
+                    if(empty(array_diff($size_filter, $sizeids))) {
                         unset($row_item_details[$key]);
                     }
                 }
