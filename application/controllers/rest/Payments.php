@@ -2507,9 +2507,9 @@ class Payments extends API_Controller {
         if($posts['type'] == CREDIT) {
            $get_detail = $get_detail->where('bs_wallet.action', 'plus');
         } else if($posts['type'] == DEBIT){
-           $get_detail = $get_detail->where('bs_wallet.action', 'minus');
+           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where_not_in('bs_wallet.type', ['bank_deposit', 'instantpay']); 
         } else if($posts['type'] == DEPOSIT){
-           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where('bs_wallet.type', 'bank_deposit');
+           $get_detail = $get_detail->where('bs_wallet.action', 'minus')->where_in('bs_wallet.type', ['bank_deposit', 'instantpay']);
         }
         
         $get_detail = $get_detail->order_by('created_at', 'desc')->get()->result_array();
@@ -2520,25 +2520,42 @@ class Payments extends API_Controller {
                 $row[$key] = $value;
                 if($posts['type'] == CREDIT) {
                     $row[$key]['type'] = 'credit';
-                } else if($posts['type'] == DEBIT && $value['type'] != 'bank_deposit'){
+                } else if($posts['type'] == DEBIT){
                     $row[$key]['type'] = 'debit';
                 } else if($posts['type'] == DEPOSIT){
-                    $row[$key]['type'] = 'bank deposit';
-                } else {
+                    $row[$key]['type'] = 'deposit';
+                    if($value['type'] == 'bank_deposit') {
+                        $row[$key]['subtype'] = 'bank';
+                        $row[$key]['account_number'] = $this->db->select('account_number')->from('bs_payouts')
+                                ->join('bs_bankdetails', 'bs_payouts.external_account_id = bs_bankdetails.external_account_id')
+                                        ->where('bs_payouts.id', $value['order_id'])->get()->row()->account_number;
+                        $row[$key]['card_number'] = '';
+                    } else if($value['type'] == 'instantpay') {
+                        $row[$key]['subtype'] = 'instant';
+                        $row[$key]['account_number'] = '';
+                        $row[$key]['card_number'] = $this->db->select('bs_card.card_number')->from('bs_payouts')
+                                    ->join('bs_card', 'bs_payouts.external_account_id = bs_card.stripe_card_id')
+                                    ->where('bs_payouts.id', $value['order_id'])->get()->row()->card_number;
+
+                     }
+                } else if($posts['type'] == ALL){
                     if($value['action'] == 'plus') {
                         $row[$key]['type'] = 'credit';
                     } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit' && $value['type'] != 'instantpay') {
                         $row[$key]['type'] = 'debit';
                     } else if($value['action'] == 'minus') {
                         $row[$key]['order_id'] = '';
-                        $row[$key]['type'] = str_replace('_', ' ', $value['type']);
                         
                         if($value['type'] == 'bank_deposit') {
+                            $row[$key]['type'] = 'deposit';
+                            $row[$key]['subtype'] = 'bank';
                             $row[$key]['account_number'] = $this->db->select('account_number')->from('bs_payouts')
                                         ->join('bs_bankdetails', 'bs_payouts.external_account_id = bs_bankdetails.external_account_id')
                                         ->where('bs_payouts.id', $value['order_id'])->get()->row()->account_number;
                             $row[$key]['card_number'] = '';
                         } else if($value['type'] == 'instantpay') {
+                            $row[$key]['type'] = 'deposit';
+                            $row[$key]['subtype'] = 'instant';
                             $row[$key]['account_number'] = '';
                             $row[$key]['card_number'] = $this->db->select('bs_card.card_number')->from('bs_payouts')
                                         ->join('bs_card', 'bs_payouts.external_account_id = bs_card.stripe_card_id')
