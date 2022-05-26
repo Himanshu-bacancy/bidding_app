@@ -1,6 +1,7 @@
 <?php
 
 require_once( APPPATH . 'libraries/REST_Controller.php' );
+require_once( APPPATH .'libraries/stripe_lib/autoload.php' );
 
 /**
  * REST API for Notification
@@ -58,7 +59,23 @@ class Cards extends API_Controller {
             if($card_type != '') {
                 $is_record_already_exists = $this->db->select('id')->from('bs_card')->where('user_id', $user_id)->where('card_number', $card_number)->where('status', 1)->get()->num_rows();
                 if(!$is_record_already_exists) {
-                    $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'card_type' => $card_type, 'address_id' => $address_id, 'created_date' => date('Y-m-d H:i:s')]);
+                    $divide_expiry_date = explode('/',$expiry_date);
+                    
+                    $paid_config = $this->Paid_config->get_one('pconfig1');
+                    \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+                    $response = \Stripe\PaymentMethod::create([
+                        'type' => 'card',
+                        'card' => [
+                            'number' => $card_number,
+                            'exp_month' => $divide_expiry_date[0],
+                            'exp_year' => $divide_expiry_date[1],
+                        ]
+                    ]);
+                    $debit_flag = 0;
+                    if($response->card['funding'] == 'debit') {
+                        $debit_flag = 1;
+                    }
+                    $this->db->insert('bs_card', ['user_id' => $user_id, 'card_holder_name' => $card_holder_name, 'card_number' => $card_number, 'expiry_date' => $expiry_date, 'card_type' => $card_type, 'address_id' => $address_id, 'is_debit' => $debit_flag,'created_date' => date('Y-m-d H:i:s')]);
                     $this->success_response("Card added successfully");
                 } else {
                     $this->error_response("Card already added");
@@ -111,7 +128,7 @@ class Cards extends API_Controller {
 
         $user_id = $this->post('user_id');
         
-        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1)->order_by('id', 'desc')->get()->result_array();
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, bs_card.is_debit,address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1)->order_by('id', 'desc')->get()->result_array();
         if(count($obj)) {
         foreach ($obj as $key => $value) {
             $row[$key] = $value;

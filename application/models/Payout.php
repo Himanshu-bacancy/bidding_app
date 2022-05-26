@@ -2,16 +2,16 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Model class for Hctopic table
+ * Model class for Payout table
  */
-class Hctopic extends PS_Model {
+class Payout extends PS_Model {
 
 	/**
 	 * Constructs the required data
 	 */
 	function __construct() 
 	{
-		parent::__construct( 'bs_helpcenter_topic', 'id', '' );
+		parent::__construct( 'bs_payouts', 'id', '' );
 	}
 
 	/**
@@ -38,8 +38,8 @@ class Hctopic extends PS_Model {
 		}
 
 		// searchterm
-		if ( isset( $conds['searchterm'] )) {
-			$this->db->like( 'name', $conds['searchterm'] );
+		if ( isset( $conds['filter_user_id'] )) {
+			$this->db->where( 'user_id', $conds['filter_user_id'] );
 		}
 
 		// order_by
@@ -48,7 +48,7 @@ class Hctopic extends PS_Model {
 			$order_by_field = $conds['order_by_field'];
 			$order_by_type = $conds['order_by_type'];
 
-			$this->db->order_by( 'bs_helpcenter_topic.'.$order_by_field, $order_by_type );
+			$this->db->order_by( 'bs_payouts.'.$order_by_field, $order_by_type );
 		} else {
 
 			$this->db->order_by( 'created_at' );

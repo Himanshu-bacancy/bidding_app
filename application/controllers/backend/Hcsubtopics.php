@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Hcsubtopics extends BE_Controller {
 
 	/**
-	 * Construt required variables
+	 * Construct required variables
 	 */
 	function __construct() {
 
@@ -26,7 +26,7 @@ class Hcsubtopics extends BE_Controller {
 	}
 
 	/**
-	 * List down the subtopics
+	 * List down the help center subtopic
 	 */
 	function index() {
 		
