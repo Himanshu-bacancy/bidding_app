@@ -368,6 +368,20 @@ class API_Controller extends REST_Controller
                 $editable = 2;
             }
             $data->editable = $editable;
+            
+            if(!empty($data->exchange_category)) {
+                $compare_cat = $this->db->select('cat_id')->from('bs_categories')->where('cat_name','CLOTHING, SHOES &amp; ACESSORIES')->get()->row()->cat_id;
+                foreach ($data->exchange_category as $key => $exchnage_item) {
+                    if($exchnage_item->cat_id == $compare_cat) {
+                        $data->exchange_subcat_id = $exchnage_item->subcat_id;
+                        $data->exchange_childsubcat_id = $exchnage_item->childsubcat_id;
+                        $data->exchange_size = $exchnage_item->size;
+                        $data->exchange_size_options_id = json_decode($exchnage_item->size_options_id, true);
+                        $data->exchange_brand = json_decode($exchnage_item->brand, true);
+                        $data->exchange_color = json_decode($exchnage_item->color, true);
+                    }
+                }
+            }
         }
         
         

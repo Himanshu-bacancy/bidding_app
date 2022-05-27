@@ -575,7 +575,8 @@ class Items extends API_Controller
                     $exchange_data['subcat_id'] = ($this->post('exchange_subcat_id')) ?? null;
                     $exchange_data['childsubcat_id'] = ($this->post('exchange_childsubcat_id')) ?? null;
                     $exchange_data['brand'] = (json_encode($this->post('exchange_category_brand'))) ?? null;
-                    $exchange_data['size'] = (json_encode($this->post('exchange_category_size'))) ?? null;
+                    $exchange_data['size'] = ($this->post('exchange_category_size')) ?? null;
+                    $exchange_data['size_options_id'] = (json_encode($this->post('exchange_category_sizeoptions'))) ?? null;
                     $exchange_data['color'] = (json_encode($this->post('exchange_category_color'))) ?? null;
                 }
 				$this->Itemexchangecategory->save($exchange_data);
@@ -1369,7 +1370,8 @@ class Items extends API_Controller
                     $subcat_id_filter = $categoryData['subcat_id'];
                     $childsubcat_id_filter = $categoryData['childsubcat_id'];
                     $brand_filter = json_decode($categoryData['brand'], true);
-                    $size_filter  = json_decode($categoryData['size'], true);
+                    $size_filter  = $categoryData['size'];
+                    $size_options_filter  = json_decode($categoryData['size_options_id'], true);
                     $color_filter = json_decode($categoryData['color'], true);
                     
                     $cateid_filter = $categoryData['cat_id'];
@@ -1414,15 +1416,24 @@ class Items extends API_Controller
 //                        unset($row_item_details[$key]);
 //                    }
                     /*size filter*/
-                    foreach($row_item_details[$key]->sizegroup_options as $sizes) {
+                    foreach($row_item_details[$key]->sizegroup as $sizes) {
                         $sizeids[] = $sizes->id;
                     }
-//                    if(!in_array($size_filter, $sizeids)) {
+                    if(!in_array($size_filter, $sizeids)) {
+                        unset($row_item_details[$key]);
+                    } else {
+                        foreach($row_item_details[$key]->sizegroup_options as $sizes) {
+                            $sizeoptionsids[] = $sizes->id;
+                        }
+                        
+                        if(empty(array_diff($size_options_filter, $sizeoptionsids))) {
+                            unset($row_item_details[$key]);
+                        }
+                        
+                    }
+//                    if(empty(array_diff($size_filter, $sizeids))) {
 //                        unset($row_item_details[$key]);
 //                    }
-                    if(empty(array_diff($size_filter, $sizeids))) {
-                        unset($row_item_details[$key]);
-                    }
                 }
             }
             $row_item_details = array_values($row_item_details);

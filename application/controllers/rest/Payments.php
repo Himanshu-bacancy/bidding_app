@@ -2713,6 +2713,16 @@ class Payments extends API_Controller {
 //        $paid_config = $this->Paid_config->get_one('pconfig1');
 //        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
 //        try {
+        
+//             $response = \Stripe\PaymentMethod::create([
+//                        'type' => 'card',
+//                        'card' => [
+//                            'number' => '4000056655665556',
+//                            'exp_month' => 11,
+//                            'exp_year' => 2023,
+//                            'cvc' => 123
+//                        ]
+//                    ]);
 //            $token = \Stripe\Token::create([
 //                'card' => [
 //                    'number' => '4000056655665556',
@@ -2752,7 +2762,7 @@ class Payments extends API_Controller {
 //            $response = \Stripe\Account::create([
 //                'type' => 'custom',
 //                'country' => 'US',
-//                'email' => 'brijesh.ramavat+4@bacancy.com',
+//                'email' => 'brijesh.ramavat+6@bacancy.com',
 //                'capabilities' => [
 //                  'card_payments' => ['requested' => true],
 //                  'transfers' => ['requested' => true],
@@ -2760,8 +2770,8 @@ class Payments extends API_Controller {
 //                'business_type' => 'individual',
 //                'business_profile' => [
 //                    "mcc" => "5045",
-//                    "support_url" => "http://laravel.com",
-//                    "url" => "http://laravel.com",
+//                    "support_url" => "http://18.208.167.164/index.php",
+//                    "url" => "http://18.208.167.164/index.php",
 //                ],
 //                'individual' => [
 //                    'address' => 
@@ -2778,7 +2788,7 @@ class Payments extends API_Controller {
 //                      'month' => 8,
 //                      'year' => 1995
 //                    ],
-//                    'email' => 'brijesh.ramavat+5@bacancy.com',
+//                    'email' => 'brijesh.ramavat+6@bacancy.com',
 //                    'first_name' => 'bacancy brijesh',
 //                    'last_name' => 'dev',
 //                    'phone' => '2015550124',
@@ -3087,8 +3097,9 @@ class Payments extends API_Controller {
                 }
                 $get_account = \Stripe\Account::retrieve($connect_id);
                 if(!$get_account->charges_enabled || !$get_account->payouts_enabled) {
+                    delete_connect_account($connect_id, trim($paid_config->stripe_secret_key));
                     $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'], 'connect_id' => $connect_id, 'response' => $get_account, 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
-                    $this->response(['status' => "success", 'message' => 'Bank detail saved, please update account details', 'response' => $get_account->requirements]);
+                    $this->response(['status' => "error", 'message' => 'Connect account creation failed', 'response' => $get_account->requirements],404);
                 }
             } catch (exception $e) {
                 $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);

@@ -432,9 +432,14 @@ class Registered_users extends BE_Controller {
         //$order = $this->db->query("SELECT * FROM `bs_order` WHERE id = '".$id."'")->result();
         $wallet_details = $this->db->select('*')
                         ->from('bs_wallet')
-                        ->where('user_id', $id)
-                        ->get()->result();
-
+                        ->where('user_id', $id);
+        
+        if($this->has_data( 'type_filter' ) ) {
+            $wallet_details = $wallet_details->where('type', $this->get_data( 'type_filter' ));
+            $this->data['type_filter'] = $this->get_data( 'type_filter' );
+        }
+        $wallet_details = $wallet_details->get()->result();
+//        echo $this->db->last_query();die();
 //		$this->data['item'] = $this->Item->get_one( $item_id );
 		$this->data['wallet_history'] = $wallet_details;
         

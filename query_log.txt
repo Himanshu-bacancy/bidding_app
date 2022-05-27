@@ -513,3 +513,7 @@ ALTER TABLE `bs_item_exchange` ADD `subcat_id` VARCHAR(255) NULL AFTER `cat_id`,
 // RB: ADDED ON 25/05/2022
 
 ALTER TABLE `bs_card` ADD `is_debit` INT NOT NULL AFTER `stripe_card_id`;
+
+// RB: ADDED ON 27/05/2022
+
+ALTER TABLE `bs_item_exchange` ADD `size_options_id` VARCHAR(255) NULL AFTER `size`;

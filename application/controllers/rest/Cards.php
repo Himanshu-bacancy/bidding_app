@@ -127,8 +127,13 @@ class Cards extends API_Controller {
         if ( !$this->is_valid( $rules )) exit;
 
         $user_id = $this->post('user_id');
+        $only_debit = $this->post('only_debit');
+        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, bs_card.is_debit,address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1);
+        if(isset($only_debit) && $only_debit) {
+            $obj = $obj->where('is_debit', 1);
+        }
+        $obj = $obj->order_by('id', 'desc')->get()->result_array();
         
-        $obj = $this->db->select('bs_card.id, bs_card.card_number, bs_card.card_type, card_holder_name, expiry_date, bs_card.is_debit,address_id')->from('bs_card')->where('bs_card.user_id', $user_id)->where('status', 1)->order_by('id', 'desc')->get()->result_array();
         if(count($obj)) {
         foreach ($obj as $key => $value) {
             $row[$key] = $value;
