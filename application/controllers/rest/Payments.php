@@ -1992,10 +1992,17 @@ class Payments extends API_Controller {
         );
         if (!$this->is_valid($rules)) exit; 
         $user_id = $this->post('user_id');
-        $cards = $this->db->query("SELECT * FROM `bs_card` WHERE user_id = '".$user_id."' and status = 1 LIMIT 1")->result();
+        $only_debit = $this->post('only_debit');
+        $condition = "";
+        $orderby = "";
+        if(isset($only_debit) && $only_debit) {
+            $condition = " and is_debit = 1";
+            $orderby = " order by id asc";
+        }
+        $cards = $this->db->query("SELECT * FROM `bs_card` WHERE user_id = '".$user_id."' and status = 1 ".$condition." ".$orderby." LIMIT 1")->result();
         $cardData = $cards && $cards[0] ? $cards[0] : []; 
         //$this->ps_adapter->convert_card($cardData);
-        $this->custom_response($cardData);
+        $this->response($cardData);
     }
 
     public function tracking_order($param) {
