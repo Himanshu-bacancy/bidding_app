@@ -25,41 +25,48 @@ class Crons extends CI_Controller {
                 ->get()->result_array();
         
         $date = date('Y-m-d H:i:s');
+        $cron_mode = 0;
         if(count($track_order)) {
             foreach ($track_order as $key => $value) {
-                $headers = array(
-                "Content-Type: application/json",
-                "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
-                                  );
-
-                $url = 'https://api.goshippo.com/tracks/shippo/'.$value['tracking_number'];
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-                $response = curl_exec($ch); 
-                
-                $res_array = json_decode($response,true);
-                        
-                $this->db->where('id', $value['id'])->update('bs_track_order',['tracking_status' => $res_array['tracking_status']['status'], 'updated_at' => $date]);
-                
-                if($res_array['tracking_status']['status'] == 'TRANSIT' && $value['tracking_status'] == 'PRE_TRANSIT') {
-                    $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
-                                ->join('bs_order', 'bs_order.items = bs_items.id')
-                                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                                ->where('bs_order.order_id', $value['order_id'])->get()->row_array();
+                if($cron_mode) {
                     
-                    if(!empty($seller)) {
-                        send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order"],['order_id' => $value['order_id']] );
+                    $headers = array(
+                    "Content-Type: application/json",
+                    "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+                                      );
+
+                    $url = 'https://api.goshippo.com/tracks/shippo/'.$value['tracking_number'];
+
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+                    $response = curl_exec($ch); 
+
+                    $res_array = json_decode($response,true);
+
+                    $this->db->where('id', $value['id'])->update('bs_track_order',['tracking_status' => $res_array['tracking_status']['status'], 'updated_at' => $date]);
+
+                    if($res_array['tracking_status']['status'] == 'TRANSIT' && $value['tracking_status'] == 'PRE_TRANSIT') {
+                        $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                                    ->join('bs_order', 'bs_order.items = bs_items.id')
+                                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                                    ->where('bs_order.order_id', $value['order_id'])->get()->row_array();
+
+                        if(!empty($seller)) {
+                            send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order"],['order_id' => $value['order_id']] );
+                        }
+
+                        $this->db->where('id', $value['id'])->update('bs_order',['return_shipment_initiate_date' => $date]);
                     }
-                    
-                    $this->db->where('id', $value['id'])->update('bs_order',['return_shipment_initiate_date' => $date]);
                 }
-                if($res_array['tracking_status']['status'] == 'DELIVERED') {
+                
+                $this->db->where('id', $value['id'])->update('bs_track_order',['tracking_status' => 'delivered', 'updated_at' => $date]);
+//                if($res_array['tracking_status']['status'] == 'DELIVERED') {
+                if(!$cron_mode) {
                     $update_order['delivery_status'] = "delivered";
                     if($value['is_return']) {
                         $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
