@@ -2720,7 +2720,6 @@ class Payments extends API_Controller {
 //        $paid_config = $this->Paid_config->get_one('pconfig1');
 //        \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
 //        try {
-        
 //             $response = \Stripe\PaymentMethod::create([
 //                        'type' => 'card',
 //                        'card' => [
@@ -2760,7 +2759,7 @@ class Payments extends API_Controller {
 //            
 //            dd($result);
 //            $response = \Stripe\Account::deleteExternalAccount('acct_1L0PWAQMJEMjFNno','ba_1L0Pv1QMJEMjFNnocBh1h9iS');
-//            $response = \Stripe\Account::retrieve('acct_1L0l7b4I13WAXEfE');
+//            $response = \Stripe\Account::retrieve('acct_1L6Aaa4JgigiO5UG');
 //            echo $response->charges_enabled.'<br>';
 //            echo $response->payouts_enabled.'<br>';
 //            echo '<pre>';
@@ -3102,12 +3101,22 @@ class Payments extends API_Controller {
                 if(isset($bank_account->id)) {
                     $this->db->where('id', $record_id)->update('bs_bankdetails',['external_account_id' => $bank_account->id, 'updated_at' => $date]);
                 }
-                $get_account = \Stripe\Account::retrieve($connect_id);
-                if(!$get_account->charges_enabled || !$get_account->payouts_enabled) {
-                    delete_connect_account($connect_id, trim($paid_config->stripe_secret_key));
-                    $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'], 'connect_id' => $connect_id, 'response' => $get_account, 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
-                    $this->response(['status' => "error", 'message' => 'Connect account creation failed', 'response' => $get_account->requirements],404);
-                }
+                do {
+                    $get_account = \Stripe\Account::retrieve($connect_id);
+                    if(!empty($get_account->requirements->errors)) {
+                        delete_connect_account($connect_id, trim($paid_config->stripe_secret_key));
+                        $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'], 'connect_id' => $connect_id, 'response' => $get_account, 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+                        $this->db->where('id', $record_id)->delete('bs_bankdetails');
+                        $this->response(['status' => "error", 'message' => 'Connect account creation failed', 'response' => $get_account->requirements],404);
+                        break;
+                    }
+                }while($get_account->charges_enabled && $get_account->payouts_enabled); 
+//                if(!$get_account->charges_enabled || !$get_account->payouts_enabled) {
+//                    delete_connect_account($connect_id, trim($paid_config->stripe_secret_key));
+//                    $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'], 'connect_id' => $connect_id, 'response' => $get_account, 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
+//                    $this->db->where('id', $record_id)->delete('bs_bankdetails');
+//                    $this->response(['status' => "error", 'message' => 'Connect account creation failed', 'response' => $get_account->requirements],404);
+//                }
             } catch (exception $e) {
                 $this->db->insert('bs_stripe_error', ['user_id' => $posts['user_id'],'response' => $e->getMessage(), 'note' => $this->router->fetch_class().'/'.$this->router->fetch_method(), 'created_at' => $date]);
                 $this->db->where('id', $record_id)->delete('bs_bankdetails');
@@ -3176,7 +3185,7 @@ class Payments extends API_Controller {
         );
         if (!$this->is_valid($rules)) exit; 
         $posts = $this->post();
-        $check_record = $this->db->select('bs_bankdetails.is_default,bs_bankdetails.external_account_id,core_users.connect_id')->from('bs_bankdetails')
+        $check_record = $this->db->select('bs_bankdetails.user_id,bs_bankdetails.is_default,bs_bankdetails.external_account_id,core_users.connect_id')->from('bs_bankdetails')
                 ->join('core_users', 'bs_bankdetails.user_id = core_users.user_id')
                 ->where('bs_bankdetails.id', $posts['record_id'])
                 ->get()->row();
@@ -3184,7 +3193,7 @@ class Payments extends API_Controller {
         $paid_config = $this->Paid_config->get_one('pconfig1');
         \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
         if($check_record->is_default) {
-            $get_record = $this->db->select('id,external_account_id')->from('bs_bankdetails')->where('id !=', $posts['record_id'])->where('status', 1)->get()->row();
+            $get_record = $this->db->select('id,external_account_id')->from('bs_bankdetails')->where('user_id', $check_record->user_id)->where('id !=', $posts['record_id'])->where('status', 1)->get()->row();
             if(!empty($get_record)) {
                 $this->db->where('id', $get_record->id)->update('bs_bankdetails',['is_default' => 1]);
                 if(!empty($get_record->external_account_id) && !is_null($get_record->external_account_id)) {
@@ -3204,6 +3213,7 @@ class Payments extends API_Controller {
         
         try {
             \Stripe\Account::deleteExternalAccount($check_record->connect_id,$check_record->external_account_id);
+            $this->db->where('user_id', $check_record->user_id)->update('core_users',['connect_id' => null]);
         } catch (Exception $e) {
             $this->error_response($e->getMessage());
         }
