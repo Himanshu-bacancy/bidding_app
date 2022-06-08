@@ -17,14 +17,14 @@
 							<?php 
 								if($this->Noti->count_all() > 0) {
 									
-									echo get_msg( 'total_label' );
+									echo get_msg( 'Total' ). ' ';
 
-									echo $this->Noti->count_all();
+									echo $this->Noti->count_all(). ' ';
 									
 									if($this->Noti->count_all() == 1) {
-										echo get_msg( 'device_label' );
+										echo get_msg( 'device_label' ). ' ';
 									} else {
-										echo get_msg( 'device_label' );
+										echo get_msg( 'device_label' ). ' ';
 									}
 
 									echo get_msg( 'registered_label' );
@@ -63,7 +63,7 @@
 					<?php endif; ?>	
 
                 </div>
-
+                
                 <div class="col-md-6"  style="padding-left: 50px;">
 					<div class="form-group">
 						<label>

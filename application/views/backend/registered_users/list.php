@@ -4,7 +4,10 @@
 		<tr>
 			<th><?php echo get_msg('no')?></th>
 			<th><?php echo get_msg('user_name')?></th>
+			<th><?php echo get_msg('user status')?></th>
 			<th><?php echo get_msg('user_email')?></th>
+			<th><?php echo get_msg('state')?></th>
+			<th><?php echo get_msg('city')?></th>
 			<th><?php echo get_msg('user_phone')?></th>
 			<!-- <th><?php echo get_msg('view'); ?></th> -->
 			<th><?php echo get_msg('role')?></th>
@@ -33,12 +36,21 @@
 
 		<?php if ( !empty( $users ) && count( $users->result()) > 0 ): ?>
 				
-			<?php foreach($users->result() as $user): ?>
+			<?php foreach($users->result() as $user): 
+                
+                $this->db->select('*');
+                $this->db->from('bs_addresses');
+                $this->db->where(array('is_default_address' => 1 ,'user_id' => $user->user_id));
+                $defaultdata = $this->db->get()->row();
+                ?>
 				
 				<tr>
 					<td><?php echo ++$count;?></td>
 					<td><?php echo $user->user_name;?></td>
+					<td><?php echo ($user->status) ? 'Active' : 'Inactive';?></td>
 					<td><?php echo $user->user_email;?></td>
+					<td><?php echo $defaultdata->state;?></td>
+					<td><?php echo $defaultdata->city;?></td>
 					<td><?php echo $user->user_phone;?></td>
 					<!-- <?php if ( $this->ps_auth->has_access( EDIT )): ?>
 					

@@ -362,7 +362,8 @@ class Users extends API_Controller
 						}
 					}
 				}
-
+                
+                $this->db->insert('bs_login_logs',['user_id' => $user->user_id, 'created_at' => date('Y-m-d H:i:s')]);
 				$user->token = $token;
 				//$data = ['data'=>$user, 'token'=>$token];
 				$this->custom_response($user);
