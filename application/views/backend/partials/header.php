@@ -63,7 +63,7 @@
 	<link rel="stylesheet" href="<?php echo base_url('assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css'); ?>">
   	<!-- Google Font: Source Sans Pro -->
   	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-
+    <link rel="stylesheet" href="<?php echo base_url('assets/datatables/dataTables.bootstrap4.min.css'); ?>">
 	<!-- ChartJS 1.0.1 -->
 	<script src="<?php echo base_url( 'assets/plugins/chartjs-old/Chart.min.js' ); ?>"></script>
 	<!-- jQuery -->

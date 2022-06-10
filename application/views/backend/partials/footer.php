@@ -54,6 +54,9 @@
         <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
             integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
             crossorigin=""></script>
+            
+        <script src="<?php echo base_url('assets/datatables/jquery.dataTables.min.js'); ?>"></script>
+        <script src="<?php echo base_url('assets/datatables/dataTables.bootstrap4.min.js'); ?>"></script>
         <script>
             <?php
                 if (isset($item)) {
@@ -575,6 +578,7 @@
             })
 
         </script>
+        
 
 		<?php if ( isset( $load_gallery_js )) : ?>
 

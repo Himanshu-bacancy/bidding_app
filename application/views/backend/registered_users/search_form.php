@@ -17,6 +17,44 @@
 				)); ?>
 
 		  	</div>
+            
+            <?php
+            $options[0]=get_msg('select_state');
+            $options2[0]=get_msg('select_city_filter');
+            $addresses = $this->Addresses->get_all();
+            
+            foreach($addresses->result() as $address) {
+                $options[strtolower(trim($address->state))] = ucfirst(trim($address->state));
+                $options2[strtolower(trim($address->city))] = ucfirst(trim($address->city));
+            }
+            ?>
+        
+            <div class="form-group" style="padding-right: 3px;">
+
+                <?php
+                    $options = array_unique($options);
+                    echo form_dropdown(
+                        'state_dd',
+                        $options,
+                        set_value( 'state_dd', show_data(@$search_state), false ),
+                        'class="form-control form-control-sm mr-3" id="state_dd"'
+                    );
+                ?>
+
+            </div>
+            <div class="form-group" style="padding-right: 3px;">
+
+                <?php
+                    $options2 = array_unique($options2);
+                    echo form_dropdown(
+                        'city_dd',
+                        $options2,
+                        set_value( 'city_dd', show_data(@$search_city), false ),
+                        'class="form-control form-control-sm mr-3" id="city_dd"'
+                    );
+                ?>
+
+            </div>
 
 			<div class="form-group mr-3">
 			  	<button type="submit" value="submit" name="submit" class="btn btn-sm btn-primary">

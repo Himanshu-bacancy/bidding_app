@@ -522,4 +522,15 @@ ALTER TABLE `bs_item_exchange` ADD `size_options_id` VARCHAR(255) NULL AFTER `si
 
 ALTER TABLE `bs_contact` ADD `status` VARCHAR(255) NOT NULL DEFAULT 'unread' AFTER `contact_message`;
 
-CREATE TABLE `bidding_app6`.`bs_login_logs` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` VARCHAR(255) NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `bs_login_logs` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` VARCHAR(255) NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+
+// RB: ADDED ON 9/06/2022
+
+ALTER TABLE `bs_items_report` ADD `status` VARCHAR(255) NOT NULL DEFAULT 'open' AFTER `reported_user_id`;
+
+
+ALTER TABLE `bs_reason_operations` ADD `status` VARCHAR(255) NOT NULL DEFAULT 'open' AFTER `user_id`;
+
+
+update `bs_reason_operations` set status = null where type != "report_item"

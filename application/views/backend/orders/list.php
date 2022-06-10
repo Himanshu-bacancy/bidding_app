@@ -5,6 +5,7 @@
 			<th><?php echo get_msg('Item'); ?></th>
 			<th><?php echo get_msg('user_name'); ?></th>
             <th><?php echo get_msg('Order Status'); ?></th>
+			<th><?php echo get_msg('Price'); ?></th>
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 				<th><span class="th-title"><?php echo get_msg('btn_view')?></span></th>
 			<?php endif; ?>			
@@ -48,6 +49,7 @@
                 }
                 ?>
                 </td>
+                <td><?php echo $order->total_amount; ?></td>
 
 				<?php if ( $this->ps_auth->has_access( VIEW )): ?>
 					<td>

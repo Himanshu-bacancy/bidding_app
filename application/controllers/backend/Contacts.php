@@ -89,7 +89,7 @@ class Contacts extends BE_Controller {
 	{
 		$contact = $this->Contact->get_one( $con_id );
 		$this->data['contact'] = $contact;
-
+        $this->db->where('contact_id', $con_id)->update('bs_contact',['status' => 'read']);
 		$this->load_detail( $this->data );
 	}
 

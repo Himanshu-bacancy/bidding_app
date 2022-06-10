@@ -1,9 +1,7 @@
 <!--Revenue CHART -->
-<div class="card-header" style="border-top: 2px solid red;">
+<div class="card-header">
   <h3 class="card-title">
-     <span class="badge badge-warning" style="height: 30px; padding: 10px; font-size: 14px;">
          <?php echo $panel_title; ?>
-     </span>
   </h3>
 
 <!--  <div class="card-tools">
@@ -19,19 +17,20 @@
 </div>
 
 <?php 
-    $jan_count = count($this->Itemreport->get_item_report(array('added_date'=>'1'))->result());
-    $feb_count = count($this->Itemreport->get_item_report(array('added_date'=>'2'))->result());
-    $mar_count = count($this->Itemreport->get_item_report(array('added_date'=>'3'))->result());
-    $apr_count = count($this->Itemreport->get_item_report(array('added_date'=>'4'))->result());
-    $may_count = count($this->Itemreport->get_item_report(array('added_date'=>'5'))->result());
-    $jun_count = count($this->Itemreport->get_item_report(array('added_date'=>'6'))->result());
-    $jul_count = count($this->Itemreport->get_item_report(array('added_date'=>'7'))->result());
-    $aug_count = count($this->Itemreport->get_item_report(array('added_date'=>'8'))->result());
-    $sep_count = count($this->Itemreport->get_item_report(array('added_date'=>'9'))->result());
-    $oct_count = count($this->Itemreport->get_item_report(array('added_date'=>'10'))->result());
-    $nov_count = count($this->Itemreport->get_item_report(array('added_date'=>'11'))->result());
-    $dec_count = count($this->Itemreport->get_item_report(array('added_date'=>'12'))->result());
-
+    foreach ($data as $key => $value) {
+        $jan_count = ($value->record_month == 1) ? $value->record_count : 0;
+        $feb_count = ($value->record_month == 2) ? $value->record_count : 0;
+        $mar_count = ($value->record_month == 3) ? $value->record_count : 0;
+        $apr_count = ($value->record_month == 4) ? $value->record_count : 0;
+        $may_count = ($value->record_month == 5) ? $value->record_count : 0;
+        $jun_count = ($value->record_month == 6) ? $value->record_count : 0;
+        $jul_count = ($value->record_month == 7) ? $value->record_count : 0;
+        $aug_count = ($value->record_month == 8) ? $value->record_count : 0;
+        $sep_count = ($value->record_month == 9) ? $value->record_count : 0;
+        $oct_count = ($value->record_month == 10) ? $value->record_count : 0;
+        $nov_count = ($value->record_month == 11) ? $value->record_count : 0;
+        $dec_count = ($value->record_month == 12) ? $value->record_count : 0;
+    }
 ?>
 
 <script>
@@ -45,18 +44,18 @@
     Morris.Line({
         element: 'transaction-line-chart',
         data: [
-            {y: 1, a: <?php echo $jan_count; ?>},
-            {y: 2, a: <?php echo $feb_count; ?>},
-            {y: 3, a: <?php echo $mar_count; ?>},
-            {y: 4, a: <?php echo $apr_count; ?>},
-            {y: 5, a: <?php echo $may_count; ?>},
-            {y: 6, a: <?php echo $jun_count; ?>},
-            {y: 7, a: <?php echo $jul_count; ?>},
-            {y: 8, a: <?php echo $aug_count; ?>},
-            {y: 9, a: <?php echo $sep_count; ?>},
-            {y: 10, a: <?php echo $oct_count; ?>},
-            {y: 11, a: <?php echo $nov_count; ?>},
-            {y: 12, a: <?php echo $dec_count; ?>}
+           {y: 1, a: <?php echo ($jan_count) ?? 0; ?>},
+            {y: 2, a: <?php echo ($feb_count) ?? 0; ?>},
+            {y: 3, a: <?php echo ($mar_count) ?? 0; ?>},
+            {y: 4, a: <?php echo ($apr_count) ?? 0; ?>},
+            {y: 5, a: <?php echo ($may_count) ?? 0; ?>},
+            {y: 6, a: <?php echo ($jun_count) ?? 0; ?>},
+            {y: 7, a: <?php echo ($jul_count) ?? 0; ?>},
+            {y: 8, a: <?php echo ($aug_count) ?? 0; ?>},
+            {y: 9, a: <?php echo ($sep_count) ?? 0; ?>},
+            {y: 10, a: <?php echo ($oct_count) ?? 0; ?>},
+            {y: 11, a: <?php echo ($nov_count) ?? 0; ?>},
+            {y: 12, a: <?php echo ($dec_count) ?? 0; ?>}
         ],
         xkey: 'y',
         parseTime: false,

@@ -51,7 +51,7 @@ class Registered_users extends BE_Controller {
 		$data['action_title'] = get_msg( 'user_search' );
 
 		if($this->input->post('submit') != NULL ){
-
+            
 			if($this->input->post('searchterm') != "") {
 				$conds['searchterm'] = $this->input->post('searchterm');
 				$this->data['searchterm'] = $this->input->post('searchterm');
@@ -60,22 +60,68 @@ class Registered_users extends BE_Controller {
 				
 				$this->session->set_userdata(array("searchterm" => NULL));
 			}
-			
-
+            if($this->input->post('state_dd')) {
+                $conds['state_dd'] = $this->input->post('state_dd');
+				$this->data['search_state'] = $this->input->post('state_dd');
+                $this->session->set_userdata(array("state_dd" => $this->input->post('state_dd')));
+            } else {
+				$this->session->set_userdata(array("state_dd" => NULL));
+			}
+            if($this->input->post('city_dd')) {
+                $conds['city_dd'] = $this->input->post('city_dd');
+				$this->data['search_city'] = $this->input->post('city_dd');
+                $this->session->set_userdata(array("city_dd" => $this->input->post('city_dd')));
+            } else {
+				$this->session->set_userdata(array("city_dd" => NULL));
+			}
+            
 		} else {
 			//read from session value
 			if($this->session->userdata('searchterm') != NULL){
 				$conds['searchterm'] = $this->session->userdata('searchterm');
 				$this->data['searchterm'] = $this->session->userdata('searchterm');
 			}
+            
+            if($this->session->userdata('state_dd') != NULL){
+                $conds['state_dd'] = $this->session->userdata('state_dd');
+                $this->data['search_state'] = $this->session->userdata('state_dd');
+            }
+            if($this->session->userdata('city_dd') != NULL){
+                $conds['city_dd'] = $this->session->userdata('city_dd');
+                $this->data['search_city'] = $this->session->userdata('city_dd');
+            }
 
 		}
-
-
-		$conds['register_role_id'] = 4;
-		$this->data['rows_count'] = $this->User->count_all_by( $conds );
-
-		$this->data['users'] = $this->User->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ));
+        
+        $result = $this->db->select('DISTINCT(core_users.user_id), core_users.*')->from('core_users')
+                ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                ->where('role_id', 4);
+        if(isset($conds['searchterm']) && !empty($conds['searchterm'])) {
+            $result = $result->group_start()->like( 'user_name', $conds['searchterm'] )->or_like( 'user_email', $conds['searchterm'] )->group_end();
+        }
+        if($conds['state_dd']) {
+            $where = 'LOWER(TRIM(bs_addresses.state)) = "'.$conds['state_dd'].'"';
+            $result = $result->where($where);
+        }
+        if($conds['city_dd']) {
+            $where = 'LOWER(TRIM(bs_addresses.city)) = "'.$conds['city_dd'].'"';
+            $result = $result->where($where);
+        }
+        $store_for_count = $result->get_compiled_select();
+        $count = $this->db->query($store_for_count)->num_rows();
+        if($this->pag['per_page']) {
+            $store_for_count .= " LIMIT ".$this->pag['per_page'];
+        }
+        if($this->uri->segment( 4 )) {
+            $store_for_count .= ", ".$this->uri->segment( 4 );
+        }
+        $query_result = $this->db->query($store_for_count);
+//        dd($this->db->last_query());
+//		$conds['register_role_id'] = 4;
+//		$this->data['rows_count'] = $this->User->count_all_by( $conds );
+		$this->data['rows_count'] = $count;
+//		$this->data['users'] = $this->User->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ));
+		$this->data['users'] = $query_result;
 		
 		parent::search();
 	}

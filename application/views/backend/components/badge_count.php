@@ -10,5 +10,10 @@
     <div class="icon">
         <i class="<?php echo $icon; ?>"></i>
     </div>
-    <a href="<?php echo $url; ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+    <?php 
+        if(!$hide_url) {
+            echo 
+    '<a href="'.$url.'" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>';
+        }
+    ?>
 </div>

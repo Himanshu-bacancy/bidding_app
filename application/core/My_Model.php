@@ -1878,6 +1878,12 @@ class PS_Model extends CI_Model {
 			}			
 		}
 
+        if(isset($conds['sub_cat_id'])) {
+			if ($conds['sub_cat_id'] != "" || $conds['sub_cat_id'] != 0) {
+				$this->db->where( 'sub_cat_id', $conds['sub_cat_id'] );	
+			}
+		}
+
 		// item id (id) check for user block condition
 		if ( isset( $conds['item_id'] )) {
 			if ($conds['item_id'] != "") {
@@ -2337,7 +2343,7 @@ class PS_Model extends CI_Model {
 	    //print_r($query1);die;
 
 	    $query = $this->db->query('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');
-	    //print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
+//	    print_r('( '. $query1 . ' ) UNION DISTINCT (' . $query2 .') ');die;
 		return $query;
 	  	
 	}

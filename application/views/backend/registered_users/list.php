@@ -3,6 +3,7 @@
 
 		<tr>
 			<th><?php echo get_msg('no')?></th>
+			<th><?php echo get_msg('id')?></th>
 			<th><?php echo get_msg('user_name')?></th>
 			<th><?php echo get_msg('user status')?></th>
 			<th><?php echo get_msg('user_email')?></th>
@@ -40,12 +41,22 @@
                 
                 $this->db->select('*');
                 $this->db->from('bs_addresses');
-                $this->db->where(array('is_default_address' => 1 ,'user_id' => $user->user_id));
+                $this->db->where(array('user_id' => $user->user_id));
+                if(isset($search_state) && !empty($search_state) && $search_state) {
+                    $this->db->where(array('state' => $search_state));
+                }
+                if(isset($search_city) && !empty($search_city) && $search_city) {
+                    $this->db->where(array('city' => $search_city));
+                }
+                if(!isset($search_city) && !isset($search_state)) {
+                    $this->db->where(array('is_default_address' => 1));
+                }
                 $defaultdata = $this->db->get()->row();
                 ?>
 				
 				<tr>
 					<td><?php echo ++$count;?></td>
+					<td><?php echo $user->user_id;?></td>
 					<td><?php echo $user->user_name;?></td>
 					<td><?php echo ($user->status) ? 'Active' : 'Inactive';?></td>
 					<td><?php echo $user->user_email;?></td>
