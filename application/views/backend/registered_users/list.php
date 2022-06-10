@@ -3,7 +3,6 @@
 
 		<tr>
 			<th><?php echo get_msg('no')?></th>
-			<th><?php echo get_msg('id')?></th>
 			<th><?php echo get_msg('user_name')?></th>
 			<th><?php echo get_msg('user status')?></th>
 			<th><?php echo get_msg('user_email')?></th>
@@ -56,7 +55,6 @@
 				
 				<tr>
 					<td><?php echo ++$count;?></td>
-					<td><?php echo $user->user_id;?></td>
 					<td><?php echo $user->user_name;?></td>
 					<td><?php echo ($user->status) ? 'Active' : 'Inactive';?></td>
 					<td><?php echo $user->user_email;?></td>
