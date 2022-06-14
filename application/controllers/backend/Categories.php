@@ -391,4 +391,76 @@ class Categories extends BE_Controller {
 			echo 'false';
 		}
 	}
+    public function uploadbyscv() {
+        if($this->input->post('upload_submit')) {
+            $this->form_validation->set_rules('file', 'CSV file', 'callback_file_check');
+            if($this->form_validation->run() == true){
+                if($_FILES['file']['error'] == 0){
+//                    $name = $_FILES['file']['name'];
+//                    $ext = strtolower(end(explode('.', $_FILES['file']['name'])));
+//                    $type = $_FILES['file']['type'];
+                    $tmpName = $_FILES['file']['tmp_name'];
+                    if(($handle = fopen($tmpName, 'r')) !== FALSE) {
+                        $date = date('Y-m-d H:i:s');
+                        set_time_limit(0);
+                        $row = 0;
+                        $row_subcat = 0;
+                        while(($data = fgetcsv($handle)) !== FALSE) {
+                            // number of fields in the csv
+                            $col_count = count($data);
+
+                            // get the values from the csv
+                            $csv[$row]['cat_id'] = getuniquedbkey('cat');
+                            $csv[$row]['cat_name'] = $data[0];
+                            if(!empty($data[1])) {
+                                $subcats = explode(',', $data[1]);
+                                foreach ($subcats as $key => $value) {
+                                    $subcat[$row_subcat]['id'] = getuniquedbkey('subcat');
+                                    $subcat[$row_subcat]['cat_id'] = $csv[$row]['cat_id'];
+                                    $subcat[$row_subcat]['name'] = trim($value);
+                                    $subcat[$row_subcat]['status'] = 0;
+                                    $subcat[$row_subcat]['added_date'] = $date;
+                                    $subcat[$row_subcat]['added_user_id'] = $this->ps_auth->get_user_info()->user_id;
+                                    $row_subcat++;
+                                }
+                            }
+                            $csv[$row]['status'] = 0;
+                            $csv[$row]['added_date'] = $date;
+
+                            // inc the row
+                            $row++;
+                        }
+                        fclose($handle);
+                    }
+                   
+                    $this->db->insert_batch('bs_categories', $csv); 
+                    if(!empty($subcat)) {
+                        $this->db->insert_batch('bs_subcategories', $subcat); 
+                    }
+                    $this->set_flash_msg( 'success', get_msg( 'File import successfully' ));
+                }
+            }else {
+                $this->set_flash_msg( 'error', get_msg( 'csv_file_upload_failed' ));	
+            }
+        }
+        redirect( $this->module_site_url());
+    }
+    
+    public function file_check($str){
+        $allowed_mime_types = array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel', 'text/plain');
+        if(isset($_FILES['file']['name']) && $_FILES['file']['name'] != ""){
+            $mime = get_mime_by_extension($_FILES['file']['name']);
+            $fileAr = explode('.', $_FILES['file']['name']);
+            $ext = end($fileAr);
+            if(($ext == 'csv') && in_array($mime, $allowed_mime_types)){
+                return true;
+            }else{
+                $this->form_validation->set_message('file_check', 'Please select only CSV file to upload.');
+                return false;
+            }
+        }else{
+            $this->form_validation->set_message('file_check', 'Please select a CSV file to upload.');
+            return false;
+        }
+    }
 }

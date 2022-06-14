@@ -922,6 +922,23 @@ class PS_Delete {
 	}
     
     /**
+	 * Delete the template record
+	 *
+	 * @param      <type>  $id     The identifier
+	 */
+	function delete_template( $id )
+	{		
+		if ( ! $this->CI->Emailtemplate->delete( $id )) {
+		// if there is an error in deleting,
+			
+			return false;
+		}
+
+
+		return true;
+	}
+    
+    /**
 	 * Delete the hctopic record
 	 *
 	 * @param      <type>  $id     The identifier

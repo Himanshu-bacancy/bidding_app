@@ -57,6 +57,9 @@
             
         <script src="<?php echo base_url('assets/datatables/jquery.dataTables.min.js'); ?>"></script>
         <script src="<?php echo base_url('assets/datatables/dataTables.bootstrap4.min.js'); ?>"></script>
+        <?php 
+            if(in_array($this->uri->segment(2), ['items','paid_items','transactions']) && in_array($this->uri->segment(3), ['add','edit']) ) {
+        ?>
         <script>
             <?php
                 if (isset($item)) {
@@ -124,6 +127,10 @@
 
             itm_map.on('click', onMapClick);
         </script>
+        <?php
+            }
+            if(in_array($this->uri->segment(2), ['app_settings']) ) {
+        ?>
         <script>
             <?php
                 if (isset($app)) {
@@ -191,6 +198,10 @@
 
             app_map.on('click', onMapClick);
         </script>
+         <?php
+            }
+            if(in_array($this->uri->segment(2), ['item_locations']) && in_array($this->uri->segment(3), ['add','edit']) ) {
+        ?>
           <script>
             <?php
                 if (isset($location)) {
@@ -258,6 +269,10 @@
 
             mymap.on('click', onMapClick);
         </script>
+        <?php
+            }
+            if(in_array($this->uri->segment(2), ['pendings']) && in_array($this->uri->segment(3), ['edit']) ) {
+        ?>
 
         <!-- pending map -->
 
@@ -312,6 +327,11 @@
 
             pending_map.on('click', onMapClick);
         </script>
+        
+        <?php
+            }
+            if(in_array($this->uri->segment(2), ['disables']) && in_array($this->uri->segment(3), ['edit']) ) {
+        ?>
 
         <!-- disable map -->
 
@@ -366,6 +386,11 @@
 
             disable_map.on('click', onMapClick);
         </script>
+        
+        <?php
+            }
+            if(in_array($this->uri->segment(2), ['rejects']) && in_array($this->uri->segment(3), ['edit']) ) {
+        ?>
 
         <!-- reject map -->
 
@@ -420,6 +445,11 @@
 
             reject_map.on('click', onMapClick);
         </script>
+        
+         <?php
+            }
+            if(in_array($this->uri->segment(2), ['popularitems']) && in_array($this->uri->segment(3), ['edit']) ) {
+        ?>
 
         <!-- popular item map-->
 
@@ -474,6 +504,11 @@
 
             popularitem_map.on('click', onMapClick);
         </script>
+        
+        <?php
+            }
+            if(in_array($this->uri->segment(2), ['reporteditems']) && in_array($this->uri->segment(3), ['edit']) ) {
+        ?>
 
         <!-- report item map -->
 
@@ -528,6 +563,10 @@
 
             report_map.on('click', onMapClick);
         </script>
+        
+        <?php
+            }
+        ?>
 
         <script src="https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js"></script>
         <?php show_analytic(); ?>

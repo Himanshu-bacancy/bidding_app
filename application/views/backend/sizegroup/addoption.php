@@ -90,7 +90,7 @@
                                 <button type="button" class="btn btn-sm btn-primary submit_form">
                                     <?php echo get_msg('btn_save')?>
                                 </button>
-                                <a href="<?php echo $module_site_url; ?>" class="btn btn-sm btn-primary">
+                                <a href="<?php echo $module_site_url.'/index/'.$sizegroup->id; ?>" class="btn btn-sm btn-primary">
                                     <?php echo get_msg('btn_cancel')?>
                                 </a>
                             </div>

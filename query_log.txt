@@ -534,3 +534,9 @@ ALTER TABLE `bs_reason_operations` ADD `status` VARCHAR(255) NOT NULL DEFAULT 'o
 
 
 update `bs_reason_operations` set status = null where type != "report_item"
+
+// RB: ADDED ON 14/06/2022
+
+CREATE TABLE `bs_email_templates` ( `id` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `content` TEXT NOT NULL , `created_at` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `bs_email_templates` ADD `status` INT NOT NULL DEFAULT '1' AFTER `content`;

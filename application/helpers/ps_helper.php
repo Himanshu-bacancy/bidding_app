@@ -911,3 +911,11 @@ if ( ! function_exists( 'delete_connect_account' ))
 //        return $result;
 	}
 }
+
+if ( ! function_exists( 'getuniquedbkey' )) 
+{
+	function getuniquedbkey( $prefix)
+	{
+        return $prefix. md5( $prefix . microtime() . uniqid() . 'teamps' );
+	}
+}
