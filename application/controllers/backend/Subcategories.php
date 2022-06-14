@@ -32,6 +32,9 @@ class Subcategories extends BE_Controller {
 	{
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
+		$conds['order_by'] = 1;
+		$conds['order_by_field'] = "added_date";
+		$conds['order_by_type'] = "desc";
 
 		// get rows count
 		$this->data['rows_count'] = $this->Subcategory->count_all_by( $conds );
