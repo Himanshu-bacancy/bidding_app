@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Users crontroller for BE_USERS table
+ * Users controller for BE_USERS table
  */
 class Registered_users extends BE_Controller {
 
@@ -490,5 +490,20 @@ class Registered_users extends BE_Controller {
 		$this->data['wallet_history'] = $wallet_details;
         
         $this->load_detail( $this->data );
+    }
+    
+    public function sendnoti() {
+        $uid = implode(',',json_decode($this->input->post('userids')));  
+        $this->load_template( 'registered_users/send_noti', ['action_title' => 'send notifcation','ids' => $uid]);
+    }
+    public function notisubmit() {
+        
+        $tokens = $this->db->select('device_token')->from('core_users')->where_in('user_id',[$this->input->post('userids')])->get()->result_array();
+        $tokens = array_filter(array_column($tokens, 'device_token'));
+        send_push( $tokens, ["message" => $this->input->post('description'), "flag" => "common",'title' =>$this->input->post('title')] );
+        
+        $this->set_flash_msg( 'success', get_msg( 'Notification send successfully' ));
+        
+        redirect( $this->module_site_url());
     }
 }

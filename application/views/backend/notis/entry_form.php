@@ -11,6 +11,7 @@ echo form_open($module_site_url . '/push_message_flutter', $attributes);
         <!-- /.card-header -->
         <div class="card-body">
             <div class="row">
+            <div class="col-md-12">
                 <label> 
                     <?php
                     if ($this->Noti->count_all() > 0) {
@@ -29,6 +30,7 @@ echo form_open($module_site_url . '/push_message_flutter', $attributes);
                     }
                     ?> 
                 </label>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>
@@ -94,9 +96,5 @@ echo form_open($module_site_url . '/push_message_flutter', $attributes);
     </div>
     <!-- card info -->
 </section>
-
-
-
-
 
 <?php echo form_close(); ?>

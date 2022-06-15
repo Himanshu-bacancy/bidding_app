@@ -63,11 +63,12 @@
 	<link rel="stylesheet" href="<?php echo base_url('assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css'); ?>">
   	<!-- Google Font: Source Sans Pro -->
   	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo base_url('assets/datatables/dataTables.bootstrap4.min.css'); ?>">
-	<!-- ChartJS 1.0.1 -->
-	<script src="<?php echo base_url( 'assets/plugins/chartjs-old/Chart.min.js' ); ?>"></script>
+    <link rel="stylesheet" href="<?php echo base_url('assets/datatables/jquery.dataTables.min.css'); ?>">
 	<!-- jQuery -->
     <script src="<?php echo base_url( 'assets/plugins/jquery/jquery.min.js' ); ?>"></script>
+    <script src="<?php echo base_url('assets/datatables/jquery.dataTables.min.js'); ?>"></script>
+	<!-- ChartJS 1.0.1 -->
+	<script src="<?php echo base_url( 'assets/plugins/chartjs-old/Chart.min.js' ); ?>"></script>
     <!-- gallery lightbox -->
     <link rel="stylesheet" href="<?php echo base_url('assets/gallery/gallery.css'); ?>">
     <script src="<?php echo base_url('assets/plugins/gallery/gallery.js');?>"></script>

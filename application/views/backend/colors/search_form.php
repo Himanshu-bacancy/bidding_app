@@ -62,7 +62,7 @@
     </div>
     <div class='col-6'>
         <b>Please make sure that :-</b> <br>
-        <label>1. Upload valid csv format </label> <br>
+        <label>1. Upload valid csv format & without multiple tabs/sheets </label> <br>
         <label>2. Start the content from first row itself without heading </label> <br>
         <label>3. First column contains color in each column individually </label> <br>
         <label>4. Second column contains valid hex value color</label> <br>

@@ -2,7 +2,59 @@
 function runAfterJQ() {
 
 	$(document).ready(function(){
-
+        
+        var register_user_table = $('#register_user_table').DataTable( {
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            order: [[ 2, 'asc' ]],
+            columnDefs: [ {
+                orderable: false,
+                'searchable': false,
+                className: 'dt-body-center',
+                targets:   0,
+                'render': function (data, type, full, meta){
+                    return '<input type="checkbox" name="id[]" value="'+data+'">';
+                }
+            },
+            { className: 'dt-body-center',  targets: [8,10] },
+            { orderable: true,  targets: [2] },
+            { orderable: false, targets: '_all' } ]
+        } );
+        // Handle click on "Select all" control
+        $('#example-select-all').on('click', function(){
+           // Get all rows with search applied
+           var rows = register_user_table.rows({ 'search': 'applied' }).nodes();
+           // Check/uncheck checkboxes for all rows in the table
+           $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+        // Handle click on checkbox to set state of "Select all" control
+        $('#register_user_table tbody').on('change', 'input[type="checkbox"]', function(){
+           // If checkbox is not checked
+           if(!this.checked){
+              var el = $('#example-select-all').get(0);
+              // If "Select all" control is checked and has 'indeterminate' property
+              if(el && el.checked && ('indeterminate' in el)){
+                 // Set visual state of "Select all" control
+                 // as 'indeterminate'
+                 el.indeterminate = true;
+              }
+           }
+        });
+        $( "#sendnotiform" ).submit(function( event ) {
+            var val = [];
+            $(':checkbox:not(#example-select-all):checked').each(function(i){
+                val[i] = $(this).val();
+            });
+            if(val.length > 0) {
+                $('#userids').val(JSON.stringify(val));
+                return;
+            }
+            event.preventDefault(); 
+        });
 		$(document).delegate('.ban','click',function(){
 			var btn = $(this);
 			var id = $(this).attr('userid');

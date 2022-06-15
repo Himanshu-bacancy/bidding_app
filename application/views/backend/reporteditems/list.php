@@ -1,10 +1,5 @@
-<style>
-    .table thead th{
-        font-size: 14px;
-    }
-</style>
-<div class="table-responsive animated fadeInRight">
-	<table id="reported_item_table" class="table m-0 table-striped">
+<div class="animated fadeInRight">
+	<table id="reported_item_table" ">
         <thead>
             <tr>
                 <th><?php echo get_msg('no'); ?></th>

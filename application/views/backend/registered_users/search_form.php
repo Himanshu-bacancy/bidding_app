@@ -61,7 +61,7 @@
 			  		<?php echo get_msg( 'btn_search' ); ?>
 			  	</button>
 		  	</div>
-
+           
 		  	<div class="form-group">
 			  	<a href="<?php echo $module_site_url ; ?>" class="btn btn-sm btn-primary">
 			  		<?php echo get_msg( 'btn_reset' ); ?>
@@ -70,11 +70,22 @@
 		
 		<?php
         
-        echo form_close(); } else {
+        echo form_close(); 
+        
+        echo "</div>".
+             form_open( $module_site_url . '/sendnoti',['id' => 'sendnotiform'] )."
+            <input type='hidden' id= 'userids' name='userids'>
+            <div class='col-3'>
+                <button type='submit' value='submit' name='submit' id='send_push' class='btn btn-sm btn-primary'>
+                    Send Push
+                </button>
+            </div>".
+        form_close();
+        } else {
             $attributes = array('class' => 'form-inline');
 			echo form_open( $module_site_url . '/wallethistory/'.$this->uri->segment(4), $attributes );
         ?>
-        
+        <div class='col-9'>
         <div class="form-group mr-3">
 				
 				<?php 

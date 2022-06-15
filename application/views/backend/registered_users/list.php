@@ -1,8 +1,8 @@
-<div class="table-responsive animated fadeInRight">
-	<table class="table m-0 table-striped">
-
+<div class=" animated fadeInRight">
+	<table id="register_user_table" >
+        <thead>
 		<tr>
-			<th><?php echo get_msg('no')?></th>
+			<th><input type="checkbox" name="select_all"  id="example-select-all"></th>
 			<th><?php echo get_msg('user_name')?></th>
 			<th><?php echo get_msg('user status')?></th>
 			<th><?php echo get_msg('user_email')?></th>
@@ -31,7 +31,8 @@
 			<?php endif; ?>
 
 		</tr>
-
+        </thead>
+        <tbody>
 		<?php $count = $this->uri->segment(4) or $count = 0; ?>
 
 		<?php if ( !empty( $users ) && count( $users->result()) > 0 ): ?>
@@ -54,9 +55,9 @@
                 ?>
 				
 				<tr>
-					<td><?php echo ++$count;?></td>
+					<td><?php echo $user->user_id;?></td>
 					<td><?php echo $user->user_name;?></td>
-					<td><?php echo ($user->status) ? 'Active' : 'Inactive';?></td>
+					<td><?php echo ($user->status == 1) ? 'Active' : 'Inactive';?></td>
 					<td><?php echo $user->user_email;?></td>
 					<td><?php echo $defaultdata->state;?></td>
 					<td><?php echo $defaultdata->city;?></td>
@@ -124,6 +125,6 @@
 			<?php $this->load->view( $template_path .'/partials/no_data' ); ?>
 
 		<?php endif; ?>
-
+        </tbody>
 	</table>
 </div>
