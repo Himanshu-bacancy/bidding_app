@@ -60,6 +60,7 @@ $route['login'] = "main/login";
 $route['logout'] = "main/logout";
 $route['reset_request'] = "main/reset_request";
 $route['reset_email/(.*)'] = "main/reset_email/$1";
+$route['verify-email/(.*)'] = "main/verify_email/$1";
 
 $route['success_reset_password'] = "main/success_reset_password";
 $route['remove-item-from-cart'] = "crons/remove_item_from_cart";

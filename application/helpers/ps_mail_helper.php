@@ -27,6 +27,7 @@ if ( !function_exists( 'send_user_register_email' )) {
     $new_user_acc = get_msg('new_user_acc');
     $verify_code = get_msg('verify_code_label');
     $best_regards = get_msg( 'best_regards_label' );
+    $link = base_url('index.php/verify-email/'.$user_id);
 
     $msg = <<<EOL
 <p>{$hi} {$user_name},</p>
@@ -34,7 +35,7 @@ if ( !function_exists( 'send_user_register_email' )) {
 <p>{$new_user_acc}</p>
 
 <p>
-{$verify_code} : {$code}<br/>
+<a href='{$link}' target="_blank" ><button type="button" name="upload_submit" value="upload_submit"> verify email </button></a><br/>
 </p>
 
 

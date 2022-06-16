@@ -390,4 +390,18 @@ class Main extends BE_Controller {
 		$this->load_view( 'success_reset_password' );
 		$this->load_view( 'partials/footer' );
 	}
+    
+    public function verify_email($user_id) {
+        $check_status = $this->User->get_one($user_id);
+        if($check_status->email_verify) {
+            $message = 'Email already verified';
+        } else {
+            $this->User->save(['email_verify' => 1], $user_id);
+            $message = 'Email verified';
+        }
+        
+        $this->load_view( 'partials/header'); 
+		$this->load_view( 'success_email_verification',['message' => $message] );
+		$this->load_view( 'partials/footer' );
+    }
 }

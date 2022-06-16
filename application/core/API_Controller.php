@@ -347,6 +347,26 @@ class API_Controller extends REST_Controller
 				$this->convert_object( $data );
 			}
 		}
+        if($this->router->fetch_class() == 'users' && $this->router->fetch_method() == 'get'){
+            
+            $data[0]->bought = $this->db->select('bs_order.id')->from('bs_order')
+                ->where('bs_order.user_id', $data[0]->user_id)
+                ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+            $data[0]->sold = $this->db->select('bs_order.id')->from('bs_order')
+              ->join('bs_items', 'bs_order.items = bs_items.id')
+              ->group_start()
+                  ->or_where('bs_items.added_user_id', $data[0]->user_id)
+              ->group_end()
+              ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+            $data[0]->trade = $this->db->select('bs_order.id')->from('bs_order')
+              ->join('bs_items', 'bs_order.items = bs_items.id')
+              ->where('bs_order.operation_type',EXCHANGE)
+              ->group_start()
+                  ->where('bs_order.user_id', $data[0]->user_id)
+                  ->or_where('bs_items.added_user_id', $data[0]->user_id)
+              ->group_end()
+              ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+        }
         if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'get') {
             if($data->item_type_id == REQUEST_ITEM) {
                 $where = 'requested_item_id = "'.$data->id.'"';
@@ -739,7 +759,7 @@ class API_Controller extends REST_Controller
 
 				$data = $this->model->get_all_by( $conds )->result();
 			}
-
+            
 			$this->custom_response( $data , $offset );
 		}
 	}
