@@ -396,7 +396,7 @@ class Main extends BE_Controller {
         if($check_status->email_verify) {
             $message = 'Email already verified';
         } else {
-            $this->User->save(['email_verify' => 1], $user_id);
+            $this->db->where('user_id', $user_id)->update('core_users',['email_verify' => 1]);
             $message = 'Email verified';
         }
         

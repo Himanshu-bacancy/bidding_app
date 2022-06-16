@@ -114,7 +114,7 @@ class Users extends API_Controller
 	        	'user_password' => md5($this->post('user_password')),
 	        	"device_token" => $this->post('device_token'),
 	        	"code" =>  $code,
-	        	"email_verify" => 1,
+	        	"email_verify" => 0,
 	        	"status" => 2, //Need to verified status
 	        	"added_date" =>  $added_date,
 	        	"added_date_timestamp" => strtotime($added_date)
