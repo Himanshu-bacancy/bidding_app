@@ -72,8 +72,12 @@
         
         echo form_close(); 
         
-        echo "</div>".
-             form_open( $module_site_url . '/sendnoti',['id' => 'sendnotiform'] )."
+        
+        echo "</div>";
+        echo '<div class="form-group"><a href="'.($module_site_url.'/export').'" class="btn btn-sm btn-primary">
+			  		'.get_msg( "export" ).'
+			  	</a></div>';
+        echo form_open( $module_site_url . '/sendnoti',['id' => 'sendnotiform'] )."
             <input type='hidden' id= 'userids' name='userids'>
             <div class='col-3'>
                 <button type='submit' value='submit' name='submit' id='send_push' class='btn btn-sm btn-primary'>

@@ -506,4 +506,92 @@ class Registered_users extends BE_Controller {
         
         redirect( $this->module_site_url());
     }
+    
+    public function export() {
+        $file_name = 'users_'.date('Ymd').'.csv'; 
+        header("Content-Description: File Transfer"); 
+        header("Content-Disposition: attachment; filename=$file_name"); 
+        header("Content-Type: application/csv;");
+        
+        $file = fopen('php://output', 'w');
+        
+        $user_data = $this->db->select('core_users.user_id,user_name,user_email,user_phone,bs_addresses.city,bs_addresses.state,core_users.status')->from('core_users')
+                ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id','left')
+                ->get();
+        
+        $header = array("No","Signup date","User Name", "User email", "User phone", "State", "City", "Status","Rating", "Followers", "Following", "Active requests", "Active selling", "Active trade", "Total sales", "Total purchases", "Total trades", "Sales amount", "Purchases amount", "Trades amount", "Puchased canceled", "sales canceled", "Trades canceled", "Returns Received", "Returns sent"); 
+        fputcsv($file, $header);
+        foreach ($user_data->result_array() as $key => $value)
+        { 
+            $row['no'] = $key+1;
+            $row['date'] = $value['added_date'];
+            $row['name'] = $value['user_name'];
+            $row['email'] = $value['user_email'];
+            $row['phone'] = $value['user_phone'];
+            $row['state'] = $value['state'];
+            $row['city'] = $value['city'];
+            $row['status'] = ($value['status'] == 1) ? 'Active' : 'Inactive';
+            $total_rating_count = $this->Rate->count_all_by(['to_user_id' => $value['user_id']]);
+            $sum_rating_value = $this->Rate->sum_all_by(['to_user_id' => $value['user_id']])->result()[0]->rating;
+            if($total_rating_count > 0) {
+                $row['rating'] = number_format((float) ($sum_rating_value  / $total_rating_count), 1, '.', '');
+            } else {
+                $row['rating'] = 0;
+            }
+            $row['followers'] = $this->db->from('bs_follows')->where('user_id', $value['user_id'])->get()->num_rows();
+            $row['following'] = $this->db->from('bs_follows')->where('followed_user_id', $value['user_id'])->get()->num_rows();
+            $row['a_request'] = $this->db->from('bs_order')
+                    ->where('operation_type', REQUEST_ITEM)
+                    ->where('bs_order.status', 'succeeded')
+                    ->where('bs_order.user_id', $value['user_id'])
+                    ->where('completed_date is NULL')
+                    ->get()->num_rows();
+            
+            $row['a_selling'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type != '.EXCHANGE)
+                    ->where('bs_items.added_user_id', $value['user_id'])
+                    ->where('bs_order.completed_date is NULL')->get()->num_rows();
+            
+            $row['a_trade'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type',EXCHANGE)
+                    ->group_start()
+                        ->where('bs_order.user_id', $value['user_id'])
+                        ->or_where('bs_items.added_user_id', $value['user_id'])
+                    ->group_end()
+                    ->where('bs_order.completed_date is NULL')->get()->num_rows();
+            $row['amt_request'] = $this->db->from('bs_order')
+                    ->where('operation_type', REQUEST_ITEM)
+                    ->where('bs_order.status', 'succeeded')
+                    ->where('bs_order.user_id', $value['user_id'])
+                    ->where('completed_date is NOT NULL')
+                    ->get()->num_rows();
+            
+            $row['amt_selling'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type != '.EXCHANGE)
+                    ->where('bs_items.added_user_id', $value['user_id'])
+                    ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+            
+            $row['amt_trade'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type',EXCHANGE)
+                    ->group_start()
+                        ->where('bs_order.user_id', $value['user_id'])
+                        ->or_where('bs_items.added_user_id', $value['user_id'])
+                    ->group_end()
+                    ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+            
+            $row['p_cancel'] = '';
+            $row['s_cancel'] = '';
+            $row['t_cancel'] = '';
+            $row['s_return'] = '';
+            $row['b_return'] = '';
+            
+            fputcsv($file, $row); 
+        }
+        fclose($file); 
+        exit; 
+    }
 }
