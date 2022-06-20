@@ -68,6 +68,7 @@ $route['track-order'] = "crons/update_order_status";
 $route['expire-offer'] = "crons/expire_offer";
 $route['read-xcel'] = "crons/read_xcel";
 $route['inactive-coupon'] = "crons/inactive_coupon";
+$route['expire-item'] = "crons/expire_item";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";

@@ -1,7 +1,8 @@
 <div class='row my-3'>
-
+    
     <div class='col-9'>
         <?php
+        if($this->router->fetch_class() == 'reporteditems' && $this->router->fetch_method() != 'detail' ) {
         $attributes = array('class' => 'form-inline');
         echo form_open($module_site_url . '/search', $attributes);
         ?>
@@ -26,7 +27,7 @@
             $options['open'] = 'Open';
             $options['in-progress'] = 'In-progress';
             $options['rejected'] = 'Rejected';
-            $options['re-liseted'] = 'Re-Listed';
+            $options['re-listed'] = 'Re-Listed';
             echo form_dropdown(
                     'status_dd',
                     $options,
@@ -63,8 +64,8 @@
             </div>
         </div>
 
-<?php echo form_close(); ?>
-
+        <?php echo form_close(); } ?>
+        
     </div>	
 
 </div>

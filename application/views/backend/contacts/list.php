@@ -3,6 +3,7 @@
 		<tr>
 			<th><?php echo get_msg('no')?></th>
 			<th><?php echo get_msg('contact_name')?></th>
+			<th><?php echo get_msg('completed date')?></th>
 			<th><?php echo get_msg('contact_email')?></th>
 			<th><?php echo get_msg('contact_phone')?></th>
 			<th><?php echo get_msg('query status')?></th>
@@ -24,6 +25,7 @@
 				<tr>
 					<td><?php echo ++$count;?></td>
 					<td><?php echo $contact->contact_name;?></td>
+					<td><?php echo ($contact->status == 'closed') ? $contact->updated_at:'-';?></td>
 					<td><?php echo $contact->contact_email;?></td>
 					<td><?php echo $contact->contact_phone;?></td>
 					<td><?php echo $contact->status;?></td>
@@ -38,8 +40,6 @@
 						</td>
 					
 					<?php endif; ?>
-					
-					
 
 				</tr>
 

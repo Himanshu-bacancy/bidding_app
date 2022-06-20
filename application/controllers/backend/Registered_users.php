@@ -519,7 +519,7 @@ class Registered_users extends BE_Controller {
                 ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id','left')
                 ->get();
         
-        $header = array("No","Signup date","User Name", "User email", "User phone", "State", "City", "Status","Rating", "Followers", "Following", "Active requests", "Active selling", "Active trade", "Total sales", "Total purchases", "Total trades", "Sales amount", "Purchases amount", "Trades amount", "Puchased canceled", "sales canceled", "Trades canceled", "Returns Received", "Returns sent"); 
+        $header = array("No","Signup date","User Name", "User email", "User phone", "State", "City", "Status","Rating", "Followers", "Following", "Active requests", "Active selling", "Active trade", "Total sales", "Total purchases", "Total trades", "Sales amount", "Purchases amount", "Trades amount", "Puchased canceled", "Sales canceled", "Trades canceled", "Returns Received", "Returns sent"); 
         fputcsv($file, $header);
         foreach ($user_data->result_array() as $key => $value)
         { 
@@ -561,6 +561,26 @@ class Registered_users extends BE_Controller {
                         ->or_where('bs_items.added_user_id', $value['user_id'])
                     ->group_end()
                     ->where('bs_order.completed_date is NULL')->get()->num_rows();
+            $row['t_request'] = $this->db->from('bs_order')
+                    ->where('operation_type', REQUEST_ITEM)
+                    ->where('bs_order.status', 'succeeded')
+                    ->where('bs_order.user_id', $value['user_id'])
+                    ->get()->num_rows();
+            
+            $row['t_selling'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type != '.EXCHANGE)
+                    ->where('bs_items.added_user_id', $value['user_id'])
+                    ->get()->num_rows();
+            
+            $row['t_trade'] = $this->db->select('bs_order.id')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_order.operation_type',EXCHANGE)
+                    ->group_start()
+                        ->where('bs_order.user_id', $value['user_id'])
+                        ->or_where('bs_items.added_user_id', $value['user_id'])
+                    ->group_end()
+                    ->get()->num_rows();
             $row['amt_request'] = $this->db->from('bs_order')
                     ->where('operation_type', REQUEST_ITEM)
                     ->where('bs_order.status', 'succeeded')
@@ -583,11 +603,44 @@ class Registered_users extends BE_Controller {
                     ->group_end()
                     ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
             
-            $row['p_cancel'] = '';
-            $row['s_cancel'] = '';
-            $row['t_cancel'] = '';
-            $row['s_return'] = '';
-            $row['b_return'] = '';
+            $row['p_cancel'] = $this->db->select('id')->from('bs_chat_history')
+                    ->where('operation_type', SELLING)
+                    ->group_start()
+                        ->where('is_cancel = 1')
+                        ->or_where('is_expired = 1')
+                    ->group_end()
+                    ->where('buyer_user_id', $value['user_id'])
+                    ->get()->num_rows();
+            $row['s_cancel'] = $this->db->select('id')->from('bs_chat_history')
+                    ->where('operation_type', SELLING)
+                    ->group_start()
+                        ->where('is_cancel = 1')
+                        ->or_where('is_expired = 1')
+                    ->group_end()
+                    ->where('seller_user_id', $value['user_id'])
+                    ->get()->num_rows();
+            $row['t_cancel'] = $this->db->select('id')->from('bs_chat_history')
+                    ->where('operation_type', EXCHANGE)
+                    ->group_start()
+                        ->where('is_cancel = 1')
+                        ->or_where('is_expired = 1')
+                    ->group_end()
+                    ->group_start()
+                        ->where('buyer_user_id', $value['user_id'])
+                        ->or_where('seller_user_id', $value['user_id'])
+                    ->group_end()
+                    ->get()->num_rows();
+            $row['s_return'] = $this->db->select('bs_return_order.id')->from('bs_return_order')
+                    ->join('bs_order', 'bs_return_order.order_id = bs_order.order_id')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_items.added_user_id', $value['user_id'])
+                    ->where('bs_return_order.status = "accept"')
+                    ->get()->num_rows();
+            $row['b_return'] = $this->db->select('bs_return_order.id')->from('bs_return_order')
+                    ->join('bs_order', 'bs_return_order.order_id = bs_order.order_id')
+                    ->where('user_id', $value['user_id'])
+                    ->where('bs_return_order.status = "accept"')
+                    ->get()->num_rows();
             
             fputcsv($file, $row); 
         }

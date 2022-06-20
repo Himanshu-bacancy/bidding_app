@@ -87,10 +87,24 @@ class Contacts extends BE_Controller {
 	*/
 	function detail($con_id)
 	{
+        $this->data['action_title'] = get_msg( 'Details' );
 		$contact = $this->Contact->get_one( $con_id );
 		$this->data['contact'] = $contact;
         $this->db->where('contact_id', $con_id)->update('bs_contact',['status' => 'read']);
 		$this->load_detail( $this->data );
+	}
+	function changestatus()
+	{
+        $record_id = $this->input->post('record_id');
+        $changestatus = $this->input->post('changestatus');
+        $update_data['status'] = $changestatus;
+        if($changestatus == 'closed') {
+            $update_data['updated_at'] =  date('Y-m-d H:i:s');
+        }
+        $this->db->where('contact_id', $record_id)->update('bs_contact',$update_data);
+        
+        $this->set_flash_msg( 'success', get_msg( 'status updated' ));
+		redirect( $this->module_site_url());
 	}
 
 }

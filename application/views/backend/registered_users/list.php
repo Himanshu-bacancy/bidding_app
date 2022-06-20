@@ -34,8 +34,6 @@
         </thead>
         <tbody>
 		<?php $count = $this->uri->segment(4) or $count = 0; ?>
-
-		<?php if ( !empty( $users ) && count( $users->result()) > 0 ): ?>
 				
 			<?php foreach($users->result() as $user): 
                 
@@ -120,11 +118,6 @@
 			
 			<?php endforeach; ?>
 
-		<?php else: ?>
-				
-			<?php $this->load->view( $template_path .'/partials/no_data' ); ?>
-
-		<?php endif; ?>
         </tbody>
 	</table>
 </div>

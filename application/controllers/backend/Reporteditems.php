@@ -96,4 +96,23 @@ class Reporteditems extends BE_Controller {
 		// load add list
 		parent::search();
 	}
+    
+    function detail($con_id)
+	{
+        $this->data['action_title'] = get_msg( 'update reporting item status' );
+		$detail = $this->Reason_operation->get_one( $con_id );
+		$this->data['detail'] = $detail;
+		$this->load_detail( $this->data );
+	}
+    
+    function changestatus()
+	{
+        $record_id = $this->input->post('record_id');
+        $changestatus = $this->input->post('changestatus');
+        $update_data['status'] = $changestatus;
+        $update_data['updated_at'] =  date('Y-m-d H:i:s');
+        $this->db->where('id', $record_id)->update('bs_reason_operations',$update_data);
+        $this->set_flash_msg( 'success', get_msg( 'status updated' ));
+		redirect( $this->module_site_url());
+	}
 }

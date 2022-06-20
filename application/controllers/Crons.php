@@ -185,4 +185,15 @@ class Crons extends CI_Controller {
         $this->db->insert('bs_cron_log',['cron_name' => 'inactive-coupon', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
+    
+    public function expire_item() {
+        $past_record = $this->db->select('id,expiration_date')->from('bs_items')->where('status', 1)->where('DATE(expiration_date) != "0000-00-00"')->where('DATE(expiration_date) < DATE(now())')->get()->result_array();
+
+        $past_record_ids = array_column($past_record, 'id');
+        if(!empty($past_record_ids) && count($past_record_ids)) {
+            $this->db->where_in('id', $past_record_ids)->update('bs_items', ['status' => 0]);
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'expire-item', 'created_at' => date('Y-m-d H:i:s')]);
+        echo 'cron run successfully';
+    }
 }
