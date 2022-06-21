@@ -347,33 +347,46 @@ class API_Controller extends REST_Controller
 				$this->convert_object( $data );
 			}
 		}
-        if($this->router->fetch_class() == 'users' && $this->router->fetch_method() == 'get'){
-            
-            $data[0]->bought = $this->db->select('bs_order.id')->from('bs_order')
-                ->where('bs_order.user_id', $data[0]->user_id)
+        if( ($this->router->fetch_class() == 'users' && $this->router->fetch_method() == 'get') || ($this->router->fetch_class() == 'userfollows' && ($this->router->fetch_method() == 'search' || $this->router->fetch_method() == 'add_follow')) ){
+            if(is_array($data)) {
+                $user_id = $data[0]->user_id;
+            } else {
+                $user_id = $data->user_id;
+            }
+            $bought = $this->db->select('bs_order.id')->from('bs_order')
+                ->where('bs_order.user_id', $user_id)
                 ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
-            $data[0]->sold = $this->db->select('bs_order.id')->from('bs_order')
+            $sold = $this->db->select('bs_order.id')->from('bs_order')
               ->join('bs_items', 'bs_order.items = bs_items.id')
               ->group_start()
-                  ->or_where('bs_items.added_user_id', $data[0]->user_id)
+                  ->or_where('bs_items.added_user_id', $user_id)
               ->group_end()
               ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
-            $data[0]->trade = $this->db->select('bs_order.id')->from('bs_order')
+            $trade = $this->db->select('bs_order.id')->from('bs_order')
               ->join('bs_items', 'bs_order.items = bs_items.id')
               ->where('bs_order.operation_type',EXCHANGE)
               ->group_start()
-                  ->where('bs_order.user_id', $data[0]->user_id)
-                  ->or_where('bs_items.added_user_id', $data[0]->user_id)
+                  ->where('bs_order.user_id', $user_id)
+                  ->or_where('bs_items.added_user_id', $user_id)
               ->group_end()
               ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+            if(is_array($data)) {
+                $data[0]->trade = $trade;
+                $data[0]->sold = $sold;
+                $data[0]->bought = $bought;
+            } else {
+                $data->trade = $trade;
+                $data->sold = $sold;
+                $data->bought = $bought;
+            }
         }
         if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'get') {
-            $data->is_item_expired = 0;
-            if($data->expiration_date_days) {
-                if(date('Y-m-d') > $data->expiration_date) {
-                    $data->is_item_expired = 1;
-                }
-            }
+//            $data->is_item_expired = 0;
+//            if($data->expiration_date_days) {
+//                if(date('Y-m-d') > $data->expiration_date) {
+//                    $data->is_item_expired = 1;
+//                }
+//            }
             if($data->item_type_id == REQUEST_ITEM) {
                 $where = 'requested_item_id = "'.$data->id.'"';
             } else if($data->item_type_id == SELLING) {
@@ -409,16 +422,16 @@ class API_Controller extends REST_Controller
                 }
             }
         }
-        if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'searchitem'){
-            foreach ($data as $key => $value) {
-                $value->is_item_expired = 0;
-                if($value->expiration_date_days) {
-                    if(date('Y-m-d') > $value->expiration_date) {
-                        $value->is_item_expired = 1;
-                    }
-                }
-            }
-        }
+//        if($this->router->fetch_class() == 'items' && $this->router->fetch_method() == 'searchitem'){
+//            foreach ($data as $key => $value) {
+//                $value->is_item_expired = 0;
+//                if($value->expiration_date_days) {
+//                    if(date('Y-m-d') > $value->expiration_date) {
+//                        $value->is_item_expired = 1;
+//                    }
+//                }
+//            }
+//        }
         
 		$data = $this->ps_security->clean_output( $data );
         if($this->router->fetch_class() == 'chats' && ($this->router->fetch_method() == 'get_offer_details' || $this->router->fetch_method() == "offer_list" || $this->router->fetch_method() == "offer_by_items")) {
@@ -587,7 +600,7 @@ class API_Controller extends REST_Controller
                 }
             }
             foreach ($is_empty_object as $key2 => $value2) {
-                if(@$data->$value2->is_empty_object || !count((array)$data->$value2)) {
+                if(isset($data->$value2) && ($data->$value2->is_empty_object || !count((array)$data->$value2) )) {
                     $data->$value2 = null;
                 }
                 

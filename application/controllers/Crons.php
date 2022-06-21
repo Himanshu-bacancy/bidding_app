@@ -57,7 +57,7 @@ class Crons extends CI_Controller {
                                     ->where('bs_order.order_id', $value['order_id'])->get()->row_array();
 
                         if(!empty($seller)) {
-                            send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order"],['order_id' => $value['order_id']] );
+                            send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order", 'title' => 'Order status update'],['order_id' => $value['order_id']] );
                         }
 
                         $this->db->where('id', $value['id'])->update('bs_order',['return_shipment_initiate_date' => $date]);
@@ -74,7 +74,7 @@ class Crons extends CI_Controller {
                             ->where('order_id', $value['order_id'])->get()->row_array();
                         
                         if(!empty($buyer_detail)) {
-                            send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order"],['order_id' => $value['order_id']] );
+                            send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order",'title' => 'Order status update'],['order_id' => $value['order_id']] );
                         }
                         $update_order['return_shipment_delivered_date'] = $date;
                         $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
@@ -186,12 +186,31 @@ class Crons extends CI_Controller {
         echo 'cron run successfully';
     }
     
+    public function notify_expireitem_user() {
+        $past_record = $this->db->select('bs_items.id, bs_items.title, bs_items.added_user_id, core_users.device_token')->from('bs_items')
+                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                ->where('bs_items.status', 1)
+                ->where('DATE(expiration_date) != "0000-00-00"')
+                ->where('DATE(expiration_date - INTERVAL 1 DAY) = DATE(now())')
+                ->where('core_users.device_token IS NOT NULL')
+                ->get()->result_array();
+        
+        if(!empty($past_record)) {
+            foreach ($past_record as $key => $value) {
+                $message = 'Your item '. $value['title'].' expires on tomorrow.';
+                send_push( [$value['device_token']], ["message" => $message, "flag" => "item",'title' => 'Update item expiration date'],['item_id' => $value['id']] );
+            }
+        }
+        
+        $this->db->insert('bs_cron_log',['cron_name' => 'notify-expireitem-user', 'created_at' => date('Y-m-d H:i:s')]);
+        echo 'cron run successfully';
+    }
     public function expire_item() {
         $past_record = $this->db->select('id,expiration_date')->from('bs_items')->where('status', 1)->where('DATE(expiration_date) != "0000-00-00"')->where('DATE(expiration_date) < DATE(now())')->get()->result_array();
 
         $past_record_ids = array_column($past_record, 'id');
         if(!empty($past_record_ids) && count($past_record_ids)) {
-            $this->db->where_in('id', $past_record_ids)->update('bs_items', ['status' => 0]);
+            $this->db->where_in('id', $past_record_ids)->update('bs_items', ['is_item_expired' => 1]);
         }
         $this->db->insert('bs_cron_log',['cron_name' => 'expire-item', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
