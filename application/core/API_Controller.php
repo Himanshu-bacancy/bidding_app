@@ -394,7 +394,8 @@ class API_Controller extends REST_Controller
             } else {
                 $where = 'requested_item_id = "'.$data->id.'" OR offered_item_id = "'.$data->id.'"';
             }
-            $get_offer_record = $this->db->select('id')->from('bs_chat_history')->where('is_offer_complete', 0)->where($where)->get()->num_rows();
+            $get_offer_record = $this->db->select('id')->from('bs_chat_history')->where('is_cancel', 0)->where('is_offer_complete', 0)->where($where)->get()->num_rows();
+            
             $get_order_record = $this->db->select('id')->from('bs_order')->where('items', $data->id)->where('status', 'succeeded')->get()->num_rows();
             
             if(!$get_offer_record) {

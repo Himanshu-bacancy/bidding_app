@@ -1640,9 +1640,10 @@ class Payments extends API_Controller {
         if(!$offer_details->is_offer_complete) {
             $new_odr_id = 'odr_'.time().$posts_var['user_id'];
             $shipping_amount = 0;
-            if( ($offer_details->seller_user_id != $posts_var['user_id']) || ($offer_details->seller_user_id == $posts_var['user_id'] && in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) ) {
+            if( ($offer_details->seller_user_id != $posts_var['user_id']) ) {
                 $order_user_id = $posts_var['user_id'];
-                if($offer_details->seller_user_id == $posts_var['user_id'] && $offer_details->operation_type == DIRECT_BUY) {
+//                if($offer_details->seller_user_id == $posts_var['user_id'] && $offer_details->operation_type == DIRECT_BUY) {
+                if($offer_details->seller_user_id == $posts_var['user_id'] && in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) {
                     $order_user_id = $offer_details->buyer_user_id;
                 }
                 if($offer_details->operation_type == REQUEST_ITEM && is_null($stripe_payment_method_id)) {

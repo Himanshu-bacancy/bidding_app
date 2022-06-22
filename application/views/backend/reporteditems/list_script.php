@@ -9,6 +9,7 @@ function runAfterJQ() {
             "ordering": true,
             "info": true,
             "autoWidth": false,
+            order: [[ 1, 'desc' ]],
             "columnDefs": [
                 { orderable: true,  targets: [1,3,4,5] },
                 { orderable: false, targets: '_all' }

@@ -205,11 +205,23 @@ class Crons extends CI_Controller {
         $this->db->insert('bs_cron_log',['cron_name' => 'notify-expireitem-user', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
+    
     public function expire_item() {
-        $past_record = $this->db->select('id,expiration_date')->from('bs_items')->where('status', 1)->where('DATE(expiration_date) != "0000-00-00"')->where('DATE(expiration_date) < DATE(now())')->get()->result_array();
+        $past_record = $this->db->select('id,expiration_date')->from('bs_items')->where('item_type_id', 1)->where('status', 1)->where('DATE(expiration_date) != "0000-00-00"')->where('DATE(expiration_date) < DATE(now())')->get()->result_array();
 
         $past_record_ids = array_column($past_record, 'id');
         if(!empty($past_record_ids) && count($past_record_ids)) {
+            $past_offer_record = $this->db->select('id, added_date, updated_date, timezone')->from('bs_chat_history')
+                ->where_in('requested_item_id', $past_record_ids)
+                ->where('is_cancel', 0)
+                ->where('is_offer_complete', 0)
+                ->order_by('added_date', 'desc')->get()->result_array();
+            if(!empty($past_offer_record)) {
+                foreach ($past_offer_record as $key => $value) {
+                    $date = new DateTime("now", new DateTimeZone($value['timezone']) );
+                    $this->db->where_in('id', $value['id'])->update('bs_chat_history',['is_expired' => 1, 'updated_date' => $date->format('Y-m-d H:i:s')]);
+                }
+            }
             $this->db->where_in('id', $past_record_ids)->update('bs_items', ['is_item_expired' => 1]);
         }
         $this->db->insert('bs_cron_log',['cron_name' => 'expire-item', 'created_at' => date('Y-m-d H:i:s')]);

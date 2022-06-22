@@ -929,7 +929,7 @@ class PS_Adapter {
 					$sizearray = $this->CI->Sizegroups->get_one($sgroups);					
 					$sizearr = json_decode(json_encode($sizearray), true);
 
-					if(!empty($sizearray) && count($sizearray)>0)
+					if(!empty($sizearray) && count((array)$sizearray)>0)
 					{
 						
 						$condscstm = array();

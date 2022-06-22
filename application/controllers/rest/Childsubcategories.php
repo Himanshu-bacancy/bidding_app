@@ -253,7 +253,7 @@ class Childsubcategories extends API_Controller
 								
 								$sizearr = json_decode(json_encode($sizearray), true);
 	
-								if(count($sizearray)>0)
+								if(count((array)$sizearray)>0)
 								{
 									
 									$condscstm = array();

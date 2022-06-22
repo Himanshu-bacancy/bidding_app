@@ -21,6 +21,16 @@ class Reason_operation extends PS_Model {
 	 */
 	function custom_conds( $conds = array())
 	{
+        // status condition
+		if ( isset( $conds['status'] )) {
+            
+            if(is_array($conds['status'])) {
+    			$this->db->where_not_in( 'status', $conds['status'] );
+            } else {
+    			$this->db->where( 'status', $conds['status'] );
+            }
+		}
+        
 		// id condition
 		if ( isset( $conds['id'] )) {
 			$this->db->where( 'id', $conds['id'] );

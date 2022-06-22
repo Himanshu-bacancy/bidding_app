@@ -742,18 +742,29 @@ class Items extends API_Controller
 			//item report check with login_user_id
 			$conds_report['user_id'] = $this->get_login_user_id();
 			$conds_report['type'] = 'report_item';
+			$conds_report['status'] = ['re-listed','rejected'];
 			$reported_data_count = $this->Reason_operation->count_all_by($conds_report);
-
+            
+			$rejected_conds_report['type'] = 'report_item';
+            $rejected_conds_report['status'] = 'rejected';
+			$rejected_data_count = $this->Reason_operation->count_all_by($rejected_conds_report);
+            
 			// item reported existed by login user
-			if ($reported_data_count > 0) {
+			if ($reported_data_count > 0 || $rejected_data_count > 0) {
 				// get the reported item data
 				$item_reported_datas = $this->Reason_operation->get_all_by($conds_report)->result();
 
 				foreach ( $item_reported_datas as $item_reported_data ) {
 					$item_ids .= "'" .$item_reported_data->operation_id . "',";			
 				}
-				// get block user's item
+                
+				$item_rejected_datas = $this->Reason_operation->get_all_by($rejected_conds_report)->result();
 
+				foreach ( $item_rejected_datas as $item_rejected_data ) {
+					$item_ids .= "'" .$item_rejected_data->operation_id . "',";			
+				}
+				// get block user's item
+                
 				$result_reports = rtrim($item_ids,',');
 				$conds_item['id'] = $result_reports;
 				$item_reports = $this->Item->get_all_in_report( $conds_item )->result();
