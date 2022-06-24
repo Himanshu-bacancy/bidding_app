@@ -152,8 +152,10 @@ if (!function_exists('sendEmail')) {
 		$config['protocol'] = "smtp";
         $config['smtp_host'] = "ssl://smtp.gmail.com";
         $config['smtp_port'] = "465";
-        $config['smtp_user'] = $CI->config->item('smtp_user');
-        $config['smtp_pass'] = $CI->config->item('smtp_pass');
+//        $config['smtp_user'] = $CI->config->item('smtp_user');
+//        $config['smtp_pass'] = $CI->config->item('smtp_pass');
+        $config['smtp_user'] = 'himanshu.sharma@bacancy.com';
+        $config['smtp_pass'] = 'lnkvpcsjefqgpszr';
         $config['charset'] = "utf-8";
         $config['mailtype'] = "html";
         $config['newline'] = "\r\n";
