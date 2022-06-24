@@ -541,3 +541,5 @@ $config['rewrite_short_tags'] = FALSE;
 */
 $config['proxy_ips'] = '';
 
+$config['smtp_user'] = 'himanshu.sharma@bacancy.com';
+$config['smtp_pass'] = 'lnkvpcsjefqgpszr';

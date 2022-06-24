@@ -1692,6 +1692,7 @@ class Items extends API_Controller
                     ->where('item_type_id', SELLING)->or_where('item_type_id', EXCHANGE)
                 ->group_end()
                 ->where($where)
+                ->order_by('added_date', 'desc')
                 ->get()->result();
         $row = [];
         

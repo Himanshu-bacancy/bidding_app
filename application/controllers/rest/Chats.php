@@ -1694,7 +1694,18 @@ class Chats extends API_Controller
                 $unread_col_sum = 'seller_unread_count';
             }
             $total = $this->db->query('SELECT sum('.$unread_col_sum.') AS unread_sum FROM `bs_chat_history` WHERE '.$condition.' '.$item_condition)->row();
-            $obj[$key]->$unread_col_sum = $total->unread_sum;            
+            $obj[$key]->$unread_col_sum = $total->unread_sum;  
+            
+            $order_status = $this->db->from('bs_order')->where('offer_id', $obj[$key]->id)->get()->row();
+            if(!empty($order_status)) {
+                if(!is_null($order_status->completed_date)) {
+                    $obj[$key]->order_status = 1;
+                } else {
+                    $obj[$key]->order_status = 2;
+                }
+            } else {
+                $obj[$key]->order_status = 0;
+            }
 		}
 //        die();
         
@@ -2047,6 +2058,17 @@ class Chats extends API_Controller
         } else {
             $offer_data->shipping_details = (object)[];
         }
+        $order_status = $this->db->from('bs_order')->where('offer_id', $offerId)->get()->row();
+        if(!empty($order_status)) {
+            if(!is_null($order_status->completed_date)) {
+                $offer_data->order_status = 1;
+            } else {
+                $offer_data->order_status = 2;
+            }
+        } else {
+            $offer_data->order_status = 0;
+        }
+            
 		$this->ps_adapter->convert_chathistory( $offer_data );
 		// echo '<pre>'; print_r($offer_data); die('rukooo');
 		if($offer_data){

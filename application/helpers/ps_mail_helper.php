@@ -137,3 +137,56 @@ EOL;
     return $CI->ps_mail->send_from_admin( $to, $subject, $msg );
   }
 }
+
+if (!function_exists('sendEmail')) {
+
+    function sendEmail($subject = '', $to = '', $message = '', $multiple = []) {
+
+        //echo $subject;
+        //echo $to;die();
+        $CI = &get_instance();
+        
+        $from = $CI->Backend_config->get_one('be1')->sender_email;
+        $from_name = $CI->Backend_config->get_one('be1')->sender_name;
+
+		$config['protocol'] = "smtp";
+        $config['smtp_host'] = "ssl://smtp.gmail.com";
+        $config['smtp_port'] = "465";
+        $config['smtp_user'] = $CI->config->item('smtp_user');
+        $config['smtp_pass'] = $CI->config->item('smtp_pass');
+        $config['charset'] = "utf-8";
+        $config['mailtype'] = "html";
+        $config['newline'] = "\r\n";
+//        print_r($config);die();
+
+        $CI->email->initialize($config);
+
+//        echo $CI->config->item('from');die();
+
+        $CI->email->from($from, $from_name);
+
+        $CI->email->subject($subject);
+
+        $CI->email->message($message);
+
+        //print_r($CI->email->send());die();
+        if(!empty($multiple)) {
+            foreach ($multiple as $key => $value) {
+                $CI->email->to($value);
+                $CI->email->send();
+            }
+        } else {
+            $CI->email->to($to);
+            if ($CI->email->send()) {
+                return TRUE;
+            } else {
+        //        $error = show_error($CI->email->print_debugger());
+                //die();
+        //        return $error;
+                return FALSE;
+            }
+        }
+
+    }
+
+}

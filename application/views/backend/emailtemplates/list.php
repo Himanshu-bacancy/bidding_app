@@ -15,6 +15,7 @@
 				<th><span class="th-title"><?php echo get_msg('btn_delete')?></span></th>
 			
 			<?php endif; ?>
+			<th><?php echo get_msg('Send to all'); ?></th>
 			
 		</tr>
 		
@@ -48,6 +49,12 @@
 					</td>
 				
 				<?php endif; ?>
+                    
+                <td>
+                    <a href='<?php echo $module_site_url .'/sendmailtoall/'. $val->id; ?>'>
+                        <i style='font-size: 18px;' class='fa fa-envelope'></i>
+                    </a>
+                </td>
 
 			</tr>
 

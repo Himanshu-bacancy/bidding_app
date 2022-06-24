@@ -152,11 +152,11 @@ class Emailtemplates extends BE_Controller {
 			if ( $id ) {
 			// if user id is not false, show success_add message
 				
-				$this->set_flash_msg( 'success', get_msg( 'success_subtopic_edit' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_template_edit' ));
 			} else {
 			// if user id is false, show success_edit message
 
-				$this->set_flash_msg( 'success', get_msg( 'success_subtopic_add' ));
+				$this->set_flash_msg( 'success', get_msg( 'success_template_add' ));
 			}
 		}
 
@@ -314,4 +314,16 @@ class Emailtemplates extends BE_Controller {
 			echo 'false';
 		}
 	}
+    
+    public function sendmailtoall($id = 0) {
+        $template = $this->Emailtemplate->get_one( $id );
+        if(!empty($template)) {
+            $users = $this->db->select('device_token')->from('core_users')->where('device_token IS NOT NULL')->where('device_token != " "')->get()->result_array();
+            $maintemplate = file_get_contents(base_url('templates/main.html'));
+            $message  = str_replace('##CONTENT##', html_entity_decode($template->content), $maintemplate);
+            sendEmail($template->title, '', $message, array_column($users,'device_token'));
+            $this->set_flash_msg( 'success', get_msg( 'success_email_send' ));
+            redirect( $this->module_site_url());
+        }
+    }
 }

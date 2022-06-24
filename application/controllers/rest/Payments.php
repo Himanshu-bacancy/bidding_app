@@ -996,6 +996,7 @@ class Payments extends API_Controller {
             }
             $seller_transaction = str_replace('Stripe\\PaymentIntent JSON: ', '', $orders['seller_transaction']);
             $orders['seller_transaction'] = json_decode($seller_transaction);
+            $orders['total_item_price'] = (double)$orders['item_offered_price'] * (int)$orders['qty'];
 //            $orders = $this->ps_security->clean_output( $orders );
             $this->custom_response((object) $orders);
         } else {
@@ -1242,6 +1243,7 @@ class Payments extends API_Controller {
                 if($order_state) {
                     if(!is_null($value->completed_date)) {
                         $row[$key] = $value;
+                        $row[$key]->total_item_price = (double)$value->item_offered_price * (int)$value->qty;
 
                         $address_details = $this->Addresses->get_one( $value->address_id );
                         $row[$key]->address_details = $address_details;
@@ -1355,6 +1357,7 @@ class Payments extends API_Controller {
                 } else {
                     if(is_null($value->completed_date)) {
                         $row[$key] = $value;
+                        $row[$key]->total_item_price = (double)$value->item_offered_price * (int)$value->qty;
 
                         $address_details = $this->Addresses->get_one( $value->address_id );
                         $row[$key]->address_details = $address_details;
@@ -1640,7 +1643,7 @@ class Payments extends API_Controller {
         if(!$offer_details->is_offer_complete) {
             $new_odr_id = 'odr_'.time().$posts_var['user_id'];
             $shipping_amount = 0;
-            if( ($offer_details->seller_user_id != $posts_var['user_id']) ) {
+            if( ($offer_details->seller_user_id != $posts_var['user_id']) || ($offer_details->seller_user_id == $posts_var['user_id'] && in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) ) {
                 $order_user_id = $posts_var['user_id'];
 //                if($offer_details->seller_user_id == $posts_var['user_id'] && $offer_details->operation_type == DIRECT_BUY) {
                 if($offer_details->seller_user_id == $posts_var['user_id'] && in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) {
@@ -1711,6 +1714,10 @@ class Payments extends API_Controller {
 //                    }
 //                }
                 $item_price = $offer_details->nego_price;
+                
+                if(in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) {
+                    $item_price = $offer_details->nego_price*$qty; 
+                }
                 
                 $backend_config = $this->Backend_config->get_one('be1');
                 $service_fee = ((float)$item_price * (float)$backend_config->selling_fees)/100;
@@ -1817,7 +1824,11 @@ class Payments extends API_Controller {
                     
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
-                    $stock_update = $item_detail->pieces - 1;
+                    if(in_array($offer_details->operation_type, [DIRECT_BUY, REQUEST_ITEM]) ) {
+                        $stock_update = $item_detail->pieces - $qty;
+                    } else{
+                        $stock_update = $item_detail->pieces - 1;
+                    }
                     $update_array['pieces'] = $stock_update;
                     if(!$stock_update) {
                         $update_array['is_sold_out'] = 1;
