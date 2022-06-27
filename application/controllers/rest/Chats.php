@@ -1532,6 +1532,18 @@ class Chats extends API_Controller
         $obj = $this->db->query("SELECT * FROM `bs_chat_history` WHERE ".$condition)->result();
 //        echo $this->db->last_query();die();
         $this->ps_adapter->convert_chathistory( $obj );
+        foreach ($obj as $key => $value) {
+            $order_status = $this->db->from('bs_order')->where('offer_id', $obj[$key]->id)->get()->row();
+            if(!empty($order_status)) {
+                if(!is_null($order_status->completed_date)) {
+                    $obj[$key]->order_status = 1;
+                } else {
+                    $obj[$key]->order_status = 2;
+                }
+            } else {
+                $obj[$key]->order_status = 0;
+            }
+        }
 		$this->custom_response( $obj );
     }
 

@@ -155,10 +155,6 @@ class Payments extends API_Controller {
         
         if($card_total_amount) {
             $remaining_amount = $card_total_amount;
-            if($posts_var['usewallet']) {
-                $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $user_id)->get()->row();
-                $remaining_amount = $card_total_amount - $get_user_wallet->wallet_amount;
-            }
             if($posts_var['coupon_id']) {
                 $coupondetail = $this->db->from('bs_coupan')->where('id', $posts_var['coupon_id'])->get()->row();
                 if($coupondetail->type) {
@@ -167,6 +163,14 @@ class Payments extends API_Controller {
                 } else {
                     $coupon_discount = $coupondetail->value;
                     $remaining_amount = $remaining_amount - $coupon_discount;
+                }
+            }
+            if($posts_var['usewallet'] && $remaining_amount) {
+                $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $user_id)->get()->row();
+                if($card_total_amount > $get_user_wallet->wallet_amount) {
+                    $remaining_amount = $card_total_amount - $get_user_wallet->wallet_amount;
+                } else {
+                    $remaining_amount = 0;
                 }
             }
             
