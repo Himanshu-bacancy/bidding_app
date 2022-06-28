@@ -120,13 +120,16 @@ class Coupans extends BE_Controller {
 		if ( $this->has_data( 'type' )) {
 			$data['type'] = $this->get_data( 'type' );
 		}
+		if ( $this->has_data( 'coupan_name' )) {
+			$data['name'] = $this->get_data( 'coupan_name' );
+		}
 		if ( $this->has_data( 'coupan_value' )) {
 			$data['value'] = $this->get_data( 'coupan_value' );
 		}
 		if ( $this->has_data( 'min_purchase_amount' )) {
 			$data['min_purchase_amount'] = $this->get_data( 'min_purchase_amount' );
 		}
-		if ( $this->has_data( 'end_at' )) {
+		if ( $this->has_data( 'end_at' ) && !empty($this->get_data( 'end_at' )) ) {
 			$data['end_at'] = $this->get_data( 'end_at' );
 		}
         

@@ -177,7 +177,7 @@ class Orders extends BE_Controller {
 		$this->data['action_title'] = get_msg( 'return_order_detail' );
         // load order
         //$order = $this->db->query("SELECT * FROM `bs_order` WHERE id = '".$id."'")->result();
-        $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')
+        $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at,bs_return_order.seller_response')
                         ->from('bs_return_order')
                         ->join('bs_order', "bs_return_order.order_id = bs_order.order_id")
                         ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")

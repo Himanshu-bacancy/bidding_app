@@ -38,6 +38,23 @@
                         <div class="form-group">
 							<label>
 	                   			<span style="font-size: 17px; color: red;">*</span>
+								<?php echo get_msg('coupan_name')?>
+								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('coupan_name')?>">
+									<span class='glyphicon glyphicon-info-sign menu-icon'>
+								</a>
+							</label>
+							<?php							
+							echo form_input( array(
+								'name' => 'coupan_name',
+								'value' => set_value( 'coupan_name', show_data( @$coupan->name ), false ),
+								'class' => 'form-control form-control-sm',
+								'placeholder' => get_msg( 'coupan_name' ),
+								'id' => 'coupan_name'
+							)); ?>
+	              		</div>
+                        <div class="form-group">
+							<label>
+	                   			<span style="font-size: 17px; color: red;">*</span>
 								<?php echo get_msg('coupan_value')?>
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('coupan_value')?>">
 									<span class='glyphicon glyphicon-info-sign menu-icon'>
@@ -75,7 +92,12 @@
                         <div class="form-group">
 							<label>
 	                   			<span style="font-size: 17px; color: red;">*</span>
-								<?php echo get_msg('end_at')?>
+								<?php 
+                                echo get_msg('end_at');
+                                if(isset($coupan->end_at)) {
+	                   			 echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="">'.date('Y-m-d', strtotime($coupan->end_at)).'</span>';
+                                }
+                                ?>
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('end_at')?>">
 									<span class='glyphicon glyphicon-info-sign menu-icon'>
 								</a>
@@ -85,7 +107,7 @@
                             echo form_input( array(
                                 'name' => 'end_at',
                                 'type' => 'date', 
-                                'value' => set_value( 'end_at', $format_date),
+//                                'value' => set_value( 'end_at', $format_date),
                                 'class' => 'form-control form-control-sm',
                                 'placeholder' => get_msg('end_at'),
                                 'id' => 'end_at'                

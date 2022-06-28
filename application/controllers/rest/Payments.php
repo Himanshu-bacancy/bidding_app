@@ -948,6 +948,7 @@ class Payments extends API_Controller {
 
                     $return_details->tracking_status = $return_trackin_details->status;
                     $return_details->tracking_url = $return_trackin_details->tracking_url;
+                    $return_details->label_url = $return_trackin_details->label_url;
                 }
                 
                 $orders['return_details'] = $return_details;
@@ -1338,6 +1339,7 @@ class Payments extends API_Controller {
 
                                 $return_details->tracking_status = $return_trackin_details->status;
                                 $return_details->tracking_url = $return_trackin_details->tracking_url;
+                                $return_details->label_url = $return_trackin_details->label_url;
                             }
                             $row[$key]->return_details = $return_details;
                         } else {
@@ -1452,6 +1454,7 @@ class Payments extends API_Controller {
 
                                 $return_details->tracking_status = $return_trackin_details->status;
                                 $return_details->tracking_url = $return_trackin_details->tracking_url;
+                                $return_details->label_url = $return_trackin_details->label_url;
                             }
                             $row[$key]->return_details = $return_details;
                         } else {
@@ -1529,8 +1532,9 @@ class Payments extends API_Controller {
         $current_date = date('Y-m-d H:i:s');
         $get_order = $this->db->select('*')->from('bs_order')->where('bs_order.order_id', $posts['order_id'])->get()->row();
         $udpate_order_array['delivery_status'] = 'delivered';
-        $udpate_order_array['completed_date'] = $current_date;
-        $udpate_order_array['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_date. ' + 3 days'));
+        $udpate_order_array['delivery_date'] = $current_date;
+//        $udpate_order_array['completed_date'] = $current_date;
+//        $udpate_order_array['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_date. ' + 3 days'));
         if(is_null($get_order->processed_date)) {
             $udpate_order_array['processed_date'] = $current_date;
         }
@@ -2621,7 +2625,7 @@ class Payments extends API_Controller {
         $this->response($response);
     }
     
-    public function shiporder_deliverstatus_post() {
+    public function return_confirm_delivery_post() {
         $user_data = $this->_apiConfig([
             'methods' => ['POST'],
             'requireAuthorization' => true,
@@ -2641,6 +2645,7 @@ class Payments extends API_Controller {
                 ->where('bs_order.order_id',$posts['order_id'])
                 ->get()->row_array();
         $update_order['delivery_status'] = "delivered";
+        $update_order['delivery_date'] = $date;
         $this->db->where('id', $track_order['id'])->update('bs_track_order',['tracking_status' => 'DELIVERED', 'updated_at' => $date]);
         if($track_order['is_return']) {
             $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
@@ -3378,5 +3383,33 @@ class Payments extends API_Controller {
         } else {
             $this->error_response('Not enough balance');
         }
+    }
+    
+    public function return_confirm_shipping_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            )
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $this->db->where('order_id', $posts['order_id'])->update('bs_order', ['return_shipment_initiate_date' => $date]);
+        
+        $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+            ->join('bs_order', 'bs_order.items = bs_items.id')
+            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+            ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
+        
+        send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order", 'title' => 'Order status update'],['order_id' => $posts['order_id']] );
+        
+        $this->response(['status' => "success", 'message' => 'Shipment initiated']);
     }
 }

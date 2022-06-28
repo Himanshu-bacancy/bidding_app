@@ -70,6 +70,7 @@ $route['read-xcel'] = "crons/read_xcel";
 $route['inactive-coupon'] = "crons/inactive_coupon";
 $route['notify-expire-item'] = "crons/notify_expireitem_user";
 $route['expire-item'] = "crons/expire_item";
+$route['order-complete'] = "crons/order_complete";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";

@@ -76,6 +76,7 @@ class Crons extends CI_Controller {
                         if(!empty($buyer_detail)) {
                             send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order",'title' => 'Order status update'],['order_id' => $value['order_id']] );
                         }
+                        $update_order['completed_date'] = $date;
                         $update_order['return_shipment_delivered_date'] = $date;
                         $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
                         $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
@@ -227,4 +228,64 @@ class Crons extends CI_Controller {
         $this->db->insert('bs_cron_log',['cron_name' => 'expire-item', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
+    
+    public function order_complete() {
+        $past_record = $this->db->select('bs_order.order_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
+                ->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                ->where('bs_order.delivery_date IS NOT NULL')
+                ->where('bs_order.completed_date IS NULL')
+                ->get()->result_array();
+        $date = date('Y-m-d H:i:s');
+        if(!empty($past_record)) {
+            foreach ($past_record as $key => $value) {
+                $verify_date = date('Y-m-d H:i:s', strtotime($value['delivery_date']. ' + 3 days'));
+                if($verify_date < $date) {
+                    $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['added_user_id'], 'action' => 'plus', 'amount' => $value['seller_earn'], 'type' => 'complete_order', 'created_at' => $date]);
+
+                    $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + $value['seller_earn']]);
+
+                    $update_order['completed_date'] = $date;
+                    $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+
+                    $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
+                }
+            }
+        }
+        
+        $this->db->insert('bs_cron_log',['cron_name' => 'order-complete', 'created_at' => $date]);
+        echo 'cron run successfully';
+    }
+    
+//    public function return_order_cancel() {
+//        $past_record = $this->db->select('bs_order.order_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
+//                ->from('bs_order')
+//                ->join('bs_items', 'bs_order.items = bs_items.id')
+//                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+//                ->where('bs_order.delivery_date IS NOT NULL')
+//                ->where('bs_order.return_shipment_initiate_date IS NULL')
+//                ->where('bs_order.completed_date IS NULL')
+//                ->get()->result_array();
+//        $date = date('Y-m-d H:i:s');
+//        if(!empty($past_record)) {
+//            foreach ($past_record as $key => $value) {
+//                $verify_date = date('Y-m-d H:i:s', strtotime($value['delivery_date']. ' + 3 days'));
+//                if($verify_date > $date) {
+//                    $update_return_order['status'] = 'cancel';
+//                    $update_return_order['cancel_by'] = 'admin';
+//                    $update_return_order['updated_at'] = $date;
+//                    $this->db->where('order_id', $value['order_id'])->update('bs_return_order', $update_return_order);
+//
+//                    $update_order['completed_date'] = $date;
+//                    $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+//
+//                    $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
+//                }
+//            }
+//        }
+//        
+//        $this->db->insert('bs_cron_log',['cron_name' => 'order-complete', 'created_at' => $date]);
+//        echo 'cron run successfully';
+//    }
 }

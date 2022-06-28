@@ -110,17 +110,40 @@
                             <?php echo get_msg('Images')?>
                         </label>
                         <div class="thumbnail">
-                            <?php 
-                            $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $order['order_id'], 'img_type' => 'return_order' ))->result();
-                            if(!empty($return_details->images)) {
-                                foreach ($return_details->images as $key => $value) {
-                                    echo '<br><img src="'.$this->ps_image->upload_url.$value->img_path .'" height="75" width="75"><br>';
+                            <div class="row">
+                                <?php 
+                                $return_details->images = $this->Image->get_all_by( array( 'img_parent_id' => $order['order_id'], 'img_type' => 'return_order' ))->result();
+                                if(!empty($return_details->images)) {
+                                    foreach ($return_details->images as $key => $value) {
+                                        echo '<div class "col-3"><img src="'.$this->ps_image->upload_url.$value->img_path .'" height="75" width="75" style="margin-right:15px;margin-bottom:15px;"></div>';
+                                    }
+                                } else {
+                                    echo '<img src="'.$this->ps_image->upload_thumbnail_url .'no_image.png" height="75" width="75">';
                                 }
-                            } else {
-                                echo '<img src="'.$this->ps_image->upload_thumbnail_url .'no_image.png" height="75" width="75">';
-                            }
-                            ?>
+                                ?>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
+                    <div class="form-group">
+                      <label> <span style="font-size: 17px; color: red;"></span>
+                        <?php echo get_msg('seller_response')?>
+                      </label>
+
+                      <?php echo form_textarea( array(
+                        'name' => 'description',
+                        'value' => set_value( 'description', show_data( $order['seller_response']), false ),
+                        'class' => 'form-control form-control-sm',
+                        'placeholder' => get_msg('seller_response'),
+                        'id' => 'seller_response',
+                        'rows' => "3",
+                        'readonly' => 'true'
+                      )); ?>
+
                     </div>
                 </div>
             </div>

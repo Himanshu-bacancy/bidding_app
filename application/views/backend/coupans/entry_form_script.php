@@ -6,17 +6,25 @@
 
 		$('#coupan-form').validate({
 			rules:{
+				coupan_name:{
+					blankCheck : "",
+				},
 				coupan_value:{
 					blankCheck : "",
 				},
                 min_purchase_amount:{
 					blankCheck : "",
 				},
-                end_at:{
-					blankCheck : "",
-				}
+                <?php if(!isset($coupan->end_at))  { ?>
+                    end_at:{
+                        blankCheck : "",
+                    }
+                <?php }?>
 			},
 			messages:{
+				coupan_name:{
+					blankCheck : "<?php echo get_msg( 'err_coupan_name' ) ;?>",
+				},
 				coupan_value:{
 					blankCheck : "<?php echo get_msg( 'err_coupan_value' ) ;?>",
 				},

@@ -550,3 +550,10 @@ ALTER TABLE `bs_reason_operations` ADD `updated_at` DATETIME NULL AFTER `added_d
 // RB: ADDED ON 21/06/2022
 
 ALTER TABLE `bs_items` ADD `is_item_expired` INT NOT NULL AFTER `expiration_date`;
+
+// RB: ADDED ON 28/06/2022
+
+ALTER TABLE `bs_coupan` ADD `name` VARCHAR(255) NOT NULL AFTER `id`;
+
+ALTER TABLE `bs_order` ADD `delivery_date` DATETIME NULL AFTER `coupon_discount`;
+

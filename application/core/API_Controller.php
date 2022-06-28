@@ -2030,7 +2030,7 @@ class API_Controller extends REST_Controller
         if($order_detail['user_id'] == $conds['from_user_id']) {
             $seller_earn = $order_detail['seller_earn'];
             
-            $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $conds['to_user_id'],'action' => 'plus', 'amount' => $seller_earn,'type' => 'rate_order', 'created_at' => date('Y-m-d H:i:s')]);
+            $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $conds['to_user_id'],'action' => 'plus', 'amount' => $seller_earn,'type' => 'rate_order', 'created_at' => $date]);
             
             $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $conds['to_user_id'])->get()->row();
             
@@ -2038,6 +2038,8 @@ class API_Controller extends REST_Controller
             
             $update_order['is_buyer_rate'] = 1;
             $update_order['rate_date'] = $date;
+            $update_order['completed_date'] = $date;
+            $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
         } else {
             $update_order['is_seller_rate'] = 1;
             $update_order['seller_rate_date'] = $date;
