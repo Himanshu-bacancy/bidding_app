@@ -266,7 +266,7 @@ class Payments extends API_Controller {
                     $update_order_array['coupon_type'] = $coupondetail->type;
                     $update_order_array['coupon_discount'] = $coupon_discount;
                 }
-                
+                $this->tracking_order(['records' => $records, 'create_offer' => 1]);
                 $this->db->where_in('id', $records)->update('bs_order',$update_order_array);
                 $item_ids = array_column($items,'item_id');
                 foreach ($item_ids as $key => $value) {
@@ -1534,7 +1534,7 @@ class Payments extends API_Controller {
         $udpate_order_array['delivery_status'] = 'delivered';
         $udpate_order_array['delivery_date'] = $current_date;
 //        $udpate_order_array['completed_date'] = $current_date;
-//        $udpate_order_array['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_date. ' + 3 days'));
+        $udpate_order_array['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_date. ' + 3 days'));
         if(is_null($get_order->processed_date)) {
             $udpate_order_array['processed_date'] = $current_date;
         }
@@ -2026,7 +2026,11 @@ class Payments extends API_Controller {
     }
 
     public function tracking_order($param) {
-        $get_records = $this->db->from('bs_order')->where('transaction_id', $param['transaction_id'])->get()->result();
+        if(isset($param['transaction_id'])) {
+            $get_records = $this->db->from('bs_order')->where('transaction_id', $param['transaction_id'])->get()->result();
+        } elseif(isset($param['records'])) {
+            $get_records = $this->db->from('bs_order')->where_in('in', $param['records'])->get()->result();
+        }
         $track_number = '';
         $current_date = date("Y-m-d H:i:s");
         if(isset($param['generate_label'])) {
@@ -2199,8 +2203,9 @@ class Payments extends API_Controller {
                     ->join('bs_order', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                     ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
+            
             if(!empty($seller)) {
-                send_push( [$seller->device_token], ["message" => "Order Returned", "flag" => "order"],['order_id' => $posts['order_id']] );
+                send_push( [$seller['device_token']], ["message" => "Buyer request for return item", "flag" => "order", "title" => $seller['item_name']." order update"],['order_id' => $posts['order_id']] );
             }
 
             $this->response(['status' => "success", 'message' => 'Order return request initiate successfully']);
@@ -2265,13 +2270,15 @@ class Payments extends API_Controller {
         $posts = $this->post();
         $date = date('Y-m-d H:i:s');
                     
-        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token')->from('bs_order')
+        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token, bs_items.title')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users', 'bs_order.user_id = core_users.user_id')
                 ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                 ->where('order_id', $posts['order_id'])->get()->row();
         $update_order['seller_response'] = $posts['seller_response'];
         $update_order['status'] = 'reject';
-        $message = "Order return request rejected by seller";
+        $title = $buyer_detail->title. " order update";
+        $message = "Seller denied return request";
         if($posts['status']) {
             if(!isset($posts['card_id']) || empty($posts['card_id']) || is_null($posts['card_id'])) {
                 $this->error_response("Please pass card id");
@@ -2421,7 +2428,7 @@ class Payments extends API_Controller {
                 }
             } else if($get_item->shipping_type == '2') {
                 $update_order['status'] = 'accept';
-                $message = "Order return request accepted by seller";
+                $message = "Seller accepted return request";
             }
         }
         $update_order['updated_at'] = $date;
@@ -2431,7 +2438,7 @@ class Payments extends API_Controller {
         $this->db->where('order_id', $posts['order_id'])->update('bs_return_order', $update_order);
         
         if(!empty($buyer_detail)) {
-            send_push( [$buyer_detail->device_token], ["message" => $message, "flag" => "order"],['order_id' => $posts['order_id']] );
+            send_push( [$buyer_detail->device_token], ["message" => $message, "flag" => "order", "title" => $title],['order_id' => $posts['order_id']] );
         }
 
         $this->response(['status' => "success", 'message' => $message]);
@@ -2547,6 +2554,9 @@ class Payments extends API_Controller {
                 $row[$key] = $value;
                 if($posts['type'] == CREDIT) {
                     $row[$key]['type'] = 'credit';
+                    if($value['type'] == 'refund') {
+                        $row[$key]['isRefund'] = '1';
+                    }
                 } else if($posts['type'] == DEBIT){
                     $row[$key]['type'] = 'debit';
                 } else if($posts['type'] == DEPOSIT){
@@ -2568,6 +2578,9 @@ class Payments extends API_Controller {
                 } else if($posts['type'] == ALL){
                     if($value['action'] == 'plus') {
                         $row[$key]['type'] = 'credit';
+                        if($value['type'] == 'refund') {
+                            $row[$key]['isRefund'] = '1';
+                        }
                     } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit' && $value['type'] != 'instantpay') {
                         $row[$key]['type'] = 'debit';
                     } else if($value['action'] == 'minus') {
@@ -2640,12 +2653,17 @@ class Payments extends API_Controller {
         $posts = $this->post();
         $date = date('Y-m-d H:i:s');
         
-        $track_order = $this->db->select('bs_track_order.*')->from('bs_track_order')
+        $track_order = $this->db->select('bs_track_order.*, bs_items.title as item_name')->from('bs_track_order')
                 ->join('bs_order', 'bs_track_order.order_id = bs_order.order_id')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->where('bs_order.order_id',$posts['order_id'])
+                ->where('bs_track_order.is_return',1)
                 ->get()->row_array();
+        
         $update_order['delivery_status'] = "delivered";
+        $update_order['completed_date'] = $date;
         $update_order['delivery_date'] = $date;
+        $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
         $this->db->where('id', $track_order['id'])->update('bs_track_order',['tracking_status' => 'DELIVERED', 'updated_at' => $date]);
         if($track_order['is_return']) {
             $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
@@ -2653,7 +2671,7 @@ class Payments extends API_Controller {
                 ->where('order_id', $posts['order_id'])->get()->row_array();
             
             if(!empty($buyer_detail)) {
-                send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order"],['order_id' => $posts['order_id']] );
+                send_push( [$buyer_detail['device_token']], ["message" => "Seller has received the item", "flag" => "order", "title" => $track_order['item_name']." order udpate"],['order_id' => $posts['order_id']] );
             }
             $update_order['return_shipment_delivered_date'] = $date;
             $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
@@ -3408,7 +3426,7 @@ class Payments extends API_Controller {
             ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
             ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
         
-        send_push( [$seller['device_token']], ["message" => "Order ship by buyer", "flag" => "order", 'title' => 'Order status update'],['order_id' => $posts['order_id']] );
+        send_push( [$seller['device_token']], ["message" => "Buyer has shipped the item", "flag" => "order", 'title' => $seller['item_name'].' status update'],['order_id' => $posts['order_id']] );
         
         $this->response(['status' => "success", 'message' => 'Shipment initiated']);
     }

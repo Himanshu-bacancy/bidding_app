@@ -1535,7 +1535,7 @@ class Chats extends API_Controller
         foreach ($obj as $key => $value) {
             $order_status = $this->db->from('bs_order')->where('offer_id', $obj[$key]->id)->get()->row();
             if(!empty($order_status)) {
-                if(!is_null($order_status->completed_date)) {
+                if(is_null($order_status->completed_date)) {
                     $obj[$key]->order_status = 1;
                 } else {
                     $obj[$key]->order_status = 2;
@@ -1710,7 +1710,7 @@ class Chats extends API_Controller
             
             $order_status = $this->db->from('bs_order')->where('offer_id', $obj[$key]->id)->get()->row();
             if(!empty($order_status)) {
-                if(!is_null($order_status->completed_date)) {
+                if(is_null($order_status->completed_date)) {
                     $obj[$key]->order_status = 1;
                 } else {
                     $obj[$key]->order_status = 2;
@@ -2072,7 +2072,7 @@ class Chats extends API_Controller
         }
         $order_status = $this->db->from('bs_order')->where('offer_id', $offerId)->get()->row();
         if(!empty($order_status)) {
-            if(!is_null($order_status->completed_date)) {
+            if(is_null($order_status->completed_date)) {
                 $offer_data->order_status = 1;
             } else {
                 $offer_data->order_status = 2;

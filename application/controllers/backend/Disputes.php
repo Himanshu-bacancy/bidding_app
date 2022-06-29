@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Disputes extends BE_Controller {
 
 	/**
-	 * Construt required variables
+	 * Construct required variables
 	 */
 	function __construct() {
 
@@ -105,7 +105,7 @@ class Disputes extends BE_Controller {
 	 * 3) save image
 	 * 4) check transaction status
 	 *
-	 * @param      boolean  $id  The user identifier
+	 * @param      boolean  $id  The dispute identifier
 	 */
 	function save( $id = false ) {
 		// start the transaction
@@ -116,13 +116,13 @@ class Disputes extends BE_Controller {
 		 */
 		$data = array();
 
-		// prepare topic name
+		// prepare dispute name
 		if ( $this->has_data( 'name' )) {
 			$data['name'] = $this->get_data( 'name' );
 		}
 
         $data['created_at'] = date('Y-m-d H:i:s');
-		// save topics
+		// save dispute
 		if ( ! $this->Dispute->save( $data, $id )) {
 		// if there is an error in inserting user data,	
 
@@ -288,13 +288,13 @@ class Disputes extends BE_Controller {
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
                     ->where('order_id', $order_id)->get()->row();
             
-            $seller = $this->db->select('device_token')->from('bs_order')
+            $seller = $this->db->select('device_token,title')->from('bs_order')
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                         ->where('order_id', $order_id)->get()->row();
             
-            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute for order has been accept by admin", "flag" => "order", 'title' => "Return order accpet"],['order_id' => $order_id] );
-            
+            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been accpeted", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
+                
 			echo 'true';
 		} else {
 			echo 'false';
@@ -304,7 +304,7 @@ class Disputes extends BE_Controller {
 	/**
 	 * Unpublish the records
 	 *
-	 * @param      integer  $id  The topics identifier
+	 * @param      integer  $id  The dispute identifier
 	 */
 	function ajx_unpublish( $id = 0, $order_id )
 	{
@@ -318,12 +318,12 @@ class Disputes extends BE_Controller {
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
                     ->where('order_id', $order_id)->get()->row();
             
-            $seller = $this->db->select('device_token')->from('bs_order')
+            $seller = $this->db->select('device_token,title')->from('bs_order')
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                         ->where('order_id', $order_id)->get()->row();
             
-            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute for order has been reject by admin", "flag" => "order", 'title' => "Return order reject"],['order_id' => $order_id] );
+            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been rejected", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
             
 			echo 'true';
 		} else {

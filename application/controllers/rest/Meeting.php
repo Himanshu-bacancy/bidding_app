@@ -167,7 +167,7 @@ class Meeting extends API_Controller {
             $update_order['pickup_date'] = $date;
             $update_order['delivery_date'] = $date;
 //            $update_order['completed_date'] = $date;
-//            $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+            $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
 //            }
             if(is_null($get_user->processed_date)) {
                 $update_order['processed_date'] = $date;

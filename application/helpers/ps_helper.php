@@ -741,7 +741,7 @@ if ( ! function_exists( 'send_android_fcm_rating' ))
     	$url = 'https://fcm.googleapis.com/fcm/send';
 
     	$noti_arr = array(
-    		'title' => get_msg('site_name'),
+    		'title' => (isset($data['title'])) ? $data['title'] : get_msg('site_name'),
     		'body' => $message,
     		'sound' => 'default',
     		'message' => $message,
@@ -757,6 +757,7 @@ if ( ! function_exists( 'send_android_fcm_rating' ))
     		'notification' => $noti_arr,
     	    'registration_ids' => $registatoin_ids,
     	    'data' => array(
+    	    	'title' => (isset($data['title'])) ? $data['title'] : get_msg('site_name'),
     	    	'message' => $message,
     	    	'rating' => $rating,
     	    	'flag' => 'review',

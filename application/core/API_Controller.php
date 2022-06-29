@@ -438,6 +438,9 @@ class API_Controller extends REST_Controller
         if($this->router->fetch_class() == 'chats' && ($this->router->fetch_method() == 'get_offer_details' || $this->router->fetch_method() == "offer_list" || $this->router->fetch_method() == "offer_by_items")) {
             if(is_array($data)) { 
                 foreach ($data as $key => $value) {
+                    if(isset($value->requested_item_detail)) {
+                        unset($value->requested_item_detail->childsub_category->brands);
+                    }
                     if(isset($value->buyer_unread_count) && empty($value->buyer_unread_count)) {
                         $value->buyer_unread_count = "0";
                     } 
@@ -446,6 +449,9 @@ class API_Controller extends REST_Controller
                     } 
                 }
             } else {
+                if(isset($data->requested_item_detail)) {
+                    unset($data->requested_item_detail->childsub_category->brands);
+                }
                 if(empty($data->buyer_unread_count)) {
                     $data->buyer_unread_count = "0";
                 }
@@ -2011,7 +2017,9 @@ class API_Controller extends REST_Controller
 		//print_r($conds);die;
 		
 		$id = $this->model->get_one_by($conds)->id;
-        $order_detail = $this->db->from('bs_order')->where('order_id', $order_id)->get()->row_array();
+        $order_detail = $this->db->select('bs_order.*,bs_items.title')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->where('order_id', $order_id)->get()->row_array();
 		
         $rating = $data['rating'];
         $date = date('Y-m-d H:i:s');
@@ -2039,7 +2047,7 @@ class API_Controller extends REST_Controller
             $update_order['is_buyer_rate'] = 1;
             $update_order['rate_date'] = $date;
             $update_order['completed_date'] = $date;
-            $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+//            $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
         } else {
             $update_order['is_seller_rate'] = 1;
             $update_order['seller_rate_date'] = $date;
@@ -2056,7 +2064,10 @@ class API_Controller extends REST_Controller
 			}
 		}
 
-		$data['message'] = htmlspecialchars_decode($this->post( 'title' ));
+//		$data['message'] = htmlspecialchars_decode($this->post( 'title' ));
+        $from_user_detail = $this->db->from('core_users')->where('user_id', $from_user_id)->get()->row();
+		$data['title'] = $order_detail['title'].' order update';
+		$data['message'] = $from_user_detail->user_name.' Rated you '.$rating.' star';
 		$data['rating'] = $this->post('rating');
 
 		$status = send_android_fcm_rating( $device_ids, $data );

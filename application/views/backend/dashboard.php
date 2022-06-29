@@ -55,7 +55,7 @@
               $data = array(
                 'url' => site_url() .'/admin/items' ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', REQUEST_ITEM)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
-                'label' => get_msg( 'New request listings'),
+                'label' => get_msg( 'New wants listings'),
                 'icon' => "fa fa-wpforms",
                 'color' => "bg-warning",
                 'hide_url' => 0
@@ -119,7 +119,7 @@
               $data = array(
                 'url' => site_url().'/admin/items'  ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', SELLING)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
-                'label' => get_msg( 'New selling listings'),
+                'label' => get_msg( 'New sale listings'),
                 'icon' => "fa fa-wpforms",
                 'color' => "bg-warning",
                 'hide_url' => 0
@@ -183,7 +183,7 @@
               $data = array(
                 'url' => site_url().'/admin/items' ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', EXCHANGE)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
-                'label' => get_msg( 'New selling/trade listings'),
+                'label' => get_msg( 'New sell/swap listings'),
                 'icon' => "fa fa-wpforms",
                 'color' => "bg-warning",
                 'hide_url' => 0

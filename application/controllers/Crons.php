@@ -247,7 +247,7 @@ class Crons extends CI_Controller {
                     $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + $value['seller_earn']]);
 
                     $update_order['completed_date'] = $date;
-                    $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+//                    $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
 
                     $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
                 }
