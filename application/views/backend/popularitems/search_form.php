@@ -118,7 +118,7 @@
 
 		  	</div>
 
-		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
+<!--		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
 
 				<?php
 					$options=array();
@@ -138,9 +138,9 @@
 					);
 				?> 
 
-		  	</div>
+		  	</div>-->
 
-		  	<div class="form-group mr-3" style="padding-top: 3px;padding-right: 2px;">
+<!--		  	<div class="form-group mr-3" style="padding-top: 3px;padding-right: 2px;">
 
 				<?php
 					$options=array();
@@ -160,7 +160,7 @@
 					);
 				?> 
 
-		  	</div>
+		  	</div>-->
 
 		  		<!-- <div class="form-group" style="padding-top: 3px;padding-right: 2px;">
 						

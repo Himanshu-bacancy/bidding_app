@@ -435,28 +435,32 @@ class API_Controller extends REST_Controller
 //        }
         
 		$data = $this->ps_security->clean_output( $data );
-        if($this->router->fetch_class() == 'chats' && ($this->router->fetch_method() == 'get_offer_details' || $this->router->fetch_method() == "offer_list" || $this->router->fetch_method() == "offer_by_items")) {
+        if(in_array($this->router->fetch_class(),['chats','payments']) && in_array($this->router->fetch_method(), ['get_offer_details','offer_list','offer_by_items','wayto_delivery']) ) {
             if(is_array($data)) { 
                 foreach ($data as $key => $value) {
                     if(isset($value->requested_item_detail)) {
                         unset($value->requested_item_detail->childsub_category->brands);
                     }
-                    if(isset($value->buyer_unread_count) && empty($value->buyer_unread_count)) {
-                        $value->buyer_unread_count = "0";
-                    } 
-                    if(isset($value->seller_unread_count) && empty($value->seller_unread_count)) {
-                        $value->seller_unread_count = "0";
-                    } 
+                    if($this->router->fetch_class() == 'chats') {
+                        if(isset($value->buyer_unread_count) && empty($value->buyer_unread_count)) {
+                            $value->buyer_unread_count = "0";
+                        } 
+                        if(isset($value->seller_unread_count) && empty($value->seller_unread_count)) {
+                            $value->seller_unread_count = "0";
+                        } 
+                    }
                 }
             } else {
                 if(isset($data->requested_item_detail)) {
                     unset($data->requested_item_detail->childsub_category->brands);
                 }
-                if(empty($data->buyer_unread_count)) {
-                    $data->buyer_unread_count = "0";
-                }
-                if(empty($data->seller_unread_count)) {
-                    $data->seller_unread_count = "0";
+                if($this->router->fetch_class() == 'chats') {
+                    if(empty($data->buyer_unread_count)) {
+                        $data->buyer_unread_count = "0";
+                    }
+                    if(empty($data->seller_unread_count)) {
+                        $data->seller_unread_count = "0";
+                    }
                 }
             }
         }

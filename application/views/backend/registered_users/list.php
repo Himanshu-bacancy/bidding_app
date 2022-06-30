@@ -1,5 +1,28 @@
+<style>
+    .dataTables_wrapper .dataTables_paginate {
+        float: none;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0px;
+        margin-left: 0px;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        border: none;
+        background: none;
+    }
+    .dataTables_length {
+        margin-top: 15px;
+    }
+    .dataTables_length label {
+        display: flex;
+        position: inherit;
+    }
+    .register_user_table_length{
+        width: auto;
+    }
+</style>
 <div class=" animated fadeInRight">
-	<table id="register_user_table" >
+    <table class="table-responsive" id="register_user_table" >
         <thead>
 		<tr>
 			<th><input type="checkbox" name="select_all"  id="example-select-all"></th>
@@ -10,7 +33,8 @@
 			<th><?php echo get_msg('city')?></th>
 			<th><?php echo get_msg('user_phone')?></th>
 			<!-- <th><?php echo get_msg('view'); ?></th> -->
-			<th><?php echo get_msg('role')?></th>
+			<!--<th><?php echo get_msg('role')?></th>-->
+			<th><?php echo get_msg('added date')?></th>
 
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 				
@@ -70,7 +94,7 @@
 				
 				
 					<?php endif; ?> -->
-					<td><?php echo "Registered User";?></td>
+					<td><?php echo $user->added_date;?></td>
 
 					<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 					

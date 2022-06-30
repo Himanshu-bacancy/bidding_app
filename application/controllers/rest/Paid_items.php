@@ -109,7 +109,8 @@ class Paid_items extends API_Controller
 	  		"payment_method" => $this->post('payment_method'),
 	  		"razor_id" => $this->post('razor_id'),
 	  		"purchased_id" => $this->post('purchased_id'),
-	  		"added_user_id" => $added_user_id
+	  		"added_user_id" => $added_user_id,
+	  		"plan_id" => ($this->post('plan_id')) ?? '0'
 	  	);
 	  	
 	  	$this->Paid_item->save($paid_data);
@@ -425,7 +426,8 @@ class Paid_items extends API_Controller
 				"payment_method" => 'stripe',
 				"transaction" => $response,
 				"payment_id" => $response->id,
-				"added_user_id" => $this->post('user_id')
+				"added_user_id" => $this->post('user_id'),
+                "plan_id" => ($this->post('plan_id')) ?? '0'
 			);
 			
 			$this->Paid_item->save($paid_data);

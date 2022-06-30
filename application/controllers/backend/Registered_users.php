@@ -30,13 +30,17 @@ class Registered_users extends BE_Controller {
 	function index() {
 
 		//registered users filter
+        $conds['order_by'] = 1;
+		$conds['order_by_field'] = "added_date";
+		$conds['order_by_type'] = "desc";
 		$conds = array( 'register_role_id' => 4 );
-
+        
 		// get rows count
-		$this->data['rows_count'] = $this->User->count_all_by($conds);
+//		$this->data['rows_count'] = $this->User->count_all_by($conds);
 
 		// get users
-		$this->data['users'] = $this->User->get_all_by($conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+//		$this->data['users'] = $this->User->get_all_by($conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['users'] = $this->User->get_all_by($conds);
 
 		// load index logic
 		parent::index();
@@ -94,7 +98,7 @@ class Registered_users extends BE_Controller {
 		}
         
         $result = $this->db->select('DISTINCT(core_users.user_id), core_users.*')->from('core_users')
-                ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
+                ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id','left')
                 ->where('role_id', 4);
         if(isset($conds['searchterm']) && !empty($conds['searchterm'])) {
             $result = $result->group_start()->like( 'user_name', $conds['searchterm'] )->or_like( 'user_email', $conds['searchterm'] )->group_end();
@@ -107,6 +111,7 @@ class Registered_users extends BE_Controller {
             $where = 'LOWER(TRIM(bs_addresses.city)) = "'.$conds['city_dd'].'"';
             $result = $result->where($where);
         }
+        $result = $result->order_by('added_date', 'desc');
         $store_for_count = $result->get_compiled_select();
         $count = $this->db->query($store_for_count)->num_rows();
         if($this->pag['per_page']) {
@@ -581,18 +586,20 @@ class Registered_users extends BE_Controller {
                         ->or_where('bs_items.added_user_id', $value['user_id'])
                     ->group_end()
                     ->get()->num_rows();
-            $row['amt_request'] = $this->db->from('bs_order')
-                    ->where('operation_type', REQUEST_ITEM)
-                    ->where('bs_order.status', 'succeeded')
-                    ->where('bs_order.user_id', $value['user_id'])
-                    ->where('completed_date is NOT NULL')
-                    ->get()->num_rows();
             
-            $row['amt_selling'] = $this->db->select('bs_order.id')->from('bs_order')
+            $row['amt_selling'] = round($this->db->select_sum('total_amount')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->where('bs_order.operation_type != '.EXCHANGE)
                     ->where('bs_items.added_user_id', $value['user_id'])
-                    ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+                    ->where('bs_order.completed_date is NOT NULL')->get()->total_amount, 2);
+            
+            $row['amt_request'] = round($this->db->select_sum('total_amount')->from('bs_order')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->where('bs_items.item_type_id', REQUEST_ITEM)
+                    ->where('bs_order.status', 'succeeded')
+                    ->where('bs_order.user_id', $value['user_id'])
+                    ->where('completed_date is NOT NULL')
+                    ->get()->total_amount,2);
             
             $row['amt_trade'] = $this->db->select('bs_order.id')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')

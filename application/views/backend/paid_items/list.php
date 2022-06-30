@@ -2,10 +2,14 @@
 	<table class="table m-0 table-striped">
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
+			<th><?php echo get_msg('user_name'); ?></th>
 			<th><?php echo get_msg('item_name'); ?></th>
 			<th><?php echo get_msg('cat_name'); ?></th>
 			<th><?php echo get_msg('subcat_name'); ?></th>
-			<th><?php echo get_msg('status_label'); ?></th>
+			<!--<th><?php echo get_msg('status_label'); ?></th>-->
+			<th><?php echo get_msg('plan name'); ?></th>
+			<th><?php echo get_msg('days'); ?></th>
+			<th><?php echo get_msg('price($)'); ?></th>
 			
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 				
@@ -23,17 +27,29 @@
 			
 			<tr>
 				<td><?php echo ++$count;?></td>
+				<td><?php 
+                $user_name = $this->db->select('user_name')->from('core_users')->where('user_id', $item->added_user_id)->get()->row();
+                echo $user_name->user_name;?></td>
 				<td><?php echo $item->title;?></td>
 				<td><?php echo $this->Category->get_one( $item->cat_id )->cat_name; ?></td>
 				<td><?php echo $this->Subcategory->get_one( $item->sub_cat_id )->name; ?></td>
-				<td>
+<!--				<td>
 					<?php if ($item->status == 1) {
 						echo "Published";
 						} elseif ($item->status == 2) {
 							echo "Reported";
 						}
 					?>
-				</td>
+				</td>-->
+                <?php
+                    $paid_detail = $this->Paid_item->get_all_by(['item_id'=>$item->id])->result_array()[0];
+                ?>
+				<td><?php echo $paid_detail['plan_id']; ?></td>
+				<td><?php 
+                $start = new DateTime($paid_detail['start_date']);
+                $end = new DateTime($paid_detail['end_date']);
+                echo $end->diff($start)->format("%a"); ?></td>
+				<td><?php echo $paid_detail['amount']; ?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 			

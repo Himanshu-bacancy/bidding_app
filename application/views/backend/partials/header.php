@@ -65,7 +65,8 @@
   	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo base_url('assets/datatables/jquery.dataTables.min.css'); ?>">
 	<!-- jQuery -->
-    <script src="<?php echo base_url( 'assets/plugins/jquery/jquery.min.js' ); ?>"></script>
+    <!--<script src="<?php echo base_url( 'assets/plugins/jquery/jquery.min.js' ); ?>"></script>-->
+    <script src="<?php echo base_url('assets/datatables/jquery-3.5.1.js'); ?>"></script>
     <script src="<?php echo base_url('assets/datatables/jquery.dataTables.min.js'); ?>"></script>
 	<!-- ChartJS 1.0.1 -->
 	<script src="<?php echo base_url( 'assets/plugins/chartjs-old/Chart.min.js' ); ?>"></script>

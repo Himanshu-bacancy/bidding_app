@@ -39,7 +39,6 @@ class Paid_items extends BE_Controller {
 		// get paid_items
 		$this->data['paid_items'] = $this->Item->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
 
-
 		// load index logic
 		parent::index();
 	}
@@ -479,7 +478,7 @@ class Paid_items extends BE_Controller {
 	/**
  	* Update the existing one
 	*/
-	function edit( ) 
+	function edit($id='') 
 	{
 		$id = $this->session->userdata('item_id');
 		// breadcrumb urls

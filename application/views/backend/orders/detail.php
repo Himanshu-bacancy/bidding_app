@@ -14,6 +14,21 @@
             	<div class="col-md-6">
             		<div class="form-group">
                    		<label>
+							<?php echo get_msg('Buyer')?>
+                        </label> :- 
+                        <?php 
+                            $buyer = $this->db->select('user_name')->from('core_users')->where('user_id', $order['user_id'])->get()->row();
+                            $buyer_url = site_url( 'admin' ).'/registered_users/edit/'.$order['user_id'];
+                        ?>
+                        <a href="<?php echo $buyer_url; ?>"><?php echo $buyer->user_name; ?></a>
+						
+              		</div>
+            	</div>
+            </div>
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
                    			<span style="font-size: 17px; color: red;">*</span>
 							<?php echo get_msg('Id')?>
 						</label>
@@ -129,6 +144,39 @@
             
             <div class="row">
             	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+							<?php echo get_msg('Seller')?>
+                        </label> :- 
+                        <?php 
+                            $seller = $this->db->select('core_users.user_id, user_name')->from('bs_order')
+                                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                                    ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                                    ->where('order_id', $order['order_id'])->get()->row();
+                            $seller_url = site_url( 'admin' ).'/registered_users/edit/'.$seller->user_id;
+                        ?>
+                        <a href="<?php echo $seller_url; ?>"><?php echo $seller->user_name; ?></a>
+						
+              		</div>
+            	</div>
+                <div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+							<?php echo get_msg('Item')?>
+                        </label> :- 
+                        <?php 
+                            $item = $this->db->select('title')->from('bs_items')
+                                    ->where('id', $order['items'])->get()->row();
+                            $item_url = site_url( 'admin' ).'/items/edit/'.$order['items'];
+                        ?>
+                        <a href="<?php echo $item_url; ?>"><?php echo $item->title; ?></a>
+						
+              		</div>
+            	</div>
+            </div>
+            
+            <div class="row">
+            	<div class="col-md-6">
                     <div class="form-group">
                       <label> <span style="font-size: 17px; color: red;"></span>
                         <?php echo get_msg('seller_response')?>
@@ -146,6 +194,23 @@
 
                     </div>
                 </div>
+                
+                <div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+							<?php echo get_msg('Seller Costs')?>
+                        </label>
+                        <?php echo form_input( array(
+                            'name' => 'amount',
+                            'value' => set_value( 'amount', show_data( ($order['amount']) ?? 0 ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'amount' ),
+                            'id' => 'amount',
+                            'readonly' => 'true'
+                        )); ?>
+                        
+              		</div>
+            	</div>
             </div>
             
         </div>

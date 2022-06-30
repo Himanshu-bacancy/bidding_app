@@ -930,7 +930,7 @@ class Payments extends API_Controller {
                 if($diff > 3) {
                     $orders['is_return_expire'] = 1;
                 } 
-                $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at, bs_return_order.seller_response')->from('bs_return_order')
                         ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
                         ->where('order_id', $order_id)
                         ->get()->row();
@@ -1320,7 +1320,7 @@ class Payments extends API_Controller {
                             if($diff > 3) {
                                 $row[$key]->is_return_expire = 1;
                             } 
-                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at,bs_return_order.seller_response')->from('bs_return_order')
                                     ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
                                     ->where('order_id', $value->order_id)
                                     ->get()->row();
@@ -1436,7 +1436,7 @@ class Payments extends API_Controller {
                             if($diff > 3) {
                                 $row[$key]->is_return_expire = 1;
                             } 
-                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at')->from('bs_return_order')
+                            $return_details = $this->db->select('bs_return_order.id,bs_return_order.order_id,bs_reasons.name as reason_name,bs_return_order.description,bs_return_order.status,bs_return_order.created_at,bs_return_order.seller_response')->from('bs_return_order')
                                     ->join('bs_reasons', "bs_return_order.reason_id = bs_reasons.id")
                                     ->where('order_id', $value->order_id)
                                     ->get()->row();
@@ -2029,7 +2029,7 @@ class Payments extends API_Controller {
         if(isset($param['transaction_id'])) {
             $get_records = $this->db->from('bs_order')->where('transaction_id', $param['transaction_id'])->get()->result();
         } elseif(isset($param['records'])) {
-            $get_records = $this->db->from('bs_order')->where_in('in', $param['records'])->get()->result();
+            $get_records = $this->db->from('bs_order')->where_in('id', $param['records'])->get()->result();
         }
         $track_number = '';
         $current_date = date("Y-m-d H:i:s");
@@ -2289,7 +2289,7 @@ class Payments extends API_Controller {
             
             $check_for_order = $this->db->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
             $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $check_for_order->items)->get()->row();
-
+            
             if($get_item->shipping_type == '1') {
                 $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
 
@@ -2383,6 +2383,9 @@ class Payments extends API_Controller {
                 $shipping_amount = $get_item->shipping_cost_by_seller;
             }
             if($shipping_amount) {
+                if($get_item->pay_shipping_by == '1') {
+                    $shipping_amount = $shipping_amount * 2;
+                }
                 $card_id = $posts['card_id'];
                 $cvc     = $posts['cvc'];
                 $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -2413,6 +2416,7 @@ class Payments extends API_Controller {
                         if($response->status == 'requires_action') {
                             $this->error_response('Transaction requires authorization');
                         }
+                        $update_order['amount'] = $shipping_amount;
                         $update_order['status'] = 'accept';
                         $update_order['payment_status'] = $response->status;
                         $update_order['transaction_id'] = $response->id;

@@ -30,10 +30,10 @@
 					remote: "<?php echo get_msg( 'err_item_exist' ) ;?>."
 				},
 				cat_id:{
-			       indexCheck: "<?php echo $this->lang->line('f_item_cat_required'); ?>"
+			       indexCheck: "item category is required"
 			    },
 			    sub_cat_id:{
-			       indexCheck: "<?php echo $this->lang->line('f_item_subcat_required'); ?>"
+			       indexCheck:  "item subcategory is required"
 			    },
 				lat:{
 			     	blankCheck : "<?php echo get_msg( 'err_lat' ) ;?>"

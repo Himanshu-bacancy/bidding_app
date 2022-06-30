@@ -233,8 +233,9 @@ class Address extends API_Controller
 							$this->db->where('user_id', $this->post('user_id'));
 							$this->db->where('id !=', $id);
 							$this->db->update('bs_addresses'); 
+                            
+                            $address_data['is_default_address'] = '1';
 						}
-
 						$address_data['updated_date'] =  date("Y-m-d H:i:s");
 						$this->Addresses->save($address_data,$id);
 						

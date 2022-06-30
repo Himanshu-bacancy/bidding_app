@@ -557,3 +557,9 @@ ALTER TABLE `bs_coupan` ADD `name` VARCHAR(255) NOT NULL AFTER `id`;
 
 ALTER TABLE `bs_order` ADD `delivery_date` DATETIME NULL AFTER `coupon_discount`;
 
+// RB: ADDED ON 30/06/2022
+
+ALTER TABLE `bs_paid_items_history` ADD `plan_id` INT NOT NULL AFTER `payment_status`;
+
+
+ALTER TABLE `bs_return_order` ADD `amount` VARCHAR(255) NOT NULL AFTER `updated_at`;

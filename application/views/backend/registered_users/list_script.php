@@ -2,15 +2,13 @@
 function runAfterJQ() {
 
 	$(document).ready(function(){
-        
         var register_user_table = $('#register_user_table').DataTable( {
-            "paging": false,
-            "lengthChange": false,
+            "paging": true,
+            "lengthChange": true,
             "searching": false,
-            "ordering": true,
             "info": false,
-            "autoWidth": false,
-            order: [[ 2, 'asc' ]],
+            "autoWidth": true,
+            order: [[ 7, 'desc' ]],
             columnDefs: [ {
                 orderable: false,
                 'searchable': false,
@@ -21,8 +19,16 @@ function runAfterJQ() {
                 }
             },
             { className: 'dt-body-center',  targets: [8,10] },
-            { orderable: true,  targets: [2] },
-            { orderable: false, targets: '_all' } ]
+            { orderable: true,  targets: [2,7] },
+            { orderable: false, targets: '_all' } ], 
+            lengthMenu: [
+                [20, 50, 100, -1],
+                [20, 50, 100, 'All'],
+            ],
+            pagingType: 'numbers',
+            dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-7'p><'col-sm-5'>>",
         } );
         // Handle click on "Select all" control
         $('#example-select-all').on('click', function(){

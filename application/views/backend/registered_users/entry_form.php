@@ -83,6 +83,22 @@
 		                </label>
 		              </div>
 		            </div>
+                    
+                    <div class="form-group">	
+						<?php $conds_rating['to_user_id'] = $obj->to_user_id;
+
+                                $total_rating_count = $this->Rate->count_all_by($conds_rating);
+                                $sum_rating_value = $this->Rate->sum_all_by($conds_rating)->result()[0]->rating;
+
+                                if($total_rating_count > 0) {
+                                    $total_rating_value = number_format((float) ($sum_rating_value  / $total_rating_count), 1, '.', '');
+                                } else {
+                                    $total_rating_value = 0;
+                                }
+
+                                $overall_rating = $total_rating_value;?>
+						<label><?php echo get_msg('Overall rating').' :- '.$total_rating_value; ?></label>
+					</div>
 					
 				</div>
 
