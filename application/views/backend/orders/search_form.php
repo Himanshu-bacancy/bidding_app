@@ -1,5 +1,7 @@
 <div class='row my-3'>
-
+    <?php 
+        if($this->router->fetch_class() == 'orders' && in_array($this->router->fetch_method(),['index','search'])) {
+    ?>
 	<div class='col-9'>
 	<?php
 		$attributes = array('class' => 'form-inline');
@@ -55,5 +57,5 @@
 	<?php echo form_close(); ?>
 
 	</div>	
-
+        <?php }?>
 </div>
