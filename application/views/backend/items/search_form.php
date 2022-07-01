@@ -84,7 +84,7 @@
 					$itemtypes = $this->Itemtype->get_all( );
 					foreach($itemtypes->result() as $type) {
 						
-						$options[$type->id]=$type->name;
+						$options[$type->id]=get_msg($type->name);
 					}
 					
 					echo form_dropdown(
@@ -97,7 +97,7 @@
 
 		  	</div>
 
-		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
+<!--		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
 
 				<?php
 					$options=array();
@@ -117,9 +117,9 @@
 					);
 				?> 
 
-		  	</div>
+		  	</div>-->
 
-		  	<div class="form-group mr-3" style="padding-top: 3px;padding-right: 2px;">
+<!--		  	<div class="form-group mr-3" style="padding-top: 3px;padding-right: 2px;">
 
 				<?php
 					$options=array();
@@ -139,9 +139,9 @@
 					);
 				?> 
 
-		  	</div>
+		  	</div>-->
 
-		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
+<!--		  	<div class="form-group" style="padding-top: 3px;padding-right: 2px;">
 
 				<?php
 					$options=array();
@@ -161,7 +161,61 @@
 					);
 				?> 
 
-		  	</div>
+		  	</div>-->
+            <?php
+                $state_options[0]=get_msg('select_state');
+                foreach($addresses->result() as $address) {
+                    $state_options[strtolower(trim($address->state))] = ucfirst(trim($address->state));
+                }
+                $city_options2[0]=get_msg('select_city_filter');
+                if(isset($search_state)) {
+                    $city_arr = $this->db->select('DISTINCT(city)')->from('bs_addresses')->like('state', $search_state)->get();
+                    foreach($city_arr->result() as $city) {
+                        $city_options2[strtolower(trim($city->city))] = ucfirst(trim($city->city));
+                    }
+                } 
+            ?>
+            <div class="form-group" style="padding-right: 3px;">
+
+                <?php
+                    echo form_dropdown(
+                        'state_dd',
+                        $state_options,
+                        set_value( 'state_dd', show_data(@$search_state), false ),
+                        'class="form-control form-control-sm mr-3" id="state_dd"'
+                    );
+                ?>
+
+            </div>
+            <div class="form-group" style="padding-right: 3px;">
+
+                <?php
+//                    $options2 = array_unique($options2);
+                    echo form_dropdown(
+                        'city_dd',
+                        $city_options2,
+                        set_value( 'city_dd', show_data(@$search_city), false ),
+                        'class="form-control form-control-sm mr-3" id="city_dd"'
+                    );
+                ?>
+
+            </div>
+            <div class="form-group" style="padding-right: 3px;">
+
+                <?php
+                    $user_options2[0]=get_msg('select_owner');
+                    foreach($item_owners->result() as $owner) {
+                        $user_options2[$owner->user_id] = ucfirst(trim($owner->user_name));
+                    }
+                    echo form_dropdown(
+                        'user_dd',
+                        $user_options2,
+                        set_value( 'user_dd', show_data(@$search_user), false ),
+                        'class="form-control form-control-sm mr-3" id="user_dd"'
+                    );
+                ?>
+
+            </div>
 
 		  	<div class="form-group" style="padding-top: 3px;padding-right: 5px;">
 			  	<button type="submit" value="submit" name="submit" class="btn btn-sm btn-primary">
@@ -211,6 +265,22 @@
 					$('#sub_cat_id').html("");
 					$.each(data, function(i, obj){
 					    $('#sub_cat_id').append('<option value="'+ obj.id +'">' + obj.name + '</option>');
+					});
+					$('#name').val($('#name').val() + " ").blur();
+				}
+			});
+		});
+        $('#state_dd').on('change', function() {
+			var state_dd = $(this).val();
+			
+			$.ajax({
+				url: '<?php echo $module_site_url . '/get_all_city/';?>' + state_dd,
+				method: 'GET',
+				dataType: 'JSON',
+				success:function(data){
+					$('#city_dd').html("");
+					$.each(data, function(i, obj){
+					    $('#city_dd').append('<option value="'+ $.trim(obj.city.toLowerCase()) +'">' + $.trim(obj.city) + '</option>');
 					});
 					$('#name').val($('#name').val() + " ").blur();
 				}

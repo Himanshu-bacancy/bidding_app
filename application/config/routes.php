@@ -71,6 +71,7 @@ $route['inactive-coupon'] = "crons/inactive_coupon";
 $route['notify-expire-item'] = "crons/notify_expireitem_user";
 $route['expire-item'] = "crons/expire_item";
 $route['order-complete'] = "crons/order_complete";
+$route['transfer-amount'] = "crons/transfer_amount";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";

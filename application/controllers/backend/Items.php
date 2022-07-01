@@ -32,12 +32,19 @@ class Items extends BE_Controller {
 
 		$conds['status'] = 1;
 		// get rows count
-		$this->data['rows_count'] = $this->Item->count_all_by( $conds );
+        $all_item = $this->Item->get_all_by( $conds);
+//		$this->data['rows_count'] = $this->Item->count_all_by( $conds );
+		$this->data['rows_count'] = count($all_item->result_array());
 
 		// get categories
 		$this->data['items'] = $this->Item->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+        $item_address = array_unique(array_column($all_item->result_array(),'Address_id'));
+        
+        $this->data['addresses'] = $this->db->select('state')->from('bs_addresses')->where_in('id',$item_address)->get();
+        $item_user = array_unique(array_column($all_item->result_array(),'added_user_id'));
 
-
+        $this->data['item_owners'] = $this->db->select('user_id,user_name')->from('core_users')->where_in('user_id',$item_user)->get();
+        
 		// load index logic
 		parent::index();
 	}
@@ -119,6 +126,27 @@ class Items extends BE_Controller {
 			} else {
 				$this->session->set_userdata(array("item_location_id" => NULL ));
 			}
+            if($this->input->post('state_dd')) {
+                $conds['state_dd'] = $this->input->post('state_dd');
+				$this->data['search_state'] = $this->input->post('state_dd');
+                $this->session->set_userdata(array("state_dd" => $this->input->post('state_dd')));
+            } else {
+				$this->session->set_userdata(array("state_dd" => NULL));
+			}
+            if($this->input->post('city_dd')) {
+                $conds['city_dd'] = $this->input->post('city_dd');
+				$this->data['search_city'] = $this->input->post('city_dd');
+                $this->session->set_userdata(array("city_dd" => $this->input->post('city_dd')));
+            } else {
+				$this->session->set_userdata(array("city_dd" => NULL));
+			}
+            if($this->input->post('user_dd')) {
+                $conds['user_dd'] = $this->input->post('user_dd');
+				$this->data['search_user'] = $this->input->post('user_dd');
+                $this->session->set_userdata(array("user_dd" => $this->input->post('user_dd')));
+            } else {
+				$this->session->set_userdata(array("user_dd" => NULL));
+			}
 
 		} else {
 			//read from session value
@@ -153,17 +181,73 @@ class Items extends BE_Controller {
 				$conds['item_currency_id'] = $this->session->userdata('item_currency_id');
 				$this->data['item_currency_id'] = $this->session->userdata('item_currency_id');
 			}
+            
+            if($this->session->userdata('state_dd') != NULL){
+                $conds['state_dd'] = $this->session->userdata('state_dd');
+                $this->data['search_state'] = $this->session->userdata('state_dd');
+            }
+            if($this->session->userdata('city_dd') != NULL){
+                $conds['city_dd'] = $this->session->userdata('city_dd');
+                $this->data['search_city'] = $this->session->userdata('city_dd');
+            }
+            if($this->session->userdata('user_dd') != NULL){
+                $conds['user_dd'] = $this->session->userdata('user_dd');
+                $this->data['search_user'] = $this->session->userdata('user_dd');
+            }
 
 		}
-		
-		$conds['status'] = 1;
+		$result = $this->db->select('bs_items.*')->from('bs_items')
+                ->join('bs_addresses', 'bs_items.Address_id = bs_addresses.id','left')
+                ->where('bs_items.status', 1);
+        if(isset($conds['searchterm']) && !empty($conds['searchterm'])) {
+            $result = $result->group_start()->like( 'title', $conds['searchterm'] )->or_like( 'description', $conds['searchterm'] )->or_like( 'condition_of_item_id', $conds['searchterm'] )->or_like( 'highlight_info', $conds['searchterm'] )->group_end();
+        }
+        if(isset($conds['cat_id']) && !empty($conds['cat_id'])) {
+            $result = $result->where( 'bs_items.cat_id', $conds['cat_id'] );
+        }
+        if(isset($conds['sub_cat_id']) && !empty($conds['sub_cat_id'])) {
+            $result = $result->where( 'bs_items.sub_cat_id', $conds['sub_cat_id'] );
+        }
+        if(isset($conds['item_type_id']) && !empty($conds['item_type_id'])) {
+            $result = $result->where( 'bs_items.item_type_id', $conds['item_type_id'] );
+        }
+        if($conds['state_dd']) {
+            $where = 'LOWER(TRIM(bs_addresses.state)) = "'.$conds['state_dd'].'"';
+            $result = $result->where($where);
+        }
+        if($conds['city_dd']) {
+            $where = 'LOWER(TRIM(bs_addresses.city)) = "'.$conds['city_dd'].'"';
+            $result = $result->where($where);
+        }
+        if($conds['user_dd']) {
+            $result = $result->where( 'bs_items.added_user_id', $conds['user_dd'] );
+        }
+        $result = $result->order_by('bs_items.added_date', 'desc');
+        $store_for_count = $result->get_compiled_select();
+//        dd($store_for_count);
+        $count = $this->db->query($store_for_count)->num_rows();
+        if($this->pag['per_page']) {
+            $store_for_count .= " LIMIT ".$this->pag['per_page'];
+        }
+        if($this->uri->segment( 4 )) {
+            $store_for_count .= ", ".$this->uri->segment( 4 );
+        }
+        $query_result = $this->db->query($store_for_count);
+//		$conds['status'] = 1;
 
 		// pagination
-		$this->data['rows_count'] = $this->Item->count_all_by( $conds );
+//		$this->data['rows_count'] = $this->Item->count_all_by( $conds );
+        $this->data['rows_count'] = $count;
+//		// search data
+//		$this->data['items'] = $this->Item->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+        $this->data['items'] = $query_result;
+        
+        $all_item = $this->Item->get_all_by(['status' => 1]);
+        $item_address = array_column($all_item->result_array(),'Address_id');
+        $this->data['addresses'] = $this->db->select('state')->from('bs_addresses')->where_in('id',$item_address)->get();
+         $item_user = array_unique(array_column($all_item->result_array(),'added_user_id'));
 
-		// search data
-		$this->data['items'] = $this->Item->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
-
+        $this->data['item_owners'] = $this->db->select('user_id,user_name')->from('core_users')->where_in('user_id',$item_user)->get();
 		// load add list
 		parent::search();
 	}
@@ -493,6 +577,13 @@ class Items extends BE_Controller {
     	
     	$sub_categories = $this->Subcategory->get_all_by($conds);
 		echo json_encode($sub_categories->result());
+    }
+	function get_all_city( $state_id ){
+    	$state_id = str_replace('%20', ' ', $state_id);
+        
+    	$cities = $this->db->select('DISTINCT(city)')->from('bs_addresses')->like('state', $state_id)->get();
+        
+		echo json_encode($cities->result());
     }
 
 	/**

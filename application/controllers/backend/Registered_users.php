@@ -591,24 +591,23 @@ class Registered_users extends BE_Controller {
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->where('bs_order.operation_type != '.EXCHANGE)
                     ->where('bs_items.added_user_id', $value['user_id'])
-                    ->where('bs_order.completed_date is NOT NULL')->get()->total_amount, 2);
+                    ->where('bs_order.completed_date is NOT NULL')->get()->row()->total_amount,2);
             
             $row['amt_request'] = round($this->db->select_sum('total_amount')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
-                    ->where('bs_items.item_type_id', REQUEST_ITEM)
-                    ->where('bs_order.status', 'succeeded')
+                    ->where('bs_order.operation_type', REQUEST_ITEM)
                     ->where('bs_order.user_id', $value['user_id'])
                     ->where('completed_date is NOT NULL')
-                    ->get()->total_amount,2);
+                    ->get()->row()->total_amount,2);
             
-            $row['amt_trade'] = $this->db->select('bs_order.id')->from('bs_order')
+            $row['amt_trade'] = round($this->db->select_sum('bs_order.total_amount')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->where('bs_order.operation_type',EXCHANGE)
                     ->group_start()
                         ->where('bs_order.user_id', $value['user_id'])
                         ->or_where('bs_items.added_user_id', $value['user_id'])
                     ->group_end()
-                    ->where('bs_order.completed_date is NOT NULL')->get()->num_rows();
+                    ->where('bs_order.completed_date is NOT NULL')->get()->row()->total_amount,2);
             
             $row['p_cancel'] = $this->db->select('id')->from('bs_chat_history')
                     ->where('operation_type', SELLING)

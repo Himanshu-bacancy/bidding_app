@@ -563,3 +563,10 @@ ALTER TABLE `bs_paid_items_history` ADD `plan_id` INT NOT NULL AFTER `payment_st
 
 
 ALTER TABLE `bs_return_order` ADD `amount` VARCHAR(255) NOT NULL AFTER `updated_at`;
+
+// RB: ADDED ON 1/07/2022
+
+ALTER TABLE `bs_dispute` ADD `amount` VARCHAR(255) NULL AFTER `is_seller_generate`, ADD `payment_status` VARCHAR(255) NULL AFTER `amount`, ADD `transaction_id` VARCHAR(255) NULL AFTER `payment_status`, ADD `payment_response` TEXT NULL AFTER `transaction_id`;
+
+
+ALTER TABLE `bs_dispute` CHANGE `is_seller_generate` `is_seller_generate` INT(11) NULL DEFAULT '0';

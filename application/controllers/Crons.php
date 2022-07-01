@@ -288,4 +288,17 @@ class Crons extends CI_Controller {
 //        $this->db->insert('bs_cron_log',['cron_name' => 'order-complete', 'created_at' => $date]);
 //        echo 'cron run successfully';
 //    }
+    
+    public function transfer_amount() {
+        $return_order = $this->db->from('bs_return_order')->where('status', 'accept')->where('payment_status','succeeded')->get()->result_array();
+        if(!empty($return_order)) {
+            foreach ($return_order as $key => $value) {
+                $payment_response = str_replace('Stripe\\PaymentIntent JSON: ', '', $value['payment_response']);
+                $payment_response = json_decode($payment_response);
+                $amount = $payment_response->amount/100;
+                
+                $this->db->where('id',$value['id'])->update('bs_return_order',['amount' => $amount]);
+            }
+        }
+    }
 }

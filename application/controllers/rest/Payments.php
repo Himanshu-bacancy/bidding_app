@@ -563,20 +563,21 @@ class Payments extends API_Controller {
             
             $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
             
-            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
 //                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                     ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                     ->where('order_id', $posts_var['order_id'])->get()->row();
             
-            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
 //                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                     ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                     ->where('order_id', $posts_var['order_id'])->get()->row();
             
-           
+            $ship_from = $seller_detail->id;
+            $ship_to = $buyer_detail->id;
             /*Shippo integration Start*/
             $headers = array(
                 "Content-Type: application/json",
@@ -644,7 +645,7 @@ class Payments extends API_Controller {
 //                echo '<pre>';
 //                echo $response->object_id.'<br>';
 //                print_r($response);die();
-                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''),'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_track_order', ['order_id' => $posts_var['order_id'], 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''),'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                 $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
             /*Shippo integration End*/
         }
@@ -910,6 +911,8 @@ class Payments extends API_Controller {
             
             if($orders['is_dispute']) {
                 $dispute_details = $this->db->from('bs_dispute')->where('order_id', $order_id)->get()->row();
+//                $payment_response = str_replace('Stripe\\PaymentIntent JSON: ', '', $dispute_details->payment_response);
+                unset($dispute_details->payment_response); 
                 $orders['dispute_details'] = $dispute_details;
             } else {
                 $orders['dispute_details'] = (object)[];
@@ -943,7 +946,8 @@ class Payments extends API_Controller {
                         $orders['is_return_expire'] = 1;
                     }
                 }
-                if($return_details->status == "accept") {
+                
+                if($return_details->status == "accept" || ($orders['is_dispute'] && $orders['dispute_details']->status == "accept") ) {
                     $return_trackin_details = $this->db->from('bs_track_order')->where('order_id',$order_id)->where('is_return', 1)->order_by('id','desc')->get()->row();
 
                     $return_details->tracking_status = $return_trackin_details->status;
@@ -1035,19 +1039,20 @@ class Payments extends API_Controller {
                     if($get_item->shipping_type == '1') { 
                         $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
                         $package_details = $this->db->from('bs_packagesizes')->where('id', $get_item->packagesize_id)->get()->row();
-                        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                             ->join('core_users', 'bs_order.user_id = core_users.user_id')
 //                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                             ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                             ->where('order_id', $value->order_id)->get()->row();
                         
-                        $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                        $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
 //                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                         ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                         ->where('order_id', $value->order_id)->get()->row();
-                        
+                        $ship_from = $seller_detail->id;
+                        $ship_to = $buyer_detail->id;
                         $headers = array(
                             "Content-Type: application/json",
                             "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
@@ -1103,7 +1108,7 @@ class Payments extends API_Controller {
 
                             $response = json_decode(curl_exec($ch)); 
                             curl_close($ch);
-                        $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                         $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
                         
 //                        if(is_null($track_number) || empty($track_number)) {
@@ -2042,19 +2047,20 @@ class Payments extends API_Controller {
                         if($get_item->shipping_type == '1') { 
                             $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
                             $package_details = $this->db->from('bs_packagesizes')->where('id', $get_item->packagesize_id)->get()->row();
-                            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                                 ->join('core_users', 'bs_order.user_id = core_users.user_id')
     //                            ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                                 ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
                                 ->where('order_id', $value->order_id)->get()->row();
 
-                            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                             ->join('bs_items', 'bs_order.items = bs_items.id')
                             ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
     //                        ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                             ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                             ->where('order_id', $value->order_id)->get()->row();
-
+                            $ship_from = $seller_detail->id;
+                            $ship_to = $buyer_detail->id;
                             $headers = array(
                                 "Content-Type: application/json",
                                 "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
@@ -2110,7 +2116,7 @@ class Payments extends API_Controller {
 
                                 $response = json_decode(curl_exec($ch)); 
                                 curl_close($ch);
-                            $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                            $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
                             $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
 
     //                        if(is_null($track_number) || empty($track_number)) {
@@ -2270,7 +2276,7 @@ class Payments extends API_Controller {
         $posts = $this->post();
         $date = date('Y-m-d H:i:s');
                     
-        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token, bs_items.title')->from('bs_order')
+        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token, bs_items.title,bs_addresses.id')->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users', 'bs_order.user_id = core_users.user_id')
                 ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
@@ -2299,12 +2305,13 @@ class Payments extends API_Controller {
             
                 $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
 
-                $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode')->from('bs_order')
+                $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                     ->join('bs_items', 'bs_order.items = bs_items.id')
                     ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                     ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
                     ->where('order_id', $posts['order_id'])->get()->row();
-
+                $ship_from = $buyer_detail->id;
+                $ship_to = $seller_detail->id;
                 /*Shippo integration Start*/
                 $headers = array(
                     "Content-Type: application/json",
@@ -2373,7 +2380,7 @@ class Payments extends API_Controller {
     //            echo $response->object_id.'<br>';
     //            print_r($response);die();
 
-                $this->db->insert('bs_track_order', ['order_id' => $posts['order_id'], 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'is_return' => 1,'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_track_order', ['order_id' => $posts['order_id'], 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'is_return' => 1,'created_at' => $date]);
                 $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
                 
                 if(is_null($track_number) || empty($track_number)) {
@@ -2421,7 +2428,7 @@ class Payments extends API_Controller {
                         $update_order['payment_status'] = $response->status;
                         $update_order['transaction_id'] = $response->id;
                         $update_order['payment_response'] = $response;
-                        $message = "Order return request accepted by seller";
+                        $message = "Seller accepted return request";
                     } else {
                         $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response, 'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
@@ -3433,5 +3440,194 @@ class Payments extends API_Controller {
         send_push( [$seller['device_token']], ["message" => "Buyer has shipped the item", "flag" => "order", 'title' => $seller['item_name'].' status update'],['order_id' => $posts['order_id']] );
         
         $this->response(['status' => "success", 'message' => 'Shipment initiated']);
+    }
+    
+    public function seller_dispute_payment_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'card_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'cvc',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,device_token, bs_items.title, bs_addresses.id')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users', 'bs_order.user_id = core_users.user_id')
+                ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
+                ->where('order_id', $posts['order_id'])->get()->row();
+
+        $check_for_order = $this->db->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
+        
+        $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller')->from('bs_items')->where('id', $check_for_order->items)->get()->row();
+        
+         if($get_item->shipping_type == '1') {
+            $get_shiping_detail = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+
+            $shipping_amount = $get_shiping_detail->price;
+
+            $shippingcarriers_details = $this->db->from('bs_shippingcarriers')->where('id', $get_item->shippingcarrier_id)->get()->row();
+
+            $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
+
+            $seller_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                ->join('bs_addresses', 'bs_items.address_id = bs_addresses.id')
+                ->where('order_id', $posts['order_id'])->get()->row();
+            $ship_from = $buyer_detail->id;
+            $ship_to = $seller_detail->id;
+            /*Shippo integration Start*/
+            $headers = array(
+                "Content-Type: application/json",
+                "Authorization: ShippoToken ".SHIPPO_AUTH_TOKEN  // place your shippo private token here
+            );
+
+            $url = 'https://api.goshippo.com/transactions/';
+
+            $address_from = array(
+                "name"    => $buyer_detail->user_name,
+                "street1" => $buyer_detail->address1,
+                "city"    => $buyer_detail->city,
+                "state"   => $buyer_detail->state,
+                "zip"     => $buyer_detail->zipcode,
+                "country" => $buyer_detail->country,
+                "phone"   => $buyer_detail->user_phone,
+                "email"   => $buyer_detail->user_email
+            );    
+
+            $address_to = array(
+                "name"    => $seller_detail->user_name,
+                "street1" => $seller_detail->address1,
+                "city"    => $seller_detail->city,
+                "state"   => $seller_detail->state,
+                "zip"     => $seller_detail->zipcode,
+                "country" => $seller_detail->country,
+                "phone"   => $seller_detail->user_phone,
+                "email"   => $seller_detail->user_email
+            );
+
+            $parcel = array(
+                "length"    => $package_details->length,
+                "width"     => $package_details->width,
+                "height"    => $package_details->height,
+                "distance_unit" => "in",
+                "weight"    => $package_details->weight,
+                "mass_unit" => "lb"
+            ); 
+
+            $shipment = 
+                array(
+                    "address_to" => $address_to,
+                    "address_from" => $address_from,
+                    "parcels"    => $parcel
+            );
+
+            $shipmentdata = 
+            array(
+                "shipment"           => $shipment,
+                "carrier_account"    => $shippingcarriers_details->shippo_object_id,
+                "servicelevel_token" => "usps_priority"
+            );                   
+//            echo '<pre>';print_r($shipmentdata);die();
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($shipmentdata));
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+            $response = json_decode(curl_exec($ch)); 
+            curl_close($ch);
+
+//            echo '<pre>';
+//            echo $response->object_id.'<br>';
+//            print_r($response);die();
+
+            $this->db->insert('bs_track_order', ['order_id' => $posts['order_id'], 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'is_return' => 1,'created_at' => date('Y-m-d H:i:s')]);
+            $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
+
+            if(is_null($track_number) || empty($track_number)) {
+                $this->response(['status' => 'error', 'message' => 'Something wrong with shipping provided detail', 'response' => $response],404);
+            }
+        } else if($get_item->shipping_type == '2'){
+            $shipping_amount = $get_item->shipping_cost_by_seller;
+        }
+        if($shipping_amount) {
+            if($get_item->pay_shipping_by == '1') {
+                $shipping_amount = $shipping_amount * 2;
+            }
+            $card_id = $posts['card_id'];
+            $cvc     = $posts['cvc'];
+            $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
+            $expiry_date = explode('/',$card_details->expiry_date);
+            $paid_config = $this->Paid_config->get_one('pconfig1');
+
+            \Stripe\Stripe::setApiKey(trim($paid_config->stripe_secret_key));
+
+            try {
+                $response = \Stripe\PaymentMethod::create([
+                    'type' => 'card',
+                    'card' => [
+                        'number' => $card_details->card_number,
+                        'exp_month' => $expiry_date[0],
+                        'exp_year' => $expiry_date[1],
+                        'cvc' => $cvc
+                    ]
+                ]);
+                $response = \Stripe\PaymentIntent::create([
+                    'amount' => $shipping_amount * 100,
+                    "currency" => trim($paid_config->currency_short_form),
+                    'payment_method' => $response->id,
+                    'payment_method_types' => ['card'],
+                    'confirm' => true
+                ]);
+
+                if (isset($response->id)) { 
+                    if($response->status == 'requires_action') {
+                        $this->error_response('Transaction requires authorization');
+                    }
+                    $update_order['amount'] = $shipping_amount;
+                    $update_order['status'] = 'accept';
+                    $update_order['payment_status'] = $response->status;
+                    $update_order['transaction_id'] = $response->id;
+                    $update_order['payment_response'] = $response;
+                    $message = "Seller accepted return request";
+                } else {
+                    $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response, 'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->error_response(get_msg('stripe_transaction_failed'));
+                }
+            } catch (exception $e) {
+                $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response,'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
+                $this->error_response(get_msg('stripe_transaction_failed'));
+            }
+        } else if($get_item->shipping_type == '2') {
+            $message = "Seller accepted return request";
+        }
+        $update_order['updated_at'] = $date;
+        
+        $this->db->where('order_id', $posts['order_id'])->where('is_seller_generate', 0)->update('bs_dispute', $update_order);
+        $title = $buyer_detail->title. " order update";
+        if(!empty($buyer_detail)) {
+            send_push( [$buyer_detail->device_token], ["message" => $message, "flag" => "order", "title" => $title],['order_id' => $posts['order_id']] );
+        }
+        
+        $this->response(['status' => "success", 'message' => $message]);
     }
 }

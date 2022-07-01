@@ -40,7 +40,7 @@
                     <?php 
                     $record_no = $this->db->select('id')->from('bs_order')->where('order_id', $val->order_id)->get()->row()->id;
                     ?>
-                    <a href='<?php echo base_url() .'index.php/admin/orders/returndetail/'. $record_no; ?>'>
+                    <a href='<?php echo site_url( 'admin' ) .'/orders/returndetail/'. $record_no; ?>'>
                         <i class="fa fa-eye" style='font-size: 18px;'></i>
                     </a>
                 </td>
