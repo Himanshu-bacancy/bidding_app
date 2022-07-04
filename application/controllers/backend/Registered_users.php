@@ -41,6 +41,9 @@ class Registered_users extends BE_Controller {
 		// get users
 //		$this->data['users'] = $this->User->get_all_by($conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
 		$this->data['users'] = $this->User->get_all_by($conds);
+        
+        $registereduser = array_unique(array_column($this->data['users']->result_array(),'user_id'));
+        $this->data['addresses'] = $this->db->select('DISTINCT(state)')->from('bs_addresses')->where_in('user_id',$registereduser)->get();
 
 		// load index logic
 		parent::index();
@@ -113,23 +116,34 @@ class Registered_users extends BE_Controller {
         }
         $result = $result->order_by('added_date', 'desc');
         $store_for_count = $result->get_compiled_select();
-        $count = $this->db->query($store_for_count)->num_rows();
-        if($this->pag['per_page']) {
-            $store_for_count .= " LIMIT ".$this->pag['per_page'];
-        }
-        if($this->uri->segment( 4 )) {
-            $store_for_count .= ", ".$this->uri->segment( 4 );
-        }
+//        $count = $this->db->query($store_for_count)->num_rows();
+//        if($this->pag['per_page']) {
+//            $store_for_count .= " LIMIT ".$this->pag['per_page'];
+//        }
+//        if($this->uri->segment( 4 )) {
+//            $store_for_count .= ", ".$this->uri->segment( 4 );
+//        }
         $query_result = $this->db->query($store_for_count);
 //        dd($this->db->last_query());
 //		$conds['register_role_id'] = 4;
 //		$this->data['rows_count'] = $this->User->count_all_by( $conds );
-		$this->data['rows_count'] = $count;
+//		$this->data['rows_count'] = $count;
 //		$this->data['users'] = $this->User->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ));
 		$this->data['users'] = $query_result;
-		
+        
+		$allusers = $this->User->get_all_by(array( 'register_role_id' => 4 ));
+        $registereduser = array_unique(array_column($allusers->result_array(),'user_id'));
+        $this->data['addresses'] = $this->db->select('DISTINCT(state)')->from('bs_addresses')->where_in('user_id',$registereduser)->get();
 		parent::search();
 	}
+    
+    function get_all_city( $state_id ){
+    	$state_id = str_replace('%20', ' ', $state_id);
+        
+    	$cities = $this->db->select('DISTINCT(city)')->from('bs_addresses')->like('state', $state_id)->get();
+        
+		echo json_encode($cities->result());
+    }
 
 	/**
 	 * Create the user

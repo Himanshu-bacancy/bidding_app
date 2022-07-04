@@ -30,7 +30,7 @@
 				<td ><?php echo $this->User->get_one( $item_detail->added_user_id)->user_name; ?></td>
                 <td ><?php echo (!empty($val->reason_id) && !is_null($val->reason_id)) ? $this->Reasons->get_one($val->reason_id)->name : $val->other_reason;?></td>
 				<td ><?php echo $val->status;?></td>
-                <td><a href='<?php echo $module_site_url .'/detail/'.$val->id;?>'><?php echo get_msg('lbl_view')?></a></td>
+                <td><a href='<?php echo $module_site_url .'/detail/'.$val->id;?>' target="_blank"><?php echo get_msg('lbl_view')?></a></td>
 			</tr>
 
 		<?php endforeach; ?>

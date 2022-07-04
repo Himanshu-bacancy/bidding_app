@@ -25,6 +25,18 @@ class Order extends PS_Model {
 		if ( isset( $conds['is_return'] )) {
 			$this->db->where( 'is_return', $conds['is_return'] );
 		}
+		if ( isset( $conds['is_seller_dispute'] )) {
+			$this->db->where( 'is_seller_dispute', $conds['is_seller_dispute'] );
+		}
+		if ( isset( $conds['status'] )) {
+			$this->db->where( 'status', $conds['status'] );
+		}
+		if ( isset( $conds['date_filter'] )) {
+            $daterange = explode(' - ', $conds['date_filter']);
+			$where = 'DATE(completed_date) BETWEEN "'.date('Y-m-d', strtotime($daterange[0])).'" AND "'.date('Y-m-d', strtotime($daterange[1])).'"';
+            
+            $this->db->where( $where );
+		}
 		
 		// order by
 		// post parameter "order_by" : "fieldname"

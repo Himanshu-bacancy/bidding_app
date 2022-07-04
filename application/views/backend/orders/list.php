@@ -1,53 +1,109 @@
+<style>
+    .dataTables_wrapper .dataTables_paginate {
+        float: none;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0px;
+        margin-left: 0px;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        border: none;
+        background: none;
+    }
+    .dataTables_length {
+        margin-top: 15px;
+    }
+    .dataTables_length label {
+        display: flex;
+        position: inherit;
+    }
+    .register_user_table_length{
+        width: auto;
+    }
+</style>
 <div class="table-responsive animated fadeInRight">
-	<table class="table m-0 table-striped">
+	<table id="orders_table" class="">
+        <thead>
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
 			<th><?php echo get_msg('Item'); ?></th>
+			<th><?php echo get_msg('Completed Date'); ?></th>
 			<th><?php echo get_msg('user_name'); ?></th>
+			<th><?php echo get_msg('category'); ?></th>
+			<th><?php echo get_msg('subcategory'); ?></th>
+			<th><?php echo get_msg('state'); ?></th>
+			<th><?php echo get_msg('city'); ?></th>
+			<th><?php echo get_msg('type'); ?></th>
+            <th><?php echo get_msg('Payment Status'); ?></th>
             <th><?php echo get_msg('Order Status'); ?></th>
 			<th><?php echo get_msg('Price'); ?></th>
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
 				<th><span class="th-title"><?php echo get_msg('btn_view')?></span></th>
 			<?php endif; ?>			
 		</tr>
+        </thead>
+        <tbody>
 	<?php $count = $this->uri->segment(4) or $count = 0; ?>
-	<?php if ( !empty( $orders ) && count( $orders->result()) > 0 ): ?>
-		<?php foreach($orders->result() as $order): ?>
+	
+		<?php foreach($orders->result() as $order): 
+            $item_detail = $this->Item->get_one( $order->items );
+            $address_detail = $this->Addresses->get_one( $order->address_id );
+            ?>
 			<tr>
 				<td><?php echo ++$count;?></td>
-				<td><?php echo $this->Item->get_one( $order->items )->title; ?></td>
+				<td><?php echo $item_detail->title; ?></td>
+				<td><?php echo ($order->completed_date) ?? '-';?></td>
 				
-				<td><?php echo $this->User->get_one( $order->user_id )->user_name ? $this->User->get_one( $order->user_id )->user_name : 'N/A'; ?></td>
-                <td><?php // echo $order->status ? $order->status : 'N/A'; 
+				<td><?php echo $order->user_name; ?></td>
+                <td><?php echo $this->Category->get_one( $item_detail->cat_id )->cat_name;?></td>
+                <td><?php echo $this->Subcategory->get_one( $item_detail->sub_cat_id )->name;?></td>
+                <td><?php echo $address_detail->state;?></td>
+                <td><?php echo $address_detail->city;?></td>
+                <td><?php echo ($item_detail->item_type_id == 1) ? 'wants' : ($item_detail->item_type_id == 2 ? 'sale' : 'swap');?></td>
+                <td><?php 
                 $print_status = $order->status ? $order->status : 'N/A';
-                if($order->is_return) {
-                    $return_details = $this->db->select('status')->from('bs_return_order')
-                        ->where('order_id', $order->order_id)
-                        ->get()->row();
-                    if($return_details->status == 'initiate') {
-                        $print_status = 'Return requested';
-                    } else if($return_details->status == 'reject') {
-                        $print_status = 'Return reject by seller';
-                        if($order->is_dispute){
-                            $dispute_details = $this->db->select('status')->from('bs_dispute')->where('order_id', $order->order_id)->get()->row();
-                            if($dispute_details->status == 'initiate') {
-                                $print_status = 'Dispute generated';
-                            } else if($dispute_details->status == 'reject') { 
-                                $print_status = 'Dispute rejected';
-                            } else if($dispute_details->status == 'solve') { 
-                                $print_status = 'Dispute solved';
-                            }
-                        }
-                    } else if($return_details->status == 'accept') {
-                        $print_status = 'Return accept by seller';
-                    } else if ($return_details->status == 'cancel') {
-                        $print_status = 'Return cancel by buyer';
-                    }
-                    echo '<a href="'.$module_site_url .'/returndetail/'.$order->id.'">'.$print_status.'</a>';
-                } else {
-                    echo $print_status;
-                }
+                echo $print_status;
                 ?>
+                </td>
+                <td><?php 
+                    $print_status = $order->delivery_status ? $order->delivery_status : 'N/A';
+                    if($order->is_return) {
+                        $return_details = $this->db->select('status')->from('bs_return_order')
+                            ->where('order_id', $order->order_id)
+                            ->get()->row();
+                        if($return_details->status == 'initiate') {
+                            $print_status = 'Return requested';
+                        } else if($return_details->status == 'reject') {
+                            $print_status = 'Return reject by seller';
+                            if($order->is_dispute){
+                                $dispute_details = $this->db->select('status')->from('bs_dispute')->where('order_id', $order->order_id)->where('is_seller_generate', 0)->get()->row();
+                                if($dispute_details->status == 'initiate') {
+                                    $print_status = 'Dispute generated by buyer';
+                                } else if($dispute_details->status == 'reject') { 
+                                    $print_status = 'Dispute rejected';
+                                } else if($dispute_details->status == 'accept') { 
+                                    $print_status = 'Dispute accept';
+                                }
+                            }
+                        } else if($return_details->status == 'accept') {
+                            $print_status = 'Return accept by seller';
+                        } else if ($return_details->status == 'cancel') {
+                            $print_status = 'Return cancel by buyer';
+                        }
+                       $print_status = '<a href="'.$module_site_url .'/returndetail/'.$order->id.'">'.$print_status.'</a>';
+                    } 
+                    if($order->is_seller_dispute) {
+                        $dispute_details = $this->db->select('status')->from('bs_dispute')->where('order_id', $order->order_id)->where('is_seller_generate', 1)->get()->row();
+                        if($dispute_details->status == 'initiate') {
+                            $print_status = 'Dispute generated by seller';
+                        } else if($dispute_details->status == 'reject') { 
+                            $print_status = 'Dispute rejected';
+                        } else if($dispute_details->status == 'accept') { 
+                            $print_status = 'Dispute accept';
+                        }
+                    }
+                    echo $print_status;
+                    ?>
                 </td>
                 <td><?php echo $order->total_amount; ?></td>
 
@@ -60,9 +116,7 @@
 				<?php endif; ?>
 			</tr>
 		<?php endforeach; ?>
-	<?php else: ?>
-		<?php $this->load->view( $template_path .'/partials/no_data' ); ?>
-	<?php endif; ?>
+	</tbody>
 </table>
 </div>
 

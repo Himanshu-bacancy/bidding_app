@@ -21,8 +21,8 @@
         width: auto;
     }
 </style>
-<div class=" animated fadeInRight">
-    <table class="table-responsive" id="register_user_table" >
+<div class="table-responsive animated fadeInRight">
+    <table class="" id="register_user_table" >
         <thead>
 		<tr>
 			<th><input type="checkbox" name="select_all"  id="example-select-all"></th>

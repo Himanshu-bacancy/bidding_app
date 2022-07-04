@@ -40,6 +40,10 @@
                     <?php echo get_msg('btn_cancel') ?>
                 </a>
             </div>
+            
+            <div class="form-group ml-5">
+                <a href="<?php echo site_url('admin').'/items/edit/'.$detail->operation_id; ?>" target="_blank">Item Detail</a>
+            </div>
 
             <?php echo form_close(); ?>
 

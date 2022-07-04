@@ -34,10 +34,10 @@ class Orders extends BE_Controller {
         $conds['order_by_field'] = "created_at";
 		$conds['order_by_type'] = "desc";
 		// get rows count
-		$this->data['rows_count'] = $this->Order->count_all_by( $conds );
+//		$this->data['rows_count'] = $this->Order->count_all_by( $conds );
 		
 		// get Item reports
-		$this->data['orders'] = $this->Order->get_all_by( $conds , $this->pag['per_page'], $this->uri->segment( 4 ) );
+		$this->data['orders'] = $this->Order->get_all_by( $conds );
         // echo '<pre>'; print_r($this->data['orders']->result()); die(' hello testing');
 		// load index logic
 		parent::index();
@@ -50,20 +50,42 @@ class Orders extends BE_Controller {
 		// breadcrumb urls
 		$this->data['action_title'] = get_msg( 'Order filter' );
 		
+        $result = $this->db->select('bs_order.*,core_users.user_name')->from('bs_order')
+            ->join('core_users', 'bs_order.user_id = core_users.user_id')
+            ->join('bs_items', 'bs_order.items = bs_items.id');
+        
 		// condition with search term
+        $searchterm = $this->searchterm_handler( $this->input->post('searchterm'));
+        $result = $result->group_start()
+                ->where('bs_items.title', $searchterm)
+                ->or_where('core_users.user_name', $searchterm)
+                ->group_end();
+        if($this->searchterm_handler( $this->input->post('is_return')) == 1) {
+            $result = $result->where('is_return', 1);
+        }
         if($this->searchterm_handler( $this->input->post('is_return')) == 2) {
-    		$conds['is_return'] = 1;
+            $result = $result->where('is_seller_dispute', 1);
+        }
+        if ( $this->input->post('pay_filter')) {
+            $result = $result->where('bs_order.status', $this->input->post('pay_filter'));
+		}
+        if(!empty($this->input->post('reservation'))) {
+            $conds['date_filter'] = $this->input->post('reservation');
+            $daterange = explode(' - ', $conds['date_filter']);
+            $where = 'DATE(completed_date) BETWEEN "'.date('Y-m-d', strtotime($daterange[0])).'" AND "'.date('Y-m-d', strtotime($daterange[1])).'"';
+            $result = $result->where($where);
+            $this->data['reservation'] = $this->input->post('reservation');
         }
 		// no publish filter
-		$conds['order_by_field'] = "created_at";
-		$conds['order_by_type'] = "desc";
-
+		$result = $result->order_by("created_at", 'desc')->get_compiled_select();
+//        dd($result);
 
 		// pagination
-		$this->data['rows_count'] = $this->Order->count_all_by( $conds );
+//		$this->data['rows_count'] = $this->Order->count_all_by( $conds );
         
 		// search data
-		$this->data['orders'] = $this->Order->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+//		$this->data['orders'] = $this->Order->get_all_by( $conds);
+		$this->data['orders'] = $this->db->query($result);
 		
 		// load add list
 		parent::search();

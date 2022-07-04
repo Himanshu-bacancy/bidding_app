@@ -11,7 +11,7 @@ class Transactions extends BE_Controller {
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'TRANSACTIONS' );
+		parent::__construct( MODULE_CONTROL, 'Paid item Transaction History' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;
@@ -30,7 +30,6 @@ class Transactions extends BE_Controller {
 	 * List down the registered users
 	 */
 	function index() {
-		
 		// no publish filter
 		$conds['no_publish_filter'] = 1;
 

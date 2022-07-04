@@ -20,13 +20,16 @@
             
             <?php
             $options[0]=get_msg('select_state');
-            $options2[0]=get_msg('select_city_filter');
-            $addresses = $this->Addresses->get_all();
-            
             foreach($addresses->result() as $address) {
                 $options[strtolower(trim($address->state))] = ucfirst(trim($address->state));
-                $options2[strtolower(trim($address->city))] = ucfirst(trim($address->city));
             }
+            $options2[0]=get_msg('select_city_filter');
+            if(isset($search_state)) {
+                $city_arr = $this->db->select('DISTINCT(city)')->from('bs_addresses')->like('state', $search_state)->get();
+                foreach($city_arr->result() as $city) {
+                    $options2[strtolower(trim($city->city))] = ucfirst(trim($city->city));
+                }
+            } 
             ?>
         
             <div class="form-group" style="padding-right: 3px;">
@@ -45,7 +48,7 @@
             <div class="form-group" style="padding-right: 3px;">
 
                 <?php
-                    $options2 = array_unique($options2);
+//                    $options2 = array_unique($options2);
                     echo form_dropdown(
                         'city_dd',
                         $options2,
@@ -127,3 +130,26 @@
 
 	</div>
 </div>
+<script>
+	
+<?php if ( $this->config->item( 'client_side_validation' ) == true ): ?>
+	function jqvalidate() {
+        $('#state_dd').on('change', function() {
+			var state_dd = $(this).val();
+			
+			$.ajax({
+				url: '<?php echo $module_site_url . '/get_all_city/';?>' + state_dd,
+				method: 'GET',
+				dataType: 'JSON',
+				success:function(data){
+					$('#city_dd').html("");
+					$.each(data, function(i, obj){
+					    $('#city_dd').append('<option value="'+ $.trim(obj.city.toLowerCase()) +'">' + $.trim(obj.city) + '</option>');
+					});
+					$('#name').val($('#name').val() + " ").blur();
+				}
+			});
+		});
+}
+	<?php endif; ?>
+</script>
