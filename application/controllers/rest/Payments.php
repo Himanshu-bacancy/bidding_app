@@ -3635,61 +3635,61 @@ class Payments extends API_Controller {
         $this->response(['status' => "success", 'message' => $message]);
     }
     
-    public function cancel_order_post() {
-        $user_data = $this->_apiConfig([
-            'methods' => ['POST'],
-            'requireAuthorization' => true,
-        ]);
-        $rules = array(
-            array(
-                'field' => 'order_id',
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'user_id',
-                'rules' => 'required'
-            ),
-        );
-        if (!$this->is_valid($rules)) exit; 
-        $posts = $this->post();
-        $date = date('Y-m-d H:i:s');
-        
-        $check_for_order = $this->db->select('bs_order.*,bs_items.added_user_id,bs.items.title, seller.device_token as seller_token, buyer.device_token as buyer_token, bs_items.delivery_method_id, bs_items.pieces, seller.wallet_amount as seller_wallet_amount, buyer.wallet_amount as buyer_wallet_amount')->from('bs_order')
-                ->join('bs_items', 'bs_order.items = bs_items.id')
-                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
-                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
-                ->where('order_id', $posts['order_id'])->get()->row();
-        if($check_for_order->delivery_status == 'pending') {
-            $refund_total_amount = $check_for_order->total_amount;
-            $update_order['delivery_status'] = 'cancel';
-            $update_order['is_cancel'] = 1;
-            $update_order['cancel_by'] = 'buyer';
-            $update_order['cancel_date'] = $date;
-            $noti_user = $check_for_order->seller_token;
-            
-            if($check_for_order->added_user_id == $posts['user_id']) {
-                $update_order['cancel_by'] = 'seller';
-                $noti_user = $check_for_order->buyer_token;
-                if($check_for_order->pay_shipping_by == '2') {
-                    $refund_total_amount = $check_for_order->seller_charge;
-                    
-                    $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $posts['user_id'], 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
-                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $check_for_order->seller_wallet_amount + (float)$refund_total_amount]);
-                }
-            } else {
-                $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $check_for_order->user_id, 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
-            
-                $this->db->where('user_id', $check_for_order->user_id)->update('core_users',['wallet_amount' => $check_for_order->buyer_wallet_amount + (float)$refund_total_amount]);
-            }
-            
-            $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
-            $this->db->where('id', $check_for_order->items)->update('bs_items', ['pieces' => $check_for_order->pieces+(int)$check_for_order->qty,'is_sold_out' => 0]);
-            
-            send_push( [$noti_user], ["message" => "Order request canceled by ".$update_order['cancel_by'], "flag" => "order"],['order_id' => $posts['order_id']] );
-
-            $this->response(['status' => "success", 'message' => 'Order request canceled']);
-        } else {
-            $this->error_response("Order already proceed");
-        }
-    }
+//    public function cancel_order_post() {
+//        $user_data = $this->_apiConfig([
+//            'methods' => ['POST'],
+//            'requireAuthorization' => true,
+//        ]);
+//        $rules = array(
+//            array(
+//                'field' => 'order_id',
+//                'rules' => 'required'
+//            ),
+//            array(
+//                'field' => 'user_id',
+//                'rules' => 'required'
+//            ),
+//        );
+//        if (!$this->is_valid($rules)) exit; 
+//        $posts = $this->post();
+//        $date = date('Y-m-d H:i:s');
+//        
+//        $check_for_order = $this->db->select('bs_order.*,bs_items.added_user_id,bs.items.title, seller.device_token as seller_token, buyer.device_token as buyer_token, bs_items.delivery_method_id, bs_items.pieces, seller.wallet_amount as seller_wallet_amount, buyer.wallet_amount as buyer_wallet_amount')->from('bs_order')
+//                ->join('bs_items', 'bs_order.items = bs_items.id')
+//                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+//                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+//                ->where('order_id', $posts['order_id'])->get()->row();
+//        if($check_for_order->delivery_status == 'pending') {
+//            $refund_total_amount = $check_for_order->total_amount;
+//            $update_order['delivery_status'] = 'cancel';
+//            $update_order['is_cancel'] = 1;
+//            $update_order['cancel_by'] = 'buyer';
+//            $update_order['cancel_date'] = $date;
+//            $noti_user = $check_for_order->seller_token;
+//            
+//            if($check_for_order->added_user_id == $posts['user_id']) {
+//                $update_order['cancel_by'] = 'seller';
+//                $noti_user = $check_for_order->buyer_token;
+//                if($check_for_order->pay_shipping_by == '2') {
+//                    $refund_total_amount = $check_for_order->seller_charge;
+//                    
+//                    $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $posts['user_id'], 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
+//                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $check_for_order->seller_wallet_amount + (float)$refund_total_amount]);
+//                }
+//            } else {
+//                $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $check_for_order->user_id, 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
+//            
+//                $this->db->where('user_id', $check_for_order->user_id)->update('core_users',['wallet_amount' => $check_for_order->buyer_wallet_amount + (float)$refund_total_amount]);
+//            }
+//            
+//            $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
+//            $this->db->where('id', $check_for_order->items)->update('bs_items', ['pieces' => $check_for_order->pieces+(int)$check_for_order->qty,'is_sold_out' => 0]);
+//            
+//            send_push( [$noti_user], ["message" => "Order request canceled by ".$update_order['cancel_by'], "flag" => "order"],['order_id' => $posts['order_id']] );
+//
+//            $this->response(['status' => "success", 'message' => 'Order request canceled']);
+//        } else {
+//            $this->error_response("Order already proceed");
+//        }
+//    }
 }
