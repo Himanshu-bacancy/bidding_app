@@ -435,7 +435,8 @@ class API_Controller extends REST_Controller
 //        }
         
 		$data = $this->ps_security->clean_output( $data );
-        if(in_array($this->router->fetch_class(),['chats','payments']) && in_array($this->router->fetch_method(), ['get_offer_details','offer_list','offer_by_items','wayto_delivery']) ) {
+        if(in_array($this->router->fetch_class(),['chats','payments']) && in_array($this->router->fetch_method(), ['get_offer_details','offer_list','offer_by_items','wayto_delivery','order_byid']) ) {
+
             if(is_array($data)) { 
                 foreach ($data as $key => $value) {
                     if(isset($value->requested_item_detail)) {
@@ -453,6 +454,10 @@ class API_Controller extends REST_Controller
             } else {
                 if(isset($data->requested_item_detail)) {
                     unset($data->requested_item_detail->childsub_category->brands);
+                }
+                if(isset($data->item_details)) {
+                    unset($data->item_details->childsub_category->brands);
+                    unset($data->item_details->childsub_category->colors);
                 }
                 if($this->router->fetch_class() == 'chats') {
                     if(empty($data->buyer_unread_count)) {

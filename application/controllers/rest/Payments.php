@@ -1646,7 +1646,7 @@ class Payments extends API_Controller {
         );
         if (!$this->is_valid($rules)) exit;
         $posts_var = $this->post();
-        
+        $date = date('Y-m-d H:i:s');
         $offer_details = $this->db->from('bs_chat_history')->where('id', $posts_var['offer_id'])->get()->row();
         $card_id = $offer_details->card_id;
         $cvc = $offer_details->cvc;
@@ -1703,7 +1703,7 @@ class Payments extends API_Controller {
                         
                         $this->db->where('id', $posts_var['offer_id'])->update('bs_chat_history', $chat_data_update);
                     } catch (exception $e) {
-                        $this->db->insert('bs_stripe_error', ['chat_id' => $posts_var['offer_id'], 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->db->insert('bs_stripe_error', ['chat_id' => $posts_var['offer_id'], 'card_id' => $card_id, 'response' => $e->getMessage(), 'created_at' => $date]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
                 }
@@ -1766,7 +1766,7 @@ class Payments extends API_Controller {
                             $shipping_amount = $get_item->shipping_cost_by_seller;
                         }
                     }
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $posts_var['item_id'], 'qty' => $qty, 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id,'seller_address_id' => $get_item->Address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => date('Y-m-d H:i:s'),'operation_type' => $offer_details->operation_type]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $posts_var['item_id'], 'qty' => $qty, 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id,'seller_address_id' => $get_item->Address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => $date,'operation_type' => $offer_details->operation_type]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
@@ -1776,7 +1776,7 @@ class Payments extends API_Controller {
                         $update_array['is_sold_out'] = 1;
                     }
                     $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
-                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => $date]);
                     
                     if($offer_details->operation_type == REQUEST_ITEM) {
                         $requested_item_stock = $this->db->from('bs_items')->where('id', $offer_details->requested_item_id)->get()->row();
@@ -1824,18 +1824,18 @@ class Payments extends API_Controller {
                             $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'card', 'order_id' => $new_odr_id]);
                         } else {
                             $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
-                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $response, 'created_at' => date('Y-m-d H:i:s')]);
+                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $response, 'created_at' => $date]);
                             $this->error_response(get_msg('stripe_transaction_failed'));
                         }
                     } catch (exception $e) {
                         $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
-                        $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                        $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => $date]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
                     }
 
                 } else if($delivery_method_id == PICKUP_ONLY) {
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
-                    $date = date('Y-m-d H:i:s');
+//                    $date = date('Y-m-d H:i:s');
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => ($posts_var['item_id'] ?? $requested_item_id),'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'seller_address_id' => $item_detail->Address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
                     
                     $record = $this->db->insert_id();
@@ -1850,7 +1850,7 @@ class Payments extends API_Controller {
                         $update_array['is_sold_out'] = 1;
                     }
                     $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
-                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+                    $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => $date]);
                     /*manage stock :end*/
                     if($offer_details->payin == PAYCARD) {
                         $this->db->where('id', $record)->update('bs_order',['payment_method' => 'card', 'card_id' => $posts_var['card_id']]);
@@ -1893,7 +1893,7 @@ class Payments extends API_Controller {
                             }
                         } catch (exception $e) {
                             $this->db->where('id', $record)->update('bs_order',['status' => 'fail']);
-                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                            $this->db->insert('bs_stripe_error', ['order_id' => $record, 'response' => $e->getMessage(), 'created_at' => $date]);
                             $this->error_response(get_msg('stripe_transaction_failed'));
                         } 
                     } else {
@@ -1924,7 +1924,7 @@ class Payments extends API_Controller {
                     $this->response(['status' => "success", 'message' => 'Notification sent successfully']);
                 } else {
                     $item_detail = $this->db->from('bs_items')->where('id', $requested_item_id)->get()->row();
-                    $date = date('Y-m-d H:i:s');
+//                    $date = date('Y-m-d H:i:s');
 //                    if($posts_var['operation_type'] == EXCHANGE) {
                     $requested_item_id = $this->db->from('bs_chat_history')->where('id',$posts_var['offer_id'])->get()->row()->requested_item_id;
 //                    } else {
@@ -2120,7 +2120,7 @@ class Payments extends API_Controller {
 
                                 $response = json_decode(curl_exec($ch)); 
                                 curl_close($ch);
-                            $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => date('Y-m-d H:i:s')]);
+                            $this->db->insert('bs_track_order', ['order_id' => $value->order_id, 'ship_from' => $ship_from, 'ship_to' => $ship_to, 'object_id' => (isset($response->object_id) ? $response->object_id: ''), 'status' => (isset($response->status) ? $response->status: 'ERROR'), 'tracking_status' => (isset($response->tracking_status) ? $response->tracking_status: ''), 'tracking_number' => (isset($response->tracking_number) ? $response->tracking_number: ''), 'tracking_url' => (isset($response->tracking_url_provider) ? $response->tracking_url_provider: ''), 'label_url' => (isset($response->label_url) ? $response->label_url: ''), 'response' => json_encode($response), 'created_at' => $current_date]);
                             $track_number = isset($response->tracking_number) ? $response->tracking_number:'';
 
     //                        if(is_null($track_number) || empty($track_number)) {
@@ -2145,12 +2145,12 @@ class Payments extends API_Controller {
                 $update_array['is_sold_out'] = 1;
             }
             $this->db->where('id', $value->items)->update('bs_items', $update_array);
-            $this->db->insert('bs_order_confirm', ['order_id' => $value->order_id, 'item_id' => $value->items, 'seller_id' => $item_detail->added_user_id, 'created_at' => date('Y-m-d H:i:s')]);
+            $this->db->insert('bs_order_confirm', ['order_id' => $value->order_id, 'item_id' => $value->items, 'seller_id' => $item_detail->added_user_id, 'created_at' => $current_date]);
 
             $this->db->where('user_id', $value->user_id)->where('item_id', $value->items)->delete('bs_cart');
         }
         if($param['create_offer']) {
-            $current_date = date("Y-m-d H:i:s");
+//            $current_date = date("Y-m-d H:i:s");
             foreach ($get_records as $key => $value) {
                 $create_offer['requested_item_id'] = $value->items;
                 $create_offer['buyer_user_id'] = $value->user_id;
@@ -2569,7 +2569,7 @@ class Payments extends API_Controller {
                 $row[$key] = $value;
                 if($posts['type'] == CREDIT) {
                     $row[$key]['type'] = 'credit';
-                    if($value['type'] == 'refund') {
+                    if($value['type'] == 'refund' || $value['type'] == 'cancel_order_payment') {
                         $row[$key]['isRefund'] = '1';
                     }
                 } else if($posts['type'] == DEBIT){
@@ -2593,7 +2593,7 @@ class Payments extends API_Controller {
                 } else if($posts['type'] == ALL){
                     if($value['action'] == 'plus') {
                         $row[$key]['type'] = 'credit';
-                        if($value['type'] == 'refund') {
+                        if($value['type'] == 'refund' || $value['type'] == 'cancel_order_payment') {
                             $row[$key]['isRefund'] = '1';
                         }
                     } else if($value['action'] == 'minus' && $value['type'] != 'bank_deposit' && $value['type'] != 'instantpay') {
@@ -3635,61 +3635,71 @@ class Payments extends API_Controller {
         $this->response(['status' => "success", 'message' => $message]);
     }
     
-//    public function cancel_order_post() {
-//        $user_data = $this->_apiConfig([
-//            'methods' => ['POST'],
-//            'requireAuthorization' => true,
-//        ]);
-//        $rules = array(
-//            array(
-//                'field' => 'order_id',
-//                'rules' => 'required'
-//            ),
-//            array(
-//                'field' => 'user_id',
-//                'rules' => 'required'
-//            ),
-//        );
-//        if (!$this->is_valid($rules)) exit; 
-//        $posts = $this->post();
-//        $date = date('Y-m-d H:i:s');
-//        
-//        $check_for_order = $this->db->select('bs_order.*,bs_items.added_user_id,bs.items.title, seller.device_token as seller_token, buyer.device_token as buyer_token, bs_items.delivery_method_id, bs_items.pieces, seller.wallet_amount as seller_wallet_amount, buyer.wallet_amount as buyer_wallet_amount')->from('bs_order')
-//                ->join('bs_items', 'bs_order.items = bs_items.id')
-//                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
-//                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
-//                ->where('order_id', $posts['order_id'])->get()->row();
-//        if($check_for_order->delivery_status == 'pending') {
-//            $refund_total_amount = $check_for_order->total_amount;
-//            $update_order['delivery_status'] = 'cancel';
-//            $update_order['is_cancel'] = 1;
-//            $update_order['cancel_by'] = 'buyer';
-//            $update_order['cancel_date'] = $date;
-//            $noti_user = $check_for_order->seller_token;
-//            
-//            if($check_for_order->added_user_id == $posts['user_id']) {
-//                $update_order['cancel_by'] = 'seller';
-//                $noti_user = $check_for_order->buyer_token;
-//                if($check_for_order->pay_shipping_by == '2') {
-//                    $refund_total_amount = $check_for_order->seller_charge;
-//                    
-//                    $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $posts['user_id'], 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
-//                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $check_for_order->seller_wallet_amount + (float)$refund_total_amount]);
-//                }
-//            } else {
-//                $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $check_for_order->user_id, 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
-//            
-//                $this->db->where('user_id', $check_for_order->user_id)->update('core_users',['wallet_amount' => $check_for_order->buyer_wallet_amount + (float)$refund_total_amount]);
-//            }
-//            
-//            $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
-//            $this->db->where('id', $check_for_order->items)->update('bs_items', ['pieces' => $check_for_order->pieces+(int)$check_for_order->qty,'is_sold_out' => 0]);
-//            
-//            send_push( [$noti_user], ["message" => "Order request canceled by ".$update_order['cancel_by'], "flag" => "order"],['order_id' => $posts['order_id']] );
-//
-//            $this->response(['status' => "success", 'message' => 'Order request canceled']);
-//        } else {
-//            $this->error_response("Order already proceed");
-//        }
-//    }
+    public function cancel_order_post() {
+        $user_data = $this->_apiConfig([
+            'methods' => ['POST'],
+            'requireAuthorization' => true,
+        ]);
+        $rules = array(
+            array(
+                'field' => 'order_id',
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'user_id',
+                'rules' => 'required'
+            ),
+        );
+        if (!$this->is_valid($rules)) exit; 
+        $posts = $this->post();
+        $date = date('Y-m-d H:i:s');
+        
+        $check_for_order = $this->db->select('bs_order.*, bs_items.added_user_id, bs_items.title, seller.device_token as seller_token, buyer.device_token as buyer_token, bs_items.delivery_method_id, bs_items.pieces, seller.wallet_amount as seller_wallet_amount, buyer.wallet_amount as buyer_wallet_amount')->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+                ->where('order_id', $posts['order_id'])->get()->row();
+        if($check_for_order->delivery_status == 'pending') {
+            $refund_total_amount = $check_for_order->total_amount;
+            $update_order['delivery_status'] = 'cancel';
+            $update_order['is_cancel'] = 1;
+            $update_order['cancel_by'] = 'buyer';
+            $update_order['cancel_date'] = $date;
+            $update_order['completed_date'] = $date;
+            $noti_user = $check_for_order->seller_token;
+            
+            if($check_for_order->added_user_id == $posts['user_id']) {
+                $update_order['cancel_by'] = 'seller';
+                $noti_user = $check_for_order->buyer_token;
+                if($check_for_order->pay_shipping_by == '2') {
+                    $refund_total_amount = $check_for_order->seller_charge;
+                    
+                    $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $posts['user_id'], 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
+                    $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $check_for_order->seller_wallet_amount + (float)$refund_total_amount]);
+                }
+            } else {
+                $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $check_for_order->user_id, 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
+            
+                $this->db->where('user_id', $check_for_order->user_id)->update('core_users',['wallet_amount' => $check_for_order->buyer_wallet_amount + (float)$refund_total_amount]);
+            }
+            
+            $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
+            $this->db->where('id', $check_for_order->items)->update('bs_items', ['pieces' => $check_for_order->pieces+(int)$check_for_order->qty,'is_sold_out' => 0]);
+            
+            if($check_for_order->operation_type == EXCHAGE) {
+                $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.offered_item_id = bs_items.id')->where('bs_exchange_chat_history.chat_id',$check_for_order->offer_id)->get()->result();
+                foreach($item_details as $key => $value) {
+                    $update_array['pieces'] = $value->pieces + 1;
+                    $update_array['is_sold_out'] = 0;
+                    $this->db->where('id', $value->item_id)->update('bs_items', $update_array);
+                } 
+            }
+            
+            send_push( [$noti_user], ["message" => "Order request canceled by ".$update_order['cancel_by'], "flag" => "order", "title" => $check_for_order->title.' order update'],['order_id' => $posts['order_id']] );
+
+            $this->response(['status' => "success", 'message' => 'Order request canceled']);
+        } else {
+            $this->error_response("Order already proceed");
+        }
+    }
 }
