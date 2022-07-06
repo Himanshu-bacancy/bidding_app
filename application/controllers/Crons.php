@@ -228,29 +228,32 @@ class Crons extends CI_Controller {
         $this->db->insert('bs_cron_log',['cron_name' => 'expire-item', 'created_at' => date('Y-m-d H:i:s')]);
         echo 'cron run successfully';
     }
-    
+    //need to change delivery date +1 to +3 for live in query
     public function order_complete() {
         $past_record = $this->db->select('bs_order.order_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
                 ->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                 ->where('bs_order.delivery_date IS NOT NULL')
+                ->where('DATE(bs_order.delivery_date + INTERVAL 1 DAY) < DATE(now())')
                 ->where('bs_order.completed_date IS NULL')
                 ->get()->result_array();
         $date = date('Y-m-d H:i:s');
         if(!empty($past_record)) {
             foreach ($past_record as $key => $value) {
-                $verify_date = date('Y-m-d H:i:s', strtotime($value['delivery_date']. ' + 3 days'));
-                if($verify_date < $date) {
-                    $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['added_user_id'], 'action' => 'plus', 'amount' => $value['seller_earn'], 'type' => 'complete_order', 'created_at' => $date]);
+//                $verify_date = date('Y-m-d H:i:s', strtotime($value['delivery_date']. ' + 1 days'));
+//                if($verify_date < $date) {
+                    if(!$value->is_return && !$value->is_dispute) {
+                        $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['added_user_id'], 'action' => 'plus', 'amount' => $value['seller_earn'], 'type' => 'complete_order', 'created_at' => $date]);
 
-                    $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + $value['seller_earn']]);
+                        $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + $value['seller_earn']]);
+                    }
 
                     $update_order['completed_date'] = $date;
 //                    $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
 
                     $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
-                }
+//                }
             }
         }
         
@@ -258,6 +261,105 @@ class Crons extends CI_Controller {
         echo 'cron run successfully';
     }
     
+    //need to change createad_at +1 to +3 for live in query
+    public function cancel_order() {
+        $past_record = $this->db->select('bs_order.order_id, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+                ->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->where('bs_order.delivery_status', 'pending')
+                ->where('bs_order.status', 'succeeded')
+                ->where('DATE(bs_order.created_at + INTERVAL 1 DAY) < DATE(now())')
+                ->get()->result_array();
+        dd($past_record);
+        $date = date('Y-m-d H:i:s');
+        if(!empty($past_record)) {
+            foreach ($past_record as $key => $value) {
+                $update_order['delivery_status'] = 'cancel';
+                $update_order['is_cancel'] = 1;
+                $update_order['cancel_by'] = 'admin';
+                $update_order['cancel_date'] = $date;
+                $update_order['completed_date'] = $date;
+                $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
+                if($value['pay_shipping_by'] == '2' && !empty($value['seller_charge']) ) {
+                    
+                    $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['added_user_id'], 'action' => 'plus', 'amount' => $value['seller_charge'], 'type' => 'cancel_order_payment', 'created_at' => $date]);
+                    $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['seller_wallet_amount'] + (float)$value['seller_charge']]);
+                }
+                $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['user_id'], 'action' => 'plus', 'amount' => $value['total_amount'], 'type' => 'cancel_order_payment', 'created_at' => $date]);
+            
+                $this->db->where('user_id', $value['user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + (float)$value['total_amount']]);
+                
+                send_push( [$value['device_token'], $value['seller_device_token']], ["message" => "Order request canceled", "flag" => "order", "title" => $value['title'].' order update'],['order_id' => $value['order_id']] );
+            }
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'cancel-order', 'created_at' => $date]);
+        echo 'cron run successfully';
+     }
+    
+     //need to change createad_at +1 to +3 for live in query
+    public function cancel_dispute_request() {
+        $past_record = $this->db->select('bs_dispute.id, bs_order.order_id, bs_dispute.is_seller_generate, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_order.seller_earn, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+            ->from('bs_dispute')
+            ->join('bs_order', 'bs_dispute.order_id = bs_order.order_id')
+            ->join('bs_items', 'bs_order.items = bs_items.id')
+            ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+            ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+            ->where('bs_dispute.status', 'initiate')
+            ->where('DATE(bs_dispute.created_at + INTERVAL 1 DAY) < DATE(now())')
+            ->get()->result_array();
+        dd($past_record);
+        $date = date('Y-m-d H:i:s');
+        if(!empty($past_record)) {
+            foreach ($past_record as $key => $value) {
+                $update_order['status'] = 'cancel';
+                $update_order['updated_at'] = $date;
+                $this->db->where('id', $value['id'])->update('bs_dispute', $update_order);
+                
+                if(!$value['is_seller_generate']) {
+                    $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['added_user_id'], 'action' => 'plus', 'amount' => $value['seller_earn'], 'type' => 'complete_order', 'created_at' => $date]);
+                    $this->db->where('user_id', $value['added_user_id'])->update('core_users',['wallet_amount' => $value['seller_wallet_amount'] + $value['seller_earn']]);
+                }
+                send_push( [$value['device_token'], $value['seller_device_token']], ["message" => "Dispute request canceled", "flag" => "order", "title" => $value['title'].' order update'],['order_id' => $value['order_id']] );
+            }
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'cancel-dispute-request', 'created_at' => $date]);
+        echo 'cron run successfully';
+    }
+    
+    //need to change return_shipment_delivered_date +1 to +3 for live 
+    public function refund_buyer() {
+        $past_record = $this->db->select('bs_order.order_id, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_order.seller_earn, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+            ->from('bs_order')
+            ->join('bs_items', 'bs_order.items = bs_items.id')
+            ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+            ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+            ->where('bs_order.is_return', 1)
+            ->where('bs_order.is_dispute IS NULL')
+            ->where('bs_order.is_seller_rate', 0)
+            ->where('DATE(bs_order.return_shipment_delivered_date + INTERVAL 1 DAY) < DATE(now())')
+            ->get()->result_array();
+        dd($past_record);
+        $date = date('Y-m-d H:i:s');
+        if(!empty($past_record)) {
+            foreach ($past_record as $key => $value) {
+                $update_order['is_seller_rate'] = 1;
+                $update_order['seller_rate_date'] = $date;
+                $update_order['completed_date'] = $date;
+                $this->db->where('order_id', $value['order_id'])->update('bs_order', $update_order);
+                $var = ['order_id' => $value['order_id'], 'from_user_id' => $value['added_user_id'], 'to_user_id' => $value['user_id'], 'rating' => DEFAULT_RATE, 'title' => 'Default rating', 'description' => 'Default rating given by system'];
+                $this->Rate->save( $var );
+                
+                $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['user_id'],'action' => 'plus', 'amount' => $value['total_amount'],'type' => 'refund', 'created_at' => $date]);
+                
+                $this->db->where('user_id', $value['user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount']+(float)$value['total_amount']]);
+                
+            }
+        }
+        $this->db->insert('bs_cron_log',['cron_name' => 'refund-buyer', 'created_at' => $date]);
+        echo 'cron run successfully';
+    }
 //    public function return_order_cancel() {
 //        $past_record = $this->db->select('bs_order.order_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
 //                ->from('bs_order')

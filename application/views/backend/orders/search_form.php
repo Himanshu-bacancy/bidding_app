@@ -24,9 +24,11 @@
 
                 <?php
                 $options = array();
-                $options[] = get_msg('select_filter');
+                $options[] = get_msg('select_order_filter');
                 $options[] = get_msg('Return Order');
                 $options[] = get_msg('Seller Dispute Order');
+                $options[] = get_msg('Cancel Order');
+                $options[] = get_msg('Delivered Order');
 
                 echo form_dropdown(
                         'is_return',
@@ -40,7 +42,7 @@
             <div class="form-group" style="padding-right: 3px;">
                 <?php
                 $pay_options = array();
-                $pay_options[] = get_msg('select_filter');
+                $pay_options[] = get_msg('select_payment_filter');
                 $pay_options['pending'] = get_msg('pending');
                 $pay_options['initiate'] = get_msg('initiate');
                 $pay_options['succeeded'] = get_msg('succeeded');

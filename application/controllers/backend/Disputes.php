@@ -309,19 +309,24 @@ class Disputes extends BE_Controller {
 	function ajx_unpublish( $id = 0, $order_id )
 	{
 		
+		$date = date('Y-m-d H:i:s');
 		// prepare data
-		$topic_data = array( 'status'=> 'reject','updated_at' => date('Y-m-d H:i:s') );
-			
+		$topic_data = array( 'status'=> 'reject','updated_at' => $date );
 		// save data
 		if ( $this->Dispute->save( $topic_data, $id )) {
+            
             $buyer = $this->db->select('device_token')->from('bs_order')
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
                     ->where('order_id', $order_id)->get()->row();
             
-            $seller = $this->db->select('device_token,title')->from('bs_order')
+            $seller = $this->db->select('device_token,title,bs_order.seller_earn,wallet_amount,bs_items.added_user_id')->from('bs_order')
                         ->join('bs_items', 'bs_order.items = bs_items.id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                         ->where('order_id', $order_id)->get()->row();
+            
+            $this->db->insert('bs_wallet', ['parent_id' => $order_id, 'user_id' => $seller->added_user_id, 'action' => 'plus', 'amount' => $seller->seller_earn, 'type' => 'complete_order', 'created_at' => $date]);
+
+            $this->db->where('user_id', $seller->added_user_id)->update('core_users', ['wallet_amount' => $seller->wallet_amount + (float)$seller->seller_earn ]);
             
             send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been rejected", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
             

@@ -2060,6 +2060,16 @@ class API_Controller extends REST_Controller
         } else {
             $update_order['is_seller_rate'] = 1;
             $update_order['seller_rate_date'] = $date;
+            $update_order['completed_date'] = $date;
+            
+            if($order_detail['is_return']) {
+                $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $conds['to_user_id'],'action' => 'plus', 'amount' => $order_detail['total_amount'],'type' => 'refund', 'created_at' => $date]);
+                
+                $get_user_wallet = $this->db->select('wallet_amount')->from('core_users')->where('user_id', $conds['to_user_id'])->get()->row();
+                
+                $this->db->where('user_id', $conds['to_user_id'])->update('core_users',['wallet_amount' => $get_user_wallet->wallet_amount + (float)$order_detail['total_amount']]);
+                
+            }
         }
         $this->db->where('order_id', $order_id)->update('bs_order', $update_order);
 		//noti send to to_user_id when reviewed

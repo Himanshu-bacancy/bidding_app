@@ -56,15 +56,23 @@ class Orders extends BE_Controller {
         
 		// condition with search term
         $searchterm = $this->searchterm_handler( $this->input->post('searchterm'));
-        $result = $result->group_start()
-                ->where('bs_items.title', $searchterm)
-                ->or_where('core_users.user_name', $searchterm)
-                ->group_end();
+        if(!empty($searchterm)) {
+            $result = $result->group_start()
+                    ->where('bs_items.title', $searchterm)
+                    ->or_where('core_users.user_name', $searchterm)
+                    ->group_end();
+        }
         if($this->searchterm_handler( $this->input->post('is_return')) == 1) {
             $result = $result->where('is_return', 1);
         }
         if($this->searchterm_handler( $this->input->post('is_return')) == 2) {
             $result = $result->where('is_seller_dispute', 1);
+        }
+        if($this->searchterm_handler( $this->input->post('is_return')) == 3) {
+            $result = $result->where('delivery_status', 'cancel');
+        }
+        if($this->searchterm_handler( $this->input->post('is_return')) == 4) {
+            $result = $result->where('delivery_status', 'delivered');
         }
         if ( $this->input->post('pay_filter')) {
             $result = $result->where('bs_order.status', $this->input->post('pay_filter'));

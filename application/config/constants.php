@@ -124,3 +124,5 @@ define('ALL', '1');
 define('CREDIT', '2');
 define('DEBIT', '3');
 define('DEPOSIT', '4');
+
+define('DEFAULT_RATE', '3');

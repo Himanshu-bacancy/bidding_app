@@ -2678,7 +2678,7 @@ class Payments extends API_Controller {
         $update_order['delivery_status'] = "delivered";
         $update_order['completed_date'] = $date;
         $update_order['delivery_date'] = $date;
-        $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
+//        $update_order['return_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 3 days'));
         $this->db->where('id', $track_order['id'])->update('bs_track_order',['tracking_status' => 'DELIVERED', 'updated_at' => $date]);
         if($track_order['is_return']) {
             $buyer_detail = $this->db->select('core_users.device_token,core_users.user_id,bs_order.total_amount, core_users.wallet_amount')->from('bs_order')
@@ -2690,10 +2690,10 @@ class Payments extends API_Controller {
             }
             $update_order['return_shipment_delivered_date'] = $date;
             $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
-            $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => $date]);
-
-            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
-            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
+//            $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => $date]);
+//
+//            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
+//            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
         }
         $this->db->where('order_id', $posts['order_id'])->update('bs_order',$update_order);
         
@@ -3671,7 +3671,7 @@ class Payments extends API_Controller {
             if($check_for_order->added_user_id == $posts['user_id']) {
                 $update_order['cancel_by'] = 'seller';
                 $noti_user = $check_for_order->buyer_token;
-                if($check_for_order->pay_shipping_by == '2') {
+                if($check_for_order->pay_shipping_by == '2' && !empty($check_for_order->seller_charge)) {
                     $refund_total_amount = $check_for_order->seller_charge;
                     
                     $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $posts['user_id'], 'action' => 'plus', 'amount' => $refund_total_amount, 'type' => 'cancel_order_payment', 'created_at' => $date]);
