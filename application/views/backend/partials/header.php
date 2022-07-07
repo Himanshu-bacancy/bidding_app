@@ -87,13 +87,9 @@
 		<?php	
 			echo "Please be aware backend is demo mode so all those dummy data will be refreshed every one hour.";
 		
+            echo '</div>';
 		}
-
 	?>
-
-	</div>
-
-
 
 <body id="<?php echo strtolower( $module_name ); ?>">
 <div class="wrapper">

@@ -579,3 +579,11 @@ ALTER TABLE `bs_order` CHANGE `user_id` `user_id` VARCHAR(255) CHARACTER SET lat
 
 
 ALTER TABLE `bs_order` CHANGE `seller_charge` `seller_charge` VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'seller shipping charge';
+
+// RB: ADDED ON 7/07/2022
+
+ALTER TABLE `bs_dispute` CHANGE `phone` `message` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+
+ALTER TABLE `bs_dispute` CHANGE `message` `phone` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+
+ALTER TABLE `bs_cron_log` ADD `timezone` VARCHAR(255) NOT NULL AFTER `created_at`;

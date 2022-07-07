@@ -294,6 +294,22 @@
             ?>
           </div>
         </div>
+        <div class="col-md-12">
+          <div class="card">
+            <?php
+                $conds['no_publish_filter'] = 1;
+                $conds['order_by'] = 1;
+                $conds['order_by_field'] = "created_at";
+                $conds['order_by_type'] = "desc";
+                $data = array(
+                  'panel_title' => get_msg('Latest 10 Disputes'),
+                  'data' => $this->Dispute->get_all_by( $conds, 10)->result()
+                );
+               
+              $this->load->view( $template_path .'/components/top_disputes', $data ); 
+            ?>
+          </div>
+        </div>
 
 <!--        <div class="col-12">
           <div class="card">
@@ -349,4 +365,4 @@
     </div>
   </div>  
        
-</div>
+<!--</div>-->

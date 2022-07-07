@@ -71,10 +71,12 @@ $route['inactive-coupon'] = "crons/inactive_coupon";
 $route['notify-expire-item'] = "crons/notify_expireitem_user";
 $route['expire-item'] = "crons/expire_item";
 $route['order-complete'] = "crons/order_complete";
-$route['transfer-amount'] = "crons/transfer_amount";
+//$route['transfer-amount'] = "crons/transfer_amount";
 $route['cancel-order'] = "crons/cancel_order";
 $route['cancel-dispute-request'] = "crons/cancel_dispute_request";
 $route['refund-buyer'] = "crons/refund_buyer";
+$route['refund-seller'] = "crons/refund_seller";
+$route['meeting-cancel-order'] = "crons/meeting_cancel_order";
 
 // if both backend and frontend exist,
 $route['admin'] = "backend/dashboard";
