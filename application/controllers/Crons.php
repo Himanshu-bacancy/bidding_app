@@ -89,7 +89,7 @@ class Crons extends CI_Controller {
                 }
             }
         }
-        $this->db->insert('bs_cron_log',['cron_name' => 'track-order', 'created_at' => date('Y-m-d H:i:s')]);
+        $this->db->insert('bs_cron_log',['cron_name' => 'track-order', 'created_at' => date('Y-m-d H:i:s'), 'timezone' => date_default_timezone_get()]);
         echo 'cron run successfully';
     }
     
