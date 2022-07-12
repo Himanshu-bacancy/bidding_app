@@ -235,7 +235,7 @@ class Chats extends API_Controller
 		// exit if there is an error in validation,
         if ( !$this->is_valid( $rules )) exit;
 		$requestedItemId = $this->post('requested_item_id');
-        
+        $currentdate =  date('Y-m-d H:i:s');
         if($this->post('operation_type') == DIRECT_BUY && $this->post('operation_type') == PICKUP_ONLY){
             $payin = $this->post('payin');
             if(!isset($payin)) {
@@ -288,7 +288,7 @@ class Chats extends API_Controller
                     ]
                 ]);
             } catch (exception $e) {
-                $this->db->insert('bs_stripe_error', ['card_id' => $this->post('card_id'),'response' => $e->getMessage(), 'created_at' => date('Y-m-d H:i:s')]);
+                $this->db->insert('bs_stripe_error', ['card_id' => $this->post('card_id'),'response' => $e->getMessage(), 'created_at' => $currentdate]);
                 $this->error_response(get_msg('stripe_transaction_failed'));
             } 
         }
@@ -297,6 +297,36 @@ class Chats extends API_Controller
         if($this->post('operation_type') == DIRECT_BUY){
             $this->db->where('id',$obj->id)->update('bs_chat_history',['delivery_method_id' => $this->post('delivery_method_id'),'card_id' => $this->post('card_id'),'stripe_payment_method_id' => $response->id,'stripe_payment_method' => $response,'delivery_address_id' => $this->post('delivery_address_id'),'payin' => $this->post('payin')]);
         }
+        /* save shipping while request offer creation :start*/
+        if($this->post('operation_type') == REQUEST_ITEM){
+            if($this->post('quantity') > 1) {
+                $posts_var = $this->post();
+                if(!$posts_var['prepaidlabel']){
+                    if(!isset($posts_var['shipping_amount']) || empty($posts_var['shipping_amount']) || is_null($posts_var['shipping_amount'])) {
+                        $this->error_response("Please provide shipping amount");
+                    } else {
+                        $this->db->where('id', $obj->id)->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount'], 'updated_date' => $currentdate]);
+                    }
+                } else {
+                    if(isset($posts_var['shipping_amount'])) {
+                        $this->db->where('id', $obj->id)->update('bs_chat_history', ['shipping_amount' => $posts_var['shipping_amount'], 'updated_date' => $currentdate]);
+                    }
+                }
+                if($posts_var['prepaidlabel']) {
+                    if(!isset($posts_var['packagesize_id']) || empty($posts_var['packagesize_id']) || is_null($posts_var['packagesize_id'])){
+                        $this->error_response("Please provide packagesize id");
+                    }   
+                    if(!isset($posts_var['shippingcarrier_id']) || empty($posts_var['shippingcarrier_id']) || is_null($posts_var['shippingcarrier_id'])) {
+                        $this->error_response("Please provide shippingcarrier id");
+                    }   
+
+                    $this->db->where('id', $obj->id)->update('bs_chat_history', ['packagesize_id' => $posts_var['packagesize_id'],'shippingcarrier_id' => $posts_var['shippingcarrier_id'], 'updated_date' => $currentdate]);
+                }
+            }
+        }
+        
+        /* save shipping while request offer creation :end*/
+        
 		$this->ps_adapter->convert_chathistory( $obj );
         /*Notify seller :start*/
         $post = $this->post();

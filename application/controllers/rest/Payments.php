@@ -952,12 +952,16 @@ class Payments extends API_Controller {
                 
                 if($return_details->status == "accept" || ($orders['is_dispute'] && $orders['dispute_details']->status == "accept") ) {
                     $return_trackin_details = $this->db->from('bs_track_order')->where('order_id',$order_id)->where('is_return', 1)->order_by('id','desc')->get()->row();
-
+                    
                     $return_details->tracking_status = $return_trackin_details->status;
                     $return_details->tracking_url = $return_trackin_details->tracking_url;
                     $return_details->label_url = $return_trackin_details->label_url;
                 }
+                $return_refund_details = $this->db->from('bs_wallet')->where('parent_id',$order_id)->where('user_id', $orders['user_id'])->where_in('type', ['cancel_order_payment','refund'])->get()->row();
                 
+                if(!empty($return_refund_details)) {
+                    $orders['isRefund'] = 1;
+                }
                 $orders['return_details'] = $return_details;
             } else {
                 $orders['return_details'] = (object)[];
@@ -1745,7 +1749,7 @@ class Payments extends API_Controller {
                     $get_item = $this->db->select('pay_shipping_by,shipping_type,shippingcarrier_id,shipping_cost_by_seller,is_confirm_with_seller,Address_id')->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
 
                     if($get_item->pay_shipping_by == '1') {
-                        if($get_item->is_confirm_with_seller) {
+                        if($get_item->is_confirm_with_seller || $qty > 1) {
                             
                             $applied_shipping_price = $offer_details->shipping_amount;
                             if(!is_null($offer_details->shippingcarrier_id)) {
@@ -2396,6 +2400,9 @@ class Payments extends API_Controller {
             if($shipping_amount) {
                 if($get_item->pay_shipping_by == '1') {
                     $shipping_amount = $shipping_amount * 2;
+                }
+                if($check_for_order->service_fee) {
+                    $shipping_amount += (float)$check_for_order->service_fee;
                 }
                 $card_id = $posts['card_id'];
                 $cvc     = $posts['cvc'];
@@ -3576,6 +3583,9 @@ class Payments extends API_Controller {
         if($shipping_amount) {
             if($get_item->pay_shipping_by == '1') {
                 $shipping_amount = $shipping_amount * 2;
+            }
+            if($check_for_order->service_fee) {
+                $shipping_amount += (float)$check_for_order->service_fee;
             }
             $card_id = $posts['card_id'];
             $cvc     = $posts['cvc'];
