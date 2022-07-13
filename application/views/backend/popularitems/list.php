@@ -5,9 +5,9 @@
 		<th><?php echo get_msg('item_name'); ?></th>
 		<th><?php echo get_msg('category'); ?></th>
 		<th><?php echo get_msg('subcategory'); ?></th>
-		<th><?php echo get_msg('item type'); ?></th>
+		<th><?php echo get_msg('item_type'); ?></th>
 		<th><span class="th-title"><?php echo get_msg('view'); ?></span></th>
-		<th><?php echo get_msg('total views'); ?></th>
+		<th><?php echo get_msg('total_views'); ?></th>
 	</tr>
 
 	<?php $count = $this->uri->segment(4) or $count = 0; ?>

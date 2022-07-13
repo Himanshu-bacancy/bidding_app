@@ -11,7 +11,7 @@ class Coupans extends BE_Controller {
 	 */
 	function __construct() {
 
-		parent::__construct( MODULE_CONTROL, 'Coupans' );
+		parent::__construct( MODULE_CONTROL, 'Coupons' );
 		///start allow module check 
 		$conds_mod['module_name'] = $this->router->fetch_class();
 		$module_id = $this->Module->get_one_by($conds_mod)->module_id;

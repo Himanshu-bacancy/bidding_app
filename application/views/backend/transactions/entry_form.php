@@ -100,7 +100,7 @@
         <div class="card-header">
 	    	<h3 class="card-title"><?php echo get_msg('prd_info')?></h3>
 	  	</div>
-
+        
 	  	<div class="card-body">
 	      	<div class="row">
 	      		<div class="col-md-6">
@@ -138,7 +138,7 @@
 	                  'cat_id',
 	                  $options,
 	                  set_value( 'cat_id', show_data( @$item->cat_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="cat_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="cat_id"'
 	                );
 	              ?>
 	            </div>
@@ -161,7 +161,7 @@
 	                  'item_type_id',
 	                  $options,
 	                  set_value( 'item_type_id', show_data( @$item->item_type_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_type_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_type_id"'
 	                );
 	              ?>
 	            </div>
@@ -184,7 +184,7 @@
 	                  'item_location_id',
 	                  $options,
 	                  set_value( 'item_location_id', show_data( @$item->item_location_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_location_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_location_id"'
 	                );
 	              ?>
 	            </div>
@@ -207,7 +207,7 @@
 	                    'deal_option_id',
 	                    $options,
 	                    set_value( 'deal_option_id', show_data( @$item->deal_option_id), false ),
-	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="deal_option_id"',
+	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="deal_option_id"'
 	                  );
 	                ?>
 	            </div>
@@ -283,7 +283,7 @@
 	                    'sub_cat_id',
 	                    $options,
 	                    set_value( 'sub_cat_id', show_data( @$item->sub_cat_id), false ),
-	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"',
+	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"'
 	                  );
 
 	                } else {
@@ -295,7 +295,7 @@
 	                    'sub_cat_id',
 	                    $options,
 	                    set_value( 'sub_cat_id', show_data( @$item->sub_cat_id), false ),
-	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"',
+	                    'class="form-control form-control-sm mr-3" disabled="disabled" id="sub_cat_id"'
 	                  );
 	                }
 	                
@@ -321,7 +321,7 @@
 	                  'item_price_type_id',
 	                  $options,
 	                  set_value( 'item_price_type_id', show_data( @$item->item_price_type_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_price_type_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_price_type_id"'
 	                );
 	              ?>
 	            </div>
@@ -344,7 +344,7 @@
 	                  'item_currency_id',
 	                  $options,
 	                  set_value( 'item_currency_id', show_data( @$item->item_currency_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_currency_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="item_currency_id"'
 	                );
 	              ?>
 	            </div>
@@ -367,7 +367,7 @@
 	                  'condition_of_item_id',
 	                  $options,
 	                  set_value( 'condition_of_item_id', show_data( @$item->condition_of_item_id), false ),
-	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="condition_of_item_id"',
+	                  'class="form-control form-control-sm mr-3" disabled="disabled" id="condition_of_item_id"'
 	                );
 	              ?>
 	            </div>

@@ -440,7 +440,12 @@ class API_Controller extends REST_Controller
             if(is_array($data)) { 
                 foreach ($data as $key => $value) {
                     if(isset($value->requested_item_detail)) {
-                        unset($value->requested_item_detail->childsub_category->brands);
+//                        unset($value->requested_item_detail->childsub_category->brands);
+                        if(isset($value->requested_item_detail->childsub_category)) {
+                            unset($value->requested_item_detail->childsub_category->brands);
+                        } else if(isset($value->requested_item_detail['childsub_category'])) {
+                            unset($value->requested_item_detail['childsub_category']->brands);
+                        }
                     }
                     if($this->router->fetch_class() == 'chats') {
                         if(isset($value->buyer_unread_count) && empty($value->buyer_unread_count)) {
@@ -453,7 +458,11 @@ class API_Controller extends REST_Controller
                 }
             } else {
                 if(isset($data->requested_item_detail)) {
-                    unset($data->requested_item_detail->childsub_category->brands);
+                    if(isset($data->requested_item_detail->childsub_category)) {
+                        unset($data->requested_item_detail->childsub_category->brands);
+                    } else if(isset($data->requested_item_detail['childsub_category'])) {
+                        unset($data->requested_item_detail['childsub_category']->brands);
+                    }
                 }
                 if(isset($data->item_details)) {
                     unset($data->item_details->childsub_category->brands);

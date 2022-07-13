@@ -73,17 +73,17 @@ class Crons extends CI_Controller {
                             ->join('core_users', 'bs_order.user_id = core_users.user_id')
                             ->where('order_id', $value['order_id'])->get()->row_array();
                         
-                        if(!empty($buyer_detail)) {
-                            send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order",'title' => 'Order status update'],['order_id' => $value['order_id']] );
-                        }
                         $update_order['delivery_date'] = $date;
 //                        $update_order['completed_date'] = $date;
                         $update_order['return_shipment_delivered_date'] = $date;
                         $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
-                        $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
-                        
-                        $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
-                        $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
+                        if(!empty($buyer_detail)) {
+                            send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order",'title' => 'Order status update'],['order_id' => $value['order_id']] );
+                            $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
+
+                            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
+                            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
+                        }
                     }
                     $this->db->where('order_id', $value['order_id'])->update('bs_order',$update_order);
                 }
@@ -387,6 +387,7 @@ class Crons extends CI_Controller {
         if(!empty($past_record)) {
             foreach ($past_record as $key => $value) {
                 $update_order['status'] = 'cancel';
+                $update_order['cancel_by'] = 'admin';
                 $update_order['updated_at'] = $date;
                 $this->db->where('id', $value['id'])->update('bs_return_order', $update_order);
                 

@@ -42,6 +42,6 @@ class Dashboard extends BE_Controller {
 		
 		// Load the download helper and send the file to your desktop
 		$this->load->helper('download');
-		force_download('ps_wallpapers.zip', $export);
+		force_download('db_'.time().'.zip', $export);
 	}
 }
