@@ -21,7 +21,7 @@ class Crons extends CI_Controller {
                 ->join('bs_order', 'bs_track_order.order_id = bs_order.order_id')
                 ->where('bs_track_order.status != "ERROR"')
                 ->where('bs_track_order.status != ""')
-                ->where('bs_order.status !=  "delivered"')
+                ->where('bs_order.delivery_status !=  "delivered"')
                 ->get()->result_array();
         
         $date = date('Y-m-d H:i:s');
