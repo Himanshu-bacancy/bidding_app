@@ -79,10 +79,10 @@ class Crons extends CI_Controller {
                         $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
                         if(!empty($buyer_detail)) {
                             send_push( [$buyer_detail['device_token']], ["message" => "Order received by seller", "flag" => "order",'title' => 'Order status update'],['order_id' => $value['order_id']] );
-                            $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
-
-                            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
-                            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
+//                            $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => date('Y-m-d H:i:s')]);
+//
+//                            $wallet_amount = $buyer_detail['wallet_amount']+$buyer_detail['total_amount'];
+//                            $this->db->where('user_id', $buyer_detail['user_id'])->update('core_users',['wallet_amount' => $wallet_amount]);
                         }
                     }
                     $this->db->where('order_id', $value['order_id'])->update('bs_order',$update_order);
@@ -231,7 +231,7 @@ class Crons extends CI_Controller {
     }
     //need to change delivery date +1 to +3 for live in query
     public function order_complete() {
-        $past_record = $this->db->select('bs_order.order_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
+        $past_record = $this->db->select('bs_order.order_id, bs_order.user_id, bs_order.items, bs_order.seller_earn, bs_items.added_user_id, core_users.wallet_amount, bs_order.delivery_date')
                 ->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
@@ -246,7 +246,7 @@ class Crons extends CI_Controller {
 //                if($verify_date < $date) {
                     if(!$value->is_return && (!$value->is_dispute || is_null($value->is_dispute))) {
                         $update_order['is_buyer_rate'] = 1;
-                        $update_order['buyer_rate_date'] = $date;
+                        $update_order['rate_date'] = $date;
                         $var = ['order_id' => $value['order_id'], 'from_user_id' => $value['user_id'], 'to_user_id' => $value['added_user_id'], 'rating' => DEFAULT_RATE, 'title' => 'Default rating', 'description' => 'Default rating given by system'];
                         $this->Rate->save( $var );
                 

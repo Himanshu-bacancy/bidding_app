@@ -89,6 +89,17 @@ class Reason extends API_Controller
                     } else {
                         $this->error_response(get_msg( 'err_cancel_offer'));
                     }
+                    $get_user = $this->db->select('device_token')->from('core_users');
+                    if($this->post('user_id') == $offersData->buyer_user_id) {
+                        $user_identy_string = 'buyer';
+                        $get_user = $get_user->where('user_id', $offersData->seller_user_id);
+                    } else {
+                        $user_identy_string = 'seller';
+                        $get_user = $get_user->where('user_id', $offersData->buyer_user_id);
+                    }
+                    $get_user = $get_user->get()->row();
+                    
+                    send_push( [$get_user->device_token], ["message" => "OFFER REQUEST CANCELLED BY ".$user_identy_string, "flag" => "chat", 'title' => 'NOT THIS TIME!'],['chat_id' => $chatId] );
                 }
             } else {
                 $this->error_response(get_msg( 'offer_already_cancelled'));

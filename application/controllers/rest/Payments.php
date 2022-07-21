@@ -571,7 +571,7 @@ class Payments extends API_Controller {
             
             $package_details = $this->db->from('bs_packagesizes')->where('id', $shippingcarriers_details->packagesize_id)->get()->row();
             
-            $buyer_detail = $this->db->select('user_name,user_email,user_phone,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
+            $buyer_detail = $this->db->select('user_name,user_email,user_phone,device_token,bs_addresses.address1,bs_addresses.address2,bs_addresses.city,bs_addresses.state,bs_addresses.country,bs_addresses.zipcode,bs_addresses.id')->from('bs_order')
                     ->join('core_users', 'bs_order.user_id = core_users.user_id')
 //                    ->join('bs_addresses', 'core_users.user_id = bs_addresses.user_id')
                     ->join('bs_addresses', 'bs_order.address_id = bs_addresses.id')
@@ -694,6 +694,10 @@ class Payments extends API_Controller {
                     $this->error_response('Transaction requires authorization');
                 }
                 $this->db->where('order_id', $posts_var['order_id'])->update('bs_order',['seller_transaction_status' => $response->status, 'seller_transaction_id' => $response->id, 'processed_date' => $date]);
+                if(!empty($buyer_detail->device_token)) {
+                    send_push( [$buyer_detail->device_token], ["message" => "Seller confirm shipping cost", "flag" => "order", 'title' => 'ALMOST THERE!'],['order_id' => $posts_var['order_id'], 'price' => $amount] );
+                }
+                
                 $this->response(['status' => "success", 'track_number' => $track_number]);
             } else {
                 $this->db->where('order_id', $record_id)->update('bs_order',['seller_transaction_status' => 'fail']);
@@ -2302,12 +2306,13 @@ class Payments extends API_Controller {
         if($check_for_order->status == 'initiate') {
             $this->db->where('order_id', $posts['order_id'])->update('bs_return_order', ['status' => 'cancel', 'cancel_by' => 'buyer', 'updated_at' => $date]);
             
-            $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+            $seller = $this->db->select('core_users.device_token as seller_token, bs_items.title as item_name, buyer.device_token as buyer_token')->from('bs_items')
                         ->join('bs_order', 'bs_order.items = bs_items.id')
+                        ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
                         ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
                         ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
             if(!empty($seller)) {
-                send_push( [$seller->device_token], ["message" => "Order return request canceled", "flag" => "order"],['order_id' => $posts['order_id']] );
+                send_push( [$seller->seller_token, $seller->buyer_token], ["message" => "Order return request canceled", "flag" => "order", 'title' => 'RETURN CANCELLED'],['order_id' => $posts['order_id']] );
             }
 
             $this->response(['status' => "success", 'message' => 'Order return canceled']);
@@ -2494,7 +2499,7 @@ class Payments extends API_Controller {
                         $update_order['payment_status'] = $response->status;
                         $update_order['transaction_id'] = $response->id;
                         $update_order['payment_response'] = $response;
-                        $message = "Seller accepted return request";
+                        $message = "SELLER ACCEPTED RETURN REQUEST, TIME TO SHIP YOUR RETURN. PRINT THE LABEL AND RETURN WITHIN 3 DAYS";
                     } else {
                         $this->db->insert('bs_stripe_error', ['order_id' => $posts['order_id'], 'card_id' => $card_id, 'response' => $response, 'note' => 'return order shipping error', 'created_at' => date('Y-m-d H:i:s')]);
                         $this->error_response(get_msg('stripe_transaction_failed'));
@@ -2575,14 +2580,25 @@ class Payments extends API_Controller {
                 $insert_arr['is_seller_generate'] = 1;
                 
                 $update_order['is_seller_dispute'] = 1;
+                $user_identy_string = 'seller';
             } else {
+                $user_identy_string = 'buyer';
                 $update_order['is_dispute'] = 1;
             }
             $this->db->insert('bs_dispute', $insert_arr);
             
             $update_order['dispute_date'] = $date;
             $this->db->where('order_id', $posts['order_id'])->update('bs_order', $update_order);
-            
+            $get_record = $this->db->select('buyer.device_token,seller.device_token as seller_device_token')
+                ->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->where('bs_order.order_id', $posts['order_id'])
+                ->get()->row();
+            if(!empty($get_record)) {
+                send_push( [$get_record->device_token, $get_record->seller_device_token], ["message" => "DISPUTE WAS OPENED BY ".$user_identy_string, "flag" => "order", 'title' => 'DISPUTE OPENED!'],['order_id' => $posts['order_id']] );
+            }
             $message = 'Dispute generated against order';
         }
         
@@ -2750,6 +2766,13 @@ class Payments extends API_Controller {
             if(!empty($buyer_detail)) {
                 send_push( [$buyer_detail['device_token']], ["message" => "Seller has received the item", "flag" => "order", "title" => $track_order['item_name']." order udpate"],['order_id' => $posts['order_id']] );
             }
+            $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                ->join('bs_order', 'bs_order.items = bs_items.id')
+                ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                ->where('bs_order.order_id', $posts['order_id'])->get()->row_array();
+            if(!empty($seller)) {
+                send_push( [$seller['device_token']], ["message" => "RETURN HAS BEEN DELIVERED", "flag" => "order", "title" => $track_order['item_name']." order udpate"],['order_id' => $posts['order_id']] );
+            }
             $update_order['return_shipment_delivered_date'] = $date;
             $update_order['seller_dispute_expiry_date'] = date('Y-m-d H:i:s', strtotime($date. ' + 1 days'));
 //            $this->db->insert('bs_wallet',['parent_id' => $posts['order_id'],'user_id' => $buyer_detail['user_id'],'action' => 'plus', 'amount' => $buyer_detail['total_amount'],'type' => 'refund', 'created_at' => $date]);
@@ -2815,7 +2838,15 @@ class Payments extends API_Controller {
         $posts = $this->post();
         
         $this->db->where('order_id', $posts['order_id'])->update('bs_order',['seller_address_id' => $posts['address_id']]);
-        
+         $get_user = $this->db->select('seller.device_token as seller_device_token')
+                ->from('bs_order')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->where('bs_order.order_id', $posts['order_id'])
+                ->get()->row();
+         if(!empty($get_user)) {
+            send_push( [$get_user->seller_device_token], ["message" => "SHIPPING ADDRESS UPDATED", "flag" => "chat", 'title' => 'JUST TO BE SURE'],['order_id' => $posts['order_id']] );
+         }
         $this->response(['status' => 'success','message' => 'Address updated successfuly', 'address_id' => $posts['address_id']]);
     }
     
@@ -3386,7 +3417,7 @@ class Payments extends API_Controller {
         if (!$this->is_valid($rules)) exit; 
         $posts = $this->post();
         $date = date('Y-m-d H:i:s');
-        $get_current_balance = $this->db->select('wallet_amount,connect_id')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
+        $get_current_balance = $this->db->select('wallet_amount,connect_id,device_token')->from('core_users')->where('user_id', $posts['user_id'])->get()->row();
         
         if($get_current_balance->wallet_amount && $get_current_balance->wallet_amount > $posts['amount']) {
             $paid_config = $this->Paid_config->get_one('pconfig1');
@@ -3414,6 +3445,8 @@ class Payments extends API_Controller {
                     $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'bank_deposit', 'created_at' => $date]);
 
                     $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
+                    
+                    send_push( [$get_current_balance->device_token], ["message" => "YOU HAVE INITIATE YOUR BALANCE TO YOUR BANK ACC", "flag" => "transfer", 'title' => 'JUST TO BE SURE'] );
 
                     $this->response(['status' => "success", 'message' => 'Amount transfered']);
 
@@ -3468,6 +3501,8 @@ class Payments extends API_Controller {
                     $this->db->insert('bs_wallet',['parent_id' => $record_id,'user_id' => $posts['user_id'],'action' => 'minus', 'amount' => $posts['amount'],'type' => 'instantpay', 'created_at' => $date]);
 
                     $this->db->where('user_id', $posts['user_id'])->update('core_users',['wallet_amount' => $get_current_balance->wallet_amount - $posts['amount']]);
+                    
+                    send_push( [$get_current_balance->device_token], ["message" => "YOU HAVE INITIATE YOUR BALANCE TO YOUR BANK ACC", "flag" => "transfer", 'title' => 'JUST TO BE SURE'] );
                     
                     $this->response(['status' => "success", 'message' => 'Amount transfered', 'payout' => $payout]);
                 }catch(Exception $e) {
