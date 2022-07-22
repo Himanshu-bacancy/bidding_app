@@ -587,3 +587,6 @@ ALTER TABLE `bs_dispute` CHANGE `phone` `message` TEXT CHARACTER SET latin1 COLL
 ALTER TABLE `bs_dispute` CHANGE `message` `phone` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 
 ALTER TABLE `bs_cron_log` ADD `timezone` VARCHAR(255) NOT NULL AFTER `created_at`;
+
+// RB: ADDED ON 22/07/2022
+ALTER TABLE `core_users` ADD `referral_code` VARCHAR(100) NULL AFTER `connect_id`;

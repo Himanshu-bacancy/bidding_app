@@ -53,7 +53,7 @@ class Meeting extends API_Controller {
         
         $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('user_id', $posts['buyer_id'])->get()->row();
-        send_push( [$buyer->device_token], ["message" => "Meeting request arrived from seller", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_item->title." order update"] );
+        send_push( [$buyer->device_token], ["message" => "Meeting request arrived from seller", "flag" => "order", 'title' => $get_item->title." order update"],['order_id' => $posts['order_id']] );
     
         $this->response(['status' => 'success', 'message' => 'Locations sent']);
     }
@@ -188,7 +188,7 @@ class Meeting extends API_Controller {
             
             $seller = $this->db->select('device_token')->from('core_users')->where('user_id', $get_user->added_user_id)->get()->row();
             
-            send_push( [$seller->device_token], ["message" => "Barcode has been scanned and payment successfully", "flag" => "order", 'order_id' => $posts['order_id'], 'title' => $get_user->title." order update"] );
+            send_push( [$seller->device_token], ["message" => "Barcode has been scanned and payment successfully", "flag" => "order", 'title' => $get_user->title." order update"],['order_id' => $posts['order_id']] );
                     
             $this->response(['status' => 'success', 'message' => 'Qr code verified']);
         } else {

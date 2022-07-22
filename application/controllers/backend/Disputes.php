@@ -279,21 +279,45 @@ class Disputes extends BE_Controller {
 	 */
 	function ajx_publish( $id = 0, $order_id )
 	{
-        $topic_data = array( 'status'=>'accept','updated_at' => date('Y-m-d H:i:s') );
+        $date = date('Y-m-d H:i:s');
+        $topic_data = array( 'status'=>'accept','updated_at' =>  $date);
         // prepare data
 			
 		// save data
 		if ( $this->Dispute->save( $topic_data, $id )) {
-            $buyer = $this->db->select('device_token')->from('bs_order')
-                    ->join('core_users', 'bs_order.user_id = core_users.user_id')
-                    ->where('order_id', $order_id)->get()->row();
+            $get_detail = $this->db->from('bs_dispute')->where('id', $id)->get()->row();
+            $past_record = $this->db->select('bs_return_order.id, bs_return_order.amount, bs_order.order_id, bs_order.user_id, bs_order.item_offered_price, bs_order.qty, bs_order.total_amount, bs_order.seller_charge, bs_order.seller_earn, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+                ->from('bs_order')
+                ->join('bs_return_order', 'bs_order.order_id = bs_return_order.order_id')
+                ->join('bs_items', 'bs_order.items = bs_items.id')
+                ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+                ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                ->where('bs_order.order_id', $order_id)
+            ->get()->row_array();
+            if($get_detail->is_seller_generate) {
+                /*shipping charge of return accept + seller earning on order:start*/
+                $total_credited = (float)$past_record['item_offered_price']*(int)$past_record['qty'];
+                $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $past_record['added_user_id'],'action' => 'plus', 'amount' => $total_credited,'type' => 'refund', 'created_at' => $date]);
+                
+                $this->db->where('user_id', $past_record['added_user_id'])->update('core_users',['wallet_amount' => $past_record['seller_wallet_amount']+$total_credited]);
+                /*shipping charge of return accept + seller earning on order:end*/
+                
+                send_push( [$past_record['seller_device_token']], ["message" => "Refund has been added to yout wallet", "flag" => "order", 'title' => $past_record['title']." order update"],['order_id' => $order_id] );
+                
+                send_push( [$past_record['device_token']], ["message" => "Dispute accpeted", "flag" => "order", 'title' => $past_record['title']." order update"],['order_id' => $order_id] );
+            } else {
+                send_push( [$past_record['device_token'],$past_record['seller_device_token']], ["message" => "Dispute against Seller Has been accpeted", "flag" => "order", 'title' => $past_record['title']." order update"],['order_id' => $order_id] );
+            }
+//            $buyer = $this->db->select('device_token')->from('bs_order')
+//                    ->join('core_users', 'bs_order.user_id = core_users.user_id')
+//                    ->where('order_id', $order_id)->get()->row();
+//            
+//            $seller = $this->db->select('device_token,title')->from('bs_order')
+//                        ->join('bs_items', 'bs_order.items = bs_items.id')
+//                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+//                        ->where('order_id', $order_id)->get()->row();
             
-            $seller = $this->db->select('device_token,title')->from('bs_order')
-                        ->join('bs_items', 'bs_order.items = bs_items.id')
-                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
-                        ->where('order_id', $order_id)->get()->row();
-            
-            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been accpeted", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
+//            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been accpeted", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
                 
 			echo 'true';
 		} else {
@@ -314,21 +338,44 @@ class Disputes extends BE_Controller {
 		$topic_data = array( 'status'=> 'reject','updated_at' => $date );
 		// save data
 		if ( $this->Dispute->save( $topic_data, $id )) {
-            
-            $buyer = $this->db->select('device_token')->from('bs_order')
-                    ->join('core_users', 'bs_order.user_id = core_users.user_id')
-                    ->where('order_id', $order_id)->get()->row();
-            
-            $seller = $this->db->select('device_token,title,bs_order.seller_earn,wallet_amount,bs_items.added_user_id')->from('bs_order')
-                        ->join('bs_items', 'bs_order.items = bs_items.id')
-                        ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+            $get_detail = $this->db->from('bs_dispute')->where('id', $id)->get()->row();
+            if($get_detail->is_seller_generate) {
+                $past_record = $this->db->select('bs_return_order.id, bs_return_order.amount, bs_order.order_id, bs_order.user_id, bs_order.item_offered_price, bs_order.qty, bs_order.shipping_amount, bs_order.total_amount, bs_order.seller_charge, bs_order.seller_earn, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+                    ->from('bs_order')
+                    ->from('bs_return_order', 'bs_order.order_id = bs_return_order.order_id')
+                    ->join('bs_items', 'bs_order.items = bs_items.id')
+                    ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
+                    ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
+                    ->where('bs_order.order_id', $order_id);
+                /*shipping charge of return accept + seller earning on order:start*/
+                $total_credited = (float)$past_record['item_offered_price']*(int)$past_record['qty'];
+                if($past_record['pay_shipping_by'] == '1') {
+                    $total_credited += $past_record['shipping_amount'];
+                }
+                $this->db->insert('bs_wallet',['parent_id' => $order_id,'user_id' => $past_record['user_id'],'action' => 'plus', 'amount' => $total_credited,'type' => 'refund', 'created_at' => $date]);
+                
+                $this->db->where('user_id', $past_record['user_id'])->update('core_users',['wallet_amount' => $past_record['wallet_amount']+$total_credited]);
+                /*shipping charge of return accept + seller earning on order:end*/
+                
+                send_push( [$past_record['device_token']], ["message" => "Refund has been added to yout wallet", "flag" => "order", 'title' => $past_record['title']." order update"],['order_id' => $order_id] );
+                
+                send_push( [$past_record['seller_device_token']], ["message" => "Dispute rejected", "flag" => "order", 'title' => $past_record['title']." order update"],['order_id' => $order_id] );
+            } else {
+                $buyer = $this->db->select('device_token')->from('bs_order')
+                        ->join('core_users', 'bs_order.user_id = core_users.user_id')
                         ->where('order_id', $order_id)->get()->row();
-            
-            $this->db->insert('bs_wallet', ['parent_id' => $order_id, 'user_id' => $seller->added_user_id, 'action' => 'plus', 'amount' => $seller->seller_earn, 'type' => 'complete_order', 'created_at' => $date]);
+                
+                $seller = $this->db->select('device_token,title,bs_order.seller_earn,wallet_amount,bs_items.added_user_id')->from('bs_order')
+                            ->join('bs_items', 'bs_order.items = bs_items.id')
+                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                            ->where('order_id', $order_id)->get()->row();
 
-            $this->db->where('user_id', $seller->added_user_id)->update('core_users', ['wallet_amount' => $seller->wallet_amount + (float)$seller->seller_earn ]);
-            
-            send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been rejected", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
+                $this->db->insert('bs_wallet', ['parent_id' => $order_id, 'user_id' => $seller->added_user_id, 'action' => 'plus', 'amount' => $seller->seller_earn, 'type' => 'complete_order', 'created_at' => $date]);
+
+                $this->db->where('user_id', $seller->added_user_id)->update('core_users', ['wallet_amount' => $seller->wallet_amount + (float)$seller->seller_earn ]);
+
+                send_push( [$buyer->device_token,$seller->device_token], ["message" => "Dispute against Seller Has been rejected", "flag" => "order", 'title' => $seller->title." order update"],['order_id' => $order_id] );
+            }
             
 			echo 'true';
 		} else {
