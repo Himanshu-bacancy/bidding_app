@@ -410,7 +410,9 @@ class Items extends API_Controller
             if(!empty($default_address_data->timezone) && !is_null($default_address_data->timezone)) {
                 $todate = new DateTime("now", new DateTimeZone($default_address_data->timezone) );
                 $todate = $todate->format('Y-m-d');
-            } 
+            } else {
+                $todate = date('Y-m-d');
+            }
             $expiration_date = date('Y-m-d', strtotime($todate. ' + '.$this->post('expiration_date_days').' days'));
         }
         
@@ -453,7 +455,7 @@ class Items extends API_Controller
         	"added_date" =>  date("Y-m-d H:i:s")
         	
         );
-
+        
 		// check if similar items are selected
 
 		if($this->post('is_accept_similar')=='1' && (count($this->post('similar_items'))<=0 || empty($this->post('similar_items'))))
@@ -494,6 +496,9 @@ class Items extends API_Controller
 		if($id != ""){
 			$status = $this->Item->get_one($id)->status;
 			$item_data['status'] = $status;
+            if(!empty($item_data['expiration_date'])) {
+                $item_data['is_item_expired'] = 0;
+            }
 		 	$this->Item->save($item_data,$id);
 		 	///start deep link update item tb by MN
 			$description = $item_data['description'];

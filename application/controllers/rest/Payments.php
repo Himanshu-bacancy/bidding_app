@@ -1783,6 +1783,15 @@ class Payments extends API_Controller {
                     $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $posts_var['item_id'], 'qty' => $qty, 'delivery_method' => $delivery_method_id,'payment_method' => 'card', 'card_id' => $card_id, 'address_id' => $delivery_address_id,'seller_address_id' => $get_item->Address_id, 'item_offered_price' => $offer_details->nego_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'pending', 'confirm_by_seller'=>1, 'delivery_status' => 'pending', 'transaction' => '','created_at' => $date,'operation_type' => $offer_details->operation_type]);
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
+                    if($offer_details->operation_type == REQUEST_ITEM) {
+                        $requested_item_stock = $this->db->from('bs_items')->where('id', $offer_details->requested_item_id)->get()->row();
+                        $requested_item_stock_update = $requested_item_stock->pieces - $qty;
+                        $requested_item_stock_array['pieces'] = $requested_item_stock_update;
+                        if(!$requested_item_stock_update) {
+                            $requested_item_stock_array['is_sold_out'] = 1;
+                        }
+                        $this->db->where('id', $offer_details->requested_item_id)->update('bs_items', $requested_item_stock_array);
+                    }
                     $item_detail = $this->db->from('bs_items')->where('id', $posts_var['item_id'])->get()->row();
                     $stock_update = $item_detail->pieces - $qty;
                     $update_array['pieces'] = $stock_update;
@@ -1791,16 +1800,6 @@ class Payments extends API_Controller {
                     }
                     $this->db->where('id', $posts_var['item_id'])->update('bs_items', $update_array);
                     $this->db->insert('bs_order_confirm', ['order_id' => $new_odr_id, 'item_id' => $posts_var['item_id'], 'seller_id' => $item_detail->added_user_id, 'created_at' => $date]);
-                    
-                    if($offer_details->operation_type == REQUEST_ITEM) {
-                        $requested_item_stock = $this->db->from('bs_items')->where('id', $offer_details->requested_item_id)->get()->row();
-                        $requested_item_stock_update = $requested_item_stock->pieces - 1;
-                        $requested_item_stock_array['pieces'] = $requested_item_stock_update;
-                        if(!$requested_item_stock_update) {
-                            $requested_item_stock_array['is_sold_out'] = 1;
-                        }
-                        $this->db->where('id', $offer_details->requested_item_id)->update('bs_items', $requested_item_stock_array);
-                    }
                     /*manage stock :end*/
                     
                     # set stripe test key
@@ -1829,7 +1828,7 @@ class Payments extends API_Controller {
                             $buyer = $this->db->select('device_token')->from('core_users')
                                     ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
                             $send_noti_user_token = $buyer->device_token;
-                            if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                            if($offer_details->buyer_user_id == $posts_var['user_id']) {
                                 $send_noti_user_token = $seller->device_token;
                             }
                             send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' =>$new_odr_id] );
@@ -1858,7 +1857,7 @@ class Payments extends API_Controller {
                     $item_detail = $this->db->from('bs_items')->where('id', $offer_details->requested_item_id)->get()->row();
                     
 //                    $date = date('Y-m-d H:i:s');
-                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => $offer_details->requested_item_id, 'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'seller_address_id' => $item_detail->Address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
+                    $this->db->insert('bs_order', ['order_id' => $new_odr_id, 'offer_id' => $posts_var['offer_id'],'user_id' => $order_user_id, 'items' => ($posts_var['item_id'] ?? $offer_details->requested_item_id), 'qty' => $qty, 'delivery_method' => $delivery_method_id, 'payment_method' => 'cash', 'card_id' => 0, 'address_id' => $delivery_address_id, 'seller_address_id' => $item_detail->Address_id, 'item_offered_price' => $item_price, 'service_fee' => $service_fee, 'processing_fee' => $processing_fees, 'seller_earn' => $seller_earn, 'shipping_amount' => $shipping_amount, 'total_amount' => $item_price, 'status' => 'succeeded', 'confirm_by_seller'=>1,'delivery_status' => 'pending', 'transaction' => '','created_at' => $date, 'processed_date' => $date,'operation_type' => $offer_details->operation_type]);
                     
                     $record = $this->db->insert_id();
                     /*manage stock :start*/
@@ -1925,7 +1924,7 @@ class Payments extends API_Controller {
                                 $buyer = $this->db->select('device_token')->from('core_users')
                                     ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
                                 $send_noti_user_token = $buyer->device_token;
-                                if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                                if($offer_details->buyer_user_id == $posts_var['user_id']) {
                                     $send_noti_user_token = $seller->device_token;
                                 }
                                 send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
@@ -1954,7 +1953,7 @@ class Payments extends API_Controller {
                         $buyer = $this->db->select('device_token')->from('core_users')
                           ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
                         $send_noti_user_token = $buyer->device_token;
-                        if($offer_details->buyer_user_id != $posts_var['user_id']) {
+                        if($offer_details->buyer_user_id == $posts_var['user_id']) {
                             $send_noti_user_token = $seller->device_token;
                         }
                         send_push( [$send_noti_user_token], ["message" => "New order placed", "flag" => "order",'title' => $seller->item_name],['image' => 'http://bacancy.com/biddingapp/uploads/'.$item_images->img_path,'order_id' => $new_odr_id] );
@@ -2028,9 +2027,13 @@ class Payments extends API_Controller {
                     
                     $this->db->where('id',$posts_var['offer_id'])->update('bs_chat_history',['is_offer_complete' => 1,'order_id' => $new_odr_id, 'delivery_address_id' => $delivery_address_id]);
 
+                    $seller = $this->db->select('device_token,bs_items.title as item_name')->from('bs_items')
+                            ->join('core_users', 'bs_items.added_user_id = core_users.user_id')
+                            ->where('bs_items.id', $offer_details->requested_item_id)->get()->row();
+                    
                     $buyer = $this->db->select('device_token')->from('core_users')
                             ->where('core_users.user_id', $offer_details->buyer_user_id)->get()->row();
-                    send_push( [$buyer->device_token], ["message" => "Offer confirmed", "flag" => "order"],['order_id' => $new_odr_id] );
+                    send_push( [$buyer->device_token], ["message" => "New order placed", "flag" => "order", 'title' => $seller->item_name],['order_id' => $new_odr_id] );
                     
                     $this->response(['status' => "success", 'order_status' => 'success', 'order_type' => 'cash', 'order_id' => $new_odr_id, 'message' => 'Notification sent successfully']);
                 }

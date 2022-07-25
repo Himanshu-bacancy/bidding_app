@@ -676,7 +676,11 @@ class Chats extends API_Controller
 		} else {
             if($chat_history_data->nego_price == $this->post('nego_price') && !$chat_history_data->is_cancel) {
                 if($this->post('operation_type') != DIRECT_BUY) {
-                    $this->error_response( get_msg( 'Active offer already exist with same price' ));
+                    if($this->post('operation_type') == REQUEST_ITEM && $chat_history_data->requested_item_id == $requestedItemId && $chat_history_data->offered_item_id == $offeredItemId && $chat_history_data->buyer_user_id == $buyerUserId && $chat_history_data->seller_user_id == $sellerUserId) { 
+                        $this->error_response( get_msg( 'Active offer already exist with same price' ));
+                    } else {
+                        $this->error_response( get_msg( 'Active offer already exist with same price' ));
+                    }
                 } else if($this->post('operation_type') == DIRECT_BUY && $chat_history_data->delivery_method_id == $this->post('delivery_method_id')) {
                     $this->error_response( get_msg( 'Active offer already exist with same price' ));
                 }
