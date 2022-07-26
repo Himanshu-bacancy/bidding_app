@@ -269,7 +269,7 @@ class Crons extends CI_Controller {
     
     //need to change createad_at +1 to +3 for live in query
     public function cancel_order() {
-        $past_record = $this->db->select('bs_order.order_id, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+        $past_record = $this->db->select('bs_order.order_id, bs_order.offer_id, bs_order.items, bs_order.qty, bs_order.operation_type, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_items.title, bs_items.pieces, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
                 ->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
@@ -296,6 +296,17 @@ class Crons extends CI_Controller {
                 $this->db->insert('bs_wallet',['parent_id' => $value['order_id'],'user_id' => $value['user_id'], 'action' => 'plus', 'amount' => $value['total_amount'], 'type' => 'cancel_order_payment', 'created_at' => $date]);
             
                 $this->db->where('user_id', $value['user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + (float)$value['total_amount']]);
+                
+                $this->db->where('id', $value['items'])->update('bs_items', ['pieces' => $value['pieces']+(int)$value['qty'],'is_sold_out' => 0]);
+                
+                if($value['operation_type'] == EXCHAGE) {
+                    $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.offered_item_id = bs_items.id')->where('bs_exchange_chat_history.chat_id',$value['offer_id'])->get()->result();
+                    foreach($item_details as $k => $v) {
+                        $update_array['pieces'] = $v->pieces + 1;
+                        $update_array['is_sold_out'] = 0;
+                        $this->db->where('id', $v->item_id)->update('bs_items', $update_array);
+                    } 
+                }
                 
                 send_push( [$value['device_token'], $value['seller_device_token']], ["message" => "Order request canceled", "flag" => "order", "title" => $value['title'].' order update'],['order_id' => $value['order_id']] );
             }
@@ -371,7 +382,7 @@ class Crons extends CI_Controller {
     public function refund_seller() {
         $past_record = $this->db->select('bs_return_order.id, bs_return_order.amount, bs_order.order_id, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_order.seller_earn, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
             ->from('bs_order')
-            ->from('bs_return_order', 'bs_order.order_id = bs_return_order.order_id')
+            ->join('bs_return_order', 'bs_order.order_id = bs_return_order.order_id')
             ->join('bs_items', 'bs_order.items = bs_items.id')
             ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
             ->join('core_users as seller', 'bs_items.added_user_id = seller.user_id')
@@ -407,9 +418,9 @@ class Crons extends CI_Controller {
         echo 'cron run successfully';
     }
     
-     //need to change createad_at +1 to +3 for live in query
+    //need to change createad_at +1 to +3 for live in query
     public function meeting_cancel_order() {
-        $past_record = $this->db->select('bs_order.order_id, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_order.card_id, bs_items.title, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
+        $past_record = $this->db->select('bs_order.order_id, bs_order.offer_id, bs_order.items, bs_order.qty, bs_order.operation_type, bs_order.user_id, bs_order.total_amount, bs_order.seller_charge, bs_order.card_id, bs_items.title, bs_items.pieces, bs_items.pay_shipping_by, bs_items.added_user_id, buyer.wallet_amount, buyer.device_token, seller.wallet_amount as seller_wallet_amount, seller.device_token as seller_device_token')
                 ->from('bs_order')
                 ->join('bs_items', 'bs_order.items = bs_items.id')
                 ->join('core_users as buyer', 'bs_order.user_id = buyer.user_id')
@@ -443,6 +454,17 @@ class Crons extends CI_Controller {
                     $this->db->where('user_id', $value['user_id'])->update('core_users',['wallet_amount' => $value['wallet_amount'] + (float)$value['total_amount']]);
                 }
                 
+                $this->db->where('id', $value['items'])->update('bs_items', ['pieces' => $value['pieces']+(int)$value['qty'],'is_sold_out' => 0]);
+                
+                if($value['operation_type'] == EXCHAGE) {
+                    $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.offered_item_id = bs_items.id')->where('bs_exchange_chat_history.chat_id',$value['offer_id'])->get()->result();
+                    foreach($item_details as $k => $v) {
+                        $update_array['pieces'] = $v->pieces + 1;
+                        $update_array['is_sold_out'] = 0;
+                        $this->db->where('id', $v->item_id)->update('bs_items', $update_array);
+                    } 
+                }
+                
                 send_push( [$value['device_token'], $value['seller_device_token']], ["message" => "Order request canceled", "flag" => "order", "title" => $value['title'].' order update'],['order_id' => $value['order_id']] );
             }
         }
@@ -459,6 +481,24 @@ class Crons extends CI_Controller {
                 $amount = $payment_response->amount/100;
                 
                 $this->db->where('id',$value['id'])->update('bs_return_order',['amount' => $amount]);
+            }
+        }
+    }
+    
+    public function ref_code() {
+        $this->load->helper('string');
+        $return_user = $this->db->from('core_users')->where('user_is_sys_admin', 0)->get()->result_array();
+        if(!empty($return_user)) {
+            foreach ($return_user as $key => $value) {
+                $str = substr($value['user_id'], -5);
+                $str2 = str_replace(' ', '_',substr($value['user_name'], 3,3));
+                $mergestr = trim($str2.$str);
+                $append_str = random_string('alnum',8-strlen($mergestr));
+                $check_length = str_replace('_', $append_str, $mergestr);
+                if(strlen($check_length) < 8) {
+                    $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
+                } 
+                $this->db->where('user_id', $value['user_id'])->update('core_users',['referral_code' => strtoupper($check_length)]);
             }
         }
     }

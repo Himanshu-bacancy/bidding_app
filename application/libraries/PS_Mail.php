@@ -56,7 +56,14 @@ class PS_Mail {
 
 	        $this->CI->email->subject($subject);
 	        $this->CI->email->message($msg);
-			return $this->CI->email->send();	
+            if($this->CI->email->send()) {
+    			return true;	
+            } else {
+//                $errors = $this->CI->email->print_debugger();
+//                print_r($errors);
+//                die();
+                return false;
+            }
 		}
 	}
 
@@ -73,6 +80,7 @@ class PS_Mail {
 	 */
 	function send( $to, $subject, $msg, $from, $from_name = false )
 	{
+        $this->CI->email->initialize(smtp_config());
 		// Sender Information
 		$this->CI->email->from( $from, $from_name );
 		
@@ -84,8 +92,14 @@ class PS_Mail {
 
 		// msg
 		$this->CI->email->message( $msg );	
-
+        if($this->CI->email->send()) {
+            return TRUE;
+        } else {
+//            $error = show_error($this->CI->email->print_debugger());
+//            dd($error);
+             return FALSE;
+        }
 		// Send Email
-		return $this->CI->email->send();
+//		return $this->CI->email->send();
 	}
 }

@@ -705,6 +705,7 @@ class Items extends API_Controller
 		$conds = $final_conds;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
+//        dd($conds);
 		if ($conds['item_search']==1) {
 
 			if(isset($conds['added_user_id']) && !empty($conds['added_user_id'])){
@@ -717,7 +718,7 @@ class Items extends API_Controller
 			$conds_login_block['user_id'] = $this->get_login_user_id();
 			$conds_login_block['type'] = 'block_user';
 			$login_block_count = $this->Reason_operation->count_all_by($conds_login_block);
-			//print_r($login_block_count);die;
+//			print_r($login_block_count);die;
 
 			// user blocked existed by login user
 			if ($login_block_count > 0) {
@@ -747,11 +748,11 @@ class Items extends API_Controller
 			//item report check with login_user_id
 			$conds_report['user_id'] = $this->get_login_user_id();
 			$conds_report['type'] = 'report_item';
-			$conds_report['status'] = ['re-listed','rejected'];
+			$conds_report['status'] = ['re-listed'];
 			$reported_data_count = $this->Reason_operation->count_all_by($conds_report);
             
 			$rejected_conds_report['type'] = 'report_item';
-            $rejected_conds_report['status'] = 'rejected';
+            $rejected_conds_report['status'] = ['re-listed'];
 			$rejected_data_count = $this->Reason_operation->count_all_by($rejected_conds_report);
             
 			// item reported existed by login user

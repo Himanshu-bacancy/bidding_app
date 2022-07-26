@@ -109,9 +109,15 @@ class Reporteditems extends BE_Controller {
 	{
         $record_id = $this->input->post('record_id');
         $changestatus = $this->input->post('changestatus');
+        $item_id = $this->input->post('item_id');
         $update_data['status'] = $changestatus;
         $update_data['updated_at'] =  date('Y-m-d H:i:s');
         $this->db->where('id', $record_id)->update('bs_reason_operations',$update_data);
+        if($changestatus == 'rejected'){
+            $this->db->where('id', $item_id)->update('bs_items',['is_report_rejected' => 1]);
+        } else {
+            $this->db->where('id', $item_id)->update('bs_items',['is_report_rejected' => 0]);
+        }
         $this->set_flash_msg( 'success', get_msg( 'status updated' ));
 		redirect( $this->module_site_url());
 	}

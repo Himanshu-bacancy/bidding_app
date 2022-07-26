@@ -152,14 +152,15 @@ if ( ! function_exists( 'smtp_config' ))
 		$smtp_pass = $CI->Backend_config->get_one('be1')->smtp_pass;
 
 		$config = Array(
-		    'protocol' => 'smtp',
-		    'smtp_host' => 'smtp.gmail.com',
-		    'smtp_port' => 465,
-		    'smtp_user' => 'himanshu.sharma@bacancy.com', //sender@blog.panacea-soft.com //azxcvbnm
-		    'smtp_pass' => 'lnkvpcsjefqgpszr',
-		    'mailtype'  => 'html', 
-		    'charset'   => 'iso-8859-1',
-			'smtp_crypto'=> 'ssl'
+		    'protocol'  => "smtp",
+		    'smtp_host' => "ssl://smtp.gmail.com",
+		    'smtp_port' => "465",
+		    'smtp_user' => "himanshu.sharma@bacancy.com", //sender@blog.panacea-soft.com //azxcvbnm
+		    'smtp_pass' => "lnkvpcsjefqgpszr",
+		    'charset'   => "utf-8",
+		    'mailtype'  => "html", 
+//			'smtp_crypto' => "ssl",
+			'newline'   => "\r\n"
 		);
 		
 		return $config;

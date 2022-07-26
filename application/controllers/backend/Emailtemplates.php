@@ -318,10 +318,10 @@ class Emailtemplates extends BE_Controller {
     public function sendmailtoall($id = 0) {
         $template = $this->Emailtemplate->get_one( $id );
         if(!empty($template)) {
-            $users = $this->db->select('device_token')->from('core_users')->where('device_token IS NOT NULL')->where('device_token != " "')->get()->result_array();
+            $users = $this->db->select('user_email')->from('core_users')->get()->result_array();
             $maintemplate = file_get_contents(base_url('templates/main.html'));
             $message  = str_replace('##CONTENT##', html_entity_decode($template->content), $maintemplate);
-            sendEmail($template->title, '', $message, array_column($users,'device_token'));
+            sendEmail($template->title, '', $message, array_column($users,'user_email'));
             $this->set_flash_msg( 'success', get_msg( 'success_email_send' ));
             redirect( $this->module_site_url());
         }

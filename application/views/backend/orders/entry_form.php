@@ -176,23 +176,23 @@
             </div>
             
             <div class="row">
-            	<div class="col-md-6">
-            		<div class="form-group">
-                   		<label>
-                   			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('QRcode')?>
-						</label>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>
+                            <span style="font-size: 17px; color: red;">*</span>
+                            <?php echo get_msg('Seller Charge')?>
+                        </label>
 
-						<?php echo form_input( array(
-							'name' => 'qrcode',
-							'value' => set_value( 'qrcode', show_data( @$order->qrcode ), false ),
-							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'qrcode' ),
-							'id' => 'qrcode',
-							'readonly' => 'true'
-						)); ?>
-              		</div>
-            	</div>
+                        <?php echo form_input( array(
+                            'name' => 'seller_charge',
+                            'value' => set_value( 'seller_charge', show_data( @$order->seller_charge ), false ),
+                            'class' => 'form-control form-control-sm',
+                            'placeholder' => get_msg( 'seller_charge' ),
+                            'id' => 'seller_charge',
+                            'readonly' => 'true'
+                        )); ?>
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>
@@ -251,7 +251,43 @@
                     </div>
                 </div>
             </div>
-            
+            <?php if(@$order->delivery_method == PICKUP_ONLY) { ?>
+            <div class="row">
+                <div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('QRcode')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'qrcode',
+							'value' => set_value( 'qrcode', show_data( @$order->qrcode ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'qrcode' ),
+							'id' => 'qrcode',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+            	<div class="col-md-6">
+            		<div class="form-group">
+                   		<label>
+                   			<span style="font-size: 17px; color: red;">*</span>
+							<?php echo get_msg('QR Generate Date')?>
+						</label>
+
+						<?php echo form_input( array(
+							'name' => 'generate_qr_date',
+							'value' => set_value( 'generate_qr_date', show_data( @$order->generate_qr_date ), false ),
+							'class' => 'form-control form-control-sm',
+							'placeholder' => get_msg( 'generate_qr_date' ),
+							'id' => 'generate_qr_date',
+							'readonly' => 'true'
+						)); ?>
+              		</div>
+            	</div>
+            </div>
             <div class="row">
             	<div class="col-md-6">
             		<div class="form-group">
@@ -270,6 +306,7 @@
 						)); ?>
               		</div>
             	</div>
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>
@@ -288,7 +325,7 @@
                     </div>
                 </div>
             </div>
-            
+            <?php }?>
             <div class="row">
             	<div class="col-md-6">
             		<div class="form-group">
@@ -326,20 +363,21 @@
                 </div>
             </div>
             
+            <?php if(@$order->is_return) { ?>
             <div class="row">
             	<div class="col-md-6">
             		<div class="form-group">
                    		<label>
                    			<span style="font-size: 17px; color: red;">*</span>
-							<?php echo get_msg('QR Generate Date')?>
+							<?php echo get_msg('Return shipment initiate date')?>
 						</label>
 
 						<?php echo form_input( array(
-							'name' => 'generate_qr_date',
-							'value' => set_value( 'generate_qr_date', show_data( @$order->generate_qr_date ), false ),
+							'name' => 'return_shipment_initiate_date',
+							'value' => set_value( 'return_shipment_initiate_date', show_data( @$order->return_shipment_initiate_date ), false ),
 							'class' => 'form-control form-control-sm',
-							'placeholder' => get_msg( 'generate_qr_date' ),
-							'id' => 'generate_qr_date',
+							'placeholder' => get_msg( 'return_shipment_initiate_date' ),
+							'id' => 'return_shipment_initiate_date',
 							'readonly' => 'true'
 						)); ?>
               		</div>
@@ -348,22 +386,23 @@
                     <div class="form-group">
                         <label>
                             <span style="font-size: 17px; color: red;">*</span>
-                            <?php echo get_msg('Seller Charge')?>
+                            <?php echo get_msg('Return shipment delivered date')?>
                         </label>
 
                         <?php echo form_input( array(
-                            'name' => 'seller_charge',
-                            'value' => set_value( 'seller_charge', show_data( @$order->seller_charge ), false ),
+                            'name' => 'return_shipment_delivered_date',
+                            'value' => set_value( 'return_shipment_delivered_date', show_data( @$order->return_shipment_delivered_date ), false ),
                             'class' => 'form-control form-control-sm',
-                            'placeholder' => get_msg( 'seller_charge' ),
-                            'id' => 'seller_charge',
+                            'placeholder' => get_msg( 'return_shipment_delivered_date' ),
+                            'id' => 'return_shipment_delivered_date',
                             'readonly' => 'true'
                         )); ?>
                     </div>
                 </div>
             </div>
+            <?php } ?>
             
-             <div class="row">
+            <div class="row">
             	<div class="col-md-6">
             		<div class="form-group">
                    		<label>

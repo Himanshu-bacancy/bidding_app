@@ -14,6 +14,7 @@ class Users extends API_Controller
 	{
 		parent::__construct( 'User' );
 		$this->CI->load->library('Authorization_Token');
+        $this->CI->load->helper('string');
 	}	
 
 	/**
@@ -134,7 +135,20 @@ class Users extends API_Controller
         	$this->error_response( get_msg( 'err_user_register' ));
 
         	} else {
-
+                $userdata = $this->User->get_one($user_data['user_id']);
+                if(is_null($userdata->referral_code)) {
+                    /*generate ref code :start*/
+                    $str = substr($user_data['user_id'], -5);
+                    $str2 = str_replace(' ', '_',substr($userdata->user_name, 3,3));
+                    $mergestr = trim($str2.$str);
+                    $append_str = random_string('alnum',8-strlen($mergestr));
+                    $check_length = str_replace('_', $append_str, $mergestr);
+                    if(strlen($check_length) < 8) {
+                        $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
+                    } 
+                    $this->db->where('user_id', $userdata->user_id)->update('core_users',['referral_code' => strtoupper($check_length)]);
+                    /*generate ref code :end*/
+                }
     			$noti_token = array(
 					"device_token" => $this->post( 'device_token' )
 				);
@@ -192,9 +206,21 @@ class Users extends API_Controller
         	}
 
        	} else {
-
        		//$this->error_response( get_msg( 'need_to_verify' ));
        		$user_id = $user_infos[0]->user_id;
+            if(is_null($user_infos[0]->referral_code)) {
+                /*generate ref code :start*/
+                $str = substr($user_id, -5);
+                $str2 = str_replace(' ', '_',substr($user_infos[0]->user_name, 3,3));
+                $mergestr = trim($str2.$str);
+                $append_str = random_string('alnum',8-strlen($mergestr));
+                $check_length = str_replace('_', $append_str, $mergestr);
+                if(strlen($check_length) < 8) {
+                    $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
+                } 
+                $this->db->where('user_id', $user_infos[0]->user_id)->update('core_users',['referral_code' => strtoupper($check_length)]);
+                /*generate ref code :end*/
+            }
        		$subject = get_msg('user_acc_reg_label');
 
        		if($email_verified_enable != 1) {

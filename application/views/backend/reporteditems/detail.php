@@ -12,6 +12,7 @@
             echo form_open($module_site_url . '/changestatus', $attributes);
             ?>
             <input type="hidden" name="record_id" id="record_id" value="<?php echo $detail->id; ?>">
+            <input type="hidden" name="item_id" id="item_id" value="<?php echo $detail->operation_id; ?>">
             <div class="form-group ml-3 mr-3">
 
                 <?php

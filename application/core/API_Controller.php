@@ -347,7 +347,7 @@ class API_Controller extends REST_Controller
 				$this->convert_object( $data );
 			}
 		}
-        if( ($this->router->fetch_class() == 'users' && $this->router->fetch_method() == 'get') || ($this->router->fetch_class() == 'userfollows' && ($this->router->fetch_method() == 'search' || $this->router->fetch_method() == 'add_follow')) ){
+        if( ($this->router->fetch_class() == 'users' && ($this->router->fetch_method() == 'get' || $this->router->fetch_method() == 'profile_update')) || ($this->router->fetch_class() == 'userfollows' && ($this->router->fetch_method() == 'search' || $this->router->fetch_method() == 'add_follow')) || ($this->router->fetch_class() == 'images' && $this->router->fetch_method() == 'upload') ){
             if(is_array($data)) {
                 $user_id = $data[0]->user_id;
             } else {
@@ -879,6 +879,7 @@ class API_Controller extends REST_Controller
 		//item report check with login_user_id
 		$conds_report['user_id'] = $this->get_login_user_id();
 		$conds_report['type'] = 'report_item';
+        $conds_report['status'] = ['open','rejected','in-process'];
 		$reported_data_count = $this->Reason_operation->count_all_by($conds_report);
 
 		// item reported existed by login user

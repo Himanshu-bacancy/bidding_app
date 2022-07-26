@@ -590,3 +590,6 @@ ALTER TABLE `bs_cron_log` ADD `timezone` VARCHAR(255) NOT NULL AFTER `created_at
 
 // RB: ADDED ON 22/07/2022
 ALTER TABLE `core_users` ADD `referral_code` VARCHAR(100) NULL AFTER `connect_id`;
+
+// RB: ADDED ON 26/07/2022
+ALTER TABLE `bs_items` ADD `is_report_rejected` INT NOT NULL DEFAULT '0' AFTER `is_confirm`;

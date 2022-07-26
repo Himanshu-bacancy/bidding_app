@@ -197,7 +197,7 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url() ,
+                'url' => site_url().'/admin/reporteditems' ,
                 'total_count' => $this->Itemreport->count_all_for_today(),
                 'label' => get_msg( 'New reported items'),
                 'icon' => "fa fa-comment",
