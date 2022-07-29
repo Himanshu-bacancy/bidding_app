@@ -190,6 +190,12 @@ class Backend_configs extends BE_Controller {
 			&& !empty( $this->get_data( 'dyn_link_package_name' ))) {
 			$data['dyn_link_package_name'] = $this->get_data( 'dyn_link_package_name' );
 		}
+        
+		// dyn_link_ref_url
+		if ( $this->has_data( 'dyn_link_ref_url' ) 
+			&& !empty( $this->get_data( 'dyn_link_ref_url' ))) {
+			$data['dyn_link_ref_url'] = $this->get_data( 'dyn_link_ref_url' );
+		}
 
 		// dyn_link_domain
 		if ( $this->has_data( 'dyn_link_domain' ) 
@@ -224,6 +230,11 @@ class Backend_configs extends BE_Controller {
 		// processing_fees
 		if ( $this->has_data( 'processing_fees' )) {
 			$data['processing_fees'] = $this->get_data( 'processing_fees' );
+		}
+        
+		// processing_fees
+		if ( $this->has_data( 'processing_fees_amount' )) {
+			$data['processing_fees_amount'] = $this->get_data( 'processing_fees_amount' );
 		}
 
         // print_r($data);die;

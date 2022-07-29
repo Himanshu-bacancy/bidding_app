@@ -123,11 +123,13 @@ class Users extends API_Controller
 	        );
 	    	$conds['status'] = 2;
 	    }
-
+        $reference_referral_code = $this->post('reference_referral_code');
+        if(isset($reference_referral_code) && !empty($reference_referral_code) && !is_null($reference_referral_code)) {
+            $user_data['reference_referral_code'] = $reference_referral_code;
+        }
         $conds['user_email'] = $user_data['user_email'];
         
        	$user_infos = $this->User->user_exists($conds)->result();
-
        	if (empty($user_infos)) {
 
        		if ( !$this->User->save($user_data)) {
@@ -136,6 +138,13 @@ class Users extends API_Controller
 
         	} else {
                 $userdata = $this->User->get_one($user_data['user_id']);
+                
+                if(!is_null($userdata->reference_referral_code)) {
+                    $find_owner_of_ref = $this->db->select('user_id')->from('core_users')->where('referral_code', $userdata->reference_referral_code)->get()->row();
+                    
+                    $get_coupon_detail = $this->db->from('bs_coupan')->where('slug', 'refer_friend')->get()->row();
+                    $this->db->insert('bs_coupan',['type'=> $get_coupon_detail->type,'value'=> $get_coupon_detail->value,'min_purchase_amount' => $get_coupon_detail->min_purchase_amount,'status' => 1,'user_id' => $userdata->user_id, 'parent_id' => $get_coupon_detail->id, 'description' => 'Your get coupon on successfull app register with reffral code of user '.$find_owner_of_ref->user_id,'created_at' => date('Y-m-d H:i:s')]);
+                }
                 if(is_null($userdata->referral_code)) {
                     /*generate ref code :start*/
                     $str = substr($user_data['user_id'], -5);
@@ -146,7 +155,9 @@ class Users extends API_Controller
                     if(strlen($check_length) < 8) {
                         $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
                     } 
-                    $this->db->where('user_id', $userdata->user_id)->update('core_users',['referral_code' => strtoupper($check_length)]);
+                    $ref_code = strtoupper($check_length);
+                    $deep_link = deep_linking_shorten_url('','','',$ref_code,'referral');
+                    $this->db->where('user_id', $userdata->user_id)->update('core_users',['referral_code' => $ref_code, 'referral_url' => $deep_link]);
                     /*generate ref code :end*/
                 }
     			$noti_token = array(
@@ -218,7 +229,9 @@ class Users extends API_Controller
                 if(strlen($check_length) < 8) {
                     $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
                 } 
-                $this->db->where('user_id', $user_infos[0]->user_id)->update('core_users',['referral_code' => strtoupper($check_length)]);
+                $ref_code = strtoupper($check_length);
+                $deep_link = deep_linking_shorten_url('','','',$ref_code,'referral');
+                $this->db->where('user_id', $user_infos[0]->user_id)->update('core_users',['referral_code' =>  $ref_code, 'referral_url' => $deep_link]);
                 /*generate ref code :end*/
             }
        		$subject = get_msg('user_acc_reg_label');

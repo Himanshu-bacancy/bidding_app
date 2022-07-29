@@ -799,11 +799,14 @@ if ( ! function_exists( 'send_android_fcm_rating' ))
 */
 if ( ! function_exists( 'deep_linking_shorten_url' ))
 {
-	function deep_linking_shorten_url ($description,$title,$img,$id) {
+	function deep_linking_shorten_url ($description,$title,$img,$id,$type='') {
 		// get ci instance
 		$CI =& get_instance();
-
+        
 		$longUrl = $CI->Backend_config->get_one('be1')->dyn_link_deep_url.$id;
+        if($type == 'referral') {
+    		$longUrl = $CI->Backend_config->get_one('be1')->dyn_link_ref_url.$id;
+        }
 	  
 		//Web API Key From Firebase   
 		$key = $CI->Backend_config->get_one('be1')->dyn_link_key;

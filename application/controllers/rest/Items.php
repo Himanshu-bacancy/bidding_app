@@ -705,7 +705,6 @@ class Items extends API_Controller
 		$conds = $final_conds;
 		$limit = $this->get( 'limit' );
 		$offset = $this->get( 'offset' );
-//        dd($conds);
 		if ($conds['item_search']==1) {
 
 			if(isset($conds['added_user_id']) && !empty($conds['added_user_id'])){
@@ -718,7 +717,7 @@ class Items extends API_Controller
 			$conds_login_block['user_id'] = $this->get_login_user_id();
 			$conds_login_block['type'] = 'block_user';
 			$login_block_count = $this->Reason_operation->count_all_by($conds_login_block);
-//			print_r($login_block_count);die;
+			//print_r($login_block_count);die;
 
 			// user blocked existed by login user
 			if ($login_block_count > 0) {
@@ -759,15 +758,21 @@ class Items extends API_Controller
 			if ($reported_data_count > 0 || $rejected_data_count > 0) {
 				// get the reported item data
 				$item_reported_datas = $this->Reason_operation->get_all_by($conds_report)->result();
-
+                
 				foreach ( $item_reported_datas as $item_reported_data ) {
-					$item_ids .= "'" .$item_reported_data->operation_id . "',";			
+                    $item_detail = $this->db->select('added_user_id')->from('bs_items')->where('id', $item_reported_data->operation_id)->get()->row();
+                    if($item_detail->added_user_id != $this->get_login_user_id()) {
+    					$item_ids .= "'" .$item_reported_data->operation_id . "',";			
+                    }
 				}
                 
 				$item_rejected_datas = $this->Reason_operation->get_all_by($rejected_conds_report)->result();
 
 				foreach ( $item_rejected_datas as $item_rejected_data ) {
-					$item_ids .= "'" .$item_rejected_data->operation_id . "',";			
+                    $item_detail = $this->db->select('added_user_id')->from('bs_items')->where('id', $item_rejected_data->operation_id)->get()->row();
+                    if($item_detail->added_user_id != $this->get_login_user_id()) { 
+    					$item_ids .= "'" .$item_rejected_data->operation_id . "',";			
+                    }
 				}
 				// get block user's item
                 
@@ -1500,12 +1505,14 @@ class Items extends API_Controller
 		$searchdata = json_decode($result);
 
 		$mapdata =  new stdClass();
-		foreach($searchdata->results as $key => $data){
-			$mapdata->$key->name = $data->name;
-			$mapdata->$key->lat = strval($data->geometry->location->lat);
-			$mapdata->$key->lng = strval($data->geometry->location->lng);
-			$mapdata->$key->address = strval($data->vicinity);
-		}
+        if(!empty($searchdata)) {
+            foreach($searchdata->results as $key => $data){
+                $mapdata->$key->name = $data->name;
+                $mapdata->$key->lat = strval($data->geometry->location->lat);
+                $mapdata->$key->lng = strval($data->geometry->location->lng);
+                $mapdata->$key->address = strval($data->vicinity);
+            }
+        }
 		$this->response(json_decode(json_encode($mapdata), TRUE));
 		//print_r( $mapdata);
 		return $this->output
@@ -1687,7 +1694,8 @@ class Items extends API_Controller
         $conds_user['sub_cat_id'] = $requestedItemDetails->sub_cat_id;
         $conds_user['childsubcat_id'] = $requestedItemDetails->childsubcat_id;
         
-        $where = "delivery_method_id = ".PICKUP_AND_DELIVERY;
+//        $where = "delivery_method_id = ".PICKUP_AND_DELIVERY;
+        $where = "delivery_method_id IN (".DELIVERY_ONLY.",".PICKUP_ONLY.",".PICKUP_AND_DELIVERY.")";
         if($requestedItemDetails->delivery_method_id == PICKUP_ONLY) {
             $where = "delivery_method_id IN (".PICKUP_ONLY.",".PICKUP_AND_DELIVERY.")";
         } else if($requestedItemDetails->delivery_method_id == DELIVERY_ONLY) {

@@ -140,6 +140,23 @@ echo form_open( '', $attributes);
 							));
 						?>
 					</div>
+                    <div class="form-group">
+						<label><?php echo get_msg('processing_fees_label')?>  (<?php echo get_msg('in $')?>)
+							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('service_fees_label')?>">
+								<span class='glyphicon glyphicon-info-sign menu-icon'>
+							</a>
+						</label>
+						<?php 
+							echo form_input( array(
+								'type' => 'text',
+								'name' => 'processing_fees_amount',
+								'id' => 'processing_fees_amount',
+								'class' => 'form-control',
+								'placeholder' => get_msg('processing_fees_amount'),
+								'value' => set_value( 'processing_fees_amount', show_data( @$backend->processing_fees_amount ), false )
+							));
+						?>
+					</div>
 	          	</div>
 
 
@@ -652,6 +669,23 @@ echo form_open( '', $attributes);
 								'class' => 'form-control',
 								'placeholder' => get_msg('dyn_link_package_name_label'),
 								'value' => set_value( 'dyn_link_package_name', show_data( @$backend->dyn_link_package_name ), false )
+							));
+						?>
+					</div>
+					<div class="form-group">
+						<label><?php echo get_msg('dyn_link_ref_url')?>
+							<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('dyn_link_ref_url')?>">
+								<span class='glyphicon glyphicon-info-sign menu-icon'>
+							</a>
+						</label>
+						<?php 
+							echo form_input( array(
+								'type' => 'text',
+								'name' => 'dyn_link_ref_url',
+								'id' => 'dyn_link_ref_url',
+								'class' => 'form-control',
+								'placeholder' => get_msg('dyn_link_ref_url'),
+								'value' => set_value( 'dyn_link_ref_url', show_data( @$backend->dyn_link_ref_url ), false )
 							));
 						?>
 					</div>

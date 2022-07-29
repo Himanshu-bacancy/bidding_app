@@ -55,9 +55,9 @@
                         <div class="form-group">
 							<label>
 	                   			<span style="font-size: 17px; color: red;">*</span>
-								<?php echo get_msg('coupan_value')?>
+								<?php echo get_msg('coupan_value')?> ($)
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('coupan_value')?>">
-									<span class='glyphicon glyphicon-info-sign menu-icon'>
+                                    <span class='glyphicon glyphicon-info-sign menu-icon'></span>
 								</a>
 							</label>
 							<?php							
@@ -70,13 +70,12 @@
 							)); ?>
 	              		</div>
                         
-                        
                         <div class="form-group">
 							<label>
 	                   			<span style="font-size: 17px; color: red;">*</span>
-								<?php echo get_msg('min_purchase_amount')?>
+								<?php echo get_msg('min_purchase_amount')?> ($)
 								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('min_purchase_amount')?>">
-									<span class='glyphicon glyphicon-info-sign menu-icon'>
+									<span class='glyphicon glyphicon-info-sign menu-icon'></span>
 								</a>
 							</label>
 							<?php							
@@ -112,6 +111,23 @@
                                 'placeholder' => get_msg('end_at'),
                                 'id' => 'end_at'                
                               )); ?>
+	              		</div>
+                        
+                        <div class="form-group">
+							<label>
+								<?php echo get_msg('user_earn')?> ($)
+								<a href="#" class="tooltip-ps" data-toggle="tooltip" title="<?php echo get_msg('user_earn')?>">
+                                    <span class='glyphicon glyphicon-info-sign menu-icon'></span>
+								</a>
+							</label>
+							<?php							
+							echo form_input( array(
+								'name' => 'user_earn',
+								'value' => set_value( 'user_earn', show_data( @$coupan->user_earn ), false ),
+								'class' => 'form-control form-control-sm',
+								'placeholder' => get_msg( 'user_earn' ),
+								'id' => 'user_earn'
+							)); ?>
 	              		</div>
 
 	              		

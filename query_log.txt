@@ -593,3 +593,30 @@ ALTER TABLE `core_users` ADD `referral_code` VARCHAR(100) NULL AFTER `connect_id
 
 // RB: ADDED ON 26/07/2022
 ALTER TABLE `bs_items` ADD `is_report_rejected` INT NOT NULL DEFAULT '0' AFTER `is_confirm`;
+
+// RB: ADDED ON 27/07/2022
+ALTER TABLE `core_backend_config` ADD `dyn_link_ref_url` VARCHAR(255) NOT NULL AFTER `dyn_link_deep_url`;
+
+
+ALTER TABLE `core_users` ADD `referral_url` VARCHAR(255) NOT NULL AFTER `referral_code`;
+
+
+ALTER TABLE `core_users` ADD `reference_referral_code` VARCHAR(100) NULL AFTER `referral_url`;
+
+
+ALTER TABLE `bs_coupan` ADD `user_id` VARCHAR(255) NULL AFTER `status`;
+
+
+ALTER TABLE `bs_coupan` ADD `slug` VARCHAR(255) NULL AFTER `name`;
+
+
+ALTER TABLE `bs_coupan` ADD `user_earn` FLOAT NULL AFTER `min_purchase_amount`;
+
+
+ALTER TABLE `core_backend_config` ADD `processing_fees_amount` FLOAT NULL AFTER `processing_fees`;
+
+// RB: ADDED ON 28/07/2022
+
+ALTER TABLE `bs_coupan` ADD `parent_id` INT NOT NULL DEFAULT '0' AFTER `user_id`;
+
+ALTER TABLE `bs_coupan` ADD `description` TEXT NULL AFTER `parent_id`;

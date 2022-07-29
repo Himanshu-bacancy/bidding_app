@@ -299,6 +299,21 @@ class Crons extends CI_Controller {
                 
                 $this->db->where('id', $value['items'])->update('bs_items', ['pieces' => $value['pieces']+(int)$value['qty'],'is_sold_out' => 0]);
                 
+                if($value['operation_type'] == REQUEST_ITEM) {
+                    if(!empty($value['offer_id'])) {
+                        $get_request_item = $this->db->select('bs_chat_history.requested_item_id, bs_chat_history.quantity, bs_items.pieces')->from('bs_chat_history')
+                                ->join('bs_items', 'bs_chat_history.requested_item_id = bs_items.id')
+                                ->where('bs_chat_history.id', $value['offer_id'])->get()->row();
+                        if(!empty($get_request_item)) {
+                            $offer_qty = (int)$get_request_item->quantity;
+                            if(!$offer_qty) {
+                                $offer_qty = 1;
+                            }
+                            $this->db->where('id', $get_request_item->requested_item_id)->update('bs_items', ['pieces' => $get_request_item->pieces+$offer_qty,'is_sold_out' => 0]);
+                        }
+                    }
+                }
+                
                 if($value['operation_type'] == EXCHAGE) {
                     $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.offered_item_id = bs_items.id')->where('bs_exchange_chat_history.chat_id',$value['offer_id'])->get()->result();
                     foreach($item_details as $k => $v) {
@@ -456,7 +471,7 @@ class Crons extends CI_Controller {
                 
                 $this->db->where('id', $value['items'])->update('bs_items', ['pieces' => $value['pieces']+(int)$value['qty'],'is_sold_out' => 0]);
                 
-                if($value['operation_type'] == EXCHAGE) {
+                if($value['operation_type'] == EXCHANGE) {
                     $item_details = $this->db->select('bs_items.pieces,bs_items.id as item_id,bs_items.added_user_id')->from('bs_exchange_chat_history')->join('bs_items', 'bs_exchange_chat_history.offered_item_id = bs_items.id')->where('bs_exchange_chat_history.chat_id',$value['offer_id'])->get()->result();
                     foreach($item_details as $k => $v) {
                         $update_array['pieces'] = $v->pieces + 1;
@@ -490,15 +505,17 @@ class Crons extends CI_Controller {
         $return_user = $this->db->from('core_users')->where('user_is_sys_admin', 0)->get()->result_array();
         if(!empty($return_user)) {
             foreach ($return_user as $key => $value) {
-                $str = substr($value['user_id'], -5);
-                $str2 = str_replace(' ', '_',substr($value['user_name'], 3,3));
-                $mergestr = trim($str2.$str);
-                $append_str = random_string('alnum',8-strlen($mergestr));
-                $check_length = str_replace('_', $append_str, $mergestr);
-                if(strlen($check_length) < 8) {
-                    $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
-                } 
-                $this->db->where('user_id', $value['user_id'])->update('core_users',['referral_code' => strtoupper($check_length)]);
+//                $str = substr($value['user_id'], -5);
+//                $str2 = str_replace(' ', '_',substr($value['user_name'], 3,3));
+//                $mergestr = trim($str2.$str);
+//                $append_str = random_string('alnum',8-strlen($mergestr));
+//                $check_length = str_replace('_', $append_str, $mergestr);
+//                if(strlen($check_length) < 8) {
+//                    $check_length = random_string('alnum',8-strlen($check_length)).$check_length;
+//                } 
+//                $this->db->where('user_id', $value['user_id'])->update('core_users',['referral_code' => strtoupper($check_length)]);
+                $deep_link = deep_linking_shorten_url('','','',$value['referral_code'],'referral');
+                $this->db->where('user_id', $value['user_id'])->update('core_users',['referral_url' => $deep_link]);
             }
         }
     }

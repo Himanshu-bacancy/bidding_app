@@ -122,6 +122,12 @@ class Coupans extends BE_Controller {
 		}
 		if ( $this->has_data( 'coupan_name' )) {
 			$data['name'] = $this->get_data( 'coupan_name' );
+            if(!$id) {
+                $data['slug'] = str_replace(' ', '_', strtolower($data['name']));
+            }
+		}
+		if ( $this->has_data( 'user_earn' )) {
+			$data['user_earn'] = $this->get_data( 'user_earn' );
 		}
 		if ( $this->has_data( 'coupan_value' )) {
 			$data['value'] = $this->get_data( 'coupan_value' );

@@ -3,7 +3,8 @@
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
 			<th><?php echo get_msg('type'); ?></th>
-			<th><?php echo get_msg('name'); ?></th>
+			<th><?php echo get_msg('coupon name'); ?></th>
+			<th><?php echo get_msg('For user'); ?></th>
 			<th><?php echo get_msg('amount'); ?></th>
 			
 			<?php if ( $this->ps_auth->has_access( EDIT )): ?>
@@ -36,7 +37,8 @@
 			<tr>
 				<td><?php echo ++$count;?></td>
 				<td ><?php echo ($val->type) ? 'Percentage' : 'Direct';?></td>
-				<td ><?php echo $val->name;?></td>
+				<td ><?php echo ($val->name) ?? '-';?></td>
+				<td ><?php echo ($this->User->get_one( $val->user_id )->user_name) ?? '-';?></td>
 				<td ><?php echo $val->value;?></td>
 
 				<?php if ( $this->ps_auth->has_access( EDIT )): ?>

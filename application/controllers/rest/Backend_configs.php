@@ -29,6 +29,7 @@ class Backend_configs extends API_Controller
 		$chat_data_update = array(
 			"selling_fees" => $config_data->selling_fees,
 			"processing_fees" => $config_data->processing_fees, 
+			"processing_fees_amount" => $config_data->processing_fees_amount, 
 		);
 		
 		$this->custom_response( $chat_data_update );
