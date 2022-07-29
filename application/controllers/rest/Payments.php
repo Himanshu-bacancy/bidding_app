@@ -3073,8 +3073,6 @@ class Payments extends API_Controller {
         $get_records = $this->db->from('bs_order')->where('order_id', $posts['order_id'])->get()->row();
         
         $track_exist = $this->db->from('bs_track_order')->where('order_id', $get_records->order_id)->order_by('id','desc')->get()->row();
-        
-       dd($track_exist);
         if(empty($track_exist) || $track_exist->status == 'ERROR') {
             $get_item = $this->db->from('bs_items')->where('id', $get_records->items)->get()->row();
             if($get_item->pay_shipping_by == '1') {
