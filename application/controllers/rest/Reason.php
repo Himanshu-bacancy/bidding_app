@@ -265,7 +265,14 @@ class Reason extends API_Controller
                     $reasonOperationData['reason_id'] = $this->post('reason_id');
                 }
                 if($this->Reason_operation->save($reasonOperationData)){
+                    $get_seller = $this->db->select('device_token,bs_items.added_user_id')->from('bs_items')
+                            ->join('core_users','bs_items.added_user_id = core_users.user_id')
+                            ->where('bs_items.id',$operation_id)->get()->row();
+                    
+                    send_push( [$get_seller->device_token], ["message" => "One of your Items have been reported by another user. This listing will be placed on hold until further review by our Compliance Team to determine if it is in accordance with our Terms of Service. If you believe your item was reported in error, we sincerely apologize for the inconvenience. You can Contact Us and share more details about your product and Claims", "flag" => "item", 'title' => 'New item reported'] );
+                    
                     $this->success_response(get_msg('success_item_reported'));
+                    
                 } else {
                     $this->error_response(get_msg( 'no_item_reported'));
                 }

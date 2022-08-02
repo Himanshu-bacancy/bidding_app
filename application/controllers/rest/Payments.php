@@ -2496,6 +2496,9 @@ class Payments extends API_Controller {
                 if($check_for_order->service_fee) {
                     $shipping_amount += (float)$check_for_order->service_fee;
                 }
+                if($check_for_order->processing_fee) {
+                    $shipping_amount += (float)$check_for_order->processing_fee;
+                }
                 $card_id = $posts['card_id'];
                 $cvc     = $posts['cvc'];
                 $card_details = $this->db->from('bs_card')->where('id', $card_id)->get()->row();
@@ -3712,6 +3715,9 @@ class Payments extends API_Controller {
             }
             if($check_for_order->service_fee) {
                 $shipping_amount += (float)$check_for_order->service_fee;
+            }
+            if($check_for_order->processing_fee) {
+                $shipping_amount += (float)$check_for_order->processing_fee;
             }
             $card_id = $posts['card_id'];
             $cvc     = $posts['cvc'];
