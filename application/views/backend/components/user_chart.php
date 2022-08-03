@@ -18,18 +18,30 @@
 
 <?php 
     foreach ($data as $key => $value) {
-        $jan_count = ($value->record_month == 1) ? $value->record_count : 0;
-        $feb_count = ($value->record_month == 2) ? $value->record_count : 0;
-        $mar_count = ($value->record_month == 3) ? $value->record_count : 0;
-        $apr_count = ($value->record_month == 4) ? $value->record_count : 0;
-        $may_count = ($value->record_month == 5) ? $value->record_count : 0;
-        $jun_count = ($value->record_month == 6) ? $value->record_count : 0;
-        $jul_count = ($value->record_month == 7) ? $value->record_count : 0;
-        $aug_count = ($value->record_month == 8) ? $value->record_count : 0;
-        $sep_count = ($value->record_month == 9) ? $value->record_count : 0;
-        $oct_count = ($value->record_month == 10) ? $value->record_count : 0;
-        $nov_count = ($value->record_month == 11) ? $value->record_count : 0;
-        $dec_count = ($value->record_month == 12) ? $value->record_count : 0;
+        if(!$jan_count)
+            $jan_count = ($value->record_month == 1) ? $value->record_count : 0;
+        if(!$feb_count)
+            $feb_count = ($value->record_month == 2) ? $value->record_count : 0;
+        if(!$mar_count)
+            $mar_count = ($value->record_month == 3) ? $value->record_count : 0;
+        if(!$apr_count)
+            $apr_count = ($value->record_month == 4) ? $value->record_count : 0;
+        if(!$may_count)
+            $may_count = ($value->record_month == 5) ? $value->record_count : 0;
+        if(!$jun_count)
+            $jun_count = ($value->record_month == 6) ? $value->record_count : 0;
+        if(!$jul_count)
+            $jul_count = ($value->record_month == 7) ? $value->record_count : 0;
+        if(!$aug_count)
+            $aug_count = ($value->record_month == 8) ? $value->record_count : 0;
+        if(!$sep_count)
+            $sep_count = ($value->record_month == 9) ? $value->record_count : 0;
+        if(!$oct_count)
+            $oct_count = ($value->record_month == 10) ? $value->record_count : 0;
+        if(!$nov_count)
+            $nov_count = ($value->record_month == 11) ? $value->record_count : 0;
+        if(!$dec_count)
+            $dec_count = ($value->record_month == 12) ? $value->record_count : 0;
     }
 ?>
 

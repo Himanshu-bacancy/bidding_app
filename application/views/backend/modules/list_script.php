@@ -2,7 +2,19 @@
 function runAfterJQ() {
 
 	$(document).ready(function(){
-		
+		$('#modules_table').DataTable({
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            order: [[ 0, 'asc' ]],
+            "columnDefs": [
+                { orderable: true,  targets: [0,1] },
+                { orderable: false, targets: '_all' }
+            ]
+        });
 		// Publish Trigger
 		$(document).delegate('.publish','click',function(){
 			

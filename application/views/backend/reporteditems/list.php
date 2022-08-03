@@ -1,5 +1,5 @@
 <div class="animated fadeInRight">
-	<table id="reported_item_table" ">
+	<table id="reported_item_table">
         <thead>
             <tr>
                 <th><?php echo get_msg('no'); ?></th>

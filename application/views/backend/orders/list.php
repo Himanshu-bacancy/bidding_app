@@ -27,7 +27,7 @@
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
 			<th><?php echo get_msg('Item'); ?></th>
-			<th><?php echo get_msg('Completed Date'); ?></th>
+			<th><?php echo get_msg('place_date'); ?></th>
 			<th><?php echo get_msg('user_name'); ?></th>
 			<th><?php echo get_msg('category'); ?></th>
 			<th><?php echo get_msg('subcategory'); ?></th>
@@ -52,9 +52,9 @@
 			<tr>
 				<td><?php echo ++$count;?></td>
 				<td><?php echo $item_detail->title; ?></td>
-				<td><?php echo ($order->completed_date) ?? '-';?></td>
+				<td><?php echo $order->created_at;?></td>
 				
-				<td><?php echo $order->user_name; ?></td>
+				<td><?php echo $this->User->get_one( $order->user_id )->user_name; ?></td>
                 <td><?php echo $this->Category->get_one( $item_detail->cat_id )->cat_name;?></td>
                 <td><?php echo $this->Subcategory->get_one( $item_detail->sub_cat_id )->name;?></td>
                 <td><?php echo $address_detail->state;?></td>

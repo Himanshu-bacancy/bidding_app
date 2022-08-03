@@ -3,6 +3,7 @@
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
 			<th><?php echo get_msg('item_name'); ?></th>
+			<th><?php echo get_msg('added_date'); ?></th>
 			<th><?php echo get_msg('item_type'); ?></th>
 			<th><?php echo get_msg('cat_name'); ?></th>
 			<th><?php echo get_msg('subcat_name'); ?></th>
@@ -34,11 +35,12 @@
 
 	<?php if ( !empty( $items ) && count( $items->result()) > 0 ): ?>
 
-		<?php foreach($items->result() as $item): ?>
+		<?php foreach($items->result() as $key => $item): ?>
 			
 			<tr>
-				<td><?php echo ++$count;?></td>
+				<td><?php echo ++$key;?></td>
 				<td><?php echo $item->title;?></td>
+				<td><?php echo $item->added_date;?></td>
 				<td><?php echo get_msg($this->Itemtype->get_one( $item->item_type_id )->name); ?></td>
 				<td><?php echo $this->Category->get_one( $item->cat_id )->cat_name; ?></td>
 				<td><?php echo $this->Subcategory->get_one( $item->sub_cat_id )->name; ?></td>
@@ -46,6 +48,8 @@
 				<td>
 					<?php if ($item->status == 1) {
 						echo "Published";
+                        } else {
+                            echo "Unpublished";
 						} 
 					?>
 				</td>

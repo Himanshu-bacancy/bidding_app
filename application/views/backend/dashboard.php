@@ -53,7 +53,7 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url() .'/admin/items' ,
+                'url' => site_url() .'/admin/items/filter/1' ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', REQUEST_ITEM)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
                 'label' => get_msg( 'New wants listings'),
                 'icon' => "fa fa-wpforms",
@@ -117,7 +117,7 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url().'/admin/items'  ,
+                'url' => site_url().'/admin/items/filter/2'  ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', SELLING)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
                 'label' => get_msg( 'New sale listings'),
                 'icon' => "fa fa-wpforms",
@@ -181,7 +181,7 @@
             <!-- small box -->
             <?php 
               $data = array(
-                'url' => site_url().'/admin/items' ,
+                'url' => site_url().'/admin/items/filter/3' ,
                 'total_count' => $this->db->from('bs_items')->where('item_type_id', EXCHANGE)->where('DATE(added_date)',  date('Y-m-d'))->get()->num_rows(),
                 'label' => get_msg( 'New sell/swap listings'),
                 'icon' => "fa fa-wpforms",
@@ -246,7 +246,7 @@
                 $current_year = date('Y');
                 $data = array(
                   'panel_title' => get_msg('Number of transactions'),
-                  'data' => $this->db->query('SELECT count(id) as record_count, MONTH(created_at) as record_month FROM `bs_order` where status = "succeeded" and YEAR(created_at) = '.$current_year.' group by MONTH(created_at)')->result()
+                  'data' => $this->db->query('SELECT ROUND(SUM(total_amount),2) as record_count, MONTH(created_at) as record_month FROM `bs_order` where status = "succeeded" and completed_date is NOT NULL and YEAR(created_at) = '.$current_year.' group by MONTH(created_at)')->result()
                 );
 
               $this->load->view( $template_path .'/components/transaction_chart', $data ); 

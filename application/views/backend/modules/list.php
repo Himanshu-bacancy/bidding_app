@@ -1,5 +1,6 @@
-<div class="table-responsive animated fadeInRight">
-	<table class="table m-0 table-striped">
+<div class="animated fadeInRight">
+	<table id="modules_table">
+        <thead>
 		<tr>
 			<th><?php echo get_msg('no'); ?></th>
 			<th><?php echo get_msg('module_desc'); ?></th>
@@ -24,11 +25,10 @@
 			<?php endif; ?>
 			
 		</tr>
-		
+		 </thead>
+        <tbody>
 	
 	<?php $count = $this->uri->segment(4) or $count = 0; ?>
-
-	<?php if ( !empty( $modules ) && count( $modules->result()) > 0 ): ?>
 
 		<?php foreach($modules->result() as $mod): ?>
 			
@@ -74,11 +74,7 @@
 
 		<?php endforeach; ?>
 
-	<?php else: ?>
-			
-		<?php $this->load->view( $template_path .'/partials/no_data' ); ?>
-
-	<?php endif; ?>
+	 </tbody>
 
 </table>
 </div>

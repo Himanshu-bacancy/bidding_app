@@ -251,8 +251,47 @@ class Items extends BE_Controller {
 		// load add list
 		parent::search();
 	}
+    
+    function filter($type_filter) {
+        // breadcrumb urls
+		$this->data['action_title'] = get_msg( 'prd_search' );
+        $conds['item_type_id'] = $type_filter;
+        $this->data['item_type_id'] = $type_filter;
+        $this->session->set_userdata(array("item_type_id" => $type_filter));
+		$result = $this->db->select('bs_items.*')->from('bs_items')
+                ->join('bs_addresses', 'bs_items.Address_id = bs_addresses.id','left')
+                ->where('DATE(bs_items.added_date) = DATE(now())');
+        
+        if(isset($conds['item_type_id']) && !empty($conds['item_type_id'])) {
+            $result = $result->where( 'bs_items.item_type_id', $conds['item_type_id'] );
+        }
+        
+        $result = $result->order_by('bs_items.added_date', 'desc');
+        $store_for_count = $result->get_compiled_select();
+//        dd($store_for_count);
+        $count = $this->db->query($store_for_count)->num_rows();
+        $store_for_count .= " LIMIT ".$this->pag['per_page'];
+        $query_result = $this->db->query($store_for_count);
+//		$conds['status'] = 1;
 
-	/**
+		// pagination
+//		$this->data['rows_count'] = $this->Item->count_all_by( $conds );
+        $this->data['rows_count'] = $count;
+//		// search data
+//		$this->data['items'] = $this->Item->get_all_by( $conds, $this->pag['per_page'], $this->uri->segment( 4 ) );
+        $this->data['items'] = $query_result;
+        
+        $all_item = $this->Item->get_all_by(['status' => 1]);
+        $item_address = array_column($all_item->result_array(),'Address_id');
+        $this->data['addresses'] = $this->db->select('state')->from('bs_addresses')->where_in('id',$item_address)->get();
+         $item_user = array_unique(array_column($all_item->result_array(),'added_user_id'));
+
+        $this->data['item_owners'] = $this->db->select('user_id,user_name')->from('core_users')->where_in('user_id',$item_user)->get();
+		// load add list
+		parent::search();
+    }
+
+    /**
 	 * Create new one
 	 */
 	function add() {
